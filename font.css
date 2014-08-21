@@ -1,0 +1,11 @@
+/* last modified 2011-12-06 */
+
+@font-face {
+    font-family: baskervald;
+    src: url('../groffonts/devps/BaskervaldADFStd.otf');
+}
+
+body {
+    font-family: baskervald, georgia, serif;
+    line-height: 1.4;
+}

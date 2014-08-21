@@ -1,0 +1,111 @@
+.\" last change 2012-08-08
+.
+.if d :=: .nx
+.
+.mso ms.tmac
+.
+.de BLM
+.ie !\\n[.u] \{\
+.ie !\\n[obeylines] \{\
+.sp .8v
+.\}
+.el \{\
+.nr obeylines 0
+.LP
+.\}
+.\}
+.el .ie \\n[next_graf_without_indent] \{\
+.nr next_graf_without_indent 0
+.LP
+.\}
+.el .PP
+.\"ns
+..
+.
+.blm BLM
+.
+.de uu
+.nf
+.nr next_graf_without_indent 1
+.in 0
+..
+.
+.de ~
+.uu
+.nr obeylines 1
+..
+.
+.rn @SH @SH_orig
+.
+.de SEC
+.if d WRITETOCLINE .WRITETOCLINE \\$*
+.nr header_level \\$1
+.@SH_orig \\n[header_level]
+.shift
+\\$*
+.LP
+.ns
+.nr next_graf_without_indent 1
+..
+.
+.de @SH
+.SEC 1 \\$*
+..
+.
+.de SS
+.SEC 2 \\$*
+..
+.
+.de :=:
+.rs
+.sp .8v
+.LP
+\[u00A4]
+.sp 1v
+.ns
+.nr next_graf_without_indent 1
+..
+.
+.ds ^ \E*[par@sup-start]\\$*\E*[par@sup-end]
+.
+.ds :: "
+.
+.\"ds :: \\$\\n[.$]
+.
+.de par*fp!0-no
+.@PP
+\&\\*[par@sup-start]\\$1\\*[par@sup-end]\ \c
+..
+.
+.de TH
+.RT
+.if !'\\$1'' \{\
+.LP
+.ce 10
+.LG
+\fB\\$*
+.sp 1ex
+.ce
+.LP
+.nr next_graf_without_indent 1
+.\}
+..
+.
+.nr FL \n[LL]
+.
+.de JPEG
+.mso jpeg.tmac
+.JPEG \\$*
+..
+.
+.de TOC
+.mso toc.tmac
+.TOC
+..
+.
+.de IX
+.mso index.tmac
+.IX \\$*
+..
+.
+.nx

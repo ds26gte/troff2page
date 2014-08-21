@@ -1,0 +1,443 @@
+.TH troff2page 1
+.SH NAME
+
+troff2page \- troff to HTML converter
+
+.SH SYNOPSIS
+
+From the shell prompt:
+
+    troff2page <pathname>
+    troff2page --help
+    troff2page --version
+
+It is not necessary to run the file troff2page as a Unix script.  You
+can simply load troff2page (it is a Lisp file) into your Common Lisp,
+and then call the Lisp procedure troff2page:troff2page (i.e., the
+procedure named troff2page in the package troff2page) on your source
+document.  E.g.,
+
+    (load "pathname/of/troff2page")
+    (troff2page:troff2page "my-troff-document.ms")
+
+The procedure troff2page:troff2page can be called
+several times, on the same or different documents, from
+within the same Lisp session.
+
+.SH DESCRIPTION
+
+troff2page converts troff (man and ms) documents into HTML web pages.
+
+The program troff2page takes a single argument.  Typically this is a
+filename specifying the input document file.  Thus, to convert an input
+troff document named jobname.ms, type
+
+    troff2page jobname.ms
+
+at your operating-system prompt.  This creates an output HTML file
+jobname.html in the current directory.  (This HTML file has the same
+basename as the input troff file (i.e., jobname), but its extension is
+\&.html.)
+
+If the input troff uses the page-break request .bp,
+then the output HTML consists of a series of interlinked files: The
+first file is named jobname.html; the rest are jobname-Z-H-1.html,
+jobname-Z-H-2.html, etc.
+
+If troff2page's argument is --help or --version,
+troff2page displays an appropriate informative
+text and exits.  For example,
+
+    % troff2page --help
+    troff2page version ...
+    Copyright (C) ...
+    For full details, please see http://www...
+
+While this is intentionally similar to groff's --help and --version
+options, troff2page cannot process true options as groff can.  Indeed,
+if --help and --version happen to be the names of input documents,
+troff2page will process them as such.
+
+If troff2page's argument is not --help or --version and does not name a
+file, troff2page exits with a "could not find file" message.
+
+If troff2page is called with no argument, it exits with a "called with
+no argument" message.
+
+.SH SYSTEM REQUIREMENTS
+
+The script troff2page runs on the Unix command-line on Cygwin, Linux,
+Mac OS X, and Solaris.  It uses the Common Lisp implementation mentioned
+in the shell environment variable LISP, which can currently be set to
+either clisp, clozure, cmu, ecl or sbcl: the corresponding Lisp
+implementations being CLISP (\*:http://clisp.sf.net), Clozure CL
+(\*:http://ccl.clozure.com), CMUCL (\*:http://cmucl.org), ECL
+(\*:http://ecls.sf.net), and SBCL (\*:http://sbcl.sf.net).
+
+If LISP is not
+set, some default Lisp implementation is assumed.
+
+For more information, please see the file INSTALL in the
+distribution.
+
+.SH SIMULATING TROFF OPTIONS
+
+In contrast to troff2page's single argument, groff allows you to specify
+on the command-line not just the input file but also various options for
+additional information, e.g.,
+-m to load macro files;
+-r to pre-set number registers;
+-d to pre-define strings;
+-f to set default font family; etc. (See groff(1)
+for details on all the provided options.)
+The options can be usefully varied
+with each call to groff.
+
+For options that do not make sense for HTML -- e.g., the setting of
+PO (adjusting the left margin to suit a particular printer) --, it is fine
+that they cannot also be fed to troff2page.  For the options
+that are valid for both print and HTML -- e.g., loading a macro
+file that works for both output formats --, you
+may need to add this information explicitly within the input document.
+Thus, a -m command-line option would be replaced by an explicit call
+to .mso within the document.
+
+However, this will not be a workable approach for some options that do
+not quite belong to the document, or that may potentially need to
+be varied for the same document, when processed by different users or
+in different environments, e.g., settings for registers like
+GROWPS and PSINCR.  For such cases, you may place the
+information in a troff macro file .troff2pagerc.tmac in your
+home directory.  troff2page will load this file, if it exists,
+before processing its argument file.
+
+(Note that groff or troff
+will not load .troff2pagerc.tmac automatically.  But that is
+presumably OK, since you are using command-line options to specify the
+same information anyway.  If you do want groff to pick up this file,
+you can use the option -m.troff2pagerc.)
+
+If the input file is recognizably a man page (i.e., it has the command
+\&.TH), both troff2page and groff will load, if it exists, the init file
+man.local in the home directory.
+
+.SH COMMANDS
+
+troff2page recognizes most of the commands (requests, macros,
+diversions, strings, escapes, glyphs) of raw troff and its ms and man
+macro packages. The syntax recognized is the improved kind supported by
+groff (\*:http://groff.ffii.org) and Heirloom troff
+(\*:http://heirloom.sf.net/doctools.html), i.e., macro, string, and glyph names
+can be arbitrarily long, and strings can have arguments.  Most of the
+commands are converted to their obvious HTML equivalent.  E.g., ms's
+footnotes have a straightforward translation in the HTML, with the
+footnote text set at the bottom of the HTML page, and with the footnote
+markers in the body and the footnote hyperlinking to each other.  Please
+consult troff and groff documentation for the commands.  We will
+concentrate here on those commands whose HTML counterpart is not
+immediately obvious.
+
+.SH MACRO FILES
+
+The troff2page distribution includes several macro files (aka tmac
+files) with extension tmac,
+viz., url.tmac for inserting hyperlinks; index.tmac for index
+generation; eval4troff.tmac(7) for extending troff using Common Lisp; and
+defhsl.tmac for defining color names using the HSL scheme.  You should
+put these tmac files in one of your macro directories, i.e., the
+directories that are searched by groff's -m option and .mso request.
+(See groff_tmac(5), section FILES, for
+details.  In a pinch, your home directory works as a macro directory.)
+
+Note that it is best to load these tmac files into your document with
+an .mso request rather than through groff's command-line option -m.
+This is because troff2page doesn't support the same kind of command-line
+arguments that groff does.
+
+.SH AUXILIARY FILES
+
+Many of the macros defined in these tmac files write
+auxiliary files that are absorbed into the document during a
+second run.  Note that in order to write these aux files,
+groff must be run with the -U option for "unsafe"
+mode.
+
+As an example, consider troff2page.ms (the groff source for the
+troff2page full manual).  The following is one
+way to get the correct PostScript output:
+
+    % groff -t -U -z troff2page.ms
+    defhsl.tmac:8: can't open `.trofftemp_lisp_1.tmp' ...
+    Rerun groff with -U
+    troff2page.ms:187: can't open `.trofftemp.aux' ...
+    troff2page.ms:799: can't open `.trofftemp.ind' ...
+
+    % groff -t -U troff2page.ms > troff2page.ps
+
+The -t option (which calls the tbl
+preprocessor) is needed because the
+document troff2page.ms
+uses a table.  The first run uses the -z option to disable
+writing an output file, which we don't need until the second
+run.
+
+In both runs, we use the -U option: The first run
+needs unsafe mode to write the aux files, and the second run
+needs it to process some of them with external programs to
+create additional aux files.  Subsequent runs may dispense
+with the -U, as all the required aux files are made.
+(You will need the option again, if the aux files' content
+changes.)
+
+troff2page is also run twice on the document to absorb
+information from the aux files.  However, troff2page doesn't
+need any special option as it is always run in what groff
+would consider "unsafe" mode, and it processes tables by
+itself.
+
+    % troff2page troff2page.ms
+    Missing: (LAST-PAGE-NUMBER .troff2page_temp_troff2page.ind
+    LISP-AUX-FILES .troff2page_temp_troff2page.aux
+    TOC TITLE STYLESHEET)
+    Rerun: troff2page troff2page.ms
+
+    % troff2page troff2page.ms
+
+The groff string \e*[AUXF] is used to construct the names of the
+auxiliary files.  By default it will be quietly set to .trofftemp for
+groff and something slightly different for troff2page.  You can change
+it to anything else in your document before the first use of any macros
+that use or write aux files.  It is a good idea to set it so that it
+remains different for troff and troff2page, so that the two programs'
+aux files don't clash.  The number register \en[.troff2page] suggests a
+way to do this.
+
+.SH PAGE LAYOUT
+
+The page-break command .bp ends the current HTML page and start a new
+one.  .bp causes a page-break in both the HTML and the print outputs.
+
+Generally, page-breaks require a different aesthetic in HTML than in
+print.  You can use troff conditionals to express this difference:
+
+    .if \en[.troff2page] .bp
+
+causes a page-break only in the HTML, whereas
+
+    .if !\en[.troff2page] .bp
+
+causes a page-break only in print.
+
+As can be seen, the number register \en[.troff2page] has a true value,
+i.e., a number greater than zero, only when troff2page processes the
+document.  This number is in fact the version number of the troff2page
+program processing the document.  It is a number such as 20050327, which
+would be the version number of the troff2page released on 2005 March 27.
+\en[.troff2page] could plausibly be used to distinguish not just
+troff2page from troff, but also between various versions of troff2page.
+Thus, one could, if the need were dire, write a document that translates
+differently with different versions of troff2page.
+
+If may be convenient to define a .HBP macro that causes a page-break
+only for HTML:
+
+    .de HBP
+    .if \en[.troff2page] .bp
+    ..
+
+Note that troff2page, like troff, does not automatically cause a page break
+at the sectioning commands.  Use .bp or a macro like .HBP to
+explicitly to insert breaks as needed.
+
+Each page in a multiple-page HTML output has a navigation bar at its
+head and foot.  The bar contains links to the first, previous, and next
+page, and the table-of-contents and index pages.  If any of these pages
+doesn't exist, or if it is the same as the page containing the
+navigation bar, then the link for it is disabled.
+
+.SH HTML PARAGRAPHS
+
+By default, troff2page sets paragraphs exactly as groff does: the first
+lines of paragraphs are indented (unless explicitly disabled via an
+\&.LP), and
+the vertical distance between adjacent paragraphs is the same smallish
+amount that groff employs.  These two values are given by the number
+registers PI and PD, which (for the ms format) are 0.3n and 0.3v
+respectively.
+
+If you wish to have the kind of block paragraphs customary in HTML, it
+is not enough to set PI to 0, for the prevailing value of PD is too
+small to comfortably tell adjacent paragraphs apart.  You could set PD
+to a larger value, but as a convenience, troff2page allows you to set PD
+to a negative value, which leads to whatever default paragraph
+separation that HTML uses.  Note that setting PD to a negative value
+should be done only for HTML, as groff will happily overstrike
+text in order to respect a negative PD:
+
+    .if \en[.troff2page] \e{\e
+    .nr PI 0n
+    .nr PD 0-1p
+    .\e}
+
+.SH HTML PAGE WIDTH
+
+Unlike groff ms, which uses the line length given by the register LL,
+troff2page by default does not restrict the width of its HTML pages.
+Text will narrow or widen to fit the current browser window width.  However, if
+you explicitly set LL (instead of relying on ms's default), troff2page
+will respect that line length.  Nevertheless, if the user shrinks the
+browser window to a width less than LL, the text will correspondingly
+shrink too to fit the window.  This is to avoid the need for horizontal
+scrolling.
+
+Note that a good LL value for troff2page should be a bit larger than
+ms's 6 inches, which is too narrow for browser.  The following sets it
+to 18 cm, making sure it takes effect only for HTML:
+
+    .if \en[.troff2page] .nr LL 18c
+
+.SH TABLE OF CONTENTS
+
+When converting man documents, troff2page automatically generates an
+untitled table of contents (toc) at the top of the output.  Toc entries are
+generated for each .SH in the input.  The toc entry for a section and
+that section's header are hyperlinks to each other.
+
+For ms documents, you will need to generate your own table of
+contents.  url.tmac supplies the macro .TAG for capturing page
+numbers. (This overrides the .TAG macro of
+groff's www.tmac, in order to allow forward references.)
+
+    .TAG sec:troffcl
+
+associates the label sec:troffcl with the number of
+the current page.  The string \e*[sec:troffcl]
+is defined to typeset as that page number.
+Thus, in your hand-crafted toc, you could
+use
+
+    Extending troff using Common Lisp, \e*[sec:troffcl]
+
+In the HTML output, the string \e*[sec:troffcl]
+furthermore is a link to where .TAG sec:troffcl was
+called.
+
+\&.TAG takes an optional second argument.  The label is
+then associated with the text of the second argument instead
+of the current page number.
+
+.SH MAKING AN INDEX
+
+The supplied macro file index.tmac
+creates a sorted
+index, with the aid of the external program makeindex.
+makeindex is included with TeX distributions, but you can
+obtain just the makeindex distribution from
+\*:http://stuff.mit.edu/afs/sipb/project/tex-dev/src/tar/makeindex.tar.gz.
+
+Note that the indexes created by groff and troff2page are
+necessarily different, because the respective paginations
+are different.  In addition, the index generated for
+troff2page has the additional feature of hyperlinking to the
+appropriate locations in the body text.
+
+The call
+
+    .IX item
+
+marks the text ``item'' as an indexable item.  The metacharacters @, !,
+", and | can be used to respectively specify (a) alternate
+alphabetization, (b) subitems, (c) literal metacharacters, and (d)
+encapsulation of the page number.  Please see the makeindex
+documentation (\*:http://tex.loria.fr/bibdex/makeindex.pdf) for all the details.
+Essentially, the syntax for entering index entries is the same as for
+LaTeX, except that in troff we use ``.IX item'' where in LaTeX one would
+use \%``\eindex{item}''.
+
+index.tmac will call makeindex to create a
+sorted index in the auxiliary file \e*[AUXF].ind, which can be
+slurped back into the input document:
+
+    .so \e*[AUXF].ind
+
+Adding a section header on top is up to you.
+
+.SH SLIDESHOWS
+
+To cause your troff source to be converted into slideshow-ready HTML,
+have it source the provided macro file t2pslides.tmac.  This macro file
+uses a version of the Mozpoint library (\*:http://mozpoint.mozdev.org)
+to produce the appropriate JavaScript and style sheets to convert your
+sequence of HTML pages into a Web presentation.
+
+HTML pages meant for presentation use larger, bolder fonts, and do not have
+navigation bars.
+
+The following table describes the keys used to control the
+presentation:
+
+.TS
+tab(#), center, allbox;
+cb cb
+l l.
+Action # Effect
+n, space, mouse-click # Next slide
+p, backspace # Previous Slide
+t, 0 # Title, or 0pening, slide
+n (integer \(>= 0) # nth slide
+b # toggle current slide with Black screen
+w # toggle current slide with White screen
+.TE
+
+Note that the slides are numbered from 0 onward (rather than 1).  Also,
+when typing a number n that's two or more digits long to get the nth
+slide, the digits should be pressed fairly rapidly so they are
+interpreted together.
+
+.SH EXTENDING TROFF USING COMMON LISP
+
+The groff macro file eval4troff.tmac(7) allows you to extend groff using
+Common Lisp, i.e., Common Lisp code embedded in a groff document can be
+used to affect how groff and troff2page process the document.
+
+Please see eval4troff.tmac(7) for details.
+
+.SH RECOVERY FROM ERRORS
+
+If troff2page fails on your document, it will display a message giving its
+best guess on what the problem is and where it occurred in the source
+document, and will offer to take you there so you can fix it immediately.
+
+    filename:lineno: error description
+    Type e to edit file filename at line lineno; x to quit
+    ?
+
+In the first line, or the error diagnostic line,
+filename is the particular source file (which need not be the
+main document file) and lineno is the estimated number of the line in
+that file that caused the error.  (This is a popular error-reporting format
+and is exploited by text editors for helping the debugging process.)
+
+In the second line, troff2page offers to fire up a text editor with the cursor
+approximately close to the
+offending line.
+
+If you type e at the ? prompt, troff2page starts the editor specified in your
+EDITOR environment variable, or if that is not set, the editor named
+vi on your system.  troff2page calls the editor with two arguments:
+the first argument is + followed by the line number, and the second
+argument is the filename.
+(This argument style works for all
+vi and emacs clones and I suspect most modern editors take care
+to recognize it, so it isn't as restrictive as it sounds.)
+
+.SH AVAILABILITY
+
+troff2page is downloadable from
+\*:http://www.ccs.neu.edu/~dorai/troff2page/troff2page.html.
+
+.SH SEE ALSO
+
+groff(1), groff_tmac(5), groff_man(7), groff_ms(7),
+eval4troff.tmac(7),
+clisp(1), cmucl(1), ecl(1), lisp(1), sbcl(1)

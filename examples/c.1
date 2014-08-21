@@ -1,0 +1,14 @@
+.ds AUXF gruen
+.de aye
+.ds AUXF blau
+\\$*
+..
+.de bee
+.aye \\*[AUXF]
+..
+.de cee
+.so \\*[AUXF]
+..
+.bee
+.cee
+DONE

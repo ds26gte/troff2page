@@ -1,0 +1,25 @@
+.mso s.tmac
+.mso www.tmac
+.mso url.tmac
+.RT
+.blm PP
+.TAG one
+.TAG two II
+
+Tag one is actually \*[TAG_one] (expected: 0).
+
+Tag two is actually \*[TAG_two] (expected: II).
+
+Referring to tag three
+.URL #three
+(expected: <see below>).
+
+Referring to tag one
+.URL #one
+(expected: <0>).
+
+Referring to tag two
+.URL #two
+(expected: <II>).
+
+.TAG three III

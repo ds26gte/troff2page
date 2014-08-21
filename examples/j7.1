@@ -1,0 +1,17 @@
+.mso eval4troff.tmac
+.
+.eval
+(princ "one")
+(terpri)
+.endeval
+.if \n[.troff2page] \{\
+.eval
+(princ "eins")
+(terpri)
+.endeval
+.\}
+.eval
+(princ "two")
+(terpri)
+.endeval
+.nx

@@ -1,0 +1,35 @@
+.\" last change 2011-11-08
+.
+.if !\n(.g .nx
+.
+.if d WRITETOCLINE .nx
+.
+.if '\*[AUXF]'' .ds AUXF .trofftemp
+.
+.de WRITETOCLINE
+.if !\\n[enable_toc_entries] .return
+.if !\\n[.U] .return
+.nr header_level \\$1
+.shift 
+.if (\\n[header_level] > \\n[GROWPS]) .return
+.if !\\n[toc_opened] \{\
+.nr toc_opened 1
+.open toc:port \\*[AUXF].toc
+.\}
+.write toc:port .TOCLINE \\n[header_level] \\n[%] \\$*
+..
+.
+.de TOCLINE
+.nr header_level \\$1
+.if (\\n[header_level] > \\n[GROWPS]) .return
+.ds pg_no \\$2
+.shift 2
+.IP " " \\n[header_level]m
+\\$*, \\*[pg_no]
+..
+.
+.de TOC
+.so \\*[AUXF].toc
+.nr next_graf_without_indent 1
+.nr enable_toc_entries 1
+..

@@ -1,0 +1,28 @@
+.\" last modified 2011-11-24
+.
+.if d BLM_EX .nx
+.
+.de BLM_EX
+.ec
+.KE
+.sp .8v
+.KS
+.eo
+..
+.
+.de EX
+.nf
+.in 0
+.blm BLM_EX
+.ft C
+.KS
+.eo
+..
+.
+.de EE
+.ec
+.KE
+.fi
+.blm BLM
+.nr next_graf_without_indent 1
+..

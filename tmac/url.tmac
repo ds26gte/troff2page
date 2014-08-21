@@ -1,0 +1,56 @@
+.\" last change 2010-09-22
+.
+.\" don't load if not groff
+.if !\n(.g .nx
+.
+.\" don't load more than once
+.if d pagetag:set_up .nx
+.
+.if !\n[.troff2page] \{\
+.ds url \\$\\n[.$]
+.\}
+.
+.if '\*[AUXF]'' .ds AUXF .trofftemp
+.
+.nr pagetag:already_set_up 0
+.
+.if !d TAG \{\
+.de TAG
+..
+.\}
+.
+.de pagetag:set_up
+.  \" load aux file containing pagetags if not already loaded
+.  if !\\n[pagetag:already_set_up] \{\
+.    nr pagetag:already_set_up 1
+.    so \\*[AUXF].aux
+.    if \\n[.U] .open pagetag:aux_port \\*[AUXF].aux
+.  \}
+..
+.
+.am TAG
+.  pagetag:set_up
+.  \" if 2nd arg present, use that value instead of current pageno
+.  ie '\\$2'' .ds pagetag:value \\n[PN]
+.  el .ds pagetag:value \\$2
+.  ds \\$1 \\\\*[url #\\$1 \\*[pagetag:value]]
+.  \" continue only in unsafe mode
+.  if !\\n[.U] .return
+.  if d www:url_check_tag .write pagetag:aux_port .ds TAG_\\$1 \\*[pagetag:value]
+.  write pagetag:aux_port .ds \\$1 \\\\*[url #\\$1 \\*[pagetag:value]]
+..
+.ig ##
+#|
+(defun url-string-value (url &optional link-text)
+  (let (internal-node-p)
+    (if link-text
+      (multiple-value-setq (url internal-node-p) (link-url url))
+      (setq link-text url))
+    (concatenate 'string
+                 (link-start url :internal-node-p internal-node-p)
+                 link-text
+                 (link-stop))))
+
+(defstring "url" #'url-string-value)
+|#
+.##

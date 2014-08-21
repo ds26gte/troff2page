@@ -1,0 +1,38 @@
+.\" last change 2009-01-12
+.
+.if d defhsl:loaded .nx
+.ds defhsl:loaded 1
+.
+.mso eval4troff.tmac
+.
+.eval
+(defun between-0-and-1 (n)
+  (cond ((< n 0) (+ n 1))
+	((> n 1) (- n 1))
+	(t n)))
+
+(defun tc-to-c (tc p q)
+  (cond ((< tc 1/6)
+	 (+ p (* (- q p) 6 tc)))
+	((and (<= 1/6 tc) (< tc 1/2))
+	 q)
+	((and (<= 1/2 tc) (< tc 2/3))
+	 (+ p (* (- q p) 6 (- 2/3 tc))))
+	(t p)))
+
+(defun hsl-to-rgb (h s l)
+  (setq h (/ (mod h 360) 360))
+  (let* ((q (cond ((< l 1/2) (* l (+ 1 s)))
+		  (t (+ l s (* -1 l s)))))
+	 (p (- (* 2 l) q))
+	 (tr (between-0-and-1 (+ h 1/3)))
+	 (tg (between-0-and-1 h))
+	 (tb (between-0-and-1 (- h 1/3))))
+    (values (tc-to-c tr p q)
+	    (tc-to-c tg p q)
+	    (tc-to-c tb p q))))
+
+(defun def-hsl-color (name h s l)
+  (multiple-value-bind (r g b) (hsl-to-rgb h s l)
+    (format t ".defcolor ~a rgb ~a ~a ~a~%" name r g b)))
+.endeval

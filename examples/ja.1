@@ -1,0 +1,41 @@
+.RT
+.nr just_did_PP 0
+.de BLM
+.ie \\n[next_graf_without_indent] \{\
+.nr next_graf_without_indent 0
+.LP
+.nr just_did_PP 0
+.\}
+.el \{\
+.PP
+.nr just_did_PP 1
+.\}
+..
+.blm BLM
+.
+.de LSM
+.nr 
+.ie \\n[just_did_PP] \{\
+.nr just_did_PP 0
+.ns
+.LP
+.\}
+.el .br
+.nr next_graf_without_indent 1
+\h'\\n[lsn]n'
+..
+.\"lsm LSM
+lkajdflkj
+lkajdl lkajdf
+
+lkjadf
+
+   one
+   two
+   three
+   \&
+   four
+   five
+
+lkjadflkj
+adlkfj

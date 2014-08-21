@@ -1,0 +1,18 @@
+.nr NR 564
+.ds urlh [``\\$1'']
+
+.open popo temp.ss
+
+.de A
+.write popo .ds \\$1 \\*[urlh \\n(NR]
+..
+
+.A ok
+
+.close popo
+
+.so temp.ss
+
+para para
+
+See \*[ok]

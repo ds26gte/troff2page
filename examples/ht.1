@@ -1,0 +1,87 @@
+.ig
+	$Id: htbl_test.ms,v 1.1 2004/05/28 17:24:41 larry Exp $
+	$Author: larry $
+..
+.RP no
+.TL
+A Test of
+.I htbl
+.AU
+Larry Kollar
+.AU
+Heinz-J\[:u]rgen Oertel
+.NH 1
+Introduction
+.LP
+The following table should be turned into HTML:
+.TS
+box;
+cb cb
+l l .
+Some Head	Another
+data	more data
+what the	hey?
+.TE
+the same table with "allbox"
+.TS
+allbox;
+cb cb
+l l .
+Some Head	Another
+data	more data
+what the	hey?
+.TE
+.LP
+gabble gabble gabble
+.NH 2
+Another table showing the "expand" attribute.
+.LP
+.TS
+box, expand;
+l c r.
+Left side	Middle	Right side
+.TE
+.LP
+``Talk to me,'' the mime cried.
+.NH 2
+Test with another tab character
+.LP
+.TS
+tab(#), allbox, expand;
+l c r.
+Left side#Middle#Right side
+.TE
+.LP
+Should work, even the tab() attribute is at another place
+.LP
+.TS
+allbox, expand, tab(#);
+l c r.
+Left side#Middle#Right side
+.TE
+.NH 2
+What happens with ".\\" and "_" ?
+.LP
+.TS
+;
+l l.
+first	line
+second	line
+_
+fourth	line
+.\" this is only a comment
+6th	line
+.TE
+.NH 2
+Another example for a horizontal rule in tables
+.LP
+.TS
+tab(#), box, expand;
+l c r.
+eins#zwei (first line)#1,00
+_
+drei#vier#1,00
+three#for#1,00
+_
+f\[:u]nf#sechs (last line)#1,00
+.TE

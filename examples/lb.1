@@ -1,0 +1,27 @@
+.mso eval4troff.tmac
+.
+pi = 
+.eval
+;following prints pi, because cos(pi) = -1
+(princ (acos -1))
+(terpri)
+.endeval
+
+e =
+.eval
+(princ (exp 1))
+(terpri)
+.endeval
+
+lb/kg = 
+.eval
+(princ (/ .45359237))
+(terpri)
+.endeval
+
+L/gal = 
+.eval
+(princ (* 231 (expt 2.54 3) .001))
+(terpri)
+.endeval
+

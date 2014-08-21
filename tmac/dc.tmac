@@ -1,0 +1,19 @@
+.\" from www.tmac
+.
+.if \n[.troff2page] .nx
+.
+.de DC
+.  in 0
+.  if !d dropcap-color .ds dropcap-color black\"
+.  if !'\\$3'' .ds dropcap-color \\$3\"
+.  ie n \
+.    nop \\$1\c
+.  el \{\
+.    nr dummy \w'\\$1'u
+.    nr dcht ((\\n[.v] + \\n[rst]) * \\n[.ps] / \\n[rst])
+.    char \[dcap] \m[\\*[dropcap-color]]\s'\\n[dcht]u'\\$1
+.    nop \v'\\n[.v]u'\\[dcap]\v'-\\n[.v]u'\c
+'        ti \w'\\[dcap]'u
+.  \}
+.  nop \\$2
+..
