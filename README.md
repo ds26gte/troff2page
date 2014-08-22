@@ -6,3 +6,6 @@ pages from troff documents.  Consult
 http://www.ccs.neu.edu/~dorai/troff2page/index.html
 
 for its capabilities.
+
+For installation instructions, please see
+[INSTALL.md](./INSTALL.md).
