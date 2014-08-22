@@ -1,4 +1,9 @@
-Last change 2013-09-02
+Last change 2014-08-22
+
+2014 Aug 22
+
+index.tmac: makeindex has a bug: It won't accept files that
+start with a dot! Added workaround.
 
 2013 Sep 2
 
@@ -59,7 +64,7 @@ Make .tm .tmc .sy .pso .writec .write much faster by using
 Lisp output primitives instead of going thru the
 string-traversing emit procedure.  (These might seem like
 unlikely places to optimize, but they are used in the
-indexing and eval macros.) 
+indexing and eval macros.)
 
 Accept .EQ's optional arguments (indent-style and eqno).
 
@@ -79,7 +84,7 @@ Mar 2, 2009
 
 Specify charset in HTML file to UTF-8, so UTF-8 chars in
 input file are rendered correctly in browsers, instead of
-the ugly a-circumflex-euro-trademark trigraphs (?). 
+the ugly a-circumflex-euro-trademark trigraphs (?).
 
 Feb 15, 2009
 
@@ -120,7 +125,7 @@ Jan 29, 2009
 For man pages, disable toc if only one .SH present.
 
 Arg of .so in man is resolved from one directory above
-current file. 
+current file.
 
 Jan 28, 2009
 
@@ -204,7 +209,7 @@ In documentation, use HSL (preferred by CSS) instead of HSV.
 
 Dec 4, 2008
 
-.DS I should use \n[DI] instead of \n[PI].  (Initially, 
+.DS I should use \n[DI] instead of \n[PI].  (Initially,
 DI == PI.)
 
 Dec 2, 2008

@@ -1,6 +1,6 @@
 .\" index.tmac
-.\" Last change: 2011-11-08 
-. 
+.\" Last change: 2014-08-22
+.
 .\" don't source if not groff
 .if !\n(.g .nx
 .
@@ -32,15 +32,17 @@
 .if \\n[index:index_already_set_up] .return
 .nr index:index_already_set_up 1
 .nr index:location 0
-.sy if test -f \\*[AUXF].idx -a ! -f \\*[AUXF].ind; then makeindex -s \\*[AUXF].mst -r \\*[AUXF].idx ; fi
-.sy rm -f \\*[AUXF].idx 
+.sy if test -f \\*[AUXF].idx; then mv \\*[AUXF].idx z\\*[AUXF].idx; fi
+.sy if test -f z\\*[AUXF].idx -a ! -f \\*[AUXF].ind; then makeindex -s \\*[AUXF].mst -r z\\*[AUXF].idx; fi
+.sy if test -f z\\*[AUXF].ind; then mv z\\*[AUXF].ind \\*[AUXF].ind; fi
+.sy rm -f z\\*[AUXF].idx z\\*[AUXF].ilg
 .open index:mst_port \\*[AUXF].mst
 .write index:mst_port preamble ".
 .write index:mst_port .if n .nx
 .write index:mst_port .index:hook
 .write index:mst_port .de see
 .\" in the following
-.\" 8 \s in .de body 
+.\" 8 \s in .de body
 .\" 4 \s when .write is called
 .\" 2 \s in the string written to
 .\" 1 \s when the string is unslashed
