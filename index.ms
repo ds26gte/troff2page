@@ -1,14 +1,14 @@
 .\" vi:ft=nroff
 .so troff2page-doc-macs.ms
 .
-.ND 2011-11-24  \"last modified
+.ND 2014-12-20  \"last modified
 .
 .TL
 troff2page
 .AU
 .ie \n[.troff2page] \{\
 \*[url ../index.html "Dorai Sitaram"]
-\*[url troff2page.tar.bz2  "Download the \*[troff2page_version_th] version"]
+\*[url https://github.com/ds26gte/troff2page "Download the \*[troff2page_version_th] version"]
 .\}
 .el \{\ Dorai Sitaram
 \*(DY
