@@ -1,19 +1,12 @@
-.\" last modified 2011-11-24
+.\" last modified 2014-12-20
 .
-.if d BLM_EX .nx
-.
-.de BLM_EX
-.ec
-.KE
-.sp .8v
-.KS
-.eo
-..
+.if d EX .nx
 .
 .de EX
+.LP
+.lsm
 .nf
 .in 0
-.blm BLM_EX
 .ft C
 .KS
 .eo
@@ -23,6 +16,7 @@
 .ec
 .KE
 .fi
-.blm BLM
-.nr next_graf_without_indent 1
+.lsm leadingSpacesMacro
+.LP
+.nr nextGrafWithoutIndent 1
 ..
