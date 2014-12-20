@@ -85,7 +85,24 @@
 .nr nextGrafWithoutIndent 1
 ..
 .
-.mso ex.tmac
+.de EX
+.LP
+.lsm
+.nf
+.in 0
+.ft C
+.KS
+.eo
+..
+.
+.de EE
+.ec
+.KE
+.fi
+.lsm leadingSpacesMacro
+.LP
+.nr nextGrafWithoutIndent 1
+..
 .
 .de ```
 .EX

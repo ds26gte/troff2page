@@ -1,4 +1,4 @@
-.\" last change 2011-11-25
+.\" last change 2014-12-20
 .\" vi:ft=nroff
 .
 .ie \n[.X] \{\
@@ -9,7 +9,6 @@
 .
 .\"mso www.tmac \" ??
 .mso p.tmac
-.mso ex.tmac
 .mso url.tmac
 .mso defhsl.tmac
 .mso dc.tmac
@@ -32,6 +31,8 @@
 .\"nr HTML1 1
 .
 .\" noad
+.
+.nr GROWPS 3
 .
 .\"nr bell_localisms 1
 .\"nr SS-first-call 1
