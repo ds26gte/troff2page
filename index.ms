@@ -91,7 +91,7 @@ within the same Lisp session.
 recognizes most of the commands (requests, macros,
 diversions, strings, escapes, glyphs) of raw troff and its
 ms and man macro packages, including such rather
-recherch\('e macros as \fC.DC\fP, here used to produce a drop cap
+recherché macros as \fC.DC\fP, here used to produce a drop cap
 colored terracotta pink.
 The syntax recognized is the improved kind
 supported by \*[urlh http://groff.ffii.org]groff\& and \*[urlh \
@@ -642,7 +642,7 @@ much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
       (cond ((< n 0) (+ n 1))
             ((> n 1) (- n 1))
             (t n)))
-  
+
     (defun tc-to-c (tc p q)
       (cond ((< tc 1/6)
              (+ p (* (- q p) 6 tc)))
@@ -651,7 +651,7 @@ much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
             ((and (<= 1/2 tc) (< tc 2/3))
              (+ p (* (- q p) 6 (- 2/3 tc))))
             (t p)))
-  
+
     (defun hsl-to-rgb (h s l)
       (setq h (/ (mod h 360) 360))
       (let* ((q (cond ((< l 1/2) (* l (+ 1 s)))
@@ -663,7 +663,7 @@ much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
         (values (tc-to-c tr p q)
                 (tc-to-c tg p q)
                 (tc-to-c tb p q))))
-  
+
     (defun def-hsl-color (name h s l)
       (multiple-value-bind (r g b) (hsl-to-rgb h s l)
         (format t ".defcolor ~a rgb ~a ~a ~a~%" name r g b)))
