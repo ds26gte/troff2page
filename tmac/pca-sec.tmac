@@ -1,20 +1,22 @@
 .\" last modified 2015-03-19
 .\" Dorai Sitaram
 .
+.rn @SH @SH_orig
+.
 .de Section
 .if d write_toc_line .write_toc_line \\$*
-.SH \\$1
+.@SH_orig \\$1
 .shift
 .nr next_graf_without_indent 1
 \\$*
 ..
 .
-.de *
+.de =
 .Section 1 \\$*
 ..
-.de **
+.de ==
 .Section 2 \\$*
 ..
-.de ***
+.de ===
 .Section 3 \\$*
 ..

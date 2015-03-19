@@ -6,6 +6,8 @@ When first arg of .char is a Unicode escape (\[uXXXX]), make
 sure the corresponding Unicode cha gets translated
 correctly.
 
+Added string-macro \*[urlh ...].
+
 2014 Aug 22
 
 index.tmac: makeindex has a bug: It won't accept files that

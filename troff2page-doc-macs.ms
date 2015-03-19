@@ -63,10 +63,10 @@
 .nr PD 1v
 .nr LL 8i
 .
-.rn * *_orig
-.de *
+.rn = =_orig
+.de =
 .HBP
-.*_orig \\$*
+.=_orig \\$*
 ..
 .\}
 .

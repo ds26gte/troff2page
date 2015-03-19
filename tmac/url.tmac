@@ -1,4 +1,4 @@
-.\" last change 2010-09-22
+.\" last change 2015-03-19
 .
 .\" don't load if not groff
 .if !\n(.g .nx
@@ -8,6 +8,7 @@
 .
 .if !\n[.troff2page] \{\
 .ds url \\$\\n[.$]
+.ds urlh "
 .\}
 .
 .if '\*[AUXF]'' .ds AUXF .trofftemp
@@ -39,18 +40,3 @@
 .  if d www:url_check_tag .write pagetag:aux_port .ds TAG_\\$1 \\*[pagetag:value]
 .  write pagetag:aux_port .ds \\$1 \\\\*[url #\\$1 \\*[pagetag:value]]
 ..
-.ig ##
-#|
-(defun url-string-value (url &optional link-text)
-  (let (internal-node-p)
-    (if link-text
-      (multiple-value-setq (url internal-node-p) (link-url url))
-      (setq link-text url))
-    (concatenate 'string
-                 (link-start url :internal-node-p internal-node-p)
-                 link-text
-                 (link-stop))))
-
-(defstring "url" #'url-string-value)
-|#
-.##

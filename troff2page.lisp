@@ -674,7 +674,7 @@
                    (t (setq url (concatenate 'string url (string c))))))
             (t (return))))
     (concatenate 'string
-                 (link-start url)
+                (link-start url)
                  url
                  (link-stop))))
 
@@ -686,6 +686,28 @@
     (concatenate 'string
                  (link-start url :internal-node-p internal-node-p)
                  link-text
+                 (link-stop))))
+
+(defun urlh-string-value (url)
+  (let (internal-node-p
+         (link-text "")
+         link-text-more
+         c)
+    (loop
+      (setq link-text-more (read-till-char #\\ :eat-delim-p t))
+      (setq link-text (concatenate 'string link-text link-text-more))
+      (setq c (snoop-char))
+      (cond ((not c)
+             (setq link-text (concatenate 'string link-text "\\"))
+             (return))
+            ((char= c #\&)
+             (get-char)
+             (return))
+            (t (setq link-text (concatenate 'string link-text "\\")))))
+    (multiple-value-setq (url internal-node-p) (link-url url))
+    (concatenate 'string
+                 (link-start url :internal-node-p internal-node-p)
+                 (expand-args link-text)
                  (link-stop))))
 
 ;** environments
@@ -2328,6 +2350,7 @@
   ;
   (defstring ":" #'man-url)
   (defstring "url" #'url-string-value)
+  (defstring "urlh" #'urlh-string-value)
   ;
   )
 

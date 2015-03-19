@@ -7,8 +7,9 @@
 troff2page
 .AU
 .ie \n[.troff2page] \{\
-\*[url ../index.html "Dorai Sitaram"]
-\*[url https://github.com/ds26gte/troff2page "Download the \*[troff2page_version_th] version"]
+\*[urlh ../index.html]Dorai Sitaram\&
+\*[urlh https://github.com/ds26gte/troff2page]Download the
+\*[troff2page_version_th] version\&
 .\}
 .el \{\ Dorai Sitaram
 \*(DY
@@ -17,7 +18,7 @@ troff2page
 .
 .LK
 
-.* 1. Introduction
+.= 1. Introduction
 
 troff2page converts troff (man and ms) documents into HTML web pages.
 
@@ -50,20 +51,20 @@ OS X, and Solaris.  It uses the Common Lisp implementation mentioned in
 the shell environment variable \fCLISP\fP, which can currently be set to
 either \fCclisp\fP, \fCclozure\fP, \fCcmu\fP, \fCecl\fP, or \fCsbcl\fP:
 the corresponding Lisp implementations being
-\*[url http://clisp.sf.net CLISP],
-\*[url http://ccl.clozure.com "Clozure CL"],
-\*[url http://cmucl.org CMUCL],
-\*[url http://ecls.sf.net ECL], and
-\*[url http://sbcl.sf.net SBCL].
+\*[urlh http://clisp.sf.net]CLISP\&,
+\*[urlh http://ccl.clozure.com]Clozure CL\&,
+\*[urlh http://cmucl.org]CMUCL\&,
+\*[urlh http://ecls.sf.net]ECL\&, and
+\*[urlh http://sbcl.sf.net]SBCL\&.
 
 If \fCLISP\fP is not
 set, some default Lisp implementation is assumed.
 
 For more information,
-please see the file \*[url INSTALL]
+please see the file \*[urlh INSTALL]INSTALL\&
 in the distribution.
 
-.** Calling troff2page from within Lisp
+.== Calling troff2page from within Lisp
 
 .IX calling troff2page from Common Lisp
 It is not necessary to run the file \fCtroff2page\fP as a
@@ -82,7 +83,7 @@ The procedure \fCtroff2page:troff2page\fP can be called
 several times, on the same or different documents, from
 within the same Lisp session.
 
-.* 2. troff and troff2page commands
+.= 2. troff and troff2page commands
 
 .IX drop caps in color
 .defcolor terracottapink rgb #9b3d3d
@@ -93,8 +94,8 @@ ms and man macro packages, including such rather
 recherch\('e macros as \fC.DC\fP, here used to produce a drop cap
 colored terracotta pink.
 The syntax recognized is the improved kind
-supported by \*[url http://groff.ffii.org groff] and \*[url \
-http://heirloom.sf.net/doctools.html "Heirloom troff"], i.e., macro, string,
+supported by \*[urlh http://groff.ffii.org]groff\& and \*[urlh \
+http://heirloom.sf.net/doctools.html]Heirloom troff\&, i.e., macro, string,
 and glyph names can be arbitrarily long, and strings can
 have arguments.  Most of the commands are converted to their
 obvious HTML equivalent.\**
@@ -135,7 +136,7 @@ groff’s command-line option \fC-m\fP.  This is because
 troff2page doesn’t support the same kind of command-line
 arguments that groff does.
 
-.** Auxiliary files
+.== Auxiliary files
 
 .IX unsafe mode
 .IX auxiliary files
@@ -212,7 +213,7 @@ programs’ aux files don’t clash.  The number register
 \fC\en[.troff2page]\fP (page \*[cond-bp]) suggests a way
 to do this.
 
-.** Simulating troff options
+.== Simulating troff options
 
 .IX troff options, translation of
 The program \fCtroff2page\fP just takes a single argument.  Typically
@@ -280,7 +281,7 @@ If the input file is recognizably a man page (i.e., it has the command
 \fC.TH\fP), both troff2page and groff will load, if it exists, the init file
 \fCman.local\fP in the home directory.
 
-.* 3. Page layout
+.= 3. Page layout
 
 .IX page breaks
 .IX bp@.bp, troff request
@@ -342,7 +343,7 @@ page, and the table-of-contents and index pages.  If any of these pages
 doesn’t exist, or if it is the same as the page containing the
 navigation bar, then the link for it is disabled.
 
-.** HTML-style paragraphs
+.== HTML-style paragraphs
 
 By default, troff2page sets paragraphs exactly as groff does: the first
 lines of paragraphs are indented (unless explicitly disabled via an
@@ -386,7 +387,7 @@ to 18 cm, making sure it takes effect only for HTML:
     .if \n[.troff2page] .nr LL 18c
 .EE
 
-.* 4. Table of contents
+.= 4. Table of contents
 
 .IX table of contents
 When converting man documents, troff2page automatically generates an
@@ -423,17 +424,18 @@ called.
 then associated with the text of the second argument instead
 of the current page number.
 
-.* 5. Making an index
+.= 5. Making an index
 
 .IX index
 .IX index.tmac, macro file
 .IX makeindex
-The supplied macro file \fCindex.tmac\fP
+The supplied macro file \fCpca-ix.tmac\fP
 creates a sorted
 index, with the aid of the external program makeindex.
 makeindex is included with TeX distributions, but you can
-obtain just the makeindex distribution from \*[url \
-http://stuff.mit.edu/afs/sipb/project/tex-dev/src/tar/makeindex.tar.gz].
+also obtain \*[urlh \
+http://stuff.mit.edu/afs/sipb/project/tex-dev/src/tar/makeindex.tar.gz]just
+the makeindex distribution\&.
 
 Note that the indexes created by groff and troff2page are
 necessarily different, because the respective paginations
@@ -454,8 +456,8 @@ alternate alphabetization, (b) subitems, (c) literal metacharacters, and
 (d) encapsulation of the page number.  Please see the
 makeindex
 documentation for all the details.  Essentially, the syntax for entering
-index entries is the same \*[url \
-http://tex.loria.fr/bibdex/makeindex.pdf "as for LaTeX"], except that in troff we use
+index entries is the same \*[urlh \
+http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in troff we use
 “\fC.IX item\fP” where in LaTeX one would use
 \%“\fC\eindex{item}\fP”.
 
@@ -469,13 +471,13 @@ slurped back into the input document:
 
 Adding a section header on top is up to you.
 
-.* 6. Slideshows
+.= 6. Slideshows
 
 .IX slideshow
 To cause your troff source to be converted into slideshow-ready HTML, have
 it source the provided macro file \fCt2pslides.tmac\fP.
-This macro file uses a version of the \*[url \
-http://mozpoint.mozdev.org MozPoint] library to
+This macro file uses a version of the \*[urlh \
+http://mozpoint.mozdev.org]MozPoint\& library to
 produce the appropriate JavaScript and style sheets to
 convert your sequence of HTML pages into a Web presentation.
 
@@ -504,7 +506,7 @@ typing a number \fIn\fP that’s two or more digits long to
 get the \fIn\fPth slide, the digits should be pressed
 fairly rapidly so they are interpreted together.
 
-.* 7. Extending troff using Common Lisp
+.= 7. Extending troff using Common Lisp
 
 .IX extending troff and troff2page with Common Lisp
 .IX eval@.eval, macro
@@ -616,7 +618,7 @@ Common Lisp language but also includes the procedures and data structures
 defined in troff2page.  These extras are not available (and are arguably
 not useful) to the \fC.eval\fP code seen by troff.
 
-.** Defining color names using HSL
+.== Defining color names using HSL
 
 .IX color names, defining
 For a more substantial example of \fC.eval\fP’s use, consider defining
@@ -626,9 +628,8 @@ define the color Venetian red using its HSL spec (357\(de, 49%,
 24%), which to many is a more intuitive description than RGB
 (91, 31, 34).
 
-While there is an \*[url \
-http://en.wikipedia.org/wiki/HSL_color_space \
-algorithm] to convert HSL to RGB,
+While there is an \*[urlh \
+http://en.wikipedia.org/wiki/HSL_color_space]algorithm\& to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
@@ -705,7 +706,7 @@ emulate the sanguine chalk drawings of the Old Masters.
 .RE
 .B2
 
-.** Extending troff2page only
+.== Extending troff2page only
 
 .IX extending troff2page with Common Lisp without producing output
 .IX ig@.ig ##, as troff2page extender
@@ -713,9 +714,8 @@ troff2page treats troff’s \fC.ig\fP
 environment, whenever it uses \fC##\fP as ender, as
 containing Lisp code that can be used to extend
 troff2page.  This syntactic overloading of \fC.ig ##\fP is an innovation introduced by
-Oliver Laumann’s \*[url \
-http://www-rn.informatik.uni-bremen.de/software/unroff \
-unroff].
+Oliver Laumann’s \*[urlh \
+http://www-rn.informatik.uni-bremen.de/software/unroff]unroff\&.
 
 Any Lisp code enclosed within
 \&\fC.ig ##\fP ... \fC.##\fP will be processed by
@@ -788,11 +788,11 @@ of chocolate.\**
 The RGB values used in this manual for
 the colors chocolate,
 terracotta pink,
-and Venetian red are all courtesy \*[url \
-http://www.resene.co.nz/swatches "Resene Paints"].
+and Venetian red are all courtesy \*[urlh \
+http://www.resene.co.nz/swatches]Resene Paints\&.
 .FE
 
-.* 8. Recovery from errors
+.= 8. Recovery from errors
 
 .IX errors
 If troff2page fails on your document, it will display a message giving its
@@ -826,7 +826,7 @@ argument is the filename.
 vi and emacs clones and I suspect most modern editors take care
 to recognize it, so it isn’t as restrictive as it sounds.)
 
-.** SBCL’s warnings
+.== SBCL’s warnings
 
 .IX SBCL, disabling warnings in
 When running troff2page on SBCL, you can get several
@@ -846,7 +846,7 @@ in your home directory.  If adding to \fC.sbclrc\fP, the
 feature expression \fC#+sbcl\fP may be omitted.
 
 .if t \{\
-.* Index
+.= Index
 
 .\"rs
 .\"if \n(.H .sp .8v
