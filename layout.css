@@ -1,4 +1,4 @@
-/* last modified 2011-12-08 */
+/* last modified 2015-03-19 */
 
 body {
     max-width: 40em;
@@ -15,13 +15,13 @@ body {
 }
 
 a {
-    color: #dd4814; /* ubuntu orange */
+    /* color: #dd4814; /* ubuntu orange */
     text-decoration: none;
     border-bottom: 1px dotted;
 }
 
 a:hover {
-    color: #333333; /* ubuntu cool gray */
+    /* color: #333333; /* ubuntu cool gray */
     background-color: #fdca01; /* ubuntu yellow */
 }
 
@@ -29,7 +29,7 @@ a:hover {
     margin-top: 2em;
     margin-bottom: 2em;
     text-align: center;
-    font-size: 161.8%; 
+    font-size: 161.8%;
 }
 
 h1,h2 {
@@ -42,7 +42,7 @@ h1,h2 {
 }
 
 h1 {
-    font-size: 127.2%; 
+    font-size: 127.2%;
 }
 
 h1,h2,h3 {

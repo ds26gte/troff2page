@@ -14,8 +14,8 @@
 .nr obeylines 0
 .LP
 .\}
-.el .ie \\n[nextGrafWithoutIndent] \{\
-.nr nextGrafWithoutIndent 0
+.el .ie \\n[next_graf_without_indent] \{\
+.nr next_graf_without_indent 0
 .LP
 .\}
 .el .PP
@@ -42,7 +42,7 @@
 \\$*
 .LP
 .ns
-.nr nextGrafWithoutIndent 1
+.nr next_graf_without_indent 1
 ..
 .de @SH
 .Section 1 \\$*
@@ -73,7 +73,7 @@
 .sp 1ex
 .ce
 .LP
-.nr nextGrafWithoutIndent 1
+.nr next_graf_without_indent 1
 ..
 .
 .de Newsection
@@ -82,7 +82,7 @@
 \\$*
 .sp .3v
 .LP
-.nr nextGrafWithoutIndent 1
+.nr next_graf_without_indent 1
 ..
 .
 .de EX
@@ -101,7 +101,7 @@
 .fi
 .lsm leadingSpacesMacro
 .LP
-.nr nextGrafWithoutIndent 1
+.nr next_graf_without_indent 1
 ..
 .
 .de ```
@@ -109,11 +109,6 @@
 ..
 .de ````
 .EE
-..
-.
-.de JPEG
-.mso jpeg.tmac
-.JPEG \\$*
 ..
 .
 .de TOC
@@ -126,7 +121,7 @@
 ..
 .
 .de IX
-.mso index.tmac
+.mso pca-ix.tmac
 .if \\n[.troff2page] .mso htmlindex.tmac
 .IX \\$*
 ..

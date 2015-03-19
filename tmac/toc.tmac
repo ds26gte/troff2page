@@ -1,16 +1,16 @@
-.\" last change 2011-11-08
+.\" last change 2015-03-19
 .
 .if !\n(.g .nx
 .
-.if d WRITETOCLINE .nx
+.if d writeTocLine .nx
 .
 .if '\*[AUXF]'' .ds AUXF .trofftemp
 .
-.de WRITETOCLINE
+.de writeTocLine
 .if !\\n[enable_toc_entries] .return
 .if !\\n[.U] .return
 .nr header_level \\$1
-.shift 
+.shift
 .if (\\n[header_level] > \\n[GROWPS]) .return
 .if !\\n[toc_opened] \{\
 .nr toc_opened 1
