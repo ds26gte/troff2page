@@ -3,11 +3,11 @@
 .
 .if !\n(.g .nx
 .
-.if d writeTocLine .nx
+.if d write_toc_line .nx
 .
 .if '\*[AUXF]'' .ds AUXF .trofftemp
 .
-.de writeTocLine
+.de write_toc_line
 .if !\\n[enable_toc_entries] .return
 .if !\\n[.U] .return
 .nr header_level \\$1

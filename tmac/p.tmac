@@ -1,37 +1,11 @@
 .\" last modified 2015-03-19
 .mso ms.tmac
 .
-.if d blankLineMacro .nx
+.if d blank_line_macro .nx
 .
-.de blankLineMacro
-.ec
-.if !\\n[.u] \{\
-.sp .5v
-.eo
-.return
-.\}
-.ie \\n[obeylines] \{\
-.nr obeylines 0
-.LP
-.\}
-.el .ie \\n[next_graf_without_indent] \{\
-.nr next_graf_without_indent 0
-.LP
-.\}
-.el .PP
-..
-.blm blankLineMacro
+.mso pca-blm.tmac
 .
-.de leadingSpacesMacro
-.ie \\n[obeylines] .br
-.el \{\
-.nr obeylines 1
-.ns
-.LP
-.\}
-\h'\\n[lsn]n'
-..
-.lsm leadingSpacesMacro
+.mso pca-lsm.tmac
 .
 .rn @SH @SHorig
 .
