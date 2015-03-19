@@ -24,7 +24,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20130902) ;last change
+(defparameter *troff2page-version* 20150319) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -56,14 +56,14 @@
       #+clozure (ccl::os-command s)
       #+cmu (ext::run-program "sh" (list "-c" s) :output t)
       #+ecl (si::system s)
-      #+sbcl 
+      #+sbcl
       (let ((p (sb-ext::run-program "sh" (list "-c" s) :search t :output t)))
         (sb-ext::process-exit-code p))
       nil))
 
 (defun retrieve-pid ()
   (or #+clisp
-      (funcall (if (find-package :linux) 
+      (funcall (if (find-package :linux)
                  ;CLISP has different names for this function in Ubuntu and Darwin
                  (find-symbol "GETPID" :linux)
                  (find-symbol "GETPPID" :posix)))
@@ -106,7 +106,7 @@
 (defparameter *ghostscript-options*
   " -q -dBATCH -dNOPAUSE -dNO_PAUSE -sDEVICE=ppmraw")
 
-(defparameter *groff-image-options* 
+(defparameter *groff-image-options*
   "-fN -rPS=20 -rVS=24")
 
 (defparameter *path-separator*
@@ -655,7 +655,7 @@
 (defun man-url ()
   (let ((url "")
         url-more c c2)
-    (loop 
+    (loop
       (setq url-more (read-till-chars '(#\space #\tab #\newline
                                          #\, #\" #\' #\)
                                          #\: #\.)))
@@ -687,7 +687,6 @@
                  (link-start url :internal-node-p internal-node-p)
                  link-text
                  (link-stop))))
-
 
 ;** environments
 
@@ -1195,7 +1194,9 @@
           (when (not c) (return))
           (ecase *outputting-to*
             ((:html :title)
-             (cond ((char= c #\\)
+             (cond ((setq *it* (gethash c *glyph-table*))
+                    (emit *it*))
+                   ((char= c #\\)
                     (let ((e (read-possible-troff2page-specific-escape i)))
                       (cond ((string= e "[htmllt]")
                              (if (eq *outputting-to* :title)
@@ -1293,10 +1294,10 @@
     (when *just-after-par-start-p* (setq *just-after-par-start-p* nil))
     (loop
       (let ((c (get-char)))
-        (when (not c) 
+        (when (not c)
           (setq *keep-newline-p* nil) ;?
           (setq c #\newline))
-        (cond ((char= c #\newline) 
+        (cond ((char= c #\newline)
                ;(setq *keep-newline-p* nil)
                (return))
               ((and count-leading-spaces-p (char= c #\space))
@@ -1307,7 +1308,7 @@
                (when blank-line-p (setq blank-line-p nil))
                (setq c (snoop-char))
                (unless c (setq c #\newline))
-               (cond ((and count-leading-spaces-p 
+               (cond ((and count-leading-spaces-p
                            (not *reading-quoted-phrase-p*)
                            (member c '(#\" #\#)))
                       (expand-escape c)
@@ -1320,17 +1321,17 @@
                       (setq r (concatenate 'string r (string *escape-char*))))
                      (t (when count-leading-spaces-p
                           (setq count-leading-spaces-p nil)
-                          (do-leading-spaces num-leading-spaces 
+                          (do-leading-spaces num-leading-spaces
                                              :insert-line-break-p insert-line-break-p))
-                        (setq r (concatenate 'string r 
+                        (setq r (concatenate 'string r
                                              (expand-escape c)))
                         (when (member c '(#\{ #\newline)) (return)))))
               (t (when blank-line-p
                    (setq blank-line-p nil))
                  (when count-leading-spaces-p
                    (setq count-leading-spaces-p nil)
-                  (do-leading-spaces num-leading-spaces 
-                                     :insert-line-break-p insert-line-break-p) 
+                  (do-leading-spaces num-leading-spaces
+                                     :insert-line-break-p insert-line-break-p)
                    )
                  (when (char= c #\") (check-verbatim-apostrophe-status))
                  (setq r (concatenate 'string r (string c)))))))
@@ -1582,7 +1583,7 @@
 (defun do-leading-spaces (num-leading-spaces &key insert-line-break-p)
   (when (> num-leading-spaces 0)
     (setq *leading-spaces-number* num-leading-spaces)
-    (cond (*leading-spaces-macro* 
+    (cond (*leading-spaces-macro*
             (cond ((setq *it* (gethash *leading-spaces-macro* *macro-table*))
                    (execute-macro-body *it*))
                   ((setq *it* (gethash *leading-spaces-macro* *request-table*))
@@ -1833,7 +1834,7 @@
       (emit *last-modified*)
       (emit (funcall *it*)) (emit-verbatim "<br>")
       (emit-newline))
-    (unless 
+    (unless
       nil
       ;(eql *macro-package* :man) ;no colophon for man pages
       (= *last-page-number* 0) ;no col. for 1-page docs
@@ -2788,6 +2789,15 @@
         (*package* (find-package :troff2page)))
     (load f)))
 
+(defun unicode-escape (s)
+  (and (= (length s) 5)
+       (char= (char s 0) #\u)
+       (let* ((s (subseq s 1))
+              (*read-base* 16)
+              (n (read-from-string s)))
+         (and (integerp n)
+              (code-char n)))))
+
 ;* requests
 
 (defrequest "bp"
@@ -3000,8 +3010,9 @@
     (unless (char= (get-char) *escape-char*)
       (error "char"))
     (let* ((glyph-name (read-escaped-word))
+           (unicode-char (unicode-escape glyph-name))
            (s (expand-args (read-troff-string-line))))
-      (defglyph glyph-name s))))
+      (defglyph (or unicode-char glyph-name) s))))
 
 (defrequest "substring"
   (lambda ()
@@ -3093,7 +3104,6 @@
       (emit-newline)
       (emit-verbatim "</div>")
       (emit-newline))))
-
 
 (defrequest "IMG"
   (gethash "PIMG" *request-table*))
@@ -3296,7 +3306,7 @@
     (let* ((th-counter (get-counter-named "man_.TH_times_called"))
            (th-n (incf (counter*-value th-counter)))
            (args (read-args)))
-      (when (= th-n 1) 
+      (when (= th-n 1)
         (!macro-package :man)
         (when (setq *it* (find-macro-file "man.local"))
           (troff2page-file *it*)))
@@ -3389,7 +3399,6 @@
       (t ;(funcall (gethash "@SH" *request-table*))
         (execute-macro "@SH")
         ))))
-
 
 (defrequest "@SH"
   (lambda ()
@@ -4312,14 +4321,13 @@
     (let ((x (read-escaped-word)) it)
       (cond ((string= x "*") (all-args))
             ((string= x "@") (all-args)) ;ok for now
-            ((string= x "\\") 
+            ((string= x "\\")
              (toss-back-char #\\)
              (setq it (read-arith-expr))
              (or (nth it *macro-args*) ""))
             ((numberp (setq it (read-from-string x nil)))
              (or (nth it *macro-args*) ""))
             (t "")))))
-
 
 (defescape #\f
   (lambda ()
