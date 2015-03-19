@@ -1,7 +1,7 @@
 .\" vi:ft=nroff
 .so troff2page-doc-macs.ms
 .
-.ND 2014-12-20  \"last modified
+.ND 2015-03-19  \"last modified
 .
 .TL
 troff2page
@@ -17,7 +17,8 @@ troff2page
 .
 .LK
 
-.SH 1. Introduction
+.* 1. Introduction
+
 troff2page converts troff (man and ms) documents into HTML web pages.
 
 .IX calling troff2page from the command-line
@@ -62,7 +63,8 @@ For more information,
 please see the file \*[url INSTALL]
 in the distribution.
 
-.SS Calling troff2page from within Lisp
+.** Calling troff2page from within Lisp
+
 .IX calling troff2page from Common Lisp
 It is not necessary to run the file \fCtroff2page\fP as a
 Unix script.  You can simply load \fCtroff2page\fP (it is
@@ -80,7 +82,8 @@ The procedure \fCtroff2page:troff2page\fP can be called
 several times, on the same or different documents, from
 within the same Lisp session.
 
-.SH 2. troff and troff2page commands
+.* 2. troff and troff2page commands
+
 .IX drop caps in color
 .defcolor terracottapink rgb #9b3d3d
 .DC T ROFF2PAGE terracottapink
@@ -98,7 +101,7 @@ obvious HTML equivalent.\**
 .
 .FS
 .IX footnotes
-E.g., ms's footnotes (\fC\e**\fP and \fC.FS\fP/\fC.FE\fP) have a
+E.g., ms’s footnotes (\fC\e**\fP and \fC.FS\fP/\fC.FE\fP) have a
 straightforward translation in the HTML, with the footnote text set at the
 bottom of the HTML page, and with the footnote markers in the body and the
 footnote hyperlinking to each other.
@@ -120,32 +123,33 @@ hyperlinks; \fCindex.tmac\fP for index generation;
 for extending troff using Common Lisp; and
 \fCdefhsl.tmac\fP for defining color names using the HSL scheme.
 You should put these \fC.tmac\fP files in one of your
-macro directories, i.e., the directories that are searched by groff's
-\fC-m\fP option and \fC.mso\fP request.  (See the section for ``Macro
-Directories'' in the groff info file for details.  In a pinch, your home
+macro directories, i.e., the directories that are searched by groff’s
+\fC-m\fP option and \fC.mso\fP request.  (See the section for “Macro
+Directories” in the groff info file for details.  In a pinch, your home
 directory works as a macro directory.)
 
 .IX macro files, loading of
 Note that it is best to load these \fC.tmac\fP files into
 your document with an \fC.mso\fP request rather than through
-groff's command-line option \fC-m\fP.  This is because
-troff2page doesn't support the same kind of command-line
+groff’s command-line option \fC-m\fP.  This is because
+troff2page doesn’t support the same kind of command-line
 arguments that groff does.
 
-.SS Auxiliary files
+.** Auxiliary files
+
 .IX unsafe mode
 .IX auxiliary files
 .IX U@-U, groff option
 Many of the macros defined in these \fC.tmac\fP files write
 auxiliary files that are absorbed into the document during a
 second run.  Note that in order to write these aux files,
-groff must be run with the \fC-U\fP option for ``unsafe''
+groff must be run with the \fC-U\fP option for “unsafe”
 mode.
 
 .IX t@-t, groff option
 .IX z@-z, groff option
 As an example, consider \fCindex.ms\fP (the groff source for the
-document you're reading).  The following is one
+document you’re reading).  The following is one
 way to get the correct PostScript output:
 
 .EX
@@ -164,7 +168,7 @@ The \fC-t\fP option (which calls the tbl
 preprocessor) is needed because the
 document \fCindex.ms\fP
 uses a table.  The first run uses the \fC-z\fP option to disable
-writing an output file, which we don't need until the second
+writing an output file, which we don’t need until the second
 run.
 
 In both runs, we use the \fC-U\fP option: The first run
@@ -172,13 +176,13 @@ needs unsafe mode to write the aux files, and the second run
 needs it to process some of them with external programs to
 create additional aux files.  Subsequent runs may dispense
 with the \fC-U\fP, as all the required aux files are made.
-(You will need the option again, if the aux files' content
+(You will need the option again, if the aux files’ content
 changes.)
 
 troff2page is also run twice on the document to absorb
-information from the aux files.  However, troff2page doesn't
+information from the aux files.  However, troff2page doesn’t
 need any special option as it is always run in what groff
-would consider ``unsafe'' mode, and it processes tables by
+would consider “unsafe” mode, and it processes tables by
 itself.
 
 .EX
@@ -204,16 +208,17 @@ your document before the first use of any macros that use or
 write aux files.  It is a good idea to set it so that it
 remains
 different for troff and troff2page, so that the two
-programs' aux files don't clash.  The number register
+programs’ aux files don’t clash.  The number register
 \fC\en[.troff2page]\fP (page \*[cond-bp]) suggests a way
 to do this.
 
-.SS Simulating troff options
+.** Simulating troff options
+
 .IX troff options, translation of
 The program \fCtroff2page\fP just takes a single argument.  Typically
 this is a filename specifying
 the input document file.  If the file so named does not exist, \fCtroff2page\fP
-exits with a ``could not find'' message.
+exits with a “could not find” message.
 
 .IX help@--help, troff2page option
 .IX version@--version, troff2page option
@@ -229,7 +234,7 @@ text and exits.  For example,
     For full details, please see http://www...
 .EE
 
-While this is intentionally similar to groff's
+While this is intentionally similar to groff’s
 \fC--help\fP and \fC--version\fP options, \fCtroff2page\fP cannot process true options as \fCgroff\fP
 can.  Indeed, if \fC--help\fP and \fC--version\fP happen to be the names of input documents, \fCtroff2page\fP will
 process them as
@@ -244,11 +249,11 @@ for details on all the provided options.)
 The options can be usefully varied
 with each call to \fCgroff\fP.
 
-For options that do not make sense for HTML \*- e.g., the setting of
-\fCPO\fP (adjusting the left margin to suit a particular printer) \*-, it is fine
+For options that do not make sense for HTML — e.g., the setting of
+\fCPO\fP (adjusting the left margin to suit a particular printer) —, it is fine
 that they cannot also be fed to \fCtroff2page\fP.  For the options
-that \fIare\fP valid for both print and HTML \*- e.g., loading a macro
-file that works for both output formats \*-, you
+that \fIare\fP valid for both print and HTML — e.g., loading a macro
+file that works for both output formats —, you
 may need to add this information explicitly within the input document.
 Thus, a \fC-m\fP command-line option would be replaced by an explicit call
 to \fC.mso\fP within the document.
@@ -275,7 +280,8 @@ If the input file is recognizably a man page (i.e., it has the command
 \fC.TH\fP), both troff2page and groff will load, if it exists, the init file
 \fCman.local\fP in the home directory.
 
-.SH 3. Page layout
+.* 3. Page layout
+
 .IX page breaks
 .IX bp@.bp, troff request
 The page-break command \fC.bp\fP ends the current HTML page and start a new
@@ -333,10 +339,11 @@ explicitly to insert breaks as needed.
 Each page in a multiple-page HTML output has a navigation bar at its
 head and foot.  The bar contains links to the first, previous, and next
 page, and the table-of-contents and index pages.  If any of these pages
-doesn't exist, or if it is the same as the page containing the
+doesn’t exist, or if it is the same as the page containing the
 navigation bar, then the link for it is disabled.
 
-.SS HTML-style paragraphs
+.** HTML-style paragraphs
+
 By default, troff2page sets paragraphs exactly as groff does: the first
 lines of paragraphs are indented (unless explicitly disabled via an
 \fC.LP\fP), and
@@ -365,33 +372,34 @@ Unlike groff ms, which uses the line length given by the register
 \fCLL\fP,
 troff2page by default does not restrict the width of its HTML pages.
 Text will narrow or widen to fit the current browser window width.  However, if
-you explicitly set \fCLL\fP (instead of relying on ms's default), troff2page
+you explicitly set \fCLL\fP (instead of relying on ms’s default), troff2page
 will respect that line length.  Nevertheless, if the user shrinks the
 browser window to a width less than \fCLL\fP, the text will correspondingly
 shrink too to fit the window.  This is to avoid the need for horizontal
 scrolling.
 
 A good \fCLL\fP value for troff2page should be a bit larger than
-ms's 6 inches, which is too narrow for a browser.  The following sets it
+ms’s 6 inches, which is too narrow for a browser.  The following sets it
 to 18 cm, making sure it takes effect only for HTML:
 
 .EX
     .if \n[.troff2page] .nr LL 18c
 .EE
 
-.SH 4. Table of contents
+.* 4. Table of contents
+
 .IX table of contents
 When converting man documents, troff2page automatically generates an
 untitled table of contents (toc) at the top of the output.  Toc entries are
 generated for each \fC.SH\fP in the input.  The toc entry for a section and
-that section's header are hyperlinks to each other.
+that section’s header are hyperlinks to each other.
 
 .IX TAG@.TAG, macro
 .IX url.tmac, macro file
 For ms documents, you will need to generate your own table of
 contents.  \fCurl.tmac\fP supplies the macro \fC.TAG\fP for capturing page
 numbers. (This overrides the \fC.TAG\fP macro of
-groff's \fCwww.tmac\fP, in order to allow forward references.)
+groff’s \fCwww.tmac\fP, in order to allow forward references.)
 
 .EX
     .TAG sec:troffcl
@@ -415,7 +423,8 @@ called.
 then associated with the text of the second argument instead
 of the current page number.
 
-.SH 5. Making an index
+.* 5. Making an index
+
 .IX index
 .IX index.tmac, macro file
 .IX makeindex
@@ -439,7 +448,7 @@ The call
     .IX item
 .EE
 
-marks the text ``item'' as an indexable item.  The metacharacters \fC@\fP,
+marks the text “item” as an indexable item.  The metacharacters \fC@\fP,
 \fC!\fP, \fC"\fP, and \fC|\fP can be used to respectively specify (a)
 alternate alphabetization, (b) subitems, (c) literal metacharacters, and
 (d) encapsulation of the page number.  Please see the
@@ -447,8 +456,8 @@ makeindex
 documentation for all the details.  Essentially, the syntax for entering
 index entries is the same \*[url \
 http://tex.loria.fr/bibdex/makeindex.pdf "as for LaTeX"], except that in troff we use
-``\fC.IX item\fP'' where in LaTeX one would use
-\%``\fC\eindex{item}\fP''.
+“\fC.IX item\fP” where in LaTeX one would use
+\%“\fC\eindex{item}\fP”.
 
 \fCindex.tmac\fP will call makeindex to create a
 sorted index in the auxiliary file \fC\e*[AUXF].ind\fP, which can be
@@ -460,7 +469,8 @@ slurped back into the input document:
 
 Adding a section header on top is up to you.
 
-.SH 6. Slideshows
+.* 6. Slideshows
+
 .IX slideshow
 To cause your troff source to be converted into slideshow-ready HTML, have
 it source the provided macro file \fCt2pslides.tmac\fP.
@@ -490,11 +500,12 @@ w # toggle current slide with White screen
 
 Note that the slides are numbered from 0 onward (rather than
 1).  Also, when
-typing a number \fIn\fP that's two or more digits long to
+typing a number \fIn\fP that’s two or more digits long to
 get the \fIn\fPth slide, the digits should be pressed
 fairly rapidly so they are interpreted together.
 
-.SH 7. Extending troff using Common Lisp
+.* 7. Extending troff using Common Lisp
+
 .IX extending troff and troff2page with Common Lisp
 .IX eval@.eval, macro
 .IX endeval@.endeval, macro
@@ -538,7 +549,7 @@ Run troff (actually groff, and in unsafe mode too) on \fCpi.1\fP:
 .EE
 
 (The \fC-z\fP avoids generating output, because we are not ready for it
-yet.  The \fC-U\fP runs in ``unsafe'' mode, i.e., it allows the writing of
+yet.  The \fC-U\fP runs in “unsafe” mode, i.e., it allows the writing of
 aux files.)
 You will find that the groff call produces a message like
 the following:
@@ -574,7 +585,7 @@ The first groff call produces a Lisp file
 \fC.trofftemp.lisp\fP.\**
 .FS
 This name may be different based on
-your setting of \fC\e*[AUXF]\fP \*- see page \*[auxf].
+your setting of \fC\e*[AUXF]\fP — see page \*[auxf].
 .FE
 The second groff
 call invokes Lisp to create an auxiliary file for each \fC.eval\fP that gets sourced
@@ -605,9 +616,10 @@ Common Lisp language but also includes the procedures and data structures
 defined in troff2page.  These extras are not available (and are arguably
 not useful) to the \fC.eval\fP code seen by troff.
 
-.SS Defining color names using HSL
+.** Defining color names using HSL
+
 .IX color names, defining
-For a more substantial example of \fC.eval\fP's use, consider defining
+For a more substantial example of \fC.eval\fP’s use, consider defining
 color names using the HSL (hue/saturation/lightness) scheme rather than the
 RGB and CMYK schemes provided by groff.  For instance, we would like to
 define the color Venetian red using its HSL spec (357\(de, 49%,
@@ -617,8 +629,8 @@ define the color Venetian red using its HSL spec (357\(de, 49%,
 While there is an \*[url \
 http://en.wikipedia.org/wiki/HSL_color_space \
 algorithm] to convert HSL to RGB,
-implementing it using groff's limited arithmetic is tedious.  Instead,
-we'll define a
+implementing it using groff’s limited arithmetic is tedious.  Instead,
+we’ll define a
 much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
 
 .EX
@@ -629,7 +641,7 @@ much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
       (cond ((< n 0) (+ n 1))
             ((> n 1) (- n 1))
             (t n)))
-    
+  
     (defun tc-to-c (tc p q)
       (cond ((< tc 1/6)
              (+ p (* (- q p) 6 tc)))
@@ -638,7 +650,7 @@ much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
             ((and (<= 1/2 tc) (< tc 2/3))
              (+ p (* (- q p) 6 (- 2/3 tc))))
             (t p)))
-    
+  
     (defun hsl-to-rgb (h s l)
       (setq h (/ (mod h 360) 360))
       (let* ((q (cond ((< l 1/2) (* l (+ 1 s)))
@@ -650,7 +662,7 @@ much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
         (values (tc-to-c tr p q)
                 (tc-to-c tg p q)
                 (tc-to-c tb p q))))
-    
+  
     (defun def-hsl-color (name h s l)
       (multiple-value-bind (r g b) (hsl-to-rgb h s l)
         (format t ".defcolor ~a rgb ~a ~a ~a~%" name r g b)))
@@ -677,7 +689,7 @@ We can call this Lisp procedure inside another \fC.eval\fP to define
 The color name \fCvenetianred\fP can now be used like any other groff color name:
 
 .EX
-    Prismacolor's burnt ochre pencil is a close match for Derwent's
+    Prismacolor’s burnt ochre pencil is a close match for Derwent’s
     \fB\m[venetianred]Venetian red\m[]\fP, and either can be used to
     emulate the sanguine chalk drawings of the Old Masters.
 .EE
@@ -687,20 +699,21 @@ which produces:
 .sp 1v
 .B1
 .RS
-Prismacolor's burnt ochre pencil is a close match for Derwent's
+Prismacolor’s burnt ochre pencil is a close match for Derwent’s
 \fB\m[venetianred]Venetian red\m[]\fP, and either can be used to
 emulate the sanguine chalk drawings of the Old Masters.
 .RE
 .B2
 
-.SS Extending troff2page only
+.** Extending troff2page only
+
 .IX extending troff2page with Common Lisp without producing output
 .IX ig@.ig ##, as troff2page extender
-troff2page treats troff's \fC.ig\fP
+troff2page treats troff’s \fC.ig\fP
 environment, whenever it uses \fC##\fP as ender, as
 containing Lisp code that can be used to extend
 troff2page.  This syntactic overloading of \fC.ig ##\fP is an innovation introduced by
-Oliver Laumann's \*[url \
+Oliver Laumann’s \*[url \
 http://www-rn.informatik.uni-bremen.de/software/unroff \
 unroff].
 
@@ -713,10 +726,10 @@ the document, as \fC.eval\fP does.  This is to maintain the invariant
 that as far as output is
 concerned, \fC.ig ##\fP, like other \fC.ig\fPs, is \fIalways\fP a
 comment.  However, you can add Lisp code within \fC.ig ##\fP
-to influence how troff2page \*- but not troff! \*- processes the rest of the
+to influence how troff2page — but not troff! — processes the rest of the
 document.
 
-For example, let's define a
+For example, let’s define a
 \fC\e*[url]\fP string register that simply typesets its URL
 argument within angle brackets.
 
@@ -725,7 +738,7 @@ argument within angle brackets.
 .EE
 
 This is adequate for the print output.
-For troff2page though, we'd like to
+For troff2page though, we’d like to
 re-define this macro, in Lisp, to create a hyperlink.
 We enclose this re-definition in a \fC.ig ##\fP, which not
 only allows it to be in Lisp, but also makes it apply only
@@ -779,7 +792,8 @@ and Venetian red are all courtesy \*[url \
 http://www.resene.co.nz/swatches "Resene Paints"].
 .FE
 
-.SH 8. Recovery from errors
+.* 8. Recovery from errors
+
 .IX errors
 If troff2page fails on your document, it will display a message giving its
 best guess on what the problem is and where it occurred in the source
@@ -810,14 +824,15 @@ the first argument is \fC+\fP followed by the line number, and the second
 argument is the filename.
 (This argument style works for \fIall\fP
 vi and emacs clones and I suspect most modern editors take care
-to recognize it, so it isn't as restrictive as it sounds.)
+to recognize it, so it isn’t as restrictive as it sounds.)
 
-.SS SBCL's warnings
+.** SBCL’s warnings
+
 .IX SBCL, disabling warnings in
 When running troff2page on SBCL, you can get several
 screenfuls of diagnostic warnings.  The conditions warned
 about are benign, but the verbosity of the messages
-can be daunting.  If you'd rather they weren't there, add
+can be daunting.  If you’d rather they weren’t there, add
 the lines
 
 .EX
@@ -831,7 +846,8 @@ in your home directory.  If adding to \fC.sbclrc\fP, the
 feature expression \fC#+sbcl\fP may be omitted.
 
 .if t \{\
-.SH Index
+.* Index
+
 .\"rs
 .\"if \n(.H .sp .8v
 .2C

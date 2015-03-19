@@ -23,6 +23,8 @@
 .\"nr FPS \n[PS]
 .\"nr FVS \n[VS]
 .
+.nr PI 1.5m
+.
 .am @AU
 .  ft R
 ..
@@ -61,10 +63,10 @@
 .nr PD 1v
 .nr LL 8i
 .
-.rn SH SH_orig
-.de SH
+.rn * *_orig
+.de *
 .HBP
-.SH_orig \\$*
+.*_orig \\$*
 ..
 .\}
 .

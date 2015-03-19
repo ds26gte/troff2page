@@ -7,57 +7,7 @@
 .
 .mso pca-lsm.tmac
 .
-.rn @SH @SHorig
-.
-.de Section
-.if d write_toc_line .write_toc_line \\$*
-.@SHorig \\$1
-.shift
-\\$*
-.LP
-.ns
-.nr next_graf_without_indent 1
-..
-.de @SH
-.Section 1 \\$*
-..
-.de SS
-.Section 2 \\$*
-..
-.de ###
-.Section 3 \\$*
-..
-.de ####
-.Section 4 \\$*
-..
-.de #####
-.Section 5 \\$*
-..
-.de ######
-.Section 6 \\$*
-..
-.
-.de TH
-.RT
-.if '\\$1'' .return
-.LP
-.ce 10
-.LG
-\fB\\$*
-.sp 1ex
-.ce
-.LP
-.nr next_graf_without_indent 1
-..
-.
-.de Newsection
-.LP
-.sp .5v
-\\$*
-.sp .3v
-.LP
-.nr next_graf_without_indent 1
-..
+.mso pca-sec.tmac
 .
 .mso pca-verb.tmac
 .
@@ -74,12 +24,6 @@
 .mso pca-ix.tmac
 .if \\n[.troff2page] .mso htmlindex.tmac
 .IX \\$*
-..
-.
-.de theIndex
-.sy test -f \\*[AUXF].ind
-.ie \\n[systat] .tm \\*[AUXF].ind not yet created
-.el .so \\*[AUXF].ind
 ..
 .
 .if !\n[.troff2page] \{\
