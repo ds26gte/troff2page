@@ -10,7 +10,7 @@
 .rn @SH @SHorig
 .
 .de Section
-.if d writeTocLine .writeTocLine \\$*
+.if d write_toc_line .write_toc_line \\$*
 .@SHorig \\$1
 .shift
 \\$*
@@ -59,31 +59,7 @@
 .nr next_graf_without_indent 1
 ..
 .
-.de EX
-.LP
-.lsm
-.nf
-.in 0
-.ft C
-.KS
-.eo
-..
-.
-.de EE
-.ec
-.KE
-.fi
-.lsm leadingSpacesMacro
-.LP
-.nr next_graf_without_indent 1
-..
-.
-.de ```
-.EX
-..
-.de ````
-.EE
-..
+.mso pca-verb.tmac
 .
 .de TOC
 .if !\\n[GROWPS] \{\
@@ -106,9 +82,9 @@
 .el .so \\*[AUXF].ind
 ..
 .
-.if \n[.troff2page] .nx
-.
+.if !\n[.troff2page] \{\
 .de DC
-.mso dc.tmac
+.mso pca-dc.tmac
 .DC \\$*
 ..
+.\}

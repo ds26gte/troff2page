@@ -1,19 +1,19 @@
-.\" from www.tmac
+.\" last modified 2015-03-19
 .
-.if \n[.troff2page] .nx
+.\" from www.tmac
 .
 .de DC
 .  in 0
-.  if !d dropcap-color .ds dropcap-color black\"
-.  if !'\\$3'' .ds dropcap-color \\$3\"
+.  if !d dropcap_color .ds dropcap_color black\"
+.  if !'\\$3'' .ds dropcap_color \\$3\"
 .  ie n \
 .    nop \\$1\c
 .  el \{\
 .    nr dummy \w'\\$1'u
-.    nr dcht ((\\n[.v] + \\n[rst]) * \\n[.ps] / \\n[rst])
-.    char \[dcap] \m[\\*[dropcap-color]]\s'\\n[dcht]u'\\$1
-.    nop \v'\\n[.v]u'\\[dcap]\v'-\\n[.v]u'\c
-'        ti \w'\\[dcap]'u
+.    nr dropcap_height ((\\n[.v] + \\n[rst]) * \\n[.ps] / \\n[rst])
+.    char \[dropcap_char] \m[\\*[dropcap_color]]\s'\\n[dropcap_height]u'\\$1
+.    nop \v'\\n[.v]u'\\[dropcap_char]\v'-\\n[.v]u'\c
+'    ti \w'\\[dropcap_char]'u
 .  \}
 .  nop \\$2
 ..

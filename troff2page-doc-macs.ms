@@ -1,4 +1,4 @@
-.\" last change 2014-12-20
+.\" last change 2015-03-19
 .\" vi:ft=nroff
 .
 .ie \n[.X] \{\
@@ -11,7 +11,6 @@
 .mso p.tmac
 .mso url.tmac
 .mso defhsl.tmac
-.mso dc.tmac
 .
 .nr HM .75i
 .nr FM 1.25i
