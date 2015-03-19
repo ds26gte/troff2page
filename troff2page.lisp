@@ -1188,14 +1188,14 @@
 
 (defun emit (s)
   (with-input-from-string (i s)
-    (let ((inside-html-angle-brackets-p nil))
+    (let ((inside-html-angle-brackets-p nil) it)
       (loop
         (let ((c (read-char i nil)))
           (when (not c) (return))
           (ecase *outputting-to*
             ((:html :title)
-             (cond ((setq *it* (gethash c *glyph-table*))
-                    (emit *it*))
+             (cond ((setq it (gethash c *glyph-table*))
+                    (emit it))
                    ((char= c #\\)
                     (let ((e (read-possible-troff2page-specific-escape i)))
                       (cond ((string= e "[htmllt]")

@@ -1,4 +1,10 @@
-Last change 2014-08-22
+Last change 2015-03-19
+
+2015 Mar 19
+
+When first arg of .char is a Unicode escape (\[uXXXX]), make
+sure the corresponding Unicode cha gets translated
+correctly.
 
 2014 Aug 22
 
