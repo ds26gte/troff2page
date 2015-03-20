@@ -1,4 +1,4 @@
-.\" last change 2011-10-30
+.\" last change 2015-03-20
 .
 .if !\n[.troff2page] .nx
 .
@@ -32,7 +32,7 @@
 .de index:hook
 .ig ##
 (when (and (> *last-page-number* 0)
-           (not (gethash "troff2page_index" *node-table*)))
+           (not (gethash "TAG_troff2page_index" *node-table*)))
   (flag-missing-piece :index-in-nav-bar))
 .##
 .TAG troff2page_index
@@ -55,7 +55,7 @@
                         (incf (gethash ix-pageno *index-pageno-mention-table*))
                         :downcasep t)
                       ))
-                  (t 
+                  (t
                     (setf (gethash ix-pageno *index-pageno-mention-table*)
                           1)
                     ""))

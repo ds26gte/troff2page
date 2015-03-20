@@ -1382,7 +1382,7 @@
 		(first-page-p (= pageno 0))
 		(last-page-p (= pageno *last-page-number*))
 		(toc-page-p (and *toc-page* (= pageno *toc-page*)))
-		(*index-page* (gethash "troff2page_index" *node-table*))
+		(*index-page* (gethash "TAG_troff2page_index" *node-table*))
 		(index-page-p (and *index-page* (= pageno *index-page*))))
 	   ;(do-para)
 	   (emit-verbatim "<div align=right class=navigation><i>")
@@ -1453,7 +1453,7 @@
 	       (unless index-page-p
 		 (emit (link-start (page-node-link
 				     *index-page*
-				     "troff2page_index"
+				     "TAG_troff2page_index"
 				     ;(concatenate 'string *html-node-prefix* "index_start")
 				     ))))
 	       (emit *navigation-index-name*)
