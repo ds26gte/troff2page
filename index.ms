@@ -314,8 +314,8 @@ The greater-than-zero number held in the register
 \fC\en[.troff2page]\fP
 is in fact the version
 number of the troff2page program processing the document.  This is a number
-such as 20050327, which would be the version number of the troff2page
-released on 2005 March 27.  \fC\en[.troff2page]\fP could plausibly be used
+such as 20150320, which would be the version number of the troff2page
+released on 2015 March 20.  \fC\en[.troff2page]\fP could plausibly be used
 to distinguish not just troff2page from troff, but also between various versions
 of troff2page.  Thus, one could, if the need were dire, write a document
 that translates differently with different versions of troff2page.
@@ -525,7 +525,7 @@ this Lisp code
 is substituted for the \fC.eval\fP ... \fC.endeval\fP.
 The usefulness of this tactic will be apparent from an
 example.
-Consider the following troff document, \fCtau.1\fP:
+Consider the following troff document, \fCtau.ms\fP:
 
 .EX
     .mso eval4troff.tmac
@@ -543,10 +543,10 @@ Consider the following troff document, \fCtau.1\fP:
 .IX unsafe mode
 .IX z@-z, groff option
 .IX U@-U, groff option
-Run troff (actually groff, and in unsafe mode too) on \fCtau.1\fP:
+Run troff (actually groff, and in unsafe mode too) on \fCtau.ms\fP:
 
 .EX
-    groff -z -U -ms tau.1
+    groff -z -U -ms tau.ms
 .EE
 
 (The \fC-z\fP avoids generating output, because we are not ready for it
@@ -564,7 +564,7 @@ the following:
 Call groff again as follows:
 
 .EX
-    groff -U -ms tau.1 > tau.ps
+    groff -U -ms tau.ms > tau.ps
 .EE
 
 \fCtau.ps\fP will now look like:
@@ -596,7 +596,7 @@ It is clear that Lisp code via \fC.eval\fP can
 serve as a very powerful \fIsecond extension language\fP
 for troff.  This benefit is available even when the document
 is processed by troff2page:
-We could run troff2page on the same document, \fCtau.1\fP, and the
+We could run troff2page on the same document, \fCtau.ms\fP, and the
 resulting \fCtau.html\fP will show the same content.
 
 .IX extending troff and troff2page differently with Common Lisp
@@ -689,14 +689,14 @@ We can call this Lisp procedure inside another \fC.eval\fP to define
 The color name \fCvenetianred\fP can now be used like any other groff color name:
 
 .EX
+.ec
     Prismacolor’s burnt ochre pencil is a close match for Derwent’s
     \fB\m[venetianred]Venetian red\m[]\fP, and either can be used to
     emulate the sanguine chalk drawings of the Old Masters.
 .EE
 
-which produces:
+This produces:
 
-.sp 1v
 .B1
 .RS
 Prismacolor’s burnt ochre pencil is a close match for Derwent’s
