@@ -3624,9 +3624,15 @@
            (pageno *current-pageno*)
            (tag-value (or (cadr args) (write-to-string pageno))))
       ;(format t "node = ~s~%" node)
-      (defstring (concatenate 'string "TAG_" node)
+      (defstring node
         (lambda ()
-          (verbatim tag-value)))
+          (concatenate 'string
+            (link-start
+              (page-node-link pageno node))
+            (verbatim tag-value)
+            (link-stop))))
+      (defstring (concatenate 'string "TAG_" node)
+        (gethash node *string-table*))
       ;(setq *keep-newline-p* nil)
       (emit (anchor node))
       ;(emit-edit-source-doc :interval 10)
