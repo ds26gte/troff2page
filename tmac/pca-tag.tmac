@@ -1,42 +1,38 @@
-.\" last change 2015-03-19
+.\" last change 2015-03-20
+.\" Dorai Sitaram
 .
 .\" don't load if not groff
 .if !\n(.g .nx
 .
 .\" don't load more than once
-.if d pagetag:set_up .nx
-.
-.if !\n[.troff2page] \{\
-.ds url \\$\\n[.$]
-.ds urlh "
-.\}
+.if d urlh .nx
 .
 .if '\*[AUXF]'' .ds AUXF .trofftemp
 .
-.nr pagetag:already_set_up 0
+.nr pca-tag:already_set_up 0
 .
-.if !d TAG \{\
+.so \*[AUXF].aux
+.
+.de pca-tag:set_up
+.  if \\n[pca-tag:already_set_up] .return
+.  nr pca-tag:already_set_up 1
+.  if !\\n[.U] .return
+.  open pca-tag:aux_port \\*[AUXF].aux
+..
+.
 .de TAG
-..
-.\}
-.
-.de pagetag:set_up
-.  \" load aux file containing pagetags if not already loaded
-.  if !\\n[pagetag:already_set_up] \{\
-.    nr pagetag:already_set_up 1
-.    so \\*[AUXF].aux
-.    if \\n[.U] .open pagetag:aux_port \\*[AUXF].aux
-.  \}
-..
-.
-.am TAG
-.  pagetag:set_up
+.  pca-tag:set_up
 .  \" if 2nd arg present, use that value instead of current pageno
-.  ie '\\$2'' .ds pagetag:value \\n[PN]
-.  el .ds pagetag:value \\$2
-.  ds \\$1 \\\\*[url #\\$1 \\*[pagetag:value]]
+.  ie '\\$2'' .ds pca-tag:value \\n[PN]
+.  el .ds pca-tag:value \\$2
+.  ds \\$1 \\*[pca-tag:value]
+.  ds TAG_\\$1 \\*[pca-tag:value]
 .  \" continue only in unsafe mode
 .  if !\\n[.U] .return
-.  if d www:url_check_tag .write pagetag:aux_port .ds TAG_\\$1 \\*[pagetag:value]
-.  write pagetag:aux_port .ds \\$1 \\\\*[url #\\$1 \\*[pagetag:value]]
+.  write pca-tag:aux_port .ds \\$1 \\*[pca-tag:value]
+.  write pca-tag:aux_port .ds TAG_\\$1 \\*[pca-tag:value]
 ..
+.
+.ds url \\$\\n[.$]
+.
+.ds urlh "
