@@ -24,7 +24,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150319) ;last change
+(defparameter *troff2page-version* 20150320) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -1913,9 +1913,15 @@
 (defun !last-page-number (n)
     (setq *last-page-number* n))
 
-(defun !node (node page)
-  (setf (gethash node *node-table*)
-        page))
+(defun !node (node pageno tag-value)
+  (setf (gethash node *node-table*) pageno)
+  (defstring node
+    (lambda ()
+      (concatenate 'string
+        (link-start
+          (page-node-link pageno node))
+        (verbatim tag-value)
+        (link-stop)))))
 
 (defun !header (s)  ;will it show in reverse
   (push s *html-head*))
@@ -3618,27 +3624,16 @@
 
 (defrequest "TAG"
   (lambda ()
-    ;(format t "doing TAG~%")
     (let* ((args (read-args))
-           (node (car args))
+           (node (concatenate 'string "TAG_" (car args)))
            (pageno *current-pageno*)
            (tag-value (or (cadr args) (write-to-string pageno))))
-      ;(format t "node = ~s~%" node)
-      (defstring node
-        (lambda ()
-          (concatenate 'string
-            (link-start
-              (page-node-link pageno node))
-            (verbatim tag-value)
-            (link-stop))))
-      (defstring (concatenate 'string "TAG_" node)
-        (gethash node *string-table*))
       ;(setq *keep-newline-p* nil)
       (emit (anchor node))
       ;(emit-edit-source-doc :interval 10)
       (emit-newline)
-      (!node node pageno)
-      (write-aux `(!node ,node ,pageno)))))
+      (!node node pageno tag-value)
+      (write-aux `(!node ,node ,pageno ,tag-value)))))
 
 (defrequest "ULS"
   (lambda ()
@@ -4613,11 +4608,13 @@
       (troff2page-file input-doc)
       (do-bye))))
 
+;(trace !last-page-number)
 ;(trace all-args execute-macro do-section)
-;(trace do-section)
 ;(trace author-info)
 ;(trace check-verbatim-apostrophe-status)
 ;(trace collect-macro-body)
+;(trace do-eject)
+;(trace do-section)
 ;(trace ev-switch)
 ;(trace eval-in-lisp)
 ;(trace execute-macro )
@@ -4629,15 +4626,16 @@
 ;(trace make-span-open)
 ;(trace open)
 ;(trace raw-counter-value)
-;(trace read-possible-troff2page-specific-escape)
+;(trace read-args)
 ;(trace read-escaped-word)
 ;(trace read-from-string)
+;(trace read-possible-troff2page-specific-escape)
+;(trace read-troff-line)
 ;(trace snoop-char)
 ;(trace switch-font switch-style)
 ;(trace switch-style )
 ;(trace troff2page-file)
-;(trace read-troff-line)
-;(trace read-args)
+;(trace troff2page-file)
 
 (troff2page *troff2page-file-arg*)
 

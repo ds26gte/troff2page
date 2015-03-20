@@ -1,5 +1,4 @@
-.\" last change 2015-03-19
-.\" vi:ft=nroff
+.\" last change 2015-03-20
 .
 .ie \n[.X] \{\
 .mso s  \" heirloom troff

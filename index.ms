@@ -1,7 +1,6 @@
-.\" vi:ft=nroff
 .so troff2page-doc-macs.ms
 .
-.ND 2015-03-19  \"last modified
+.ND 2015-03-20  \"last modified
 .
 .TL
 troff2page
@@ -113,13 +112,13 @@ obvious.
 
 .IX macro files provided with troff2page
 .IX m@-m, groff option
-.IX url.tmac, macro file
-.IX index.tmac, macro file
+.IX pca-tag.tmac, macro file
+.IX pca-ix.tmac, macro file
 .IX eval4troff.tmac, macro file
 .IX mso@.mso, groff request
 The troff2page distribution includes several files with
-extension \fCtmac\fP, viz., \fCurl.tmac\fP for inserting
-hyperlinks; \fCindex.tmac\fP for index generation;
+extension \fCtmac\fP, viz., \fCpca-tag.tmac\fP for inserting
+hyperlinks; \fCpca-ix.tmac\fP for index generation;
 \fCeval4troff.tmac\fP
 for extending troff using Common Lisp; and
 \fCdefhsl.tmac\fP for defining color names using the HSL scheme.
@@ -210,7 +209,7 @@ write aux files.  It is a good idea to set it so that it
 remains
 different for troff and troff2page, so that the two
 programs’ aux files don’t clash.  The number register
-\fC\en[.troff2page]\fP (page \*[cond-bp]) suggests a way
+\fC\en[.troff2page]\fP (page \*[TAG_cond-bp]) suggests a way
 to do this.
 
 .== Simulating troff options
@@ -396,9 +395,9 @@ generated for each \fC.SH\fP in the input.  The toc entry for a section and
 that section’s header are hyperlinks to each other.
 
 .IX TAG@.TAG, macro
-.IX url.tmac, macro file
+.IX pca-tag.tmac, macro file
 For ms documents, you will need to generate your own table of
-contents.  \fCurl.tmac\fP supplies the macro \fC.TAG\fP for capturing page
+contents.  \fCpca-tag.tmac\fP supplies the macro \fC.TAG\fP for capturing page
 numbers. (This overrides the \fC.TAG\fP macro of
 groff’s \fCwww.tmac\fP, in order to allow forward references.)
 
@@ -406,17 +405,17 @@ groff’s \fCwww.tmac\fP, in order to allow forward references.)
     .TAG sec:troffcl
 .EE
 
-associates the label \fCsec:troffcl\fP with the number of
-the current page.  The string \fC\e*[sec:troffcl]\fP
+associates the label \fCTAG_sec:troffcl\fP with the number of
+the current page.  The string \fC\e*[TAG_sec:troffcl]\fP
 is defined to typeset as that page number.
 Thus, in your hand-crafted toc, you could
 use
 
 .EX
-    Extending troff using Common Lisp, \*[sec:troffcl]
+    Extending troff using Common Lisp, \*[TAG_sec:troffcl]
 .EE
 
-In the HTML output, the string \fC\e*[sec:troffcl]\fP
+In the HTML output, the string \fC\e*[TAG_sec:troffcl]\fP
 furthermore is a link to where \fC.TAG sec:troffcl\fP was
 called.
 
@@ -427,7 +426,7 @@ of the current page number.
 .= 5. Making an index
 
 .IX index
-.IX index.tmac, macro file
+.IX pca-ix.tmac, macro file
 .IX makeindex
 The supplied macro file \fCpca-ix.tmac\fP
 creates a sorted
@@ -461,7 +460,7 @@ http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in troff we
 “\fC.IX item\fP” where in LaTeX one would use
 \%“\fC\eindex{item}\fP”.
 
-\fCindex.tmac\fP will call makeindex to create a
+\fCpca-ix.tmac\fP will call makeindex to create a
 sorted index in the auxiliary file \fC\e*[AUXF].ind\fP, which can be
 slurped back into the input document:
 
@@ -587,7 +586,7 @@ The first groff call produces a Lisp file
 \fC.trofftemp.lisp\fP.\**
 .FS
 This name may be different based on
-your setting of \fC\e*[AUXF]\fP — see page \*[auxf].
+your setting of \fC\e*[AUXF]\fP — see page \*[TAG_auxf].
 .FE
 The second groff
 call invokes Lisp to create an auxiliary file for each \fC.eval\fP that gets sourced
@@ -604,7 +603,7 @@ resulting \fCpi.html\fP will show the same content.
 Furthermore, we can embed  \fC.eval\fP-enclosed Lisp code inside an
 \fC.if\fP (or \fC.ie\fP or \fC.el\fP) statement so that it gets executed
 only for troff or only for troff2page.  (Recall we used the number register
-\fC\en[.troff2page]\fP for this purpose on page \*[cond-bp].)  In
+\fC\en[.troff2page]\fP for this purpose on page \*[TAG_cond-bp].)  In
 particular, by calling Lisp code only for troff2page, the
 user has the
 means to extend troff2page to deal with things that the core

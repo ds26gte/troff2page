@@ -1,6 +1,9 @@
 .\" last change 2015-03-20
 .\" Dorai Sitaram
 .
+.\" Generalization of .TAG in groff's www.tmac, in order
+.\" to allow forward references
+.
 .\" don't load if not groff
 .if !\n(.g .nx
 .
@@ -14,23 +17,21 @@
 .so \*[AUXF].aux
 .
 .de pca-tag:set_up
-.  if \\n[pca-tag:already_set_up] .return
-.  nr pca-tag:already_set_up 1
-.  if !\\n[.U] .return
-.  open pca-tag:aux_port \\*[AUXF].aux
+. if \\n[pca-tag:already_set_up] .return
+. nr pca-tag:already_set_up 1
+. if !\\n[.U] .return
+. open pca-tag:port \\*[AUXF].aux
 ..
 .
 .de TAG
-.  pca-tag:set_up
-.  \" if 2nd arg present, use that value instead of current pageno
-.  ie '\\$2'' .ds pca-tag:value \\n[PN]
-.  el .ds pca-tag:value \\$2
-.  ds \\$1 \\*[pca-tag:value]
-.  ds TAG_\\$1 \\*[pca-tag:value]
-.  \" continue only in unsafe mode
-.  if !\\n[.U] .return
-.  write pca-tag:aux_port .ds \\$1 \\*[pca-tag:value]
-.  write pca-tag:aux_port .ds TAG_\\$1 \\*[pca-tag:value]
+. pca-tag:set_up
+. \" if 2nd arg present, use that value instead of current pageno
+. ie '\\$2'' .ds pca-tag:value \\n[PN]
+. el .ds pca-tag:value \\$2
+. ds TAG_\\$1 \\*[pca-tag:value]
+. \" continue only in unsafe mode
+. if !\\n[.U] .return
+. write pca-tag:port .ds TAG_\\$1 \\*[pca-tag:value]
 ..
 .
 .ds url \\$\\n[.$]
