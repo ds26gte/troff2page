@@ -43,7 +43,7 @@
 
 (setf (gethash "index:function" *string-table*)
       (lambda (ixno)
-        (let* ((ix-tag (concatenate 'string "index_" ixno))
+        (let* ((ix-tag (concatenate 'string "TAG_index_" ixno))
                (ix-pageno (gethash ix-tag *node-table*)))
           (concatenate 'string
             (link-start (page-node-link ix-pageno ix-tag))
