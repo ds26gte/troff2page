@@ -691,8 +691,7 @@ The color name \fCvenetianred\fP can now be used like any other groff color name
 .EX
 .ec
     Prismacolor’s burnt ochre pencil is a close match for Derwent’s
-.eo
-    \fB\m[venetianred]Venetian red\m[]\fP, and either can be used to
+    \\fB\\m[venetianred]Venetian red\\m[]\\fP, and either can be used to
     emulate the sanguine chalk drawings of the Old Masters.
 .EE
 
