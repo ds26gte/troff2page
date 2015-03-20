@@ -525,16 +525,16 @@ this Lisp code
 is substituted for the \fC.eval\fP ... \fC.endeval\fP.
 The usefulness of this tactic will be apparent from an
 example.
-Consider the following troff document, \fCpi.1\fP:
+Consider the following troff document, \fCtau.1\fP:
 
 .EX
     .mso eval4troff.tmac
     .
     The ratio of the circumference of a circle to
-    its diameter is \(*p \(~=
+    its radius is \(*t \(~=
     .eval
-    ;following prints pi, because cos(pi) = -1
-    (princ (acos -1))
+    ;following prints tau, because cos(tau/2) = -1
+    (princ (* 2 (acos -1)))
     (princ ".")
     (terpri)
     .endeval
@@ -543,10 +543,10 @@ Consider the following troff document, \fCpi.1\fP:
 .IX unsafe mode
 .IX z@-z, groff option
 .IX U@-U, groff option
-Run troff (actually groff, and in unsafe mode too) on \fCpi.1\fP:
+Run troff (actually groff, and in unsafe mode too) on \fCtau.1\fP:
 
 .EX
-    groff -z -U -ms pi.1
+    groff -z -U -ms tau.1
 .EE
 
 (The \fC-z\fP avoids generating output, because we are not ready for it
@@ -564,18 +564,18 @@ the following:
 Call groff again as follows:
 
 .EX
-    groff -U -ms pi.1 > pi.ps
+    groff -U -ms tau.1 > tau.ps
 .EE
 
-\fCpi.ps\fP will now look like:
+\fCtau.ps\fP will now look like:
 
 .B1
 .RS
 The ratio of the circumference of a circle to
-its diameter is \(*p \(~=
+its radius is \(*t \(~=
 .eval
-;following prints pi, because cos(pi) = -1
-(princ (acos -1))
+;following prints tau, because cos(tau/2) = -1
+(princ (* 2 (acos -1)))
 (princ ".")
 (terpri)
 .endeval
@@ -596,8 +596,8 @@ It is clear that Lisp code via \fC.eval\fP can
 serve as a very powerful \fIsecond extension language\fP
 for troff.  This benefit is available even when the document
 is processed by troff2page:
-We could run troff2page on the same document, \fCpi.1\fP, and the
-resulting \fCpi.html\fP will show the same content.
+We could run troff2page on the same document, \fCtau.1\fP, and the
+resulting \fCtau.html\fP will show the same content.
 
 .IX extending troff and troff2page differently with Common Lisp
 Furthermore, we can embed  \fC.eval\fP-enclosed Lisp code inside an

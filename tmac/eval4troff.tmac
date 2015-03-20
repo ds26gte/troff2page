@@ -1,4 +1,5 @@
-.\" last modified 2010-09-18
+.\" last modified 2015-03-20
+.\" Dorai Sitaram
 .
 .\" don't load if not groff
 .if !\n(.g .nx
@@ -34,26 +35,23 @@
 .  if !\\n[.U] .return
 .  evallispsnippets
 .  nr eval4troff:count 0
-.  ecs
-.  ec @
-.  open  eval4troff:port @*[AUXF].lisp
+.  open  eval4troff:port \\*[AUXF].lisp
 .  write eval4troff:port (defvar *eval4troff-stdout* *standard-output*)
 .  write eval4troff:port (defun eval4troff-preamble (f)
-.  write eval4troff:port   (setq *standard-output* 
-.  write eval4troff:port     (open f :direction :output :if-exists :supersede))
-.  write eval4troff:port   (format t ".ecr~%"))
+.  write eval4troff:port   (setq *standard-output*
+.  write eval4troff:port     (open f :direction :output :if-exists :supersede)))
 .  write eval4troff:port (defun eval4troff-postamble ()
-.\"  write eval4troff:port   (format t "\\\\c~%")
-.  write eval4troff:port   (format t ".ecs~%")
+.  eo
+.  write eval4troff:port   (format t "\\\\c~%")
+.  ec
 .  write eval4troff:port   (format t ".ds eval4troff:status done~%")
 .  write eval4troff:port   (close *standard-output*)
 .  write eval4troff:port   (setq *standard-output* *eval4troff-stdout*))
-.  ecr
 ..
 .
 .ds eval4troff:status try
 .
-.de eval 
+.de eval
 .  eval4troff:setup
 .  nr eval4troff:count +1
 .  ie !'\\*[eval4troff:status]'rerun' \{\
@@ -68,13 +66,11 @@
 .de endeval
 .  ec
 .  if !\\n[.U] .return
-.  ecs
-.  ec @
-.if !\n[.X]  .write  eval4troff:port " 
-.  write  eval4troff:port (eval4troff-preamble "@*[AUXF]_lisp_@n[eval4troff:count].tmp")
-.  writem eval4troff:port eval4troff:text 
+.  write  eval4troff:port (eval4troff-preamble "\\*[AUXF]_lisp_\\n[eval4troff:count].tmp")
+.  eo
+.  writem eval4troff:port eval4troff:text
+.  ec
 .  write  eval4troff:port (eval4troff-postamble)
-.  ecr
 ..
 .
 .de eval4troff:usage
@@ -85,7 +81,7 @@
 (defrequest "evallispsnippets"
   (lambda ()
     (read-troff-line)
-    (let ((f (concatenate 'string 
+    (let ((f (concatenate 'string
                 (funcall (gethash "AUXF" *string-table*))
                 ".lisp")))
       (when (probe-file f) (load f)))))
