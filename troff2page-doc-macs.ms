@@ -9,7 +9,7 @@
 .
 .\"mso www.tmac \" ??
 .mso p.tmac
-.mso url.tmac
+.\"mso url.tmac
 .mso defhsl.tmac
 .
 .nr HM .75i
