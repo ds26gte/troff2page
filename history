@@ -1,4 +1,8 @@
-Last change 2015-03-19
+Last change 2015-03-25
+
+2015 Mar 25
+
+Don't do ToC in troff2page.lisp. Move it to a .tmac file.
 
 2015 Mar 19
 

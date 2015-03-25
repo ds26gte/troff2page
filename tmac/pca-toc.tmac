@@ -1,13 +1,13 @@
-.\" last modified 2015-03-19
+.\" last modified 2015-03-25
 .\" Dorai Sitaram
 .
 .if !\n(.g .nx
 .
-.if d write_toc_line .nx
+.if d process_toc_line .nx
 .
 .if '\*[AUXF]'' .ds AUXF .trofftemp
 .
-.de write_toc_line
+.de process_toc_line
 .if !\\n[enable_toc_entries] .return
 .if !\\n[.U] .return
 .nr header_level \\$1
@@ -16,7 +16,12 @@
 .if !\\n[toc_opened] \{\
 .nr toc_opened 1
 .open toc:port \\*[AUXF].toc
+.write toc:port .if d toc:hook .toc:hook
 .\}
+.write_toc_line \\$*
+..
+.
+.de write_toc_line
 .write toc:port .TOCLINE \\n[header_level] \\n[%] \\$*
 ..
 .
@@ -34,3 +39,5 @@
 .nr next_graf_without_indent 1
 .nr enable_toc_entries 1
 ..
+.
+.if \n[.troff2page] .mso pca-t2p-toc.tmac

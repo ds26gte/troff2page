@@ -24,7 +24,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150320) ;last change
+(defparameter *troff2page-version* 20150325) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -515,7 +515,6 @@
 (defvar *html-head*)
 (defvar *html-page*)
 (defvar *image-file-count*)
-(defvar *index-page*)
 (defvar *input-line-no*)
 (defvar *inside-table-text-block-p*)
 (defvar *jobname*)
@@ -561,8 +560,6 @@
 (defvar *temp-string-count*)
 (defvar *this-footnote-is-numbered-p*)
 (defvar *title*)
-(defvar *toc-list*)
-(defvar *toc-page*)
 (defvar *turn-off-escape-char-p*)
 (defvar *verbatim-apostrophe-p*)
 
@@ -570,7 +567,6 @@
 
 (defstruct bport* (port nil) (buffer '()))
 (defstruct counter* (value 0) (format "1") (thunk nil))
-(defstruct tocentry* level number page node header)
 (defstruct diversion* port return)
 (defstruct footnote* tag number text)
 
@@ -1381,9 +1377,10 @@
 	 (let* ((pageno *current-pageno*)
 		(first-page-p (= pageno 0))
 		(last-page-p (= pageno *last-page-number*))
-		(toc-page-p (and *toc-page* (= pageno *toc-page*)))
-		(*index-page* (gethash "TAG_troff2page_index" *node-table*))
-		(index-page-p (and *index-page* (= pageno *index-page*))))
+                (toc-page (gethash "TAG_troff2page_toc" *node-table*))
+		(toc-page-p (and toc-page (= pageno toc-page)))
+		(index-page (gethash "TAG_troff2page_index" *node-table*))
+		(index-page-p (and index-page (= pageno index-page))))
 	   ;(do-para)
 	   (emit-verbatim "<div align=right class=navigation><i>")
 	   ;(emit-newline)
@@ -1417,45 +1414,43 @@
 	   ;
 	   (emit *navigation-page-name*)
 	   ;
-	   (when (or *toc-page* *index-page*)
+	   (when (or toc-page index-page)
 	     (emit-verbatim "<span")
-	     (when (or (and toc-page-p (not *index-page*) (not index-page-p))
-		       (and index-page-p (not *toc-page*) (not toc-page-p)))
+	     (when (or (and toc-page-p (not index-page) (not index-page-p))
+		       (and index-page-p (not toc-page) (not toc-page-p)))
 	       (emit-verbatim " class=disable"))
 	     (emit-verbatim ">; ")
 	     (emit-nbsp 2)
 	     (emit-verbatim "</span>")
 	     ;
-	     (when *toc-page*
+	     (when toc-page
 	       (emit-verbatim "<span")
 	       (when toc-page-p (emit-verbatim " class=disable"))
 	       (emit-verbatim ">")
 	       (unless toc-page-p
 		 (emit (link-start (page-node-link
-				     *toc-page*
-				     (concatenate 'string *html-node-prefix* "toc_start")))))
+				     toc-page
+                                     "TAG_troff2page_toc"))))
 	       (emit *navigation-contents-name*)
 	       (unless toc-page-p (emit (link-stop)))
 	       (emit-verbatim "</span>"))
 	     ;
-	     (when *index-page*
+	     (when index-page
 	       (emit-verbatim "<span")
 	       (when index-page-p (emit-verbatim " class=disable"))
 	       (emit-verbatim ">")
 	       (emit-verbatim "<span")
-	       (unless (and *toc-page* (not toc-page-p))
+	       (unless (and toc-page (not toc-page-p))
 		 (emit-verbatim " class=disable"))
 	       (emit-verbatim ">")
-	       (when *toc-page*
+	       (when toc-page
 		 (emit-verbatim "; ")
 		 (emit-nbsp 2))
 	       (emit-verbatim "</span>")
 	       (unless index-page-p
 		 (emit (link-start (page-node-link
-				     *index-page*
-				     "TAG_troff2page_index"
-				     ;(concatenate 'string *html-node-prefix* "index_start")
-				     ))))
+				     index-page
+				     "TAG_troff2page_index"))))
 	       (emit *navigation-index-name*)
 	       (unless index-page-p (emit (link-stop)))
 	       (emit-verbatim "</span>")))
@@ -1556,34 +1551,6 @@
   (emit-verbatim "</div>") (emit-newline)
   (emit-verbatim "</body>") (emit-newline)
   (emit-verbatim "</html>") (emit-newline))
-
-(defun do-toc ()
-  ;(read-troff-line)
-  (unless (and (eql *macro-package* :man)
-               (= (length *toc-list*) 1))
-    (let ((html-page-count *current-pageno*))
-      (!toc-page html-page-count)
-      (write-aux `(!toc-page ,html-page-count)))
-    (cond ((null *toc-list*) (unless (= *last-page-number* 0)
-                               (flag-missing-piece :toc)))
-          (t (emit (anchor (concatenate 'string *html-node-prefix* "toc_start")))
-             ;(emit-edit-source-doc)
-             (emit-newline)
-             (dolist (x *toc-list*)
-               (emit-nbsp (* 3 (1- (tocentry*-level x))))
-               (emit (link-start (page-node-link
-                                   (tocentry*-page x)
-                                   (tocentry*-node x))))
-               (when (setq *it* (tocentry*-number x))
-                 (emit-verbatim *it*)
-                 (emit-verbatim ".")
-                 (emit-nbsp 2))
-               (emit-verbatim (tocentry*-header x))
-               (emit (link-stop))
-               (emit-verbatim "<br>")
-               (emit-newline))
-             (emit (anchor (concatenate 'string *html-node-prefix* "toc_end")))
-             (emit-newline)))))
 
 ;
 
@@ -1714,10 +1681,7 @@
 
 (defun do-section (level &key numberedp)
   (let* ((this-section-no nil)
-         (growps (raw-counter-value "GROWPS"))
-         (tocp (case *macro-package*
-                 (:man (= level 1))
-                 (t (<= level growps)))))
+         (growps (raw-counter-value "GROWPS")))
     (do-para)
     (when numberedp
       (setf (counter*-value (get-counter-named "nh*hl")) level)
@@ -1733,7 +1697,6 @@
     ;(emit-edit-source-doc)
     (get-header
       (lambda (header)
-        (when (string= header "") (setq tocp nil))
         (let ((node-name (concatenate 'string
                            *html-node-prefix* "sec_"
                            (or this-section-no (gen-temp-string))))
@@ -1759,12 +1722,6 @@
                                        ps))))
             (emit-verbatim "%\""))))
           (emit-verbatim ">")
-          #|
-          (when *toc-page*
-            (emit (link-start (page-node-link
-				*toc-page*
-				(concatenate 'string *html-node-prefix* "toc_start")))))
-          |#
           (when (eq *macro-package* :man)
             (emit-verbatim
               (case level
@@ -1774,9 +1731,6 @@
           (when this-section-no
             (emit this-section-no) (emit-verbatim ".") (emit-nbsp 2))
           (emit-verbatim header)
-          #|
-          (when *toc-page* (emit (link-stop)))
-          |#
           (when (eq *macro-package* :man)
             (emit-verbatim
               (case level
@@ -1787,16 +1741,7 @@
           (emit-verbatim ">")
           (emit-newline)
           ;(do-para)
-          #|
-          (let ((hx (raw-counter-value "www:HX")))
-            (cond ((= hx -1) t)
-                  ((= hx 0) (setq tocp nil))
-                  ((> level hx) (setq tocp nil))))
-          |#
-          (when tocp
-            (write-aux
-              `(!toc-entry ,level ,this-section-no ,*current-pageno*
-                           ,node-name ,header))))))))
+          )))))
 
 (defun do-end-page ()
   (output-footnotes)
@@ -2370,9 +2315,7 @@
       (delete-file aux-file))
     (when *html-head* (setq *html-head* (nreverse *html-head*)))
     (setq *aux-port* (open aux-file :direction :output)))
-  (start-css-file)
-  (unless (null *toc-list*)
-    (setq *toc-list* (nreverse *toc-list*))))
+  (start-css-file))
 
 (defun next-html-image-file-stem ()
   (incf *image-file-count*)
@@ -2800,18 +2743,6 @@
 
 (defun formatted-counter-value (str)
   (get-counter-value (get-counter-named str)))
-
-(defun !toc-page (p)
-  (setq *toc-page* p))
-
-(defun !toc-entry (level number page node header)
-  (push
-    (make-tocentry* :level level
-                    :number number
-                    :page page
-                    :node node
-                    :header header)
-    *toc-list*))
 
 (defun load-troff2page-data-file (f)
   (let ((*input-line-no* 0)
@@ -3355,9 +3286,7 @@
                     (setq date (string-trim-blanks date))
                     (unless (string= date "")
                       (setf (gethash "DY" *string-table*)
-                            (lambda () date))))
-                  (when sec
-                    (do-toc)))))))))
+                            (lambda () date)))))))))))
 
 (defrequest "TL"
   (lambda ()
@@ -4109,11 +4038,6 @@
 
 ;
 
-(defrequest "LK"
-  (lambda ()
-    (read-troff-line)
-    (do-toc)))
-
 (defrequest "HX"
   (lambda ()
     (setf (counter*-value (get-counter-named "www:HX"))
@@ -4548,7 +4472,6 @@
           (*html-head* '())
           (*html-page* nil)
           (*image-file-count* 0)
-          (*index-page* nil)
           (*input-line-no* 0)
           (*inside-table-text-block-p* nil)
           (*jobname* (file-stem-name input-doc))
@@ -4593,8 +4516,6 @@
           (*temp-string-count* 0)
           (*this-footnote-is-numbered-p* nil)
           (*title* nil)
-          (*toc-list* '())
-          (*toc-page* nil)
           (*turn-off-escape-char-p* nil)
           (*verbatim-apostrophe-p* nil)
 

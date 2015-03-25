@@ -1,4 +1,4 @@
-.\" last change 2015-03-20
+.\" last change 2015-03-23
 .\" Dorai Sitaram
 .
 .\" Generalization of .TAG in groff's www.tmac, in order
@@ -14,7 +14,11 @@
 .
 .nr pca-tag:already_set_up 0
 .
-.so \*[AUXF].aux
+.ie \n[.U] \{\
+.sy test -f \*[AUXF].aux
+.if !\n[systat] .so \*[AUXF].aux
+.\}
+.el .so \*[AUXF].aux
 .
 .de pca-tag:set_up
 . if \\n[pca-tag:already_set_up] .return

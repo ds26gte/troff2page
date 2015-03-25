@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-03-20  \"last modified
+.ND 2015-03-25  \"last modified
 .
 .TL
 troff2page
@@ -15,7 +15,7 @@ troff2page
 .\}
 .RT
 .
-.LK
+.TOC
 
 .= 1. Introduction
 
@@ -386,20 +386,16 @@ to 18 cm, making sure it takes effect only for HTML:
     .if \n[.troff2page] .nr LL 18c
 .EE
 
-.= 4. Table of contents
+.= 4. Cross-references
 
-.IX table of contents
-When converting man documents, troff2page automatically generates an
-untitled table of contents (toc) at the top of the output.  Toc entries are
-generated for each \fC.SH\fP in the input.  The toc entry for a section and
-that section’s header are hyperlinks to each other.
-
+.IX cross-references
 .IX TAG@.TAG, macro
 .IX pca-tag.tmac, macro file
-For ms documents, you will need to generate your own table of
-contents.  \fCpca-tag.tmac\fP supplies the macro \fC.TAG\fP for capturing page
-numbers. (This overrides the \fC.TAG\fP macro of
-groff’s \fCwww.tmac\fP, in order to allow forward references.)
+troff2page provides a \fC.TAG\fP macro for managing
+cross-references. A compatible groff definition is provided in
+the supplied macro file \fCpca-tag.tmac\fP. (This overrides the
+similarly named macro in groff’s \fCwww.tmac\fP, in order to allow
+forward references.)
 
 .EX
     .TAG sec:troffcl
@@ -408,7 +404,7 @@ groff’s \fCwww.tmac\fP, in order to allow forward references.)
 associates the label \fCTAG_sec:troffcl\fP with the number of
 the current page.  The string \fC\e*[TAG_sec:troffcl]\fP
 is defined to typeset as that page number.
-Thus, in your hand-crafted toc, you could
+Thus, in a hand-crafted table of contents, you could
 use
 
 .EX
@@ -422,6 +418,9 @@ called.
 \fC.TAG\fP takes an optional second argument.  The label is
 then associated with the text of the second argument instead
 of the current page number.
+
+troff2page comes with the macro file \fCpca-toc.tmac\fP that
+uses \fC.TAG\fP to generate a table of contents.
 
 .= 5. Making an index
 
