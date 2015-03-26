@@ -1657,29 +1657,27 @@
   (concatenate 'string "Temp_"
     (write-to-string (incf *temp-string-count*))))
 
-(defun get-header (k)
-  (case *macro-package*
-    (:ms
-     (let ((old-*out* *out*)
-           (o (make-string-output-stream)))
-       (setq *out* o)
-       (setq *afterpar*
-             (lambda ()
-               (setq *out* old-*out*)
-               (funcall k (string-trim-blanks (get-output-stream-string o)))))))
-    (t  ; man
-      (funcall k
-      (with-output-to-string (o)
-        (let ((*out* o)
-              (*exit-status* nil)
-              (firstp t))
-          (loop
-            (let ((w (read-word)))
-              (cond ((not w) (read-troff-line) (return))
-                    (t (if firstp (setq firstp nil) (emit " "))
-                       (emit (expand-args w))))))))))))
+(defun get-header (k &key man-header-p)
+  (if (not man-header-p)
+    (let ((old-*out* *out*)
+          (o (make-string-output-stream)))
+      (setq *out* o)
+      (setq *afterpar*
+            (lambda ()
+              (setq *out* old-*out*)
+              (funcall k (string-trim-blanks (get-output-stream-string o))))))
+    (funcall k
+             (with-output-to-string (o)
+               (let ((*out* o)
+                     (*exit-status* nil)
+                     (firstp t))
+                 (loop
+                   (let ((w (read-word)))
+                     (cond ((not w) (read-troff-line) (return))
+                           (t (if firstp (setq firstp nil) (emit " "))
+                              (emit (expand-args w)))))))))))
 
-(defun do-section (level &key numberedp)
+(defun do-section (level &key numberedp man-header-p)
   (let* ((this-section-no nil)
          (growps (raw-counter-value "GROWPS")))
     (do-para)
@@ -1697,12 +1695,7 @@
     ;(emit-edit-source-doc)
     (get-header
       (lambda (header)
-        (let ((node-name (concatenate 'string
-                           *html-node-prefix* "sec_"
-                           (or this-section-no (gen-temp-string))))
-              (hnum (write-to-string (max 1 (min 6 level)))))
-          (emit (anchor node-name))
-          (emit-newline)
+        (let ((hnum (write-to-string (max 1 (min 6 level)))))
           (emit-verbatim "<h")
           (emit hnum)
           '(when (eq *macro-package* :man)
@@ -3269,6 +3262,8 @@
       (when (= th-n 1)
         (!macro-package :man)
         (when (setq *it* (find-macro-file "man.local"))
+          (troff2page-file *it*))
+        (when (setq *it* (find-macro-file "pca-t2p-man.tmac"))
           (troff2page-file *it*)))
       (cond ((and (= th-n 1) (setq *it* (gethash "TH" *macro-table*)))
              (let* ((the-new-th *it*)
@@ -3286,7 +3281,10 @@
                     (setq date (string-trim-blanks date))
                     (unless (string= date "")
                       (setf (gethash "DY" *string-table*)
-                            (lambda () date)))))))))))
+                            (lambda () date))))
+                  (when (gethash "TH:hook" *macro-table*)
+                    (toss-back-char #\newline)
+                    (execute-macro "TH:hook")))))))))
 
 (defrequest "TL"
   (lambda ()
@@ -3353,7 +3351,7 @@
 (defrequest "SH"
   (lambda ()
     (case *macro-package*
-      (:man (do-section 1))
+      (:man (do-section 1 :man-header-p t))
       (t ;(funcall (gethash "@SH" *request-table*))
         (execute-macro "@SH")
         ))))
@@ -3365,7 +3363,7 @@
 
 (defrequest "SS"
   (lambda ()
-    (do-section 2)))
+    (do-section 2 :man-header-p t)))
 
 (defrequest "SC"
   (lambda ()
