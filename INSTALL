@@ -8,16 +8,8 @@ This creates a directory ‘troff2page’.  ‘cd’ to it.
 
 Copy the script ‘troff2page’ to a directory in your PATH.
 
-Copy the files
-
-  tmac/defhsl.tmac  
-  tmac/eval4troff.tmac  
-  tmac/htmlindex.tmac  
-  tmac/index.tmac  
-  tmac/t2pslides.tmac  
-  tmac/url.tmac  
-
-to a directory in your GROFF_TMAC_PATH, or your home directory.
+Copy the *.tmac files in the ‘tmac’ subdirectory to a directory
+in your GROFF_TMAC_PATH, or your home directory.
 
 Copy the file ‘man/man1/troff2page.1’ to the ‘man1’ subdirectory of a
 directory in your MANPATH.

@@ -3,6 +3,11 @@
 .
 .if !\n[.troff2page] .nx
 .
+.\" these macros are relevant only for troff2page,
+.\" which uses them to create and insert a table
+.\" of contents for man pages.
+.\" Place this file in GROFF_TMAC_PATH, cwd, or home
+.
 .if d process_toc_line .nx
 .
 .mso pca-toc.tmac
