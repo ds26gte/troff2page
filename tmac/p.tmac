@@ -1,7 +1,8 @@
-.\" last modified 2015-03-20
-.mso ms.tmac
+.\" last modified 2015-03-26
 .
 .if d blank_line_macro .nx
+.
+.mso ms.tmac
 .
 .mso pca-blm.tmac
 .
@@ -13,23 +14,10 @@
 .
 .mso pca-tag.tmac
 .
-.de TOC
-.if !\\n[GROWPS] \{\
-.tm GROWPS should be > 0 for ToC to materialize
-.return
-.\}
 .mso pca-toc.tmac
-.TOC
-..
 .
-.de IX
 .mso pca-ix.tmac
-.IX \\$*
-..
 .
-.if !\n[.troff2page] \{\
-.de DC
 .mso pca-dc.tmac
-.DC \\$*
-..
-.\}
+.
+.mso defhsl.tmac
