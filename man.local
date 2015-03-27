@@ -1,136 +1,27 @@
-.\" last change 2009-03-26
+.\" last modified
+.\" Dorai Sitaram
 .
-.if n \{\
-.na
-.nh
-.rm BT
-.de PT
-.ie !'\\*[an-section]'' .tl '''\\*[an-title](\\*[an-section])'
-.el .if !'\\*[an-title]'' .tl '\\*[an-title]'''
-..
-.am TH
-.LP
-..
-.\}
+.if !\n[.troff2page] .nx
 .
-.if !\n[.troff2page] .ds url \\$\\n[.$]
+.mso pca-toc.tmac
 .
-.if n .nx
-.
-.nr obeylines 0
-.nr next_graf_without_indent 1
-.
-.de BLM
-.ie \\n[obeylines] \{\
-.nr obeylines 0
-.if \\n[codelines] \{\
-.nr codelines 0
-.ig ##
-(emit-verbatim "</div>")
-.##
-.\}
-.if t .sp \\n[DD]u
-.LP
-.\}
-.el .ie !\\n[.u] \{\
-.sp .8v
-.\}
-.el .ie \\n[next_graf_without_indent] \{\
-.nr next_graf_without_indent 0
-.LP
-.\}
-.el .ie r groff_char_C \{\
-.\" groff_char(7) doesn't like .PP here
-.sp
-.\}
-.el \{\
-.PP
-.\}
-..
-.
-.blm BLM
-.
-.de LSM
-.ie \\n[obeylines] .br
-.el \{\
-.nr obeylines 1
-.nr codelines 0
-.ns
-.LP
-.rs
-.if t .sp \\n[DD]u
-.if '\\n[lsn]'4' \{\
-.ft C
-.nr codelines 1
-.ig ##
-(emit-verbatim "<div class=codelines>")
-.##
-.\}
-.\}
-\h'\\n[lsn]n'
-..
-.
-.lsm LSM
-.
-.ig ##
-(format *css-port* "
- body { max-width: 36em; }
- h1,h2 { margin-left: -3.5em; }
- /* h1,h2 { font-family: sans-serif; } */
- .sh { padding-left: .5em; padding-right: 1em; }
- .sh { background-color: #e5e5e5; }
- .ss { padding-left: 1.5em; }
- h1 { font-size: 110%; margin-top: 2em;  }
- h2 { font-size: 100%; margin-top: 1.5em;  }
- h1,h2 { margin-bottom: 0; }
- .title { font-size: 120%; text-align: left; margin-left: -3.5em; }
- .codelines { background-color: #f5f5f5; }
- .colophon { color: #888888; }
- .colophon a { color: #888888; }
- a:hover { text-decoration: none; background-color: yellow; }
-")
-.##
-.
-.if \n[.troff2page] .nx
-.
-.mso ms.tmac
+.rn TH TH_orig
 .
 .de TH
-.RT
-.if !'\\$1'' \{\
-.RT
-.LP
-.LG
-\fB\\$1
-.sp 1ex
-.LP
-.nr next_graf_without_indent 1
-.\}
+.TH_orig \\$*
+.TOC
 ..
 .
-.if \n[.troff2page] .nx
+.rn SH SH_orig
 .
-.ds : "
-.
-.de TP
-.IP
+.de SH
+.process_toc_line 1 \\$*
+.SH_orig \\$*
 ..
 .
-.am @SH
-.ft HB
-.nr next_graf_without_indent 1
-..
-.rn @SH @SH_orig
-.de @SH
-.@SH_orig 1
-\\$*
-.LP
-..
+.rn SS SS_orig
+.
 .de SS
-.@SH_orig 2
-\\$*
-.LP
+.process_toc_line 2 \\$*
+.SS_orig \\$*
 ..
-.nr GROWPS 3
-.nr PSINCR 3p
-.\" vi:ft=nroff

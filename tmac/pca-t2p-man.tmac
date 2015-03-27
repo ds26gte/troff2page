@@ -1,17 +1,29 @@
 .\" last modified
 .\" Dorai Sitaram
 .
-.de TH:hook
+.if !\n[.troff2page] .nx
+.
+.if d process_toc_line .nx
+.
+.mso pca-toc.tmac
+.
+.rn TH TH_orig
+.
+.de TH
+.TH_orig \\$*
 .TOC
 ..
 .
-.mso pca-sec.tmac
-.mso pca-toc.tmac
+.rn SH SH_orig
 .
 .de SH
-.Section 1 \\$*
+.process_toc_line 1 \\$*
+.SH_orig \\$*
 ..
 .
+.rn SS SS_orig
+.
 .de SS
-.Section 2 \\$*
+.process_toc_line 2 \\$*
+.SS_orig \\$*
 ..

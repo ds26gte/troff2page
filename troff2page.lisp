@@ -24,7 +24,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150326) ;last change
+(defparameter *troff2page-version* 20150327) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -1723,7 +1723,8 @@
           (emit-verbatim ">")
           (emit-newline)
           ;(do-para)
-          )))))
+          ))
+      :man-header-p man-header-p)))
 
 (defun do-end-page ()
   (output-footnotes)
@@ -1832,13 +1833,13 @@
     (format t "Rerun: troff2page ~a~%" *main-troff-file*)))
 
 (defun !doctype (d)
-    (setq *doctype* d))
+  (setq *doctype* d))
 
 (defun !macro-package (m)
-    (setq *macro-package* m))
+  (setq *macro-package* m))
 
 (defun !last-page-number (n)
-    (setq *last-page-number* n))
+  (setq *last-page-number* n))
 
 (defun !node (node pageno tag-value)
   (setf (gethash node *node-table*) pageno)
@@ -3270,10 +3271,7 @@
                     (setq date (string-trim-blanks date))
                     (unless (string= date "")
                       (setf (gethash "DY" *string-table*)
-                            (lambda () date))))
-                  (when (gethash "TH:hook" *macro-table*)
-                    (toss-back-char #\newline)
-                    (execute-macro "TH:hook")))))))))
+                            (lambda () date)))))))))))
 
 (defrequest "TL"
   (lambda ()
