@@ -24,7 +24,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150325) ;last change
+(defparameter *troff2page-version* 20150326) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -1698,7 +1698,7 @@
         (let ((hnum (write-to-string (max 1 (min 6 level)))))
           (emit-verbatim "<h")
           (emit hnum)
-          '(when (eq *macro-package* :man)
+          (when (eq *macro-package* :man)
             (emit-verbatim
              (case level
                (1 " class=sh")
@@ -1715,20 +1715,9 @@
                                        ps))))
             (emit-verbatim "%\""))))
           (emit-verbatim ">")
-          (when (eq *macro-package* :man)
-            (emit-verbatim
-              (case level
-                (1 "<span class=sh>")
-                (2 "<span class=ss>")
-                (t ""))))
           (when this-section-no
             (emit this-section-no) (emit-verbatim ".") (emit-nbsp 2))
           (emit-verbatim header)
-          (when (eq *macro-package* :man)
-            (emit-verbatim
-              (case level
-                ((1 2) "</span>")
-                (t ""))))
           (emit-verbatim "</h")
           (emit hnum)
           (emit-verbatim ">")
@@ -4393,13 +4382,6 @@
              (concatenate 'string "\\[htmlamp]#x" s1 ";"))
             (t (twarning "warning: can't find special character `~a'" s)
                (concatenate 'string "\\[" s "]"))))))
-
-'(defescape #\h
-  ;dummy def for now
-  (lambda ()
-    (let ((delim (get-char)))
-      (read-till-char delim :eat-delim-p t)
-      " ")))
 
 (defescape #\h
   (lambda ()
