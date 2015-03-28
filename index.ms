@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-03-25  \"last modified
+.ND 2015-03-28  \"last modified
 .
 .TL
 troff2page
@@ -419,8 +419,13 @@ called.
 then associated with the text of the second argument instead
 of the current page number.
 
-troff2page comes with the macro file \fCpca-toc.tmac\fP that
-uses \fC.TAG\fP to generate a table of contents.
+troff2page comes with the macro files \fCpca-toc.tmac\fP and
+\fCpca-sec.tmac\fP that
+use \fC.TAG\fP to help generate a table of contents (ToC).
+
+troff2page also comes with the macro file \fCpca-t2p-man\fP that
+automatically generates a ToC for man pages, with a ToC entry for
+each .SH in the input.
 
 .= 5. Making an index
 

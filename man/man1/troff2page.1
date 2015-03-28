@@ -141,8 +141,8 @@ immediately obvious.
 
 The troff2page distribution includes several macro files (aka tmac
 files) with extension tmac,
-viz., url.tmac for inserting hyperlinks; index.tmac for index
-generation; eval4troff.tmac(7) for extending troff using Common Lisp; and
+viz., pca-*.tmac for various useful extensions;
+eval4troff.tmac(7) for extending troff using Common Lisp; and
 defhsl.tmac for defining color names using the HSL scheme.  You should
 put these tmac files in one of your macro directories, i.e., the
 directories that are searched by groff's -m option and .mso request.
@@ -296,39 +296,40 @@ to 18 cm, making sure it takes effect only for HTML:
 
     .if \en[.troff2page] .nr LL 18c
 
-.SH TABLE OF CONTENTS
+.SH CROSS-REFERENCES
 
-When converting man documents, troff2page automatically generates an
-untitled table of contents (toc) at the top of the output.  Toc entries are
-generated for each .SH in the input.  The toc entry for a section and
-that section's header are hyperlinks to each other.
-
-For ms documents, you will need to generate your own table of
-contents.  url.tmac supplies the macro .TAG for capturing page
-numbers. (This overrides the .TAG macro of
-groff's www.tmac, in order to allow forward references.)
+troff2page provides a .TAG macro for managing cross-references.
+(This overrides the .TAG macro of groff's www.tmac, in order to
+allow forward references.)
 
     .TAG sec:troffcl
 
-associates the label sec:troffcl with the number of
-the current page.  The string \e*[sec:troffcl]
-is defined to typeset as that page number.
-Thus, in your hand-crafted toc, you could
-use
+associates the label TAG_sec:troffcl with the number of the
+current page. The string \e*[TAG_sec:troffcl] is defined
+to typeset as that page number. Thus, in a hand-crafted table of
+contents, you could use
 
-    Extending troff using Common Lisp, \e*[sec:troffcl]
+    Extending troff using Common Lisp, \e*[TAG_sec:troffcl]
 
-In the HTML output, the string \e*[sec:troffcl]
-furthermore is a link to where .TAG sec:troffcl was
-called.
+In the HTML output, the string \e*[TAG_sec:troffcl] is not just a page
+number but also a link to 
+where .TAG sec:troffcl was called.
 
-\&.TAG takes an optional second argument.  The label is
-then associated with the text of the second argument instead
-of the current page number.
+\&.TAG takes an optional second argument. The label is then
+associated with the text of the second argument instead of the
+current page number.
+
+troff2page comes with the macro files pca-toc.tmac and
+pca-sec.tmac that uses .TAG
+to help generate a table-of-contents (ToC).
+
+troff2page also comes with the macro file pca-t2p-man.tmac that
+automatically generates a table of contents for man pages, with a toc entry for
+each .SH in the input.
 
 .SH MAKING AN INDEX
 
-The supplied macro file index.tmac
+The supplied macro file pca-ix.tmac
 creates a sorted
 index, with the aid of the external program makeindex.
 makeindex is included with TeX distributions, but you can
