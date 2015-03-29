@@ -71,8 +71,8 @@ into your Common Lisp, and then call the Lisp procedure
 ‘troff2page:troff2page’ (i.e., the procedure named ‘troff2page’
 in the package ‘troff2page’) on your source document.  E.g.,
 
-  (load “pathname/of/troff2page”)  
-  (troff2page:troff2page “my-troff-document.1”)  
+  (load "pathname/of/troff2page")  
+  (troff2page:troff2page "my-troff-document.1")  
 
 The procedure ‘troff2page:troff2page’ can be called several times, on the
 same or different documents, from within the same Lisp session.
