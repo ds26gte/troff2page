@@ -26,22 +26,22 @@ conveniently loaded using the .mso request.
 until the following .endeval, and the text written to standard output
 by this Lisp code is substituted for the .eval ... .endeval.  The
 usefulness of this tactic will be apparent from an example.  Consider
-the following groff document, pi.1:
+the following groff document, tau.1:
 
     .mso eval4troff.tmac
     .
     The ratio of the circumference of a circle to
-    its diameter is \e(*p \e(~=
+    its radius is \e(*t \e(~=
     .eval
-    ;following prints pi, because cos(pi) = -1
-    (princ (acos -1))
+    ;following prints tau, because cos(tau/2) = -1
+    (princ (* 2 (acos -1)))
     (princ ".")
     (terpri)
     .endeval
 
-Run groff, in unsafe mode, on pi.1:
+Run groff, in unsafe mode, on tau.1:
 
-    groff -z -U -ms pi.1
+    groff -z -U -ms tau.1
 
 (The -z avoids generating output, because we are not ready for it
 yet.  The -U runs in "unsafe" mode, i.e., it allows the writing of
@@ -54,13 +54,13 @@ the following:
 
 Call groff again as follows:
 
-    groff -U -ms pi.1 > pi.ps
+    groff -U -ms tau.1 > tau.ps
 
-pi.ps will now look like:
+tau.ps will now look like:
 
 .RS
 The ratio of the circumference of a circle to
-its diameter is \(*p \(~= 3.1415925.
+its radius is \(*t \(~= 6.2831855.
 .RE
 
 The first groff call produces a Lisp file
@@ -78,8 +78,8 @@ It is clear that Lisp code via .eval can
 serve as a very powerful second extension language
 for groff.  This benefit is available even when the document
 is processed by troff2page:
-We could run troff2page on the same document, pi.1, and the
-resulting pi.html will show the same content.
+We could run troff2page on the same document, tau.1, and the
+resulting tau.html will show the same content.
 
 Furthermore, we can embed  .eval-enclosed Lisp code inside an
 \&.if (or .ie or .el) statement so that it gets executed
