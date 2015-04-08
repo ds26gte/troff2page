@@ -1,0 +1,64 @@
+.\" last modified 2015-04-08
+.\" Dorai Sitaram
+.
+.mso ms.tmac
+.
+.if d blankLineMacro .nx
+.
+.mso pca-blm.tmac
+.
+.mso pca-lsm.tmac
+.
+.mso pca-sec.tmac
+.
+.mso pca-tag.tmac
+.
+.de TOC
+.mso pca-toc.tmac
+.TOC
+..
+.
+.de IX
+.mso pca-ix.tmac
+.IX \\$*
+..
+.
+.de EX
+.mso pca-verb.tmac
+.EX
+..
+.
+.de ```
+.mso pca-verb.mac
+.```
+..
+.
+.am par@init
+.nr FL \\n[LL]
+..
+.
+.de AN
+..
+.
+.de BB
+.LP
+\*{[\\$*]\*}
+..
+.
+.de NAV
+..
+.
+.if !d DC \{\
+.
+.de DC
+.mso pca-dc.tmac
+.DC \\$*
+..
+.
+.de IMG
+.mso pca-img.tmac
+.IMG \\$*
+..
+.\}
+.
+.char \[u2216] \[u005C]

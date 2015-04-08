@@ -1,4 +1,4 @@
-.\" last change 2015-03-30
+.\" last change 2015-04-08
 .
 .ie \n[.X] \{\
 .mso s  \" heirloom troff
@@ -6,14 +6,8 @@
 .\}
 .el .mso ms.tmac   \" groff
 .
-.mso pca-blm.tmac
-.mso pca-lsm.tmac
-.mso pca-sec.tmac
-.mso pca-verb.tmac
-.mso pca-tag.tmac
-.mso pca-toc.tmac
-.mso pca-ix.tmac
-.mso pca-dc.tmac
+.mso pca.tmac
+.
 .mso defhsl.tmac
 .
 .nr HM .75i
