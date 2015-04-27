@@ -8,14 +8,20 @@ This creates a directory ‘troff2page’.  ‘cd’ to it.
 
 Copy the script ‘troff2page’ to a directory in your PATH.
 
-Copy the *.tmac files in the ‘tmac’ subdirectory to a directory
-in your GROFF_TMAC_PATH, or your home directory.
-
 Copy the file ‘man/man1/troff2page.1’ to the ‘man1’ subdirectory of a
 directory in your MANPATH.
 
 Copy the file ‘man/man7/eval4troff.tmac.7’ to the ‘man7’ subdirectory of a
 directory in your MANPATH.
+
+troff2page makes use of some general-purpose groff macros for
+some special features and also for its documentation.  These can
+also be obtained from GitHub:
+
+git clone https://github.com/ds26gte/mpca
+
+Copy the *.tmac files in the ‘mpca’ directory to a directory
+in your GROFF_TMAC_PATH, or your home directory.
 
 .== Man pages
 
