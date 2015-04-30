@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-03-28  \"last modified
+.ND 2015-04-29  \"last modified
 .
 .TL
 troff2page
@@ -42,7 +42,7 @@ HTML consists of a series of interlinked files: The first file is named
 the rest are
 \fCjobname-Z-H-1.html\fP,
 \fCjobname-Z-H-2.html\fP,
-etc.
+&c.
 
 The script \fCtroff2page\fP runs on the Unix command-line on Cygwin,
 Linux, Mac
