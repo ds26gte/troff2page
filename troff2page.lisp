@@ -1,11 +1,4 @@
 ":"; export T2PARG=$1
-":"; if test -z "$LISP"; then
-":";   if test "$USER" = evalwhen; then LISP=ecl
-":";   elif test $(hostname | grep TUSMA.*RLKVT); then LISP=clisp
-":";   fi; fi
-":"; if test "$USER" = ds26 -a "$HOSTNAME" = fun; then
-":";   export LANG=en_US.UTF-8
-":"; fi
 ":"; if test "$LISP" = abcl; then exec abcl --load $0 --eval '(ext::quit)'
 ":"; elif test "$LISP" = allegro; then exec alisp -L $0 -kill
 ":"; elif test "$LISP" = clisp; then exec clisp -q $0
@@ -24,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150327) ;last change
+(defparameter *troff2page-version* 20150529) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
