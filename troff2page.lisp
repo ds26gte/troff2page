@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150529) ;last change
+(defparameter *troff2page-version* 20150530) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -1454,11 +1454,11 @@
 	   ))))
 
 (defun link-stylesheets ()
-  (emit-verbatim "<link rel=\"stylesheet\" type=\"text/css\" href=\"")
+  (emit-verbatim "<link rel=\"stylesheet\" href=\"")
   (emit-verbatim *jobname*) (emit-verbatim *css-file-suffix*)
   (emit-verbatim "\" title=default>") (emit-newline)
   (dolist (css (nreverse *stylesheets*))
-    (emit-verbatim "<link rel=\"stylesheet\" type=\"text/css\" href=\"")
+    (emit-verbatim "<link rel=\"stylesheet\" href=\"")
     (emit-verbatim css)
     (emit-verbatim "\" title=default>")
     (emit-newline)))
@@ -1490,11 +1490,8 @@
 |#
 
 (defun output-html-preamble ()
-  (when (stringp *doctype*)
-    (emit-verbatim "<!doctype ")
-    (emit-verbatim *doctype*)
-    (emit-verbatim ">")
-    (emit-newline))
+  (emit-verbatim "<!DOCTYPE html>")
+  (emit-newline)
   (let ((pageno *current-pageno*))
     (emit-verbatim "<html>")
     (emit-newline)
@@ -1523,7 +1520,7 @@
     (emit-newline)
     (emit-verbatim "<head>")
     (emit-newline)
-    (emit-verbatim "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">")
+    (emit-verbatim "<meta charset=\"utf-8\">")
     (emit-newline)
     (output-external-title)
     (link-stylesheets)
@@ -4371,7 +4368,8 @@
                     (setq s1 (subseq s 1))
                     (integerp (read-from-string s1))))
              (concatenate 'string "\\[htmlamp]#x" s1 ";"))
-            (t (twarning "warning: can't find special character `~a'" s)
+            (t (unless (eql (search "html" s) 0)
+                 (twarning "warning: can't find special character `~a'" s))
                (concatenate 'string "\\[" s "]"))))))
 
 (defescape #\h
