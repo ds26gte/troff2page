@@ -60,7 +60,8 @@ If \fCLISP\fP is not
 set, some default Lisp implementation is assumed.
 
 For more information,
-please see the file \*[urlh INSTALL]INSTALL\&
+please see the file \*[urlh \
+https://github.com/ds26gte/troff2page/blob/master/INSTALL]INSTALL\&
 in the distribution.
 
 .== Calling troff2page from within Lisp
