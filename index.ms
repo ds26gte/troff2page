@@ -1,12 +1,12 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-04-29  \"last modified
+.ND 2015-06-01  \"last modified
 .
 .TL
 troff2page
 .AU
 .ie \n[.troff2page] \{\
-\*[urlh ../index.html]Dorai Sitaram\&
+\*[urlh http://ds26gte.github.io]Dorai Sitaram\&
 \*[urlh https://github.com/ds26gte/troff2page]Download the
 \*[troff2page_version_th] version\&
 .\}

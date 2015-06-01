@@ -17,11 +17,11 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150530) ;last change
+(defparameter *troff2page-version* 20150601) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
-  "http://www.ccs.neu.edu/~dorai/troff2page/index.html")
+  "http://ds26gte.github.io/troff2page/index.html")
 
 (defparameter *troff2page-copyright-notice*
   (format nil "Copyright (C) 2003-~a Dorai Sitaram"
