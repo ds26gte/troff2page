@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150601) ;last change
+(defparameter *troff2page-version* 20150604) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -104,12 +104,6 @@
 
 (defparameter *path-separator*
   (if (eq *operating-system* :windows) #\; #\:))
-
-(defparameter *doctype*
-  (concatenate 'string
-    "html public "
-    "\"-//W3C//DTD HTML 4.01 Transitional//EN\" "
-    "\"http://www.w3.org/TR/html4/loose.dtd\""))
 
 (defparameter *aux-file-suffix* "-Z-A.lisp")
 (defparameter *css-file-suffix* "-Z-S.css")
@@ -1821,9 +1815,6 @@
   (when *missing-pieces*
     (format t "Missing: ~a~%" *missing-pieces*)
     (format t "Rerun: troff2page ~a~%" *main-troff-file*)))
-
-(defun !doctype (d)
-  (setq *doctype* d))
 
 (defun !macro-package (m)
   (setq *macro-package* m))
