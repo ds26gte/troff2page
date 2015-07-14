@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150604) ;last change
+(defparameter *troff2page-version* 20150713) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -460,7 +460,7 @@
     "~A" #xc3
     "~N" #xd1
     "~O" #xd5
-    "~a" #xa3
+    "~a" #xe3
     "~n" #xf1
     "~o" #xf5
     "~~" #x2248
@@ -1179,8 +1179,8 @@
             (setq double-quote-p t))))
       (princ
         (ecase q
-          (#\` (if double-quote-p "&ldquo;" "&lsquo;"))
-          (#\' (if double-quote-p "&rdquo;" "&rsquo;")))
+          (#\` (if double-quote-p "&#x201c;" "&#x2018;"))
+          (#\' (if double-quote-p "&#x201d;" "&#x2019;")))
         *out*))))
 
 (defun check-verbatim-apostrophe-status ()
@@ -1222,25 +1222,23 @@
                             ((string= e "[htmlspace]")
                              (write-char #\space *out*))
                             ((string= e "[htmlnbsp]")
-                             (princ "&nbsp;" *out*))
+                             (princ "&#xa0;" *out*))
                             ((string= e "[htmleightnbsp]")
                              (dotimes (i 8)
-                               (princ "&nbsp;" *out*)))
+                               (princ "&#xa0;" *out*)))
                             ((string= e "[htmlempty]") nil)
                             (t (write-char c *out*)
                                (princ e *out*)))))
                    ((and (eq *outputting-to* :title)
                          inside-html-angle-brackets-p) nil)
-                   ((char= c #\<) (princ "&lt;" *out*))
-                   ((char= c #\>) (princ "&gt;" *out*))
-                   ((char= c #\&) (princ "&amp;" *out*))
+                   ((char= c #\<) (princ "&#x3c;" *out*))
+                   ((char= c #\>) (princ "&#x3e;" *out*))
+                   ((char= c #\&) (princ "&#x26;" *out*))
                    ((char= c #\")
-                    (princ "&quot;" *out*)
+                    (princ "&#x22;" *out*)
                     ;(check-verbatim-apostrophe-status)
                     ;do this in expand-line
                     )
-                   ;((char= c #\`) (princ "&lsquo;" *out*))
-                   ;((char= c #\') (princ "&rsquo;" *out*))
                    ((or (char= c #\`) (char= c #\'))
                     (emit-quote c i))
                    ((fillp) (write-char c *out*))
@@ -1326,7 +1324,7 @@
                       (setq r (concatenate 'string r (string *escape-char*))))
                      (t (when count-leading-spaces-p
                           (setq count-leading-spaces-p nil)
-                          (do-leading-spaces num-leading-spaces
+                          (emit-leading-spaces num-leading-spaces
                                              :insert-line-break-p insert-line-break-p))
                         (setq r (concatenate 'string r
                                              (expand-escape c)))
@@ -1335,12 +1333,12 @@
                    (setq blank-line-p nil))
                  (when count-leading-spaces-p
                    (setq count-leading-spaces-p nil)
-                  (do-leading-spaces num-leading-spaces
+                  (emit-leading-spaces num-leading-spaces
                                      :insert-line-break-p insert-line-break-p)
                    )
                  (when (char= c #\") (check-verbatim-apostrophe-status))
                  (setq r (concatenate 'string r (string c)))))))
-    (if blank-line-p (do-blank-line)
+    (if blank-line-p (emit-blank-line)
       (emit r))))
 
 (defun expand-escape (c)
@@ -1352,14 +1350,14 @@
         ((setq *it* (gethash (string c) *glyph-table*)))
         (t (verbatim (string c)))))
 
-(defun output-navigation-bar (&key headerp)
+(defun emit-navigation-bar (&key headerp)
   (cond ((and headerp (= *last-page-number* -1))
 	 ;will put out some vertical space here, so when the correct header navbar
 	 ;does get calculated in the next run, it will occupy the space without
 	 ;the browser shifting the other text.
 	 ;We don't need this phantom navbar for single-page output, but css takes
 	 ;care of taking it out, even in the first run
-	 (emit-verbatim "<div class=navigation>&nbsp;</div>"))
+	 (emit-verbatim "<div class=navigation>&#xa0;</div>"))
 	((/= *last-page-number* 0)
 	 (let* ((pageno *current-pageno*)
 		(first-page-p (= pageno 0))
@@ -1368,7 +1366,7 @@
 		(toc-page-p (and toc-page (= pageno toc-page)))
 		(index-page (gethash "TAG_troff2page_index" *node-table*))
 		(index-page-p (and index-page (= pageno index-page))))
-	   ;(do-para)
+	   ;(emit-para)
 	   (emit-verbatim "<div align=right class=navigation><i>")
 	   ;(emit-newline)
 	   (emit-verbatim "[")
@@ -1457,7 +1455,7 @@
     (emit-verbatim "\" title=default>")
     (emit-newline)))
 
-(defun output-external-title ()
+(defun emit-external-title ()
   (emit-verbatim "<title>")
   (emit-newline)
   (let ((*outputting-to* :title))
@@ -1483,7 +1481,7 @@
     (setq *last-input-milestone* *input-line-no*)))
 |#
 
-(defun output-html-preamble ()
+(defun emit-html-preamble ()
   (emit-verbatim "<!DOCTYPE html>")
   (emit-newline)
   (let ((pageno *current-pageno*))
@@ -1516,7 +1514,7 @@
     (emit-newline)
     (emit-verbatim "<meta charset=\"utf-8\">")
     (emit-newline)
-    (output-external-title)
+    (emit-external-title)
     (link-stylesheets)
     (emit-verbatim "<meta name=robots content=\"index,follow\">")
     (emit-newline)
@@ -1530,15 +1528,15 @@
     (emit-verbatim ">")
     (emit-newline)))
 
-(defun output-html-postamble ()
-  (do-para)
+(defun emit-html-postamble ()
+  (emit-para)
   (emit-verbatim "</div>") (emit-newline)
   (emit-verbatim "</body>") (emit-newline)
   (emit-verbatim "</html>") (emit-newline))
 
 ;
 
-(defun do-blank-line ()
+(defun emit-blank-line ()
   (cond ((eq *outputting-to* :troff) (emit-newline))
         (*blank-line-macro*
           (setq *keep-newline-p* nil)
@@ -1549,11 +1547,11 @@
                  (toss-back-char #\newline)
                  (funcall *it*))))
         (t (emit-verbatim "<P>")
-           ;(do-para)
-           ;(emit-verbatim "&nbsp;<br>")
+           ;(emit-para)
+           ;(emit-verbatim "&#xa0;<br>")
            (emit-newline))))
 
-(defun do-leading-spaces (num-leading-spaces &key insert-line-break-p)
+(defun emit-leading-spaces (num-leading-spaces &key insert-line-break-p)
   (when (> num-leading-spaces 0)
     (setq *leading-spaces-number* num-leading-spaces)
     (cond (*leading-spaces-macro*
@@ -1571,7 +1569,7 @@
     (setq *afterpar* nil)
     (funcall *it*)))
 
-(defun do-para (&key parstartp indentp)
+(defun emit-para (&key parstartp indentp)
   (do-afterpar)
   (setq *margin-left* 0)
   (when (setq *it* (gethash "par@reset" *request-table*))
@@ -1590,7 +1588,7 @@
 (defun ensure-file-deleted (f)
   (if (probe-file f) (delete-file f)))
 
-(defun do-start ()
+(defun emit-start ()
   (let ((html-page-count (incf *current-pageno*)))
     (when (and (= html-page-count 1) (= *last-page-number* -1))
       (flag-missing-piece :last-page-number))
@@ -1605,9 +1603,9 @@
 		       *output-extension*))
     (setq *out* (open *html-page* :direction :output
 		      :if-exists :supersede))
-    (output-html-preamble)
-    (output-navigation-bar :headerp t)
-    (do-para)))
+    (emit-html-preamble)
+    (emit-navigation-bar :headerp t)
+    (emit-para)))
 
 (defun get-counter-named (name)
   (or (gethash name *numreg-table*)
@@ -1661,10 +1659,10 @@
                            (t (if firstp (setq firstp nil) (emit " "))
                               (emit (expand-args w)))))))))))
 
-(defun do-section (level &key numberedp man-header-p)
+(defun emit-section-header (level &key numberedp man-header-p)
   (let* ((this-section-no nil)
          (growps (raw-counter-value "GROWPS")))
-    (do-para)
+    (emit-para)
     (when numberedp
       (setf (counter*-value (get-counter-named "nh*hl")) level)
       (increment-section-counter level)
@@ -1706,17 +1704,17 @@
           (emit hnum)
           (emit-verbatim ">")
           (emit-newline)
-          ;(do-para)
+          ;(emit-para)
           ))
       :man-header-p man-header-p)))
 
-(defun do-end-page ()
-  (output-footnotes)
-  (output-navigation-bar)
+(defun emit-end-page ()
+  (emit-footnotes)
+  (emit-navigation-bar)
   (when (= *current-pageno* 0)
-    (output-colophon)
+    (emit-colophon)
     (collect-css-info-from-preamble))
-  (output-html-postamble)
+  (emit-html-postamble)
   (close *out*))
 
 (defun collect-css-info-from-preamble ()
@@ -1760,8 +1758,8 @@
       )
     ))
 
-(defun output-colophon ()
-    (do-para)
+(defun emit-colophon ()
+    (emit-para)
     (emit-verbatim "<div align=right class=colophon>")
     (emit-newline)
     (when (setq *it* (gethash "DY" *string-table*))
@@ -1798,12 +1796,12 @@
 
 (defun do-bye ()
   (let ((*blank-line-macro* nil))
-    (do-blank-line))
+    (emit-blank-line))
   (do-end-macro)
   (let ((pageno *current-pageno*))
     (!last-page-number pageno)
     (write-aux `(!last-page-number ,pageno)))
-  (do-end-page)
+  (emit-end-page)
   (when *verbatim-apostrophe-p* (write-aux `(!verbatim-apostrophe)))
   (write-aux `(!macro-package ,*macro-package*))
   (when *title* (write-aux `(!title ,*title*)))
@@ -1885,8 +1883,8 @@
     (cond ((= *last-page-number* 0) (setq page-break-p nil))
 	  ((/= (raw-counter-value "HTML1") 0)
 	   (setq *last-page-number* 0) (setq page-break-p nil)))
-    (cond (page-break-p (do-end-page)
-			(do-start))
+    (cond (page-break-p (emit-end-page)
+			(emit-start))
 	  (t (emit-verbatim "<div class=pagebreak></div>")
 	     (emit-newline)))))
 
@@ -2208,7 +2206,7 @@
                                  (lambda ()
                                    (if (ev*-fill (car *ev-stack*)) 1 0))))
   (defnumreg ".ce" (make-counter* :thunk (lambda () *lines-to-be-centered*)))
-  ;current-time-related registers
+  ;current-time -related registers
   (multiple-value-bind (seconds minutes hours dy mo year dw dst tz)
     (get-decoded-time)
     (declare (ignore dst tz))
@@ -2371,12 +2369,12 @@
            (princ x o) (terpri o)))
        (princ endenv o) (terpri o)))))
 
-(defun output-footnotes ()
+(defun emit-footnotes ()
   (when *footnote-buffer*
-    (do-para)
+    (emit-para)
     (emit-verbatim "<div class=footnote><hr align=left width=\"40%\">")
     (dolist (fn (nreverse *footnote-buffer*))
-      (do-para)
+      (emit-para)
       (let ((fntag (footnote*-tag fn))
             (fno (footnote*-number fn))
             (fnc (footnote*-text fn)))
@@ -2619,7 +2617,7 @@
 (defun start-display (w)
     (setq w (troff-align-to-html w))
     (read-troff-line)
-    (do-para)
+    (emit-para)
     (emit-verbatim "<div class=display align=")
     (emit-verbatim
       (cond ((string= w "block") "center")
@@ -2644,7 +2642,7 @@
     ;
 ;    (emit-verbatim "<tr>")
 ;    (when (string= w "indent")
-;      (emit-verbatim "<td class=princindent>&nbsp;</td>")
+;      (emit-verbatim "<td class=princindent>&#xa0;</td>")
 ;      (emit-newline))
 ;    ;
 ;    (emit-verbatim "<td align=")
@@ -2667,7 +2665,7 @@
   (emit-verbatim "</div>")
   ;(emit-edit-source-doc)
   (emit-newline)
-  (do-para))
+  (emit-para))
 
 (defun number-to-roman (n &key downcasep)
   (format nil (if downcasep "~(~@R~)" "~@R") n))
@@ -3133,7 +3131,7 @@
 (defrequest "RS"
   (lambda ()
     (read-troff-line)
-    (do-para)
+    (emit-para)
     (emit-verbatim "<blockquote>")))
 
 (defrequest "RE"
@@ -3141,7 +3139,7 @@
     (read-troff-line)
     (emit-verbatim "</blockquote>")
     (emit-newline)
-    (do-para)))
+    (emit-para)))
 
 (defrequest "DE"
   (lambda ()
@@ -3156,7 +3154,7 @@
   (lambda ()
     (read-troff-line)
     (emit-newline)
-    (do-para :parstartp t)))
+    (emit-para :parstartp t)))
 
 (defrequest "RT" (gethash "LP" *request-table*))
 
@@ -3166,7 +3164,7 @@
   (lambda ()
     (read-troff-line)
     (emit-newline)
-    (do-para :parstartp t :indentp t)))
+    (emit-para :parstartp t :indentp t)))
 
 (defrequest "P" (gethash "PP" *request-table*))
 
@@ -3270,7 +3268,7 @@
 
 (defun author-info (&key italicp)
   (read-troff-line)
-  (do-para)
+  (emit-para)
   ;(emit-verbatim "<div align=center class=abstract>")
   (emit-verbatim "<div align=center class=author>")
   (when italicp (emit (switch-font "I")))
@@ -3295,10 +3293,10 @@
 (defrequest "AB"
   (lambda ()
     (let ((w (car (read-args))))
-      (do-para)
+      (emit-para)
       (unless (and w (string= w "no"))
         (emit-verbatim "<div align=center class=abstract><i>ABSTRACT</i></div>")
-        (do-para))
+        (emit-para))
       (emit-verbatim "<blockquote>"))))
 
 (defrequest "AE"
@@ -3313,13 +3311,13 @@
 (defrequest "@NH"
   (lambda ()
     (let ((lvl (car (read-args))))
-      (do-section (if lvl (string-to-number lvl) 1)
+      (emit-section-header (if lvl (string-to-number lvl) 1)
                   :numberedp t))))
 
 (defrequest "SH"
   (lambda ()
     (case *macro-package*
-      (:man (do-section 1 :man-header-p t))
+      (:man (emit-section-header 1 :man-header-p t))
       (t ;(funcall (gethash "@SH" *request-table*))
         (execute-macro "@SH")
         ))))
@@ -3327,17 +3325,17 @@
 (defrequest "@SH"
   (lambda ()
     (let ((lvl (car (read-args))))
-      (do-section (if lvl (string-to-number lvl) 1)))))
+      (emit-section-header (if lvl (string-to-number lvl) 1)))))
 
 (defrequest "SS"
   (lambda ()
-    (do-section 2 :man-header-p t)))
+    (emit-section-header 2 :man-header-p t)))
 
 (defrequest "SC"
   (lambda ()
     (unless (gethash "bell_localisms" *numreg-table*)
       (defnumreg "bell_localisms" (make-counter*)))
-    (do-section 1 :numberedp t)))
+    (emit-section-header 1 :numberedp t)))
 
 (defrequest "P1"
   (lambda ()
@@ -3533,26 +3531,26 @@
 (defrequest "ULS"
   (lambda ()
     (read-troff-line)
-    (do-para)
+    (emit-para)
     (emit-verbatim "<ul>")))
 
 (defrequest "ULE"
   (lambda ()
     (read-troff-line)
     (emit-verbatim "</ul>")
-    (do-para)))
+    (emit-para)))
 
 (defrequest "OLS"
   (lambda ()
     (read-troff-line)
-    (do-para)
+    (emit-para)
     (emit-verbatim "<ol>")))
 
 (defrequest "OLE"
   (lambda ()
     (read-troff-line)
     (emit-verbatim "</ol>")
-    (do-para)))
+    (emit-para)))
 
 (defrequest "LI"
   (lambda ()
@@ -3582,7 +3580,7 @@
 (defrequest "QP"
   (lambda ()
     (read-troff-line)
-    (do-para)
+    (emit-para)
     (emit-verbatim "<blockquote>")
     (setq *afterpar*
       (lambda () (emit-verbatim "</blockquote>")))))
@@ -3590,19 +3588,19 @@
 (defrequest "QS"
   (lambda ()
     (read-troff-line)
-    (do-para)
+    (emit-para)
     (emit-verbatim "<blockquote>")))
 
 (defrequest "QE"
   (lambda ()
     (read-troff-line)
     (emit-verbatim "</blockquote>")
-    (do-para)))
+    (emit-para)))
 
 (defrequest "IP"
   (lambda ()
     (let ((label (car (read-args))))
-      (do-para)
+      (emit-para)
       (emit-verbatim "<dl><dt>")
       (when label
         (emit (expand-args label)))
@@ -3615,7 +3613,7 @@
 (defrequest "TP"
   (lambda ()
     (read-troff-line)
-    (do-para)
+    (emit-para)
     (emit-verbatim "<dl")
     (process-line)
     (emit-verbatim "</dt><dd>")
@@ -4481,42 +4479,13 @@
 
           )
       (load-aux-file)
-      (do-start)
+      (emit-start)
       (when (setq *it* (find-macro-file ".troff2pagerc.tmac"))
         (troff2page-file *it*))
       (when (probe-file (setq *it* (concatenate 'string *jobname* ".t2p")))
         (troff2page-file *it*))
       (troff2page-file input-doc)
       (do-bye))))
-
-;(trace !last-page-number)
-;(trace all-args execute-macro do-section)
-;(trace author-info)
-;(trace check-verbatim-apostrophe-status)
-;(trace collect-macro-body)
-;(trace do-eject)
-;(trace do-section)
-;(trace ev-switch)
-;(trace eval-in-lisp)
-;(trace execute-macro )
-;(trace execute-macro-body)
-;(trace expand-args)
-;(trace get-header)
-;(trace if-test-passed-p)
-;(trace link-url)
-;(trace make-span-open)
-;(trace open)
-;(trace raw-counter-value)
-;(trace read-args)
-;(trace read-escaped-word)
-;(trace read-from-string)
-;(trace read-possible-troff2page-specific-escape)
-;(trace read-troff-line)
-;(trace snoop-char)
-;(trace switch-font switch-style)
-;(trace switch-style )
-;(trace troff2page-file)
-;(trace troff2page-file)
 
 (troff2page *troff2page-file-arg*)
 
