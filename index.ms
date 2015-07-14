@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-06-01  \"last modified
+.ND 2015-07-14  \"last modified
 .
 .TL
 troff2page
@@ -829,25 +829,6 @@ argument is the filename.
 (This argument style works for \fIall\fP
 vi and emacs clones and I suspect most modern editors take care
 to recognize it, so it isn’t as restrictive as it sounds.)
-
-.== SBCL’s warnings
-
-.IX SBCL, disabling warnings in
-When running troff2page on SBCL, you can get several
-screenfuls of diagnostic warnings.  The conditions warned
-about are benign, but the verbosity of the messages
-can be daunting.  If you’d rather they weren’t there, add
-the lines
-
-.EX
-    #+sbcl
-    (declaim (sb-ext::muffle-conditions style-warning))
-.EE
-
-either toward the beginning of the \fCtroff2page\fP script; or
-to your SBCL user-init file, which is the file \fC.sbclrc\fP
-in your home directory.  If adding to \fC.sbclrc\fP, the
-feature expression \fC#+sbcl\fP may be omitted.
 
 .if t \{\
 .= Index
