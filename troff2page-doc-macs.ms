@@ -63,8 +63,10 @@
 .
 .rn @SH @SH_orig
 .de @SH
-.HBP
-.@SH_orig \\$*
+.nr troff2page-doc-macs.ms:@SH:arg1 \\$1
+.shift
+.if '\\n[troff2page-doc-macs.ms:@SH:arg1]'1' .HBP
+.@SH_orig \n[troff2page-doc-macs.ms:@SH:arg1] \\$*
 ..
 .\}
 .
