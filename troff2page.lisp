@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150713) ;last change
+(defparameter *troff2page-version* 20150922) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -554,7 +554,7 @@
 
 (defstruct bport* (port nil) (buffer '()))
 (defstruct counter* (value 0) (format "1") (thunk nil))
-(defstruct diversion* port return)
+(defstruct diversion* port return value)
 (defstruct footnote* tag number text)
 
 (defstruct ev*
@@ -1903,12 +1903,19 @@
   (get-char) ;eat the control char
   (expand-args (read-word)))
 
+(defun retrieve-diversion (div)
+  (let ((value (diversion*-value div)))
+    (cond (value)
+          (t (setq value (get-output-stream-string (diversion*-port div)))
+             (setf (diversion*-value div) value)
+             value))))
+
 (defun execute-macro (w)
   (cond ((not w)
          nil)
         ((setq *it* (gethash w *diversion-table*))
          (read-troff-line)
-         (princ (get-output-stream-string (diversion*-port *it*)) *out*))
+         (toss-back-string (retrieve-diversion *it*)))
         ((setq *it* (gethash w *macro-table*))
          (let* ((mac *it*)
                 (args (read-args))
@@ -4195,7 +4202,7 @@
     ;(read-troff-line) ; check
     (princ (expand-args (read-troff-string-line)) o)
     ;(setq *keep-newline-p* nil)
-    (when newlinep (terpri o))))
+    (when newlinep (terpri o)))))
 
 (defrequest "writec"
   (lambda ()
@@ -4268,9 +4275,12 @@
     (let* ((s-args (read-troff-string-args))
            (s (car s-args))
            (args (cdr s-args)))
-      ;(format t "s = ~s~%" s)
       (cond ((setq *it* (gethash s *string-table*))
-             (apply *it* args))
+             (let ((x (apply *it* args)))
+               x))
+            ((setq *it* (gethash s *diversion-table*))
+             (let ((x (retrieve-diversion *it*)))
+               x))
             (t "")))))
 
 (defescape #\c
