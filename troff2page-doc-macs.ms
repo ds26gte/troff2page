@@ -1,4 +1,4 @@
-.\" last change 2015-04-08
+.\" last change 2015-09-22
 .
 .ie \n[.X] \{\
 .mso s  \" heirloom troff
@@ -61,10 +61,10 @@
 .nr PD 1v
 .nr LL 8i
 .
-.rn = =_orig
-.de =
+.rn @SH @SH_orig
+.de @SH
 .HBP
-.=_orig \\$*
+.@SH_orig \\$*
 ..
 .\}
 .

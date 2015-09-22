@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-07-14  \"last modified
+.ND 2015-09-22  \"last modified
 .
 .TL
 troff2page
@@ -17,7 +17,8 @@ troff2page
 .
 .TOC
 
-.= 1. Introduction
+.SH 1
+1. Introduction
 
 troff2page converts troff (man and ms) documents into HTML web pages.
 
@@ -64,7 +65,8 @@ please see the file \*[urlh \
 https://github.com/ds26gte/troff2page/blob/master/INSTALL]INSTALL\&
 in the distribution.
 
-.== Calling troff2page from within Lisp
+.SH 2
+Calling troff2page from within Lisp
 
 .IX calling troff2page from Common Lisp
 It is not necessary to run the file \fCtroff2page\fP as a
@@ -83,7 +85,8 @@ The procedure \fCtroff2page:troff2page\fP can be called
 several times, on the same or different documents, from
 within the same Lisp session.
 
-.= 2. troff and troff2page commands
+.SH 1
+2. troff and troff2page commands
 
 .IX drop caps in color
 .defcolor terracottapink rgb #9b3d3d
@@ -136,7 +139,8 @@ groff’s command-line option \fC-m\fP.  This is because
 troff2page doesn’t support the same kind of command-line
 arguments that groff does.
 
-.== Auxiliary files
+.SH 2
+Auxiliary files
 
 .IX unsafe mode
 .IX auxiliary files
@@ -213,7 +217,8 @@ programs’ aux files don’t clash.  The number register
 \fC\en[.troff2page]\fP (page \*[TAG_cond-bp]) suggests a way
 to do this.
 
-.== Simulating troff options
+.SH 2
+Simulating troff options
 
 .IX troff options, translation of
 The program \fCtroff2page\fP just takes a single argument.  Typically
@@ -281,7 +286,8 @@ If the input file is recognizably a man page (i.e., it has the command
 \fC.TH\fP), both troff2page and groff will load, if it exists, the init file
 \fCman.local\fP in the home directory.
 
-.= 3. Page layout
+.SH 1
+3. Page layout
 
 .IX page breaks
 .IX bp@.bp, troff request
@@ -343,7 +349,8 @@ page, and the table-of-contents and index pages.  If any of these pages
 doesn’t exist, or if it is the same as the page containing the
 navigation bar, then the link for it is disabled.
 
-.== HTML-style paragraphs
+.SH 2
+HTML-style paragraphs
 
 By default, troff2page sets paragraphs exactly as groff does: the first
 lines of paragraphs are indented (unless explicitly disabled via an
@@ -387,7 +394,8 @@ to 18 cm, making sure it takes effect only for HTML:
     .if \n[.troff2page] .nr LL 18c
 .EE
 
-.= 4. Cross-references
+.SH 1
+4. Cross-references
 
 .IX cross-references
 .IX TAG@.TAG, macro
@@ -428,7 +436,8 @@ troff2page also comes with the macro file \fCpca-t2p-man\fP that
 automatically generates a ToC for man pages, with a ToC entry for
 each .SH in the input.
 
-.= 5. Making an index
+.SH 1
+5. Making an index
 
 .IX index
 .IX pca-ix.tmac, macro file
@@ -475,7 +484,8 @@ slurped back into the input document:
 
 Adding a section header on top is up to you.
 
-.= 6. Slideshows
+.SH 1
+6. Slideshows
 
 .IX slideshow
 To cause your troff source to be converted into slideshow-ready HTML, have
@@ -510,7 +520,8 @@ typing a number \fIn\fP that’s two or more digits long to
 get the \fIn\fPth slide, the digits should be pressed
 fairly rapidly so they are interpreted together.
 
-.= 7. Extending troff using Common Lisp
+.SH 1
+7. Extending troff using Common Lisp
 
 .IX extending troff and troff2page with Common Lisp
 .IX eval@.eval, macro
@@ -622,7 +633,8 @@ Common Lisp language but also includes the procedures and data structures
 defined in troff2page.  These extras are not available (and are arguably
 not useful) to the \fC.eval\fP code seen by troff.
 
-.== Defining color names using HSL
+.SH 2
+Defining color names using HSL
 
 .IX color names, defining
 For a more substantial example of \fC.eval\fP’s use, consider defining
@@ -710,7 +722,8 @@ emulate the sanguine chalk drawings of the Old Masters.
 .RE
 .B2
 
-.== Extending troff2page only
+.SH 2
+Extending troff2page only
 
 .IX extending troff2page with Common Lisp without producing output
 .IX ig@.ig ##, as troff2page extender
@@ -796,7 +809,8 @@ and Venetian red are all courtesy \*[urlh \
 http://www.resene.co.nz/swatches]Resene Paints\&.
 .FE
 
-.= 8. Recovery from errors
+.SH 1
+8. Recovery from errors
 
 .IX errors
 If troff2page fails on your document, it will display a message giving its
@@ -831,7 +845,8 @@ vi and emacs clones and I suspect most modern editors take care
 to recognize it, so it isn’t as restrictive as it sounds.)
 
 .if t \{\
-.= Index
+.SH 1
+Index
 
 .\"rs
 .\"if \n(.H .sp .8v
