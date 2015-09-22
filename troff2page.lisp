@@ -4202,7 +4202,7 @@
     ;(read-troff-line) ; check
     (princ (expand-args (read-troff-string-line)) o)
     ;(setq *keep-newline-p* nil)
-    (when newlinep (terpri o)))))
+    (when newlinep (terpri o))))
 
 (defrequest "writec"
   (lambda ()
