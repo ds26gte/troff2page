@@ -68,6 +68,7 @@
 .if '\\n[troff2page-doc-macs.ms:@SH:arg1]'1' .HBP
 .@SH_orig \n[troff2page-doc-macs.ms:@SH:arg1] \\$*
 ..
+.als SH @SH
 .\}
 .
 .HX 1

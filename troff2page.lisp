@@ -1880,7 +1880,7 @@
 
 (defun do-eject ()
   (let ((page-break-p t))
-    (cond ((= *last-page-number* 0) (setq page-break-p nil))
+    (cond ;((= *last-page-number* 0) (setq page-break-p nil))
 	  ((/= (raw-counter-value "HTML1") 0)
 	   (setq *last-page-number* 0) (setq page-break-p nil)))
     (cond (page-break-p (emit-end-page)
