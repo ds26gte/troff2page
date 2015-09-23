@@ -3846,7 +3846,7 @@
 (defun if-test-passed-p ()
   (let ((delim (get-char)))
     (case delim
-      ((#\" #\')
+      ((#\' #\")
        (let* ((left (expand-args (read-till-char delim :eat-delim-p t)))
               (right (expand-args (read-till-char delim :eat-delim-p t))))
          (string= left right)))
@@ -4344,6 +4344,15 @@
                 (#\-
                  (decf (counter*-value c))))
               (get-counter-value c))))))
+
+(defescape #\B
+  (lambda ()
+    (let ((delim (get-char)))
+      (case delim
+        ((#\' #\") (let* ((arg (read-till-char delim :eat-delim-p t))
+                          (n (string-to-number arg)))
+                     (if n "1" "0")))
+        (t (terror "\\B: bad delim ~a" delim))))))
 
 (defescape #\V
   (lambda ()
