@@ -2,6 +2,8 @@ Last change 2015-09-22
 
 2015 Sept 22
 
+\B'...'
+
 Diversion should be retrievable several times.
 
 execute-macro on a diversion should sent it back to input
