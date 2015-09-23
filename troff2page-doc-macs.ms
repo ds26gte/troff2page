@@ -1,4 +1,4 @@
-.\" last change 2015-09-22
+.\" last change 2015-09-23
 .
 .ie \n[.X] \{\
 .mso s  \" heirloom troff
@@ -7,6 +7,8 @@
 .el .mso ms.tmac   \" groff
 .
 .mso pca.tmac
+.
+.ds eval4trofflang lisp
 .
 .mso defhsl.tmac
 .
