@@ -1,4 +1,4 @@
-.= troff2page
+.SH troff2page
 
 troff2page is a Common Lisp program for making Web
 pages from troff documents.  Consult
