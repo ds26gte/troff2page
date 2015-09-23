@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150922) ;last change
+(defparameter *troff2page-version* 20150923) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -3237,6 +3237,7 @@
            (args (read-args)))
       (when (= th-n 1)
         (!macro-package :man)
+        (man-specific-requests)
         (when (setq *it* (find-macro-file "man.local"))
           (troff2page-file *it*))
         (when (setq *it* (find-macro-file "pca-t2p-man.tmac"))
@@ -3323,20 +3324,20 @@
 
 (defrequest "SH"
   (lambda ()
-    (case *macro-package*
-      (:man (emit-section-header 1 :man-header-p t))
-      (t ;(funcall (gethash "@SH" *request-table*))
-        (execute-macro "@SH")
-        ))))
+    (execute-macro "@SH")))
 
 (defrequest "@SH"
   (lambda ()
     (let ((lvl (car (read-args))))
       (emit-section-header (if lvl (string-to-number lvl) 1)))))
 
-(defrequest "SS"
-  (lambda ()
-    (emit-section-header 2 :man-header-p t)))
+(defun man-specific-requests ()
+  (defrequest "SH"
+    (lambda ()
+      (emit-section-header 1 :man-header-p t)))
+  (defrequest "SS"
+    (lambda ()
+      (emit-section-header 2 :man-header-p t))))
 
 (defrequest "SC"
   (lambda ()
@@ -3892,6 +3893,11 @@
     (ignore-spaces)
     (cond  (*cascaded-if-p* (setq *cascaded-if-p* nil))
            (t (ignore-branch)))))
+
+(defrequest "nop"
+  ;eqv to .if 1
+  (lambda ()
+    (ignore-spaces)))
 
 (defrequest "nx"
   (lambda ()
