@@ -2182,6 +2182,9 @@
            "
            *css-port*)))
 
+(defun bool-to-num (b)
+  (if b 1 0))
+
 (defun initialize-glyph-number-and-string-registers ()
   ;
   (defglyph "htmllt" "\\[htmllt]")
@@ -2211,7 +2214,7 @@
   (defnumreg ".i" (make-counter* :thunk (lambda () *margin-left*)))
   (defnumreg ".u" (make-counter* :thunk
                                  (lambda ()
-                                   (if (ev*-fill (car *ev-stack*)) 1 0))))
+                                   (bool-to-num (ev*-fill (car *ev-stack*))))))
   (defnumreg ".ce" (make-counter* :thunk (lambda () *lines-to-be-centered*)))
   ;current-time -related registers
   (multiple-value-bind (seconds minutes hours dy mo year dw dst tz)
@@ -3717,62 +3720,69 @@
                        ((char= c #\{) (incf nesting))))))))
     (read-troff-line)))
 
-(defun read-arith-expr (&key stop)
+(defun read-arith-expr (&key stop inside-paren-p)
   (let ((acc 0))
     (loop
       (let ((c (snoop-char)))
         (cond ((not c) (return acc))
-              ((char= c #\+) (get-char)
+              ((char= c #\+) (get-char) (ignore-spaces)
                              (incf acc (read-arith-expr :stop t)))
-              ((char= c #\-) (get-char)
+              ((char= c #\-) (get-char) (ignore-spaces)
                              (decf acc (read-arith-expr :stop t)))
-              ((char= c #\*) (get-char)
+              ((char= c #\*) (get-char) (ignore-spaces)
 			     (setq acc
 				   (* acc (read-arith-expr :stop t))))
-              ((char= c #\/) (get-char)
+              ((char= c #\/) (get-char) (ignore-spaces)
 			     (setq acc
 				   (/ acc (read-arith-expr :stop t))))
-              ((char= c #\%) (get-char)
+              ((char= c #\%) (get-char) (ignore-spaces)
 			     (setq acc
 				   (mod acc (read-arith-expr :stop t))))
               ((char= c #\<) (get-char)
-			     (setq acc
-				   (let (eq-also
-					  (c (snoop-char)))
-				     (when (char= c #\=)
-				       (get-char)
-				       (setq eq-also t))
-				     (if (funcall
-					   (if eq-also #'<= #'<)
-					   acc (read-arith-expr :stop t))
-				       1 0))))
+                             (setq acc
+                                   (let (proc (c (snoop-char)))
+                                     (case c
+                                       (#\= (get-char) (setq proc #'<=))
+                                       (#\? (get-char) (setq proc #'min))
+                                       (t (setq proc #'<)))
+                                     (ignore-spaces)
+                                     (let ((r (funcall proc acc (read-arith-expr :stop t))))
+                                       (case c
+                                         (#\? r)
+                                         (t (bool-to-num r)))))))
               ((char= c #\>) (get-char)
-			     (setq acc
-				   (let (eq-also
-					  (c (snoop-char)))
-				     (when (char= c #\=)
-				       (get-char)
-				       (setq eq-also t))
-				     (if (funcall
-					   (if eq-also #'>= #'>)
-					   acc (read-arith-expr :stop t))
-				       1 0))))
+                             (setq acc
+                                   (let (proc (c (snoop-char)))
+                                     (case c
+                                       (#\= (get-char) (setq proc #'>=))
+                                       (#\? (get-char) (setq proc #'max))
+                                       (t (setq proc #'>)))
+                                     (ignore-spaces)
+                                     (let ((r (funcall proc acc (read-arith-expr :stop t))))
+                                       (case c
+                                         (#\? r)
+                                         (t (bool-to-num r)))))))
               ((char= c #\=) (get-char)
 			     (when (char= (snoop-char) #\=)
 			       (get-char))
+                             (ignore-spaces)
                              (setq acc
-                                   (if (= acc (read-arith-expr :stop t))
-                                     1 0)))
-	      ((char= c #\&) (get-char)
+                                   (bool-to-num (= acc (read-arith-expr :stop t)))))
+              ((char= c #\() (get-char) (ignore-spaces)
+                             (setq acc (read-arith-expr :inside-paren-p t))
+                             (ignore-spaces)
+                             (let ((c (snoop-char)))
+                               (unless (eql c #\) )
+                                 (terror "bad arithmetic parenthetic expression ~a" c))
+                               (ignore-spaces)))
+	      ((char= c #\&) (get-char) (ignore-spaces)
 			     (setq acc
 				   (let ((rhs (read-arith-expr :stop t)))
-				     (if (and (> acc 0) (> rhs 0))
-				       1 0))))
-	      ((char= c #\:) (get-char)
+				     (bool-to-num (and (> acc 0) (> rhs 0))))))
+	      ((char= c #\:) (get-char) (ignore-spaces)
 			     (setq acc
 				   (let ((rhs (read-arith-expr :stop t)))
-				     (or (and (> acc 0) (> rhs 0))
-				       1 0))))
+				     (bool-to-num (or (> acc 0) (> rhs 0))))))
               ((or (digit-char-p c) (char= c #\.))
                (get-char)
                (let ((r (list c))
@@ -3792,8 +3802,9 @@
                  (let ((n (read-from-string
                             (concatenate 'string
                               (nreverse r)))))
-                   (if stop (return n)
-                     (setq acc n)))))
+                   (when inside-paren-p (ignore-spaces))
+                   (cond (stop (return n))
+                         (t (setq acc n))))))
               ((char= c *escape-char*)
                (get-char)
                (toss-back-string (expand-escape (snoop-char)))
