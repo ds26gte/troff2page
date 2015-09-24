@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150923) ;last change
+(defparameter *troff2page-version* 20150924) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -3909,6 +3909,11 @@
   ;eqv to .if 1
   (lambda ()
     (ignore-spaces)))
+
+(defrequest "do"
+  (lambda ()
+    (ignore-spaces)
+    (toss-back-char #\.)))
 
 (defrequest "nx"
   (lambda ()
