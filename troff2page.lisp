@@ -1660,19 +1660,20 @@
                               (emit (expand-args w)))))))))))
 
 (defun emit-section-header (level &key numberedp man-header-p)
-  (let* ((this-section-no nil)
+  (let* ((this-section-num nil)
          (growps (raw-counter-value "GROWPS")))
     (emit-para)
     (when numberedp
       (setf (counter*-value (get-counter-named "nh*hl")) level)
       (increment-section-counter level)
-      (setq this-section-no (section-counter-value))
+      (setq this-section-num (section-counter-value))
       (setf (gethash "SN-NO-DOT" *string-table*)
-            (lambda () this-section-no))
-      (let ((this-section-no-dot
-              (concatenate 'string this-section-no ".")))
-        (setf (gethash "SN-DOT" *string-table*) (lambda () this-section-no-dot)
-              (gethash "SN" *string-table*) (lambda () this-section-no-dot)))) ; without dot?
+            (lambda () this-section-num))
+      (let ((this-section-num-dot
+              (concatenate 'string this-section-num ".")))
+        (setf (gethash "SN-DOT" *string-table*) (lambda () this-section-num-dot)
+              (gethash "SN" *string-table*) (lambda () this-section-num-dot)
+              (gethash "SN-STYLE" *string-table*) (lambda () this-section-num-dot))))
     (ignore-spaces)
     ;(emit-edit-source-doc)
     (get-header
@@ -1697,8 +1698,8 @@
                                        ps))))
             (emit-verbatim "%\""))))
           (emit-verbatim ">")
-          (when this-section-no
-            (emit this-section-no) (emit-verbatim ".") (emit-nbsp 2))
+          (when this-section-num
+            (emit this-section-num) (emit-verbatim ".") (emit-nbsp 2))
           (emit-verbatim header)
           (emit-verbatim "</h")
           (emit hnum)
@@ -4371,7 +4372,7 @@
   (lambda ()
     (let ((delim (get-char)))
       (case delim
-        ((#\' #\") (let* ((arg (read-till-char delim :eat-delim-p t))
+        ((#\' #\") (let* ((arg (expand-args (read-till-char delim :eat-delim-p t)))
                           (n (string-to-number arg)))
                      (if n "1" "0")))
         (t (terror "\\B: bad delim ~a" delim))))))
