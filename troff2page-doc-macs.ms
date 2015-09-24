@@ -31,12 +31,7 @@
 .
 .\"nr HTML1 1
 .
-.\" noad
-.
 .nr GROWPS 3
-.
-.\"nr bell_localisms 1
-.\"nr SS-first-call 1
 .
 .if !d LK \{\
 .de LK
