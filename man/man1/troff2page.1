@@ -312,20 +312,33 @@ contents, you could use
     Extending troff using Common Lisp, \e*[TAG_sec:troffcl]
 
 In the HTML output, the string \e*[TAG_sec:troffcl] is not just a page
-number but also a link to 
+number but also a link to
 where .TAG sec:troffcl was called.
 
 \&.TAG takes an optional second argument. The label is then
 associated with the text of the second argument instead of the
 current page number.
 
-troff2page comes with the macro files pca-toc.tmac and
-pca-sec.tmac that uses .TAG
-to help generate a table-of-contents (ToC).
+The macro file pca-toc.tmac supplies a .TOC macro for automatic
+generation of a table of contents. This can be used by both groff
+and troff2page.
 
-troff2page also comes with the macro file pca-t2p-man.tmac that
-automatically generates a table of contents for man pages, with a toc entry for
-each .SH in the input.
+The troff2page aspect of pca-toc.tmac uses .TAG. For both
+outputs, TOC entries are created for headers of level \en[GROWPS]
+or lower. By default, GROWPS is set to 0, so you should set it to
+at least 1 to see a TOC.
+
+pca-toc.tmac doesn't require you to modify how you use your
+header macros (.SH or .NH). It is a solution to the following
+statement from the groff manual:
+
+“Altering the ‘NH’ macro to automatically build the table of
+contents is perhaps initially more difficult, but would save a
+great deal of time in the long run if you use ‘ms’ regularly.”
+
+troff2page uses the macro file pca-t2p-man.tmac (if it can find
+it in GROFF_TMAC_PATH) to automatically generate a TOC for man
+pages, with a TOC entry for each .SH in the input.
 
 .SH MAKING AN INDEX
 

@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-09-24  \"last modified
+.ND 2015-09-25  \"last modified
 .
 .TL
 troff2page
@@ -432,17 +432,17 @@ of the current page number.
 .IX table of contents
 The
 macro file \fCpca-toc.tmac\fP supplies a \fC.TOC\fP macro
-for automatic generation of table of contents. This can be used
+for automatic generation of a table of contents. This can be used
 by both groff and troff2page.
 
 .IX GROWPS, number register
-The troff2page aspect of this \fCpca-toc.tmac\fP
+The troff2page aspect of \fCpca-toc.tmac\fP
 uses \fC.TAG\fP. For both outputs, TOC entries are created for
-headers of level \fC\\n[GROWPS]\fP or lower. (By default,
+headers of level \fC\\n[GROWPS]\fP or lower. By default,
 \fCGROWPS\fP is set to 0, so you should set it to at least 1 to see
-a TOC.)
+a TOC.
 
-\fCpca-toc.tmac\fP does not require you to modify how you use your header
+\fCpca-toc.tmac\fP doesn’t require you to modify how you use your header
 macros (\fC.SH\fP or \fC.NH\fP). It is a solution to the
 following statement from the groff manual:
 
