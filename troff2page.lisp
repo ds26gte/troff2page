@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150924) ;last change
+(defparameter *troff2page-version* 20150925) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -971,7 +971,7 @@
             (*macro-copy-mode-p* t)
             (*outputting-to* :troff)
             (*out* o))
-        (generate-html '(:return :nx :ex))))))
+        (generate-html '(:break :continue :ex :nx :return))))))
 
 ;** .TS ... .TE
 
@@ -1973,21 +1973,21 @@
 (defun troff2page-lines (ss)
   (let ((*current-troff-input* (make-bport*)))
     (dolist (s ss) (toss-back-line s))
-    (generate-html '(:return :nx :ex))))
+    (generate-html '(:ex :nx :return))))
 
 (defun troff2page-chars (cc)
   (let ((*current-troff-input* (make-bport* :buffer cc)))
-    (generate-html '(:return :nx :ex))))
+    (generate-html '(:ex :nx :return))))
 
 (defun troff2page-string (s)
   (let ((*current-troff-input* (make-bport*)))
     (toss-back-string s)
-    (generate-html '(:return :nx :ex))))
+    (generate-html '(:break :continue :ex :nx :return))))
 
 (defun troff2page-line (s)
   (let ((*current-troff-input* (make-bport*)))
     (toss-back-line s)
-    (generate-html '(:return :nx :ex))))
+    (generate-html '(:ex :nx :return))))
 
 (defun troff2page-file (f)
   (cond ((or (not f) (not (probe-file f)))
@@ -3772,10 +3772,11 @@
               ((char= c #\() (get-char) (ignore-spaces)
                              (setq acc (read-arith-expr :inside-paren-p t))
                              (ignore-spaces)
-                             (let ((c (snoop-char)))
+                             (let ((c (get-char)))
                                (unless (eql c #\) )
                                  (terror "bad arithmetic parenthetic expression ~a" c))
-                               (ignore-spaces)))
+                               (ignore-spaces))
+                            (when stop (return acc)))
 	      ((char= c #\&) (get-char) (ignore-spaces)
 			     (setq acc
 				   (let ((rhs (read-arith-expr :stop t)))
@@ -3794,18 +3795,17 @@
                            ((char= c #\.)
                             (when dot-read-p (return))
                             (setq dot-read-p t)
-			    (get-char)
+                            (get-char)
                             (push c r))
                            ((digit-char-p c)
                             (get-char)
                             (push c r))
                            (t (return)))))
-                 (let ((n (read-from-string
-                            (concatenate 'string
-                              (nreverse r)))))
-                   (when inside-paren-p (ignore-spaces))
-                   (cond (stop (return n))
-                         (t (setq acc n))))))
+                 (setq acc (read-from-string
+                             (concatenate 'string
+                               (nreverse r))))
+                 (when inside-paren-p (ignore-spaces))
+                 (when stop (return acc))))
               ((char= c *escape-char*)
                (get-char)
                (toss-back-string (expand-escape (snoop-char)))
@@ -3876,7 +3876,7 @@
       (#\e (twarning "if: evenness of page number should not be relevant for HTML")
        (evenp *current-pageno*))
       (#\( (toss-back-char #\( )
-       (plusp (read-arith-expr)))
+       (plusp (read-arith-expr :stop t)))
       (t (cond ((or (char= c *escape-char*)
                     (digit-char-p c)
                     (char= c #\+) (char= c #\-))
@@ -3953,6 +3953,7 @@
              (get-char)
              (setq c (get-char))
              (case c
+               (#\newline)
                (#\{ (incf nesting)
                 (unless (= nesting 1)
                   (setq r (concatenate 'string r (list *escape-char* #\{ )))))
@@ -3968,11 +3969,16 @@
   (lambda ()
     (ignore-spaces)
     (let* ((test (read-test))
-          (body (read-block)))
+           (body (read-block)))
       (loop
         (toss-back-string test)
         (cond ((if-test-passed-p)
-               (troff2page-string body))
+               (troff2page-string body)
+               (when *exit-status*
+                 (case *exit-status*
+                   (:break (setq *exit-status* nil) (return))
+                   (:continue (setq *exit-status* nil))
+                   (t (return)))))
               (t (return)))))))
 
 (defrequest "do"
@@ -4001,6 +4007,16 @@
   (lambda ()
     (do-tmc :newlinep t)
     (setq *exit-status* :ex)))
+
+(defrequest "break"
+  (lambda ()
+    (read-troff-line)
+    (setq *exit-status* :break)))
+
+(defrequest "continue"
+  (lambda ()
+    (read-troff-line)
+    (setq *exit-status* :continue)))
 
 (defrequest "nf"
   (lambda ()
@@ -4398,7 +4414,7 @@
 (defescape #\{
   (lambda ()
     ;(format t "doing \\{\n")
-    (ignore-spaces)
+    ;(ignore-spaces)
     (setq *cascaded-if-stack* (cons *cascaded-if-p* *cascaded-if-stack*)
           *cascaded-if-p* nil)
     ;(setq *previous-line-exec-p* t)
