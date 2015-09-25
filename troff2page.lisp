@@ -796,10 +796,10 @@
       (let ((c (snoop-char)))
         (cond ((not c)
                (if newline-is-delim-p
-                 (if (string= r "") c r)
-                 (progn
-                 (terror "read-till-chars: could not find closer ~a" r)
-                 (return))))
+                   (if (string= r "") c r)
+                   (progn
+                     (terror "read-till-chars: could not find closer ~a" r)
+                     (return))))
               ((member c delims :test #'char=)
                (when eat-delim-p (get-char))
                (return r))
@@ -3857,11 +3857,11 @@
       (t (round (* 4.5 n))))))  ;or 5?
 
 (defun if-test-passed-p ()
-  (let ((delim (get-char)))
-    (case delim
+  (let ((c (get-char)))
+    (case c
       ((#\' #\")
-       (let* ((left (expand-args (read-till-char delim :eat-delim-p t)))
-              (right (expand-args (read-till-char delim :eat-delim-p t))))
+       (let* ((left (expand-args (read-till-char c :eat-delim-p t)))
+              (right (expand-args (read-till-char c :eat-delim-p t))))
          (string= left right)))
       (#\! (not (if-test-passed-p)))
       (#\n nil)
@@ -3875,15 +3875,15 @@
        (oddp *current-pageno*))
       (#\e (twarning "if: evenness of page number should not be relevant for HTML")
        (evenp *current-pageno*))
-      (t (cond ((or (char= delim *escape-char*)
-                    (digit-char-p delim)
-                    (char= delim #\+) (char= delim #\-))
-                (toss-back-char delim)
-                (let ((n (read-arith-expr)))
-                  ;(format t "if value = ~s~%" n)
-                  (and n (> n 0))))
+      (#\( (toss-back-char #\( )
+       (plusp (read-arith-expr)))
+      (t (cond ((or (char= c *escape-char*)
+                    (digit-char-p c)
+                    (char= c #\+) (char= c #\-))
+                (toss-back-char c)
+                (plusp (read-arith-expr)))
                (t nil
-                  ;(terror 'unsupported-if-test delim)
+                  ;(terror 'unsupported-if-test c)
                   ))))))
 
 (defrequest "if"
@@ -3910,6 +3910,70 @@
   ;eqv to .if 1
   (lambda ()
     (ignore-spaces)))
+
+(defun read-test ()
+  (let ((r "") (nesting 0) c)
+    (loop
+      (setq c (snoop-char))
+      (cond ((not c)
+             (when (string= r "") (terror "test: empty"))
+             (return))
+            ((char= c #\newline)
+             (get-char)
+             (if (= nesting 0) (return)
+                 (setq r (concatenate 'string r (string #\newline)))))
+            ((char= c *escape-char*)
+             (get-char)
+             (setq c (get-char))
+             (setq r (concatenate 'string r (list *escape-char* c))))
+            ((char= c #\( )
+             (get-char) (incf nesting)
+             (setq r (concatenate 'string r (string #\( ))))
+            ((char= c #\) )
+             (get-char) (decf nesting)
+             (setq r (concatenate 'string r (string #\) )))
+             (when (= nesting 0) (return)))
+            (t (get-char)
+               (setq r (concatenate 'string r (string c))))))
+    r))
+
+(defun read-block ()
+  (ignore-spaces)
+  (let ((r "") (nesting 0) c)
+    (loop
+      (setq c (snoop-char))
+      (cond ((not c)
+             (if (= nesting 0) (return)
+                 (terror "block: eof before end")))
+            ((char= c #\newline)
+             (get-char)
+             (if (= nesting 0) (return)
+                 (setq r (concatenate 'string r (string #\newline)))))
+            ((char= c *escape-char*)
+             (get-char)
+             (setq c (get-char))
+             (case c
+               (#\{ (incf nesting)
+                (unless (= nesting 1)
+                  (setq r (concatenate 'string r (list *escape-char* #\{ )))))
+               (#\} (decf nesting)
+                (cond ((< nesting 0) (terror "block: \\} without \\{"))
+                      ((= nesting 0) (return))
+                      (t (setq r (concatenate 'string r (list *escape-char* #\} ))))))
+               (t (setq r (concatenate 'string r (list *escape-char* c))))))
+            (t (get-char) (setq r (concatenate 'string r (string c))))))
+    r))
+
+(defrequest "while"
+  (lambda ()
+    (ignore-spaces)
+    (let* ((test (read-test))
+          (body (read-block)))
+      (loop
+        (toss-back-string test)
+        (cond ((if-test-passed-p)
+               (troff2page-string body))
+              (t (return)))))))
 
 (defrequest "do"
   (lambda ()
@@ -4146,7 +4210,6 @@
 
 (defrequest "nr"
   (lambda ()
-    ;(format t "doing .nr\n")
     (let* ((n (read-word))
            (c (get-counter-named n)))
       (when (counter*-thunk c)
