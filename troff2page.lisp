@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150925) ;last change
+(defparameter *troff2page-version* 20150926) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -531,6 +531,7 @@
 (defvar *pso-temp-file*)
 (defvar *reading-quoted-phrase-p*)
 (defvar *reading-string-call-p*)
+(defvar *reading-table-header-p*)
 (defvar *reading-table-p*)
 (defvar *saved-escape-char*)
 (defvar *sourcing-ascii-file-p*)
@@ -1067,7 +1068,10 @@
         c)
     (loop
       (when (= *table-cell-number* 0)
-        (emit-verbatim "<tr>"))
+        (emit-verbatim "<tr")
+        (when *reading-table-header-p*
+          (emit-verbatim " class=tableheader"))
+        (emit-verbatim ">"))
       ;(ignore-spaces) ;?
       (setq c (snoop-char))
       (cond ((and (= *table-cell-number* 0) (char= c *control-char*))
@@ -2096,6 +2100,10 @@
 
            ol ol ol ol {
            list-style-type: upper-alpha;
+           }
+
+           tr.tableheader {
+           font-weight: bold
            }
 
            tt i {
@@ -3248,33 +3256,37 @@
 
 (defrequest "TH"
   (lambda ()
-    (let* ((th-counter (get-counter-named "man_.TH_times_called"))
-           (th-n (incf (counter*-value th-counter)))
-           (args (read-args)))
-      (when (= th-n 1)
-        (!macro-package :man)
-        (man-specific-requests)
-        (when (setq *it* (find-macro-file "man.local"))
-          (troff2page-file *it*))
-        (when (setq *it* (find-macro-file "pca-t2p-man.tmac"))
-          (troff2page-file *it*)))
-      (cond ((and (= th-n 1) (setq *it* (gethash "TH" *macro-table*)))
-             (let* ((the-new-th *it*)
-                    (*macro-args* (cons "TH" args)))
-               (execute-macro-body the-new-th)))
-            (t
-              (let ((title (car args))
-                    (sec (cadr args))
-                    (date (caddr args)))
-                (when title
-                  (setq title (string-trim-blanks title))
-                  (unless (string= title "")
-                    (store-title title :emitp t))
-                  (when date
-                    (setq date (string-trim-blanks date))
-                    (unless (string= date "")
-                      (setf (gethash "DY" *string-table*)
-                            (lambda () date)))))))))))
+    (block TH-request
+      (when *reading-table-p*
+        (read-troff-line)
+        (setq *reading-table-header-p* nil)
+        (return-from TH-request))
+      (let* ((th-counter (get-counter-named "man_.TH_times_called"))
+             (th-n (incf (counter*-value th-counter)))
+             (args (read-args)))
+        (when (= th-n 1)
+          (!macro-package :man)
+          (man-specific-requests)
+          (when (setq *it* (find-macro-file "man.local"))
+            (troff2page-file *it*))
+          (when (setq *it* (find-macro-file "pca-t2p-man.tmac"))
+            (troff2page-file *it*)))
+        (cond ((and (= th-n 1) (setq *it* (gethash "TH" *macro-table*)))
+               (let* ((the-new-th *it*)
+                      (*macro-args* (cons "TH" args)))
+                 (execute-macro-body the-new-th)))
+              (t (let ((title (car args))
+                       (sec (cadr args))
+                       (date (caddr args)))
+                   (when title
+                     (setq title (string-trim-blanks title))
+                     (unless (string= title "")
+                       (store-title title :emitp t))
+                     (when date
+                       (setq date (string-trim-blanks date))
+                       (unless (string= date "")
+                         (setf (gethash "DY" *string-table*)
+                               (lambda () date))))))))))))
 
 (defrequest "TL"
   (lambda ()
@@ -3675,9 +3687,9 @@
       (emit-newline))))
 
 (defrequest "TS"
-  (lambda ()
-    (read-troff-line)
-    (let ((*reading-table-p* t)
+  (lambda (&aux (args (read-args)))
+    (let ((*reading-table-header-p* (and args (string= (car args) "H")))
+          (*reading-table-p* t)
           (*table-format-table* (make-hash-table))
           (*table-default-format-line* 0)
           (*table-row-number* 0)
@@ -4592,6 +4604,7 @@
           (*previous-line-exec-p* nil)
           (*reading-quoted-phrase-p* nil)
           (*reading-string-call-p* nil)
+          (*reading-table-header-p* nil)
           (*reading-table-p* nil)
           (*saved-escape-char* nil)
           (*sourcing-ascii-file-p* nil)
