@@ -637,11 +637,13 @@
         (t (values "[???]" nil))))
 
 (defun man-url ()
+  (format t "doing man-url~%")
   (let ((url "")
         url-more c c2)
     (loop
       (setq url-more (read-till-chars '(#\space #\tab #\newline
                                          #\, #\" #\' #\)
+                                         #\\
                                          #\: #\.)))
       (setq url (concatenate 'string url url-more))
       (setq c (snoop-char))
@@ -662,21 +664,18 @@
                  url
                  (link-stop))))
 
-(defun url-string-value (url &optional link-text)
+(defun url-to-html (url link-text)
   (let (internal-node-p)
-    (if link-text
-      (multiple-value-setq (url internal-node-p) (link-url url))
-      (setq link-text url))
+    (multiple-value-setq (url internal-node-p) (link-url url))
     (concatenate 'string
-                 (link-start url :internal-node-p internal-node-p)
-                 link-text
-                 (link-stop))))
+      (link-start url :internal-node-p internal-node-p)
+      (expand-args link-text)
+      (link-stop))))
 
-(defun urlh-string-value (url)
-  (let (internal-node-p
-         (link-text "")
-         link-text-more
-         c)
+(defun urlh-string-value (&optional url)
+  (let ((link-text "")
+        link-text-more
+        c)
     (loop
       (setq link-text-more (read-till-char #\\ :eat-delim-p t))
       (setq link-text (concatenate 'string link-text link-text-more))
@@ -688,11 +687,8 @@
              (get-char)
              (return))
             (t (setq link-text (concatenate 'string link-text "\\")))))
-    (multiple-value-setq (url internal-node-p) (link-url url))
-    (concatenate 'string
-                 (link-start url :internal-node-p internal-node-p)
-                 (expand-args link-text)
-                 (link-stop))))
+    (unless url (setq url link-text))
+    (url-to-html url link-text)))
 
 ;** environments
 
@@ -872,19 +868,19 @@
 (defun read-quoted-phrase ()
   (get-char) ;read the "
   (let ((*reading-quoted-phrase-p* t)
-        (read-escape? nil)
+        (read-escape-p nil)
         (r '())
         c)
     (loop
       (setq c (snoop-char))
-      (cond (read-escape?
-              (setq read-escape? nil)
+      (cond (read-escape-p
+              (setq read-escape-p nil)
               (get-char)
               (cond ((char= c #\newline) t)
                     (t (push *escape-char* r)
                        (push c r))))
             ((escape-char-p c)
-             (setq read-escape? t)
+             (setq read-escape-p t)
              (get-char))
             ((or (char= c #\") (char= c #\newline))
              (when (char= c #\") (get-char))
@@ -2290,7 +2286,7 @@
           (link-stop)))))
   ;
   (defstring ":" #'man-url)
-  (defstring "url" #'url-string-value)
+  (defstring "url" #'urlh-string-value)
   (defstring "urlh" #'urlh-string-value)
   ;
   )
@@ -2436,7 +2432,7 @@
                 (s-string c1 c2)))
       (t (string c)))))
 
-(defun read-troff-string-args ()
+(defun read-troff-string-and-args ()
   (let ((c (get-char)))
     (case c
       (#\( (let* ((c1 (get-char)) (c2 (get-char)))
@@ -2446,7 +2442,7 @@
              (loop
                (ignore-spaces)
                (let ((c (snoop-char)))
-                 (cond ((not c) (terror "read-troff-string-args: string too long"))
+                 (cond ((not c) (terror "read-troff-string-and-args: string too long"))
                        ((char= c #\newline) (get-char))
                        ((char= c #\]) (get-char) (return))
                        (t (push (expand-args (read-word)) r)))))
@@ -4400,7 +4396,7 @@
 
 (defescape #\*
   (lambda ()
-    (let* ((s-args (read-troff-string-args))
+    (let* ((s-args (read-troff-string-and-args))
            (s (car s-args))
            (args (cdr s-args)))
       (cond ((setq *it* (gethash s *string-table*))
