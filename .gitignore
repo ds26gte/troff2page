@@ -1,6 +1,10 @@
 *-Z-*
 *.html
 *.ps
+*.txt
 *temp_*
 *~
 .trofftemp*
+?.lisp
+?.ms
+examples/*.ms
