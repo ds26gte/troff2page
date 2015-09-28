@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150926) ;last change
+(defparameter *troff2page-version* 20150928) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -2872,7 +2872,7 @@
                  (setf (gethash w *request-table*)
                        (lambda ()
                          (execute-macro w)))))
-              (t (twarning "am: ignoring ~a" w)))
+              (t (setf (gethash w *macro-table*) extra-macro-body)))
         (call-ender ender)))))
 
 (defrequest "eo"
@@ -3687,36 +3687,37 @@
       (emit-newline))))
 
 (defrequest "TS"
-  (lambda (&aux (args (read-args)))
-    (let ((*reading-table-header-p* (and args (string= (car args) "H")))
-          (*reading-table-p* t)
-          (*table-format-table* (make-hash-table))
-          (*table-default-format-line* 0)
-          (*table-row-number* 0)
-          (*table-cell-number* 0)
-          (*table-colsep-char* #\tab)
-          (*table-options* " cellpadding=2") ;?
-          (*table-number-of-columns* 0)
-          (*table-align* nil) ;??
-          )
-      (table-do-global-options)
-      (table-do-format-section)
-      (emit-verbatim "<div")
-      (when *table-align*
-        (emit-verbatim " align=")
-        (emit-verbatim *table-align*))
-      (emit-verbatim ">")
-      (emit-newline)
-      (emit-verbatim "<table")
-      (princ *table-options* *out*)
-      (emit-verbatim ">")
-      (emit-newline)
-      (table-do-rows)
-      (emit-verbatim "</table>")
-      (emit-newline)
-      (emit-verbatim "</div>")
-      (clrhash *table-format-table*) ;shouldn't be necessary
-      )))
+  (lambda ()
+    (let ((args (read-args)))
+      (let ((*reading-table-header-p* (and args (string= (car args) "H")))
+            (*reading-table-p* t)
+            (*table-format-table* (make-hash-table))
+            (*table-default-format-line* 0)
+            (*table-row-number* 0)
+            (*table-cell-number* 0)
+            (*table-colsep-char* #\tab)
+            (*table-options* " cellpadding=2") ;?
+            (*table-number-of-columns* 0)
+            (*table-align* nil) ;??
+            )
+        (table-do-global-options)
+        (table-do-format-section)
+        (emit-verbatim "<div")
+        (when *table-align*
+          (emit-verbatim " align=")
+          (emit-verbatim *table-align*))
+        (emit-verbatim ">")
+        (emit-newline)
+        (emit-verbatim "<table")
+        (princ *table-options* *out*)
+        (emit-verbatim ">")
+        (emit-newline)
+        (table-do-rows)
+        (emit-verbatim "</table>")
+        (emit-newline)
+        (emit-verbatim "</div>")
+        (clrhash *table-format-table*) ;shouldn't be necessary
+        ))))
 
 (defun ignore-branch ()
   (ignore-spaces)
@@ -4279,7 +4280,7 @@
 
 (defrequest "ev"
   (lambda ()
-    (let* ((ev-new-name (read-word)))
+    (let ((ev-new-name (read-word)))
       (if ev-new-name
           (ev-push ev-new-name)
           (ev-pop)))))
