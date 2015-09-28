@@ -1,13 +1,13 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-09-25  \"last modified
+.ND 2015-09-28  \"last modified
 .
 .TL
 troff2page
 .AU
 .ie \n[.troff2page] \{\
-\*[urlh http://ds26gte.github.io]Dorai Sitaram\&
-\*[urlh https://github.com/ds26gte/troff2page]Download the
+\*[url http://ds26gte.github.io]Dorai Sitaram\&
+\*[url https://github.com/ds26gte/troff2page]Download the
 \*[troff2page_version_th] version\&
 .\}
 .el \{\ Dorai Sitaram
@@ -51,17 +51,17 @@ OS X, and Solaris.  It uses the Common Lisp implementation mentioned in
 the shell environment variable \fCLISP\fP, which can currently be set to
 either \fCclisp\fP, \fCclozure\fP, \fCcmu\fP, \fCecl\fP, or \fCsbcl\fP:
 the corresponding Lisp implementations being
-\*[urlh http://clisp.sf.net]CLISP\&,
-\*[urlh http://ccl.clozure.com]Clozure CL\&,
-\*[urlh http://cmucl.org]CMUCL\&,
-\*[urlh http://ecls.sf.net]ECL\&, and
-\*[urlh http://sbcl.sf.net]SBCL\&.
+\*[url http://clisp.sf.net]CLISP\&,
+\*[url http://ccl.clozure.com]Clozure CL\&,
+\*[url http://cmucl.org]CMUCL\&,
+\*[url http://ecls.sf.net]ECL\&, and
+\*[url http://sbcl.sf.net]SBCL\&.
 
 If \fCLISP\fP is not
 set, some default Lisp implementation is assumed.
 
 For more information,
-please see the file \*[urlh \
+please see the file \*[url \
 https://github.com/ds26gte/troff2page/blob/master/INSTALL]INSTALL\&
 in the distribution.
 
@@ -97,7 +97,7 @@ ms and man macro packages, including such rather
 recherché macros as \fC.DC\fP, here used to produce a drop cap
 colored terracotta pink.
 The syntax recognized is the improved kind
-supported by \*[urlh http://groff.ffii.org]groff\& and \*[urlh \
+supported by \*[url http://groff.ffii.org]groff\& and \*[url \
 http://heirloom.sf.net/doctools.html]Heirloom troff\&, i.e., macro, string,
 and glyph names can be arbitrarily long, and strings can
 have arguments.  Most of the commands are converted to their
@@ -466,7 +466,7 @@ The supplied macro file \fCpca-ix.tmac\fP
 creates a sorted
 index, with the aid of the external program makeindex.
 makeindex is included with TeX distributions, but you can
-also obtain \*[urlh \
+also obtain \*[url \
 http://stuff.mit.edu/afs/sipb/project/tex-dev/src/tar/makeindex.tar.gz]just
 the makeindex distribution\&.
 
@@ -489,7 +489,7 @@ alternate alphabetization, (b) subitems, (c) literal metacharacters, and
 (d) encapsulation of the page number.  Please see the
 makeindex
 documentation for all the details.  Essentially, the syntax for entering
-index entries is the same \*[urlh \
+index entries is the same \*[url \
 http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in troff we use
 “\fC.IX item\fP” where in LaTeX one would use
 \%“\fC\eindex{item}\fP”.
@@ -510,7 +510,7 @@ Adding a section header on top is up to you.
 .IX slideshow
 To cause your troff source to be converted into slideshow-ready HTML, have
 it source the provided macro file \fCt2pslides.tmac\fP.
-This macro file uses a version of the \*[urlh \
+This macro file uses a version of the \*[url \
 http://mozpoint.mozdev.org]MozPoint\& library to
 produce the appropriate JavaScript and style sheets to
 convert your sequence of HTML pages into a Web presentation.
@@ -664,7 +664,7 @@ define the color Venetian red using its HSL spec (357\(de, 49%,
 24%), which to many is a more intuitive description than RGB
 (91, 31, 34).
 
-While there is an \*[urlh \
+While there is an \*[url \
 http://en.wikipedia.org/wiki/HSL_color_space]algorithm\& to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
@@ -751,7 +751,7 @@ troff2page treats troff’s \fC.ig\fP
 environment, whenever it uses \fC##\fP as ender, as
 containing Lisp code that can be used to extend
 troff2page.  This syntactic overloading of \fC.ig ##\fP is an innovation introduced by
-Oliver Laumann’s \*[urlh \
+Oliver Laumann’s \*[url \
 http://www-rn.informatik.uni-bremen.de/software/unroff]unroff\&.
 
 Any Lisp code enclosed within
@@ -825,7 +825,7 @@ of chocolate.\**
 The RGB values used in this manual for
 the colors chocolate,
 terracotta pink,
-and Venetian red are all courtesy \*[urlh \
+and Venetian red are all courtesy \*[url \
 http://www.resene.co.nz/swatches]Resene Paints\&.
 .FE
 
