@@ -73,7 +73,7 @@
   ;We only need distinguish between Unix and Windows.
   ;Cygwin on Windows qualifies as Unix
   (or #+unix :unix
-      #+darwin :unix  ;ECL on Unix doesn't have #+unix
+      #+darwin :unix  ;ECL on Mac doesn't have #+unix ?
       (if (retrieve-env "COMSPEC") :windows :unix)))
 
 (setq *load-verbose* nil)
