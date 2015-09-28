@@ -2,6 +2,12 @@ Last change 2015-09-28
 
 2015 Sept 28
 
+\*[url ...] and \*[urlh ...] consolidated to just \*[url
+...].
+
+\*[url URL]linktext\& becomes <a href="URL">linktext</a>
+\*[url]URL\&          becomes <a href="URL">URL</a>
+
 .am doesn't need arg to be already defined
 
 2015 Sept 26
