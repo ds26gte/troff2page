@@ -8,6 +8,12 @@ Last change 2015-09-28
 \*[url URL]linktext\& becomes <a href="URL">linktext</a>
 \*[url]URL\&          becomes <a href="URL">URL</a>
 
+No corresponding definition needed for groff!
+
+Defined string : as abbrev for url.
+
+*
+
 .am doesn't need arg to be already defined
 
 2015 Sept 26

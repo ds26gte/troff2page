@@ -637,7 +637,6 @@
         (t (values "[???]" nil))))
 
 (defun man-url ()
-  (format t "doing man-url~%")
   (let ((url "")
         url-more c c2)
     (loop
@@ -1750,8 +1749,8 @@
                   p-margin p-margin)
           (format *css-port* "~&.display { margin-top: ~apx; margin-bottom: ~apx; }~%"
                   display-margin display-margin)
-          '(format *css-port* "~&h1,h2,h3,h4,h5,h6 { margin-bottom: ~apx; }~%"
-                   h-margin)
+          ;(format *css-port* "~&h1,h2,h3,h4,h5,h6 { margin-bottom: ~apx; }~%"
+          ;         h-margin)
           (format *css-port* "~&.footnote { margin-top: ~apx; }~%"
                   fnote-rule-margin)
           (format *css-port* "~&.navigation { margin-top: ~apx; margin-bottom: ~apx; }~%"
@@ -2285,7 +2284,7 @@
           (verbatim "</small></sup>")
           (link-stop)))))
   ;
-  (defstring ":" #'man-url)
+  (defstring ":" #'urlh-string-value)
   (defstring "url" #'urlh-string-value)
   (defstring "urlh" #'urlh-string-value)
   ;
@@ -2850,9 +2849,6 @@
     (let* ((args (read-args))
            (w (car args))
            (ender (or (cadr args) ".")))
-      ;      (format t "mactbl is ~s~%" *macro-table*)
-      ;      (format t "--> ~a~%" (gethash w *macro-table*))
-            ;(format t "doing .am ~s ~s~%" w ender)
       (let ((extra-macro-body (collect-macro-body w ender)))
         (cond ((not (eq (setq *it* (gethash w *macro-table* :undefined))
                         :undefined))
@@ -2947,7 +2943,6 @@
   (lambda ()
     (let* ((w (expand-args (read-word)))
            (s (expand-args (read-troff-string-line))))
-      ;(format t "setting ~s to ~s~%" w s)
       (setf (gethash w *string-table*)
             (lambda (&rest args)
               (let ((*macro-args* (cons w args)))
@@ -3262,7 +3257,7 @@
              (args (read-args)))
         (when (= th-n 1)
           (!macro-package :man)
-          (man-specific-requests)
+          (man-specific-defs)
           (when (setq *it* (find-macro-file "man.local"))
             (troff2page-file *it*))
           (when (setq *it* (find-macro-file "pca-t2p-man.tmac"))
@@ -3355,13 +3350,14 @@
     (let ((lvl (car (read-args))))
       (emit-section-header (if lvl (string-to-number lvl) 1)))))
 
-(defun man-specific-requests ()
+(defun man-specific-defs ()
   (defrequest "SH"
     (lambda ()
       (emit-section-header 1 :man-header-p t)))
   (defrequest "SS"
     (lambda ()
-      (emit-section-header 2 :man-header-p t))))
+      (emit-section-header 2 :man-header-p t)))
+  (defstring ":" #'man-url))
 
 (defrequest "SC"
   (lambda ()
@@ -4435,7 +4431,6 @@
 
 (defescape #\{
   (lambda ()
-    ;(format t "doing \\{\n")
     ;(ignore-spaces)
     (setq *cascaded-if-stack* (cons *cascaded-if-p* *cascaded-if-stack*)
           *cascaded-if-p* nil)
@@ -4445,7 +4440,6 @@
 
 (defescape #\}
   (lambda ()
-    ;(format t "doing \\}\n")
     (read-troff-line)
     (setq *cascaded-if-p* (car *cascaded-if-stack*)
           *cascaded-if-stack* (cdr *cascaded-if-stack*))
