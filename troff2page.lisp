@@ -25,7 +25,7 @@
 
 (defparameter *troff2page-copyright-notice*
   (format nil "Copyright (C) 2003-~a Dorai Sitaram"
-          (subseq (format nil "~a" *troff2page-version*) 2 4)))
+          (subseq (format nil "~a" *troff2page-version*) 0 4)))
 
 (defun retrieve-env (s)
   (or #+clisp (ext::getenv s)
