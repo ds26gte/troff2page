@@ -2004,7 +2004,7 @@
 	 (flag-missing-piece f))
         (t (with-open-file (i f :direction :input)
              (let* ((*current-troff-input* (make-bport* :port i))
-                    (*input-line-no* 1)
+                    (*input-line-no* 0)
                     (*current-source-file* f))
                ;(emit-edit-source-doc)
                (generate-html '(:ex))))
