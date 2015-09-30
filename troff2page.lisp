@@ -1603,7 +1603,7 @@
     (setq *html-page*
 	  (concatenate 'string
 		       *jobname*
-		       (if (= html-page-count 0) ""
+		       (unless (= html-page-count 0)
 			 (concatenate 'string *html-page-suffix*
 				      (write-to-string html-page-count)))
 		       *output-extension*))
