@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150929) ;last change
+(defparameter *troff2page-version* 20150930) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -617,15 +617,15 @@
   (let ((curr-pageno *current-pageno*))
     (when (not link-pageno) (setq link-pageno curr-pageno))
     (concatenate 'string
-      (if (= link-pageno curr-pageno) ""
+      (unless (= link-pageno curr-pageno)
         (concatenate 'string
           *jobname*
-          (if (= link-pageno 0) ""
+          (unless (= link-pageno 0)
             (concatenate 'string
               *html-page-suffix*
               (write-to-string link-pageno)))
           *output-extension*))
-      (if node "#" "")
+      (when node "#")
       node)))
 
 (defun link-url (url &aux it)
