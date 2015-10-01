@@ -1855,9 +1855,6 @@
 (defun !stylesheet (css)
   (push css *stylesheets*))
 
-(defun !slides ()
-  (setq *slides* t))
-
 (defun store-title (title &key preferredp emitp)
   (cond (preferredp
           (when (or (not *title*)
