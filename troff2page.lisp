@@ -1532,17 +1532,16 @@
   (emit-newline)
   (when *slides*
     (emit-verbatim "<div id=slideother></div>")
-    (emit-newline))
-  (emit-verbatim "<div")
-  (when *slides*
-    (emit " class=")
-    (emit-verbatim (if (= *current-pageno* 0) "slidetitle" "slidecontent")))
-  (emit-verbatim ">")
-  (emit-newline))
+    (emit-newline)
+    (emit-verbatim "<div class=")
+    (emit-verbatim (if (= *current-pageno* 0) "slidetitle" "slidecontent"))
+    (emit-verbatim ">")
+    (emit-newline)))
 
 (defun emit-html-postamble ()
   (emit-para)
-  (emit-verbatim "</div>") (emit-newline)
+  (when *slides*
+    (emit-verbatim "</div>") (emit-newline))
   (emit-verbatim "</body>") (emit-newline)
   (emit-verbatim "</html>") (emit-newline))
 
