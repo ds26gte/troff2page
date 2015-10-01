@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20150930) ;last change
+(defparameter *troff2page-version* 20151001) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -1535,7 +1535,7 @@
     (emit-newline))
   (emit-verbatim "<div")
   (when *slides*
-    (emit " id=")
+    (emit " class=")
     (emit-verbatim (if (= *current-pageno* 0) "slidetitle" "slidecontent")))
   (emit-verbatim ">")
   (emit-newline))
