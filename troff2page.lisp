@@ -533,6 +533,7 @@
 (defvar *reading-table-header-p*)
 (defvar *reading-table-p*)
 (defvar *saved-escape-char*)
+(defvar *slides*)
 (defvar *sourcing-ascii-file-p*)
 (defvar *string-table*)
 (defvar *stylesheets*)
@@ -1529,8 +1530,13 @@
   (emit-newline)
   (emit-verbatim "<body>")
   (emit-newline)
-  (emit-verbatim "<div id=")
-  (emit-verbatim (if (= *current-pageno* 0) "title" "content"))
+  (when *slides*
+    (emit-verbatim "<div id=slideother></div>")
+    (emit-newline))
+  (emit-verbatim "<div")
+  (when *slides*
+    (emit " id=")
+    (emit-verbatim (if (= *current-pageno* 0) "slidetitle" "slidecontent")))
   (emit-verbatim ">")
   (emit-newline))
 
@@ -1592,7 +1598,7 @@
   (emit-newline))
 
 (defun ensure-file-deleted (f)
-  (if (probe-file f) (delete-file f)))
+  (when (probe-file f) (delete-file f)))
 
 (defun emit-start ()
   (let ((html-page-count (incf *current-pageno*)))
@@ -1849,6 +1855,9 @@
 
 (defun !stylesheet (css)
   (push css *stylesheets*))
+
+(defun !slides ()
+  (setq *slides* t))
 
 (defun store-title (title &key preferredp emitp)
   (cond (preferredp
@@ -4605,6 +4614,7 @@
           (*reading-table-header-p* nil)
           (*reading-table-p* nil)
           (*saved-escape-char* nil)
+          (*slides* nil)
           (*sourcing-ascii-file-p* nil)
           (*string-table* (make-hash-table :test #'equal))
           (*stylesheets* '())
