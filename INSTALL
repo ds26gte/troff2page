@@ -14,9 +14,10 @@ directory in your MANPATH.
 Copy the file ‘man/man7/eval4troff.tmac.7’ to the ‘man7’ subdirectory of a
 directory in your MANPATH.
 
-For its documentation, troff2page makes use of a submodule 'mpca'
-(available on its own at https://github.com/ds26gte/mpca)
-containing general-purpose groff macros. To include these, do
+For its documentation (see below), troff2page makes use of some
+*.tmac files, some of which are in the 'troff2page' directory and
+the rest in the submodule 'mpca' (available on its own at
+https://github.com/ds26gte/mpca).  To include the latter, do
 
 git submodule init
 git submodule update
@@ -25,7 +26,9 @@ This will create an 'mpca' subdirectory.
 
 Copy the *.tmac files in 'troff2page' directory as well as the
 ‘mpca’ subdirectory to a directory in your GROFF_TMAC_PATH, or
-your home directory.
+your home directory. These *.tmac files are needed only to typeset
+the supplied documentation. If you plan to use troff2page with
+your own -ms or -man macros, these may be ignored.
 
 .SS Man pages
 
