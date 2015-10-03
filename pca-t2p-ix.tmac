@@ -1,0 +1,63 @@
+.\" last change 2015-03-20
+.
+.if !\n[.troff2page] .nx
+.
+.nr index:location 0
+.
+.de IX
+.index:set_up_index
+.nr index:location +1
+.TAG index_\\n[index:location]
+.write index:idx_port \\\\indexentry{\\$*|index:function}{\\n[index:location]}
+..
+.
+.am index:item0
+.ig ##
+(clrhash *index-pageno-mention-table*)
+.##
+..
+.
+.am index:item1
+.ig ##
+(clrhash *index-pageno-mention-table*)
+.##
+..
+.
+.am index:item2
+.ig ##
+(clrhash *index-pageno-mention-table*)
+.##
+..
+.
+.de index:hook
+.ig ##
+(when (and (> *last-page-number* 0)
+           (not (gethash "TAG_troff2page_index" *node-table*)))
+  (flag-missing-piece :index-in-nav-bar))
+.##
+.TAG troff2page_index
+..
+.
+.ig ##
+(defvar *index-pageno-mention-table* (make-hash-table))
+
+(setf (gethash "index:function" *string-table*)
+      (lambda (ixno)
+        (let* ((ix-tag (concatenate 'string "TAG_index_" ixno))
+               (ix-pageno (gethash ix-tag *node-table*)))
+          (concatenate 'string
+            (link-start (page-node-link ix-pageno ix-tag))
+            (verbatim ix-pageno)
+            (cond ((gethash ix-pageno *index-pageno-mention-table*)
+                    (concatenate 'string
+                      ":"
+                      (number-to-roman
+                        (incf (gethash ix-pageno *index-pageno-mention-table*))
+                        :downcasep t)
+                      ))
+                  (t
+                    (setf (gethash ix-pageno *index-pageno-mention-table*)
+                          1)
+                    ""))
+            (link-stop)))))
+.##

@@ -1,0 +1,70 @@
+.\" last modified 2015-09-27
+.\" Dorai Sitaram
+.
+.\" these macros are relevant only for troff2page,
+.\" which uses them to create and insert a table
+.\" of contents for man pages.
+.\" Place this file in GROFF_TMAC_PATH, cwd, or home
+.
+.if !\n[.troff2page] .nx
+.
+.ig ##
+(unless (eq *macro-package* :man)
+  (troff2page-string ".nx"))
+.##
+.
+.if d TOCLINE-PLAIN .nx
+.
+.rn TH pca-t2p-man:orig-TH
+.
+.de TH
+.pca-t2p-man:orig-TH \\$*
+.ig ##
+(when (and (> *last-page-number* 0)
+           (not (gethash "TAG_troff2page_toc" *node-table*)))
+  (flag-missing-piece :toc))
+.##
+.TAG troff2page_toc
+.so \\*[AUXF].toc
+.nr pca:next-graf-without-indent 1
+.nr pca-t2p-man:enable-toc-entries 1
+..
+.
+.de TOCLINE-PLAIN
+.nr pca-t2p-man:sec-count \\$1
+.shift
+.nr pca-t2p-man:toc-item-indent \\$1
+.shift
+\h'\\n[pca-t2p-man:toc-item-indent]m'
+\\*[url #TAG_sec_\\n[pca-t2p-man:sec-count] "\\$*"]
+.br
+..
+.
+.de pca-t2p-man:write-toc-line
+.if !\\n[pca-t2p-man:enable-toc-entries] .return
+.if !\\n[pca-t2p-man:toc-opened-p] \{\
+.nr pca-t2p-man:toc-opened-p 1
+.open pca:toc-port \\*[AUXF].toc
+.\}
+.nr pca-toc:count +1
+.TAG sec_\\n[pca-toc:count]
+.write pca:toc-port .TOCLINE-PLAIN \\n[pca-toc:count] \\$*
+..
+.
+.ig ##
+(defrequest "pca-t2p-man:orig-SH"
+  (lambda ()
+    (emit-section-header 1 :man-header-p t)))
+.##
+.
+.de SH
+.pca-t2p-man:write-toc-line 0 \\$*
+.pca-t2p-man:orig-SH \\$*
+..
+.
+.rn SS pca-t2p-man:orig-SS
+.
+.de SS
+.pca-t2p-man:write-toc-line 1 \\$*
+.pca-t2p-man:orig-SS \\$*
+..

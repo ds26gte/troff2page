@@ -1,0 +1,56 @@
+.\" last modified 2015-09-28
+.\" Dorai Sitaram
+.
+.if !\n[.troff2page] .nx
+.
+.de pca:toc-hook
+.ig ##
+(when (and (> *last-page-number* 0)
+           (not (gethash "TAG_troff2page_toc" *node-table*)))
+  (flag-missing-piece :toc))
+.##
+.TAG troff2page_toc
+..
+.
+.de pca-toc:write-toc-line
+.ie \\n[pca:inside-NH-p] \{\
+.write pca:toc-port .TOCLINE-NH \\n[pca-toc:header-level] \\n[pca-toc:count] \\*[SN-STYLE]
+.nr pca:inside-NH-p 0
+.\}
+.el .write pca:toc-port .TOCLINE-SH \\n[pca-toc:header-level] \\n[pca-toc:count]
+..
+.
+.de TOCLINE-NH
+.nr pca-toc:item-indent \\$1
+.nr pca-toc:item-indent -1
+.nr pca-toc:snippet-count \\$2
+\h'\\n[pca-toc:item-indent]m'
+\\$3
+\\*[pca-toc:create-link \\n[pca-toc:snippet-count]]
+.br
+..
+.
+.de TOCLINE-SH
+.nr pca-toc:item-indent \\$1
+.nr pca-toc:item-indent -1
+.nr pca-toc:snippet-count \\$2
+\h'\\n[pca-toc:item-indent]m'
+\\*[pca-toc:create-link \\n[pca-toc:snippet-count]]
+.br
+..
+.
+.ig ##
+(defstring  "pca-toc:create-link"
+  (lambda (n)
+    (let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) "-snippet-" n ".tmp")))
+      (let ((o (make-string-output-stream)))
+        (with-open-file (i f :direction :input)
+          (loop
+            (let ((x (read-line i nil)))
+              (unless x (return))
+              (princ x o) (terpri o))))
+        (url-to-html (concatenate 'string "#TAG_sec_" n)
+          (get-output-stream-string o))))))
+.##
+.br
+..

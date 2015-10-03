@@ -21,8 +21,11 @@ containing general-purpose groff macros. To include these, do
 git submodule init
 git submodule update
 
-Copy the *.tmac files in the ‘mpca’ directory to a directory
-in your GROFF_TMAC_PATH, or your home directory.
+This will create an 'mpca' subdirectory.
+
+Copy the *.tmac files in 'troff2page' directory as well as the
+‘mpca’ subdirectory to a directory in your GROFF_TMAC_PATH, or
+your home directory.
 
 .SS Man pages
 
