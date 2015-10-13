@@ -19,8 +19,8 @@ For its documentation (see below), troff2page makes use of some
 the rest in the submodule 'mpca' (available on its own at
 https://github.com/ds26gte/mpca).  To include the latter, do
 
-git submodule init
-git submodule update
+  git submodule init
+  git submodule update
 
 This will create an 'mpca' subdirectory.
 
