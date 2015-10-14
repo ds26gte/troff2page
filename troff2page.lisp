@@ -546,6 +546,7 @@
 (defvar *table-options*)
 (defvar *table-row-number*)
 (defvar *temp-string-count*)
+(defvar *th-already-called-p*)
 (defvar *this-footnote-is-numbered-p*)
 (defvar *title*)
 (defvar *turn-off-escape-char-p*)
@@ -572,6 +573,9 @@
 
 (defun defrequest (w th)
   (setf (gethash w *request-table*) th))
+
+(defun deftmacro (w ss)
+  (setf (gethash w *macro-table*) ss))
 
 (defun defescape (c th)
   (setf (gethash c *escape-table*) th))
@@ -1359,7 +1363,7 @@
         (t (get-char)))
   (cond (*turn-off-escape-char-p* (s-string *escape-char* c)) ;shdnt be needed
         ((setq it (gethash c *escape-table*)) (funcall it))
-        ((setq it (gethash (string c) *glyph-table*)))
+        ((gethash (string c) *glyph-table*))
         (t (verbatim (string c)))))
 
 (defun emit-navigation-bar (&key headerp)
@@ -1683,13 +1687,13 @@
       (setf (counter*-value (get-counter-named "nh*hl")) level)
       (increment-section-counter level)
       (setq this-section-num (section-counter-value))
-      (setf (gethash "SN-NO-DOT" *string-table*)
-            (lambda () this-section-num))
-      (let ((this-section-num-dot
-              (concatenate 'string this-section-num ".")))
-        (setf (gethash "SN-DOT" *string-table*) (lambda () this-section-num-dot)
-              (gethash "SN" *string-table*) (lambda () this-section-num-dot)
-              (gethash "SN-STYLE" *string-table*) (lambda () this-section-num-dot))))
+      (defstring "SN-NO-DOT" (lambda () this-section-num))
+      (let* ((this-section-num-dot
+               (concatenate 'string this-section-num "."))
+             (this-section-num-dot-thunk (lambda () this-section-num-dot)))
+        (defstring "SN-DOT" this-section-num-dot-thunk)
+        (defstring "SN" this-section-num-dot-thunk)
+        (defstring "SN-STYLE" this-section-num-dot-thunk)))
     (ignore-spaces)
     ;(emit-edit-source-doc)
     (get-header
@@ -2798,8 +2802,7 @@
     (let* ((args (read-args))
            (w (car args))
            (ender (or (cadr args) ".")))
-      (setf (gethash w *macro-table*)
-            (collect-macro-body w ender))
+      (deftmacro w (collect-macro-body w ender))
       (call-ender ender))))
 
 (defrequest "shift"
@@ -2837,9 +2840,9 @@
            (old (cadr args))
            it)
       (cond ((setq it (gethash old *macro-table*))
-             (setf (gethash new *macro-table*) it))
+             (deftmacro new it))
             ((setq it (gethash old *request-table*))
-             (setf (gethash new *request-table*) it))
+             (defrequest new it))
             (t (terror "als: unknown rhs ~a" old))))))
 
 (defrequest "rn"
@@ -2849,36 +2852,35 @@
            (new (cadr args))
            it)
       (cond ((setq it (gethash old *macro-table*))
-             (setf (gethash new *macro-table*) it
-                   (gethash old *macro-table*) nil))
+             (deftmacro new it)
+             (deftmacro old nil))
             ((setq it (gethash old *request-table*))
-             (setf (gethash new *request-table*) it
-                   (gethash old *request-table*) nil))
+             (defrequest new it)
+             (defrequest old nil))
             (t (terror "rn: unknown lhs ~a" old))))))
 
 (defrequest "am"
   (lambda ()
     (let* ((args (read-args))
            (w (car args))
-           (ender (or (cadr args) ".")))
-      (let ((extra-macro-body (collect-macro-body w ender))
-            it)
-        (cond ((not (eq (setq it (gethash w *macro-table* :undefined))
-                        :undefined))
-               (setf (gethash w *macro-table*)
-                     (nconc it extra-macro-body)))
-              ((setq it (gethash w *request-table*))
-               (let ((tmp (gen-temp-string)))
-                 (setf (gethash tmp *request-table*) it)
-                 (setf (gethash w *macro-table*)
-                       (cons
-                         (concatenate 'string "." tmp " \\$*")
-                         extra-macro-body))
-                 (setf (gethash w *request-table*)
-                       (lambda ()
-                         (execute-macro w)))))
-              (t (setf (gethash w *macro-table*) extra-macro-body)))
-        (call-ender ender)))))
+           (ender (or (cadr args) "."))
+           (extra-macro-body (collect-macro-body w ender))
+           it)
+      (cond ((not (eq (setq it (gethash w *macro-table* :undefined))
+                      :undefined))
+             (deftmacro w (nconc it extra-macro-body)))
+            ((setq it (gethash w *request-table*))
+             (let ((tmp (gen-temp-string)))
+               (defrequest tmp it)
+               (deftmacro w
+                 (cons
+                   (concatenate 'string "." tmp " \\$*")
+                   extra-macro-body))
+               (defrequest w
+                 (lambda ()
+                   (execute-macro w)))))
+            (t (deftmacro w extra-macro-body)))
+      (call-ender ender))))
 
 (defrequest "eo"
   (lambda ()
@@ -2886,9 +2888,9 @@
     (read-troff-line)))
 
 (defun get-first-non-space-char-on-curr-line ()
-    (ignore-spaces)
-    (let ((ln (read-troff-line)))
-      (if (string= ln "") nil
+  (ignore-spaces)
+  (let ((ln (read-troff-line)))
+    (if (string= ln "") nil
         (char ln 0))))
 
 (defrequest "ec"
@@ -2956,10 +2958,10 @@
   (lambda ()
     (let* ((w (expand-args (read-word)))
            (s (expand-args (read-troff-string-line))))
-      (setf (gethash w *string-table*)
-            (lambda (&rest args)
-              (let ((*macro-args* (cons w args)))
-                (expand-args s)))))))
+      (defstring w
+        (lambda (&rest args)
+          (let ((*macro-args* (cons w args)))
+            (expand-args s)))))))
 
 (defrequest "char"
   (lambda ()
@@ -2991,8 +2993,7 @@
         (unless n (setq n (length str)))
         (setq n2 (+ n n2 1)))
       (setq str-new (subseq str n1 n2))
-      (setf (gethash s *string-table*)
-            (lambda () str-new)))))
+      (defstring s (lambda () str-new)))))
 
 (defrequest "length"
   (lambda ()
@@ -3260,28 +3261,21 @@
 
 (defrequest "TH"
   (lambda ()
-    (block TH-request
-      (when *reading-table-p*
-        (read-troff-line)
-        (setq *reading-table-header-p* nil)
-        (return-from TH-request))
-      (let* ((th-counter (get-counter-named "man_.TH_times_called"))
-             (th-n (incf (counter*-value th-counter)))
-             (args (read-args))
-             it)
-        (when (= th-n 1)
-          (!macro-package :man)
-          (man-specific-defs)
-          (when (setq it (find-macro-file "man.local"))
-            (troff2page-file it))
-          (when (setq it (find-macro-file "pca-t2p-man.tmac"))
-            (troff2page-file it)))
-        (cond ((and (= th-n 1) (setq it (gethash "TH" *macro-table*)))
-               (let* ((the-new-th it)
-                      (*macro-args* (cons "TH" args)))
-                 (execute-macro-body the-new-th)))
+    (unless *th-already-called-p*
+      (setq *th-already-called-p* t)
+      (!macro-package :man)
+      (man-specific-defs)
+      (let ((args (read-args))
+            it)
+        (when (setq it (find-macro-file "man.local"))
+          (troff2page-file it))
+        (when (setq it (find-macro-file "pca-t2p-man.tmac"))
+          (troff2page-file it))
+        (cond ((setq it (gethash "TH" *macro-table*))
+               (let ((*macro-args* (cons "TH" args)))
+                 (execute-macro-body it)))
               (t (let ((title (car args))
-                       (sec (cadr args))
+                       ;ignoring (cadr args), which is section number
                        (date (caddr args)))
                    (when title
                      (setq title (string-trim-blanks title))
@@ -3290,8 +3284,7 @@
                      (when date
                        (setq date (string-trim-blanks date))
                        (unless (string= date "")
-                         (setf (gethash "DY" *string-table*)
-                               (lambda () date))))))))))))
+                         (defstring "DY" (lambda () date))))))))))))
 
 (defrequest "TL"
   (lambda ()
@@ -3405,7 +3398,7 @@
   (lambda ()
     (let ((w (expand-args (read-troff-line))))
       ;possible trailing space?  shd i use all-args instead?
-      (setf (gethash "DY" *string-table*) (lambda () w)))
+      (defstring "DY" (lambda () w)))
     ;(read-troff-line)
     ))
 
@@ -4629,6 +4622,7 @@
           (*table-options* "")
           (*table-row-number* 0)
           (*temp-string-count* 0)
+          (*th-already-called-p* nil)
           (*this-footnote-is-numbered-p* nil)
           (*title* nil)
           (*turn-off-escape-char-p* nil)
