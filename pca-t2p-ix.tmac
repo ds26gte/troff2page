@@ -1,4 +1,4 @@
-.\" last change 2015-03-20
+.\" last change 2015-10-13
 .
 .if !\n[.troff2page] .nx
 .
@@ -41,23 +41,23 @@
 .ig ##
 (defvar *index-pageno-mention-table* (make-hash-table))
 
-(setf (gethash "index:function" *string-table*)
-      (lambda (ixno)
-        (let* ((ix-tag (concatenate 'string "TAG_index_" ixno))
-               (ix-pageno (gethash ix-tag *node-table*)))
-          (concatenate 'string
-            (link-start (page-node-link ix-pageno ix-tag))
-            (verbatim ix-pageno)
-            (cond ((gethash ix-pageno *index-pageno-mention-table*)
-                    (concatenate 'string
-                      ":"
-                      (number-to-roman
-                        (incf (gethash ix-pageno *index-pageno-mention-table*))
-                        :downcasep t)
-                      ))
-                  (t
-                    (setf (gethash ix-pageno *index-pageno-mention-table*)
-                          1)
-                    ""))
-            (link-stop)))))
+(defstring "index:function"
+  (lambda (ixno)
+    (let* ((ix-tag (concatenate 'string "TAG_index_" ixno))
+           (ix-pageno (gethash ix-tag *node-table*)))
+      (concatenate 'string
+        (link-start (page-node-link ix-pageno ix-tag))
+        (verbatim ix-pageno)
+        (cond ((gethash ix-pageno *index-pageno-mention-table*)
+               (concatenate 'string
+                 ":"
+                 (number-to-roman
+                   (incf (gethash ix-pageno *index-pageno-mention-table*))
+                   :downcasep t)
+                 ))
+              (t
+                (setf (gethash ix-pageno *index-pageno-mention-table*)
+                      1)
+                ""))
+        (link-stop)))))
 .##
