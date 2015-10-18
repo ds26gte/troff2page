@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20151013) ;last change
+(defparameter *troff2page-version* 20151018) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -1538,6 +1538,7 @@
   (emit-newline)
   (emit-verbatim "<body>")
   (emit-newline)
+  (emit-para :firstp t)
   (when *slides*
     (emit-verbatim "<div id=slideother></div>")
     (emit-newline)
@@ -1547,7 +1548,7 @@
     (emit-newline)))
 
 (defun emit-html-postamble ()
-  (emit-para)
+  (emit-para :lastp t)
   (when *slides*
     (emit-verbatim "</div>") (emit-newline))
   (emit-verbatim "</body>") (emit-newline)
@@ -1588,19 +1589,23 @@
     (setq *afterpar* nil)
     (funcall it)))
 
-(defun emit-para (&key parstartp indentp &aux it)
-  (do-afterpar)
+(defun emit-para (&key par-start-p indentp firstp lastp &aux it)
+  (unless firstp
+    (do-afterpar)
+    (emit-verbatim "</p>")
+    (emit-newline))
   (setq *margin-left* 0)
   (when (setq it (gethash "par@reset" *request-table*))
     (funcall it))
   (emit (switch-style :font nil :color nil :bgcolor nil :size nil))
   (fill-mode)
   ;(emit-newline)
-  (emit-verbatim "<p")
-  (when indentp
-    (emit-verbatim " class=indent"))
-  (emit-verbatim ">")
-  (setq *just-after-par-start-p* parstartp)
+  (unless lastp
+    (emit-verbatim "<p")
+    (when indentp
+      (emit-verbatim " class=indent"))
+    (emit-verbatim ">")
+    (setq *just-after-par-start-p* par-start-p))
   ;(emit-edit-source-doc :interval 10)
   (emit-newline))
 
@@ -1623,8 +1628,7 @@
     (setq *out* (open *html-page* :direction :output
 		      :if-exists :supersede))
     (emit-html-preamble)
-    (emit-navigation-bar :headerp t)
-    (emit-para)))
+    (emit-navigation-bar :headerp t)))
 
 (defun get-counter-named (name)
   (or (gethash name *numreg-table*)
@@ -1873,6 +1877,7 @@
              (flag-missing-piece :title))
            (setq *title* title)))
   (when emitp
+    (emit-para)
     (emit-verbatim "<h1 align=center class=title>")
     (emit title)
     (emit-verbatim "</h1>")
@@ -3190,7 +3195,7 @@
   (lambda ()
     (read-troff-line)
     (emit-newline)
-    (emit-para :parstartp t)))
+    (emit-para :par-start-p t)))
 
 (defrequest "RT" (gethash "LP" *request-table*))
 
@@ -3200,7 +3205,7 @@
   (lambda ()
     (read-troff-line)
     (emit-newline)
-    (emit-para :parstartp t :indentp t)))
+    (emit-para :par-start-p t :indentp t)))
 
 (defrequest "P" (gethash "PP" *request-table*))
 
