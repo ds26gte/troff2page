@@ -1,4 +1,4 @@
-.SH troff2page
+= troff2page
 
 troff2page is a Common Lisp program for making Web
 pages from troff documents.  Consult
@@ -8,4 +8,4 @@ http://ds26gte.github.io/troff2page/index.html
 for its capabilities.
 
 For installation instructions, please see
-the file ‘INSTALL’.
+link:INSTALL.adoc[].
