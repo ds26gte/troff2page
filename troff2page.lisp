@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20151018) ;last change
+(defparameter *troff2page-version* 20151119) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -532,6 +532,7 @@
 (defvar *reading-string-call-p*)
 (defvar *reading-table-header-p*)
 (defvar *reading-table-p*)
+(defvar *redirectedp*)
 (defvar *saved-escape-char*)
 (defvar *slides*)
 (defvar *sourcing-ascii-file-p*)
@@ -1855,8 +1856,14 @@
         (verbatim tag-value)
         (link-stop)))))
 
-(defun !header (s)  ;will it show in reverse
+(defun !header (s)
   (push s *html-head*))
+
+(defun !redirect (f)
+  (setq *redirectedp* t)
+  (!header
+    (concatenate 'string
+      "<meta http-equiv=refresh content=\"0;" f "\">")))
 
 (defun !verbatim-apostrophe ()
   (setq *verbatim-apostrophe-p* t))
@@ -3414,6 +3421,13 @@
         (flag-missing-piece :stylesheet))
       (write-aux `(!stylesheet ,f)))))
 
+(defrequest "REDIRECT"
+  (lambda ()
+    (unless *redirectedp*
+      (flag-missing-piece :redirect))
+    (let ((f (car (read-args))))
+      (write-aux `(!redirect ,f)))))
+
 (defrequest "gcolor"
   (lambda ()
     (let ((c (car (read-args))))
@@ -4613,6 +4627,7 @@
           (*reading-string-call-p* nil)
           (*reading-table-header-p* nil)
           (*reading-table-p* nil)
+          (*redirectedp* nil)
           (*saved-escape-char* nil)
           (*slides* nil)
           (*sourcing-ascii-file-p* nil)
