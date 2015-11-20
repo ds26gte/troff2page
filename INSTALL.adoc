@@ -1,4 +1,4 @@
-= Installation instructions
+= Installing troff2page
 
 Get the troff2page distribution from GitHub:
 
