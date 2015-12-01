@@ -4,35 +4,35 @@ Get the troff2page distribution from GitHub:
 
   git clone https://github.com/ds26gte/troff2page
 
-This creates a directory ‘troff2page’.  ‘cd’ to it.
+This creates a directory `troff2page`.  `cd` to it.
 
-Copy the script ‘troff2page’ to a directory in your PATH.
+Copy the script `troff2page` to a directory in your PATH.
 
-Copy the file ‘man/man1/troff2page.1’ to the ‘man1’ subdirectory of a
-directory in your MANPATH.
+Copy the file `man/man1/troff2page.1` to the `man1` subdirectory of a
+directory in your `MANPATH`.
 
-Copy the file ‘man/man7/eval4troff.tmac.7’ to the ‘man7’ subdirectory of a
-directory in your MANPATH.
+Copy the file `man/man7/eval4troff.tmac.7` to the `man7` subdirectory of a
+directory in your `MANPATH`.
 
 For its documentation (see below), troff2page makes use of some
-*.tmac files, some of which are in the ‘troff2page’ directory and
-the rest in the submodule ‘mpca’ (available on its own at
+`*.tmac` files, some of which are in the `troff2page` directory and
+the rest in the submodule `mpca` (available on its own at
 https://github.com/ds26gte/mpca).  To include the latter, do
 
   git submodule init
   git submodule update
 
-This will create an ‘mpca’ subdirectory.
+This will create an `mpca` subdirectory.
 
-Copy the *.tmac files in ‘troff2page’ directory as well as the
-‘mpca’ subdirectory to a directory in your GROFF_TMAC_PATH, or
-your home directory. These *.tmac files are needed only to typeset
+Copy the `*.tmac` files in `troff2page` directory as well as the
+`mpca` subdirectory to a directory in your `GROFF_TMAC_PATH`, or
+your home directory. These `*.tmac` files are needed only to typeset
 the supplied documentation. If you plan to use troff2page with
-your own -ms or -man macros, these may be ignored.
+your own `-ms` or `-man` macros, these may be ignored.
 
 == Man pages
 
-You can now consult the man pages troff2page(1) and eval4troff.tmac(7)
+You can now consult the man pages `troff2page(1)` and `eval4troff.tmac(7)`
 to get started with using troff2page.
 
   man troff2page
@@ -40,8 +40,8 @@ to get started with using troff2page.
 
 == Lisp implementions
 
-The script ‘troff2page’ uses the Common Lisp implementation mentioned by the shell
-environment variable LISP.  Currently, the values supported for LISP
+The script `troff2page` uses the Common Lisp implementation mentioned by the shell
+environment variable `LISP`.  Currently, the values supported for `LISP`
 are:
 
   clisp
@@ -50,8 +50,8 @@ are:
   ecl
   sbcl
 
-If LISP is not set, some default implementation is assumed.
-Here are some ways to invoke troff2page (assume LISP
+If `LISP` is not set, some default implementation is assumed.
+Here are some ways to invoke troff2page (assume `LISP`
 unset):
 
   % troff2page jobname.ms    # uses some default Lisp impl
@@ -62,16 +62,16 @@ unset):
   % troff2page jobname.ms
 
 To have troff2page run on Common Lisp implementations other than these,
-you will have to add lines to the head of the ‘troff2page’ file.
+you will have to add lines to the head of the `troff2page` file.
 
-To have ‘.eval’ work for groff (and not just troff2page), you will have to
-add lines in the corresponding area in the file ‘eval4troff.tmac’ as well.
+To have `.eval` work for groff (and not just troff2page), you will have to
+add lines in the corresponding area in the file `eval4troff.tmac` as well.
 
 == Documentation
 
-The file ‘index.ms’ provides complete documentation for troff2page
+The file `index.ms` provides complete documentation for troff2page
 and can be processed with either groff or troff2page.  To process
-‘index.ms’, you must have installed troff2page, including the macro
+`index.ms`, you must have installed troff2page, including the macro
 files that come with this distribution, as described above.
 
 You will need to run groff or troff2page more than once in order to
@@ -81,14 +81,14 @@ how.  Follow that information.
 
 == Running troff2page as a Lisp procedure
 
-It is not necessary to use the file troff2page as a Unix script.
-You can simply load ‘troff2page’ (which is really a Lisp file)
+It is not necessary to use the file `troff2page` as a Unix script.
+You can simply load `troff2page` (which is really a Lisp file)
 into your Common Lisp, and then call the Lisp procedure
-‘troff2page:troff2page’ (i.e., the procedure named ‘troff2page’
-in the package ‘troff2page’) on your source document.  E.g.,
+`troff2page:troff2page` (i.e., the procedure named `troff2page`
+in the package `troff2page`) on your source document.  E.g.,
 
   (load "pathname/of/troff2page")
   (troff2page:troff2page "my-troff-document.1")
 
-The procedure ‘troff2page:troff2page’ can be called several times, on the
+The procedure `troff2page:troff2page` can be called several times, on the
 same or different documents, from within the same Lisp session.
