@@ -1,251 +1,385 @@
-.TH eval4troff 7
-.SH NAME
-
-eval4troff.tmac \- groff macros for using Common Lisp as extension language
-
-.SH SYNOPSIS
-
-eval4troff.tmac can be loaded as the groff(7) command-line option
--meval4troff.tmac.
-
+'\" t
+.\"     Title: eval4troff
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: Asciidoctor 1.5.4
+.\"      Date: 2015-12-28
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "EVAL4TROFF.TMAC" "7" "2015-12-28" "\ \&" "\ \&"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
+.LINKSTYLE blue R < >
+.SH "NAME"
+eval4troff \- groff macros for using Common Lisp as extension language
+.SH "SYNOPSIS"
+.sp
+eval4troff.tmac can be loaded as the \f[CR]groff(1)\fP command\-line option
+\f[CR]\-meval4troff.tmac\fP.
+.sp
 Alternatively, it can loaded within a groff document as:
-
-    .mso eval4troff.tmac
-
-.SH DESCRIPTION
-
-The groff macro file eval4troff.tmac allows you to extend groff using
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.mso eval4troff.tmac
+.fi
+.if n \{\
+.RE
+.\}
+.SH "DESCRIPTION"
+.sp
+The groff macro file \f[CR]eval4troff.tmac\fP allows you to extend groff using
 Common Lisp, i.e., Common Lisp code embedded in a groff document can
-be used to affect how groff(1) and troff2page(1) process the document.
-
-eval4troff.tmac provides two macros: .eval and its closer .endeval.  You
-should put eval4troff.tmac in a macro directory, so it can be
-conveniently loaded using the .mso request.
-
-\&.eval does only one thing: It allows you to place arbitrary Lisp code
-until the following .endeval, and the text written to standard output
-by this Lisp code is substituted for the .eval ... .endeval.  The
+be used to affect how \f[CR]groff(1)\fP and \f[CR]troff2page(1)\fP process the document.
+.sp
+\f[CR]eval4troff.tmac\fP provides two macros: \f[CR].eval\fP and its closer
+\f[CR].endeval\fP.  You
+should put \f[CR]eval4troff.tmac\fP in a macro directory, so it can be
+conveniently loaded using the \f[CR].mso\fP request.
+.sp
+\f[CR].eval\fP does only one thing: It allows you to place arbitrary Lisp code
+until the following \f[CR].endeval\fP, and the text written to standard output
+by this Lisp code is substituted for the \f[CR].eval\fP ... \f[CR].endeval\fP.  The
 usefulness of this tactic will be apparent from an example.  Consider
-the following groff document, tau.1:
-
-    .mso eval4troff.tmac
-    .
-    The ratio of the circumference of a circle to
-    its radius is \e(*t \e(~=
-    .eval
-    ;following prints tau, because cos(tau/2) = -1
-    (princ (* 2 (acos -1)))
-    (princ ".")
-    (terpri)
-    .endeval
-
-Run groff, in unsafe mode, on tau.1:
-
-    groff -z -U -ms tau.1
-
-(The -z avoids generating output, because we are not ready for it
-yet.  The -U runs in "unsafe" mode, i.e., it allows the writing of
+the following groff document, \f[CR]tau.1\fP:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.mso eval4troff.tmac
+\&.
+The ratio of the circumference of a circle to
+its radius is \(rs(*t \(rs(~=
+\&.eval
+;following prints tau, because cos(tau/2) = \-1
+(princ (* 2 (acos \-1)))
+(princ ".")
+(terpri)
+\&.endeval
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Run groff, in unsafe mode, on \f[CR]tau.1\fP:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+groff \-z \-U \-ms tau.1
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+(The \f[CR]\-z\fP avoids generating output, because we are not ready for it
+yet.  The \f[CR]\-U\fP runs in “unsafe” mode, i.e., it allows the writing of
 aux files.)
 You will find that the groff call produces a message like
 the following:
-
-    .trofftemp.lisp missing for this run
-    Rerun groff with -U
-
-Call groff again as follows:
-
-    groff -U -ms tau.1 > tau.ps
-
-tau.ps will now look like:
-
-.RS
-The ratio of the circumference of a circle to
-its radius is \(*t \(~= 6.2831855.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.trofftemp.lisp missing for this run
+Rerun groff with \-U
+.fi
+.if n \{\
 .RE
-
+.\}
+.sp
+Call groff again as follows:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+groff \-U \-ms tau.1 > tau.ps
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+\f[CR]tau.ps\fP will now look like:
+.in +.3i
+.ll -.3i
+.nf
+.sp
+The ratio of the circumference of a circle to
+its radius is τ ≈ 6.2831855.
+.fi
+.br
+.in
+.ll
+.sp
 The first groff call produces a Lisp file
-\&.trofftemp.lisp.
+\f[CR].trofftemp.lisp\fP.
 (This name may be different based on
-your setting of \e*[AUXF].)
-
+your setting of \f[CR]\(rs*[AUXF]\fP.)
+.sp
 The second groff
-call invokes Lisp to create an auxiliary file for each .eval that gets sourced
+call invokes Lisp to create an auxiliary file for each \f[CR].eval\fP that gets sourced
 back into the document.
-
-.SH USE WITH troff2page
-
-It is clear that Lisp code via .eval can
+.SH "USE WITH TROFF2PAGE"
+.sp
+It is clear that Lisp code via \f[CR].eval\fP can
 serve as a very powerful second extension language
 for groff.  This benefit is available even when the document
 is processed by troff2page:
-We could run troff2page on the same document, tau.1, and the
-resulting tau.html will show the same content.
-
-Furthermore, we can embed  .eval-enclosed Lisp code inside an
-\&.if (or .ie or .el) statement so that it gets executed
+We could run troff2page on the same document, \f[CR]tau.1\fP, and the
+resulting \f[CR]tau.html\fP will show the same content.
+.sp
+Furthermore, we can embed  \f[CR].eval\fP\-enclosed Lisp code inside an
+\f[CR].if\fP (or \f[CR].ie\fP or \f[CR].el\fP) statement so that it gets executed
 only for troff or only for troff2page.  (Recall we used the number register
-\en[.troff2page] for this purpose.)  In
+\f[CR]\(rsn[.troff2page]\fP for this purpose.)  In
 particular, by calling Lisp code only for troff2page, the
 user has the
 means to extend troff2page to deal with things that the core
 program as supplied does
 not.
-
-Note that when troff2page sees .eval-enclosed Lisp code, it runs it in
+.sp
+Note that when troff2page sees \f[CR].eval\fP\-enclosed Lisp code, it runs it in
 a Lisp environment that has not only the basic Common Lisp language but
 also includes the procedures and data structures defined in troff2page.
 These extras are not available (and are arguably not useful) to the
-.eval code seen by troff.
-
-.SH DEFINING COLOR NAMES USING HSL
-
-For a more substantial example of .eval's use, consider defining
+\f[CR].eval\fP code seen by troff.
+.SH "DEFINING COLOR NAMES USING HSL"
+.sp
+For a more substantial example of \f[CR].eval\fP’s use, consider defining
 color names using the HSL (hue/saturation/lightness) scheme rather than the
 RGB and CMYK schemes provided by groff.  For instance, we would like to
-define the color Venetian red using its HSL spec (357\(de, 49%,
+define the color Venetian red using its HSL spec (357°, 49%,
 24%), which to many is a more intuitive description than RGB
 (91, 31, 34).
-
-While there is an algorithm
-(\*:http://en.wikipedia.org/wiki/HSL_color_space)
+.sp
+While there is an
+.URL "http://en.wikipedia.org/wiki/HSL_color_space" "algorithm" ""
 to convert HSL to RGB,
-implementing it using groff's limited arithmetic is tedious.  Instead, we shall define a
-much easier Lisp procedure to do the same, and put it inside an .eval:
-
-    .mso eval4troff.tmac
-    .
-    .eval
-    (defun between-0-and-1 (n)
-    (cond ((< n 0) (+ n 1))
-          ((> n 1) (- n 1))
-          (t n)))
-
-    (defun tc-to-c (tc p q)
-    (cond ((< tc 1/6)
-           (+ p (* (- q p) 6 tc)))
-          ((and (<= 1/6 tc) (< tc 1/2))
-           q)
-          ((and (<= 1/2 tc) (< tc 2/3))
-           (+ p (* (- q p) 6 (- 2/3 tc))))
-          (t p)))
-
-    (defun hsl-to-rgb (h s l)
-    (setq h (/ (mod h 360) 360))
-    (let* ((q (cond ((< l 1/2) (* l (+ 1 s)))
-                    (t (+ l s (* -1 l s)))))
-           (p (- (* 2 l) q))
-           (tr (between-0-and-1 (+ h 1/3)))
-           (tg (between-0-and-1 h))
-           (tb (between-0-and-1 (- h 1/3))))
-      (values (tc-to-c tr p q)
-              (tc-to-c tg p q)
-              (tc-to-c tb p q))))
-
-    (defun def-hsl-color (name h s l)
-    (multiple-value-bind (r g b) (hsl-to-rgb h s l)
-      (format t ".defcolor ~a rgb ~a ~a ~a~%" name r g b)))
-    .endeval
-
-.\"mso defhsl.tmac
-Here, the Lisp procedure def-hsl-color takes an HSL spec and
+implementing it using groff’s limited arithmetic is tedious.  Instead, we shall define a
+much easier Lisp procedure to do the same, and put it inside an
+\f[CR].eval\fP:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.mso eval4troff.tmac
+\&.
+\&.eval
+(defun between\-0\-and\-1 (n)
+(cond ((< n 0) (+ n 1))
+      ((> n 1) (\- n 1))
+      (t n)))
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+(defun tc\-to\-c (tc p q)
+(cond ((< tc 1/6)
+       (+ p (* (\- q p) 6 tc)))
+      ((and (<= 1/6 tc) (< tc 1/2))
+       q)
+      ((and (<= 1/2 tc) (< tc 2/3))
+       (+ p (* (\- q p) 6 (\- 2/3 tc))))
+      (t p)))
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+(defun hsl\-to\-rgb (h s l)
+(setq h (/ (mod h 360) 360))
+(let* ((q (cond ((< l 1/2) (* l (+ 1 s)))
+                (t (+ l s (* \-1 l s)))))
+       (p (\- (* 2 l) q))
+       (tr (between\-0\-and\-1 (+ h 1/3)))
+       (tg (between\-0\-and\-1 h))
+       (tb (between\-0\-and\-1 (\- h 1/3))))
+  (values (tc\-to\-c tr p q)
+          (tc\-to\-c tg p q)
+          (tc\-to\-c tb p q))))
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+(defun def\-hsl\-color (name h s l)
+(multiple\-value\-bind (r g b) (hsl\-to\-rgb h s l)
+  (format t ".defcolor ~a rgb ~a ~a ~a~%" name r g b)))
+\&.endeval
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Here, the Lisp procedure \f[CR]def\-hsl\-color\fP takes an HSL spec and
 writes out the equivalent RGB groff definition. (The troff2page
-distribution provides def-hsl-color in the macro file
-defhsl.tmac.)
-
-We can call this Lisp procedure inside another .eval to define
-venetianred using its HSL spec:
-
-    .eval
-    (def-hsl-color "venetianred" 357 .49 .24)
-    .endeval
-
-The color name venetianred can now be used like any other groff color name:
-
-    Prismacolor's burnt ochre pencil is a close match for Derwent's
-    \em[venetianred]Venetian red\em[], and either can be used to
-    emulate the sanguine chalk drawings of the Old Masters.
-
-.SH EXTENDING troff2page ONLY
-
-troff2page treats troff's .ig environment, whenever it uses ## as ender,
+distribution provides \f[CR]def\-hsl\-color\fP in the macro file
+\f[CR]defhsl.tmac\fP.)
+.sp
+We can call this Lisp procedure inside another \f[CR].eval\fP to define
+\f[CR]venetianred\fP using its HSL spec:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.eval
+(def\-hsl\-color "venetianred" 357 .49 .24)
+\&.endeval
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The color name \f[CR]venetianred\fP can now be used like any other groff color name:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Prismacolor\(aqs burnt ochre pencil is a close match for Derwent\(aqs
+\(rsm[venetianred]Venetian red\(rsm[], and either can be used to
+emulate the sanguine chalk drawings of the Old Masters.
+.fi
+.if n \{\
+.RE
+.\}
+.SH "EXTENDING TROFF2PAGE ONLY"
+.sp
+troff2page treats troff’s \f[CR].ig\fP environment, whenever it uses
+\f[CR]##\fP as ender,
 as containing Lisp code that can be used to extend troff2page.  This
-syntactic overloading of .ig ## is an innovation introduced by Oliver
-Laumann's unroff
-(\*:http://www-rn.informatik.uni-bremen.de/software/unroff).
-
+syntactic overloading of \f[CR].ig ##\fP is an innovation introduced by Oliver
+Laumann’s
+.URL "http://www\-rn.informatik.uni\-bremen.de/software/unroff" "unroff" "."
+.sp
 Any Lisp code enclosed within
-\&.ig ## ... .## will be processed by
+\f[CR].ig ##\fP ... \f[CR].##\fP will be processed by
 troff2page but not by
 troff, which treats it as a multiline comment of course.
-Note that .ig ## does not pipe its stdout back into
-the document, as .eval does.  This is to maintain the invariant
+Note that \f[CR].ig ##\fP does not pipe its stdout back into
+the document, as \f[CR].eval\fP does.  This is to maintain the invariant
 that as far as output is
-concerned, .ig ##, like other .igs, is always a
-comment.  However, you can add Lisp code within .ig ##
-to influence how troff2page -- but not troff! -- processes the rest of the
+concerned, \f[CR].ig ##\fP, like other \f[CR].ig\fPs, is always a
+comment.  However, you can add Lisp code within \f[CR].ig ##\fP
+to influence how troff2page — but not troff! — processes the rest of the
 document.
-
-For example, let's define a
-\e*[url] string register that simply typesets its URL
+.sp
+For example, let’s define a
+\f[CR]\(rs*[url]\fP string register that simply typesets its URL
 argument within angle brackets.
-
-    .ds url \e(la\efC\e\e$1\efP\e(ra
-
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.ds url \(rs(la\(rsfC\(rs\$1\(rsfP\(rs(ra
+.fi
+.if n \{\
+.RE
+.\}
+.sp
 This is adequate for the print output.
-For troff2page though, we'd like to
-re-define this macro, in Lisp, to create a hyperlink.
-We enclose this re-definition in a .ig ##, which not
+For troff2page though, we’d like to
+re\-define this macro, in Lisp, to create a hyperlink.
+We enclose this re\-definition in a \f[CR].ig ##\fP, which not
 only allows it to be in Lisp, but also makes it apply only
 when troff2page reads it:
-
-    .ig ##
-    (defstring "url"
-    (lambda (url)
-      (concatenate 'string
-        (link-start url)
-        url
-        (link-stop))))
-    .##
-
-The procedures defstring, link-start, and
-link-stop are defined in the troff2page code.
-
-\&.ig ## can be used to specify settings that are relevant only
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.ig ##
+(defstring "url"
+(lambda (url)
+  (concatenate \(aqstring
+    (link\-start url)
+    url
+    (link\-stop))))
+\&.##
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The procedures \f[CR]defstring\fP, \f[CR]link\-start\fP, and
+\f[CR]link\-stop\fP are defined in the troff2page code.
+.sp
+\f[CR].ig ##\fP can be used to specify settings that are relevant only
 when troff2page is used on a document, e.g., stylesheet changes.
-troff2page uses the output-port *css-port* to
+troff2page uses the output\-port \f[CR]*css\-port*\fP to
 write out style information.  The user can also write to this port, e.g.,
-
-    .ig ##
-    (format *css-port* "
-      h1,h2,h3,h4,h5,h6 {
-          color: rgb(61,35,39); /* chocolate */
-      }
-      ")
-    .##
-
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.ig ##
+(format *css\-port* "
+  h1,h2,h3,h4,h5,h6 {
+      color: rgb(61,35,39); /* chocolate */
+  }
+  ")
+\&.##
+.fi
+.if n \{\
+.RE
+.\}
+.sp
 This sets the HTML headers with a foreground color of chocolate.
-
-.SH SYSTEM REQUIREMENTS
-
-eval4troff.tmac uses the Common Lisp implementation mentioned in the
-shell environment variable LISP, which can currently be set to either
-clisp, clozure, cmu, or sbcl: the corresponding Lisp implementations
-being CLISP (\*:http://clisp.sf.net), Clozure CL
-(\*:http://ccl.clozure.com), CMUCL (\*:http://cmucl.org), ECL
-(\*:http://ecls.sf.net), and SBCL (\*:http://sbcl.sf.net).
-
-If LISP is not
-set, clozure is assumed on Linux and Mac OS X, and clisp is assumed for other
+.SH "SYSTEM REQUIREMENTS"
+.sp
+\f[CR]eval4troff.tmac\fP uses the Common Lisp implementation mentioned in the
+shell environment variable \f[CR]LISP\fP, which can currently be set to either
+\f[CR]clisp\fP, \f[CR]clozure\fP, \f[CR]cmu\fP, or \f[CR]sbcl\fP: the corresponding Lisp implementations
+being \c
+.URL "http://clisp.sf.net" "CLISP" ","
+.URL "http://ccl.clozure.com" "Clozure CL" ","
+.URL "http://cmucl.org" "CMUCL" ","
+.URL "http://ecls.sf.net" "ECL" ","
+and
+.URL "http://sbcl.sf.net" "SBCL" "."
+.sp
+If \f[CR]LISP\fP is not
+set, \f[CR]sbcl\fP is assumed on Linux, \f[CR]clozure\fP on Mac OS X, and
+\f[CR]clisp\fP on other
 systems.
-
-.SH AVAILABILITY
-
-eval4troff.tmac is included in the troff2page distribution, which is
+.SH "AVAILABILITY"
+.sp
+\f[CR]eval4troff.tmac\fP is included in the troff2page distribution, which is
 downloadable from
-\*:http://www.ccs.neu.edu/~dorai/troff2page/troff2page.html.
-
-.SH SEE ALSO
-
+.URL "http://github.com/ds26gte/troff2page" "" "."
+.SH "SEE ALSO"
+.sp
 groff(1), groff_tmac(5), groff_man(7), groff_ms(7),
 troff2page(1),
 clisp(1), cmucl(1), ecl(1), lisp(1), sbcl(1)
