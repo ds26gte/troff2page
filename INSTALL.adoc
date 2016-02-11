@@ -24,11 +24,19 @@ https://github.com/ds26gte/mpca).  To include the latter, do
 
 This will create an `mpca` subdirectory.
 
-Copy the `*.tmac` files in `troff2page` directory as well as the
-`mpca` subdirectory to a directory in your `GROFF_TMAC_PATH`, or
-your home directory. These `*.tmac` files are needed only to typeset
-the supplied documentation. If you plan to use troff2page with
-your own `-ms` or `-man` macros, these may be ignored.
+Copy the `pca*.tmac` files in the `mpca` subdirectory to a
+directory in your `GROFF_TMAC_PATH`, or your home directory.
+These `*.tmac` files, while generally useful, are specifically
+needed to typeset the supplied documentation, which is provided
+in `index.ms`. If you don’t need these macros for anything other
+than processing `index.ms`, you may make do by copying these
+files to the current directory, i.e., the directory containing
+`index.ms`.)
+
+The `pca-t2p-*.tmac` files may also be copied to your
+`GROFF_TMAC_PATH`, if you like to use them in your own
+documents. These macros are not used by groff; only by
+`troff2page`.
 
 == Man pages
 
