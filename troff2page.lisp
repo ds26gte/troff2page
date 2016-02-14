@@ -509,7 +509,7 @@
 (defvar *keep-newline-p*)
 (defvar *last-input-milestone*)
 (defvar *last-page-number*)
-(defvar *log-stream*)
+(defvar *log-stream* nil)
 (defvar *leading-spaces-macro*)
 (defvar *leading-spaces-number*)
 (defvar *lines-to-be-centered*)
@@ -770,7 +770,8 @@
 
 (defun tlog (fstr &rest args)
   (apply #'format t fstr args)
-  (apply #'format *log-stream* fstr args))
+  (when *log-stream*
+    (apply #'format *log-stream* fstr args)))
 
 (defun twarning (fstr &rest args)
   (tlog "~a:~a: " *current-source-file* *input-line-no*)
