@@ -38,9 +38,9 @@
 (defvar *troff2page-file-arg*
   (or #-(or clisp clozure cmu ecl sbcl)
       (progn
-        (format t "! Don't know how to read your Common Lisp's command-line.~%")
-        (format t "! Please load the file troff2page into your CL and then~%")
-        (format t "!   call the procedure troff2page:troff2page on your troff document(s)~%")
+        (tlog "! Don't know how to read your Common Lisp's command-line.~%")
+        (tlog "! Please load the file troff2page into your CL and then~%")
+        (tlog "!   call the procedure troff2page:troff2page on your troff document(s)~%")
         t)
       (retrieve-env "T2PARG")))
 
@@ -112,6 +112,7 @@
 (defparameter *html-page-suffix* "-Z-H-")
 (defparameter *image-file-suffix* "-Z-G-")
 (defparameter *last-modified* "Last modified: ")
+(defparameter *log-file-suffix* "-Z-L.log")
 (defparameter *navigation-contents-name* "contents")
 (defparameter *navigation-first-name* "first")
 (defparameter *navigation-index-name* "index")
@@ -508,6 +509,7 @@
 (defvar *keep-newline-p*)
 (defvar *last-input-milestone*)
 (defvar *last-page-number*)
+(defvar *log-port*)
 (defvar *leading-spaces-macro*)
 (defvar *leading-spaces-number*)
 (defvar *lines-to-be-centered*)
@@ -766,10 +768,17 @@
     (toss-back-char c)
     c))
 
-(defun twarning (fstr &rest args)
-  (format t "~a:~a: " *current-source-file* *input-line-no*)
+(defun tlog (fstr &rest args)
   (apply #'format t fstr args)
-  (terpri))
+  (unless *log-port*
+    (let ((log-file (concatenate 'string *jobname* *log-file-suffix*)))
+      (setq *log-port* (open log-file :direction :output :if-exists :supersede))))
+  (apply #'format *log-port* fstr args))
+
+(defun twarning (fstr &rest args)
+  (tlog "~a:~a: " *current-source-file* *input-line-no*)
+  (tlog fstr args)
+  (tlog "~%"))
 
 (defun edit-offending-file ()
   (format t "Type e to edit file ~a at line ~a; x to quit.~%"
@@ -1835,10 +1844,10 @@
     ;remove unsightly placeholder vert space for header navbar
     (format *css-port* "~&.navigation { display: none; }~%"))
   (clear-per-doc-hash-tables)
-  (close-all-open-ports)
   (when *missing-pieces*
-    (format t "Missing: ~a~%" *missing-pieces*)
-    (format t "Rerun: troff2page ~a~%" *main-troff-file*)))
+    (tlog "Missing: ~a~%" *missing-pieces*)
+    (tlog "Rerun: troff2page ~a~%" *main-troff-file*))
+  (close-all-open-ports))
 
 (defun !macro-package (m)
   (setq *macro-package* m))
@@ -1908,6 +1917,7 @@
 (defun close-all-open-ports ()
   (when *aux-port* (close *aux-port*))
   (when *css-port* (close *css-port*))
+  (when *log-port* (close *log-port*))
   (dolist (c *output-streams*)
     (close (cdr c))))
 
@@ -2046,13 +2056,13 @@
                          (t :file-not-found))))
     (prog1 situation
       (case situation
-        (:no-arg (format t "troff2page called with no argument~%"))
-        (:file-not-found (format t "troff2page could not find file ~s~%" f))
+        (:no-arg (tlog "troff2page called with no argument~%"))
+        (:file-not-found (tlog "troff2page could not find file ~s~%" f))
         ((:help :version)
-         (format t "troff2page version ~a~%" *troff2page-version*)
-         (format t "~a~%" *troff2page-copyright-notice*)
+         (tlog "troff2page version ~a~%" *troff2page-version*)
+         (tlog "~a~%" *troff2page-copyright-notice*)
          (when (eq situation :help)
-           (format t "For full details, please see ~a~%" *troff2page-website*)))))))
+           (tlog "For full details, please see ~a~%" *troff2page-website*)))))))
 
 (defun read-args ()
   (let ((ln (expand-args (read-troff-line)))
@@ -4607,6 +4617,7 @@
           (*leading-spaces-macro* nil)
           (*leading-spaces-number* 0)
           (*lines-to-be-centered* 0)
+          (*log-port* nil)
           (*macro-args* '(t))
           (*macro-copy-mode-p* nil)
           (*macro-package* :ms)
