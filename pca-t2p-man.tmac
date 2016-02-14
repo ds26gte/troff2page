@@ -1,4 +1,4 @@
-.\" last modified 2015-10-13
+.\" last modified 2016-02-14
 .\" Dorai Sitaram
 .
 .\" these macros are relevant only for troff2page,
@@ -44,11 +44,11 @@
 .if !\\n[pca-t2p-man:enable-toc-entries] .return
 .if !\\n[pca-t2p-man:toc-opened-p] \{\
 .nr pca-t2p-man:toc-opened-p 1
-.open pca:toc-port \\*[AUXF].toc
+.open pca:toc-stream \\*[AUXF].toc
 .\}
 .nr pca-toc:count +1
 .TAG sec_\\n[pca-toc:count]
-.write pca:toc-port .TOCLINE-PLAIN \\n[pca-toc:count] \\$*
+.write pca:toc-stream .TOCLINE-PLAIN \\n[pca-toc:count] \\$*
 ..
 .
 .ig ##

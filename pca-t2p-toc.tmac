@@ -18,10 +18,10 @@
 .
 .de pca-toc:write-toc-line
 .ie \\n[pca:inside-NH-p] \{\
-.write pca:toc-port .TOCLINE-NH \\n[pca-toc:header-level] \\n[pca-toc:count] \\*[SN-STYLE]
+.write pca:toc-stream .TOCLINE-NH \\n[pca-toc:header-level] \\n[pca-toc:count] \\*[SN-STYLE]
 .nr pca:inside-NH-p 0
 .\}
-.el .write pca:toc-port .TOCLINE-SH \\n[pca-toc:header-level] \\n[pca-toc:count]
+.el .write pca:toc-stream .TOCLINE-SH \\n[pca-toc:header-level] \\n[pca-toc:count]
 ..
 .
 .de TOCLINE-NH

@@ -477,13 +477,13 @@
 ;
 
 (defvar *afterpar*)
-(defvar *aux-port*)
+(defvar *aux-stream*)
 (defvar *blank-line-macro*)
 (defvar *cascaded-if-p*)
 (defvar *cascaded-if-stack*)
 (defvar *color-table*)
 (defvar *control-char*)
-(defvar *css-port*)
+(defvar *css-stream*)
 (defvar *current-diversion*)
 (defvar *current-pageno*)
 (defvar *current-source-file*)
@@ -509,7 +509,7 @@
 (defvar *keep-newline-p*)
 (defvar *last-input-milestone*)
 (defvar *last-page-number*)
-(defvar *log-port*)
+(defvar *log-stream*)
 (defvar *leading-spaces-macro*)
 (defvar *leading-spaces-number*)
 (defvar *lines-to-be-centered*)
@@ -557,9 +557,9 @@
 
 ;
 
-(defstruct bport* (port nil) (buffer '()))
+(defstruct bstream* (stream nil) (buffer '()))
 (defstruct counter* (value 0) (format "1") (thunk nil))
-(defstruct diversion* port return value)
+(defstruct diversion* stream return value)
 (defstruct footnote* tag number text)
 
 (defstruct ev*
@@ -745,9 +745,9 @@
 ;** input
 
 (defun get-char (&aux it)
-  (cond ((consp (bport*-buffer *current-troff-input*))
-         (pop (bport*-buffer *current-troff-input*)))
-        ((setq it (bport*-port *current-troff-input*))
+  (cond ((consp (bstream*-buffer *current-troff-input*))
+         (pop (bstream*-buffer *current-troff-input*)))
+        ((setq it (bstream*-stream *current-troff-input*))
          (let ((c (read-char it nil)))
            (when c
              (when (char= c #\return)
@@ -761,7 +761,7 @@
         (t nil)))
 
 (defun toss-back-char (c)
-  (push c (bport*-buffer *current-troff-input*)))
+  (push c (bstream*-buffer *current-troff-input*)))
 
 (defun snoop-char ()
   (let ((c (get-char)))
@@ -770,10 +770,10 @@
 
 (defun tlog (fstr &rest args)
   (apply #'format t fstr args)
-  (unless *log-port*
+  (unless *log-stream*
     (let ((log-file (concatenate 'string *jobname* *log-file-suffix*)))
-      (setq *log-port* (open log-file :direction :output :if-exists :supersede))))
-  (apply #'format *log-port* fstr args))
+      (setq *log-stream* (open log-file :direction :output :if-exists :supersede))))
+  (apply #'format *log-stream* fstr args))
 
 (defun twarning (fstr &rest args)
   (tlog "~a:~a: " *current-source-file* *input-line-no*)
@@ -795,7 +795,7 @@
 
 (defun terror (&rest args)
   (apply #'twarning args)
-  (close-all-open-ports)
+  (close-all-open-streams)
   (edit-offending-file)
   (error "troff2page fatal error"))
 
@@ -823,15 +823,15 @@
   (read-till-char #\newline :eat-delim-p t))
 
 (defun toss-back-string (s)
-  (setf (bport*-buffer *current-troff-input*)
+  (setf (bstream*-buffer *current-troff-input*)
         (nconc (concatenate 'list s)
-               (bport*-buffer *current-troff-input*))))
+               (bstream*-buffer *current-troff-input*))))
 
 (defun toss-back-line (s)
-  (setf (bport*-buffer *current-troff-input*)
+  (setf (bstream*-buffer *current-troff-input*)
         (nconc (concatenate 'list s)
                (cons #\newline
-                     (bport*-buffer *current-troff-input*)))))
+                     (bstream*-buffer *current-troff-input*)))))
 
 (defun ignore-spaces ()
   (let (c)
@@ -964,7 +964,7 @@
                 w " " ender))
         (return))
       (let* ((ln (expand-args (read-troff-line)))
-             (*current-troff-input* (make-bport*)))
+             (*current-troff-input* (make-bstream*)))
         (toss-back-line ln)
         (let ((c (snoop-char)))
           (cond ((char= c *control-char*)
@@ -980,7 +980,7 @@
 (defun expand-args (s)
   (if (not s) ""
     (with-output-to-string (o)
-      (let ((*current-troff-input* (make-bport* :buffer (concatenate 'list s)))
+      (let ((*current-troff-input* (make-bstream* :buffer (concatenate 'list s)))
             (*macro-copy-mode-p* t)
             (*outputting-to* :troff)
             (*out* o))
@@ -1002,7 +1002,7 @@
 
 (defun table-do-global-option-1 (x)
   (let ((*current-troff-input*
-          (make-bport* :buffer (concatenate 'list x)))
+          (make-bstream* :buffer (concatenate 'list x)))
         w)
     (loop
       (ignore-char #\,)
@@ -1046,7 +1046,7 @@
 
 (defun table-do-format-1 (x)
   (let ((*current-troff-input*
-          (make-bport* :buffer (concatenate 'list x)))
+          (make-bstream* :buffer (concatenate 'list x)))
         (row-hash-table (make-hash-table))
         (cell-number 0)
         (w nil)
@@ -1179,11 +1179,11 @@
                          (t (return r))))))))
           (t ""))))
 
-(defun read-until-past-char-from-port (delim i)
+(defun read-until-past-char-from-stream (delim i)
   (let ((r '()) c)
     (loop
       (setq c (read-char i))
-      (cond ((not c) (terror "read-until-past-char-from-port"))
+      (cond ((not c) (terror "read-until-past-char-from-stream"))
             ((char= c delim)
              (return
                (concatenate 'string (nreverse r))))
@@ -1759,37 +1759,37 @@
 	(ll (raw-counter-value "LL"))
 	(html1 (raw-counter-value "HTML1")))
     (unless (= ps 10)
-      (format *css-port* "~&body { font-size: ~a%; }~%" (* ps 10)))
+      (format *css-stream* "~&body { font-size: ~a%; }~%" (* ps 10)))
     (unless (= ll 0)
-      (format *css-port* "~%body { max-width: ~apx; }~%" ll))
+      (format *css-stream* "~%body { max-width: ~apx; }~%" ll))
     (unless (eq *macro-package* :man)
       (unless (= p-i 0)
-        (format *css-port* "~&p.indent { text-indent: ~apx; }~%" p-i))
+        (format *css-stream* "~&p.indent { text-indent: ~apx; }~%" p-i))
       (unless (< pd 0)
         (let ((p-margin pd) ; not pd/2
               (display-margin (* pd 2))
               ;(h-margin (* pd 2))
               (fnote-rule-margin (* pd 2))
               (navbar-margin (* ps 2))) ;2*pd can be too small
-          (format *css-port* "~&p { margin-top: ~apx; margin-bottom: ~apx; }~%"
+          (format *css-stream* "~&p { margin-top: ~apx; margin-bottom: ~apx; }~%"
                   p-margin p-margin)
-          (format *css-port* "~&.display { margin-top: ~apx; margin-bottom: ~apx; }~%"
+          (format *css-stream* "~&.display { margin-top: ~apx; margin-bottom: ~apx; }~%"
                   display-margin display-margin)
-          ;(format *css-port* "~&h1,h2,h3,h4,h5,h6 { margin-bottom: ~apx; }~%"
+          ;(format *css-stream* "~&h1,h2,h3,h4,h5,h6 { margin-bottom: ~apx; }~%"
           ;         h-margin)
-          (format *css-port* "~&.footnote { margin-top: ~apx; }~%"
+          (format *css-stream* "~&.footnote { margin-top: ~apx; }~%"
                   fnote-rule-margin)
-          (format *css-port* "~&.navigation { margin-top: ~apx; margin-bottom: ~apx; }~%"
+          (format *css-stream* "~&.navigation { margin-top: ~apx; margin-bottom: ~apx; }~%"
                   navbar-margin navbar-margin)
-          (format *css-port* "~&.colophon { margin-top: ~apx; margin-bottom: ~apx; }~%"
+          (format *css-stream* "~&.colophon { margin-top: ~apx; margin-bottom: ~apx; }~%"
                   display-margin display-margin)
           )))
     (unless (= html1 0)
       ;browsers can't deal with these CSS3 features yet
-      (format *css-port* "~&@media print {~%")
-      (format *css-port* "~&a.hrefinternal::after { content: target-counter(attr(href), page); }~%")
-      (format *css-port* "~&a.hrefinternal .hreftext { display: none; }~%")
-      (format *css-port* "~&}~%")
+      (format *css-stream* "~&@media print {~%")
+      (format *css-stream* "~&a.hrefinternal::after { content: target-counter(attr(href), page); }~%")
+      (format *css-stream* "~&a.hrefinternal .hreftext { display: none; }~%")
+      (format *css-stream* "~&}~%")
       )
     ))
 
@@ -1821,8 +1821,8 @@
     )
 
 (defun write-aux (e)
-  (prin1 e *aux-port*)
-  (terpri *aux-port*))
+  (prin1 e *aux-stream*)
+  (terpri *aux-stream*))
 
 (defun do-end-macro (&aux it)
   (when (and *end-macro*
@@ -1842,12 +1842,12 @@
   (when *title* (write-aux `(!title ,*title*)))
   (when (= *last-page-number* 0)
     ;remove unsightly placeholder vert space for header navbar
-    (format *css-port* "~&.navigation { display: none; }~%"))
+    (format *css-stream* "~&.navigation { display: none; }~%"))
   (clear-per-doc-hash-tables)
   (when *missing-pieces*
     (tlog "Missing: ~a~%" *missing-pieces*)
     (tlog "Rerun: troff2page ~a~%" *main-troff-file*))
-  (close-all-open-ports))
+  (close-all-open-streams))
 
 (defun !macro-package (m)
   (setq *macro-package* m))
@@ -1914,10 +1914,10 @@
   (clrhash *string-table*)
   )
 
-(defun close-all-open-ports ()
-  (when *aux-port* (close *aux-port*))
-  (when *css-port* (close *css-port*))
-  (when *log-port* (close *log-port*))
+(defun close-all-open-streams ()
+  (when *aux-stream* (close *aux-stream*))
+  (when *css-stream* (close *css-stream*))
+  (when *log-stream* (close *log-stream*))
   (dolist (c *output-streams*)
     (close (cdr c))))
 
@@ -1933,7 +1933,7 @@
 
 (defun execute-macro-body (ss)
   (let ((*macro-spill-over* nil))
-    (let ((*current-troff-input* (make-bport*))
+    (let ((*current-troff-input* (make-bstream*))
           (i (- (length ss) 1)))
       (loop (when (< i 0) (return))
             (toss-back-line (elt ss i))
@@ -1949,7 +1949,7 @@
 (defun retrieve-diversion (div)
   (let ((value (diversion*-value div)))
     (cond (value)
-          (t (setq value (get-output-stream-string (diversion*-port div)))
+          (t (setq value (get-output-stream-string (diversion*-stream div)))
              (setf (diversion*-value div) value)
              value))))
 
@@ -2014,21 +2014,21 @@
     (when *keep-newline-p* (emit-newline))))
 
 (defun troff2page-lines (ss)
-  (let ((*current-troff-input* (make-bport*)))
+  (let ((*current-troff-input* (make-bstream*)))
     (dolist (s ss) (toss-back-line s))
     (generate-html '(:ex :nx :return))))
 
 (defun troff2page-chars (cc)
-  (let ((*current-troff-input* (make-bport* :buffer cc)))
+  (let ((*current-troff-input* (make-bstream* :buffer cc)))
     (generate-html '(:ex :nx :return))))
 
 (defun troff2page-string (s)
-  (let ((*current-troff-input* (make-bport*)))
+  (let ((*current-troff-input* (make-bstream*)))
     (toss-back-string s)
     (generate-html '(:break :continue :ex :nx :return))))
 
 (defun troff2page-line (s)
-  (let ((*current-troff-input* (make-bport*)))
+  (let ((*current-troff-input* (make-bstream*)))
     (toss-back-line s)
     (generate-html '(:ex :nx :return))))
 
@@ -2038,7 +2038,7 @@
          ;(twarning 'ignoring-file f)
 	 (flag-missing-piece f))
         (t (with-open-file (i f :direction :input)
-             (let* ((*current-troff-input* (make-bport* :port i))
+             (let* ((*current-troff-input* (make-bstream* :stream i))
                     (*input-line-no* 0)
                     (*current-source-file* f))
                ;(emit-edit-source-doc)
@@ -2078,7 +2078,7 @@
 
 (defun start-css-file ()
   (let ((css-file (concatenate 'string *jobname* *css-file-suffix*)))
-    (setq *css-port* (open css-file :direction :output
+    (setq *css-stream* (open css-file :direction :output
                            :if-exists :supersede))
     (princ "
            body {
@@ -2228,7 +2228,7 @@
 
            } /* media print */
            "
-           *css-port*)))
+           *css-stream*)))
 
 (defun bool-to-num (b)
   (if b 1 0))
@@ -2334,7 +2334,7 @@
       (load-troff2page-data-file aux-file)
       (delete-file aux-file))
     (when *html-head* (setq *html-head* (nreverse *html-head*)))
-    (setq *aux-port* (open aux-file :direction :output)))
+    (setq *aux-stream* (open aux-file :direction :output)))
   (start-css-file))
 
 (defun next-html-image-file-stem ()
@@ -2342,7 +2342,7 @@
   (concatenate 'string *jobname* *image-file-suffix*
                (write-to-string *image-file-count*)))
 
-(defun call-with-image-port (p)
+(defun call-with-image-stream (p)
   (let* ((img-file-stem (next-html-image-file-stem))
          (aux-file (concatenate 'string img-file-stem ".troff")))
     (with-open-file (o aux-file :direction :output
@@ -2416,8 +2416,8 @@
           "groff -pte -ms -Tascii " f ".troff > " f.ascii)))))
 
 (defun make-image (env endenv)
-  (let ((i (bport*-port *current-troff-input*)))
-    (call-with-image-port
+  (let ((i (bstream*-stream *current-troff-input*)))
+    (call-with-image-stream
       (lambda (o)
         (princ env o) (terpri o)
         (let (x j)
@@ -2951,7 +2951,7 @@
              (setq *current-diversion* w)
              (let ((o (make-string-output-stream)))
                (setf (gethash w *diversion-table*)
-                           (make-diversion* :port o
+                           (make-diversion* :stream o
                                            :return *out*))
                (setq *out* o))))
           (t
@@ -2968,13 +2968,13 @@
         (terror "da: name missing"))
       (setq *current-diversion* w)
       (let ((div (gethash w *diversion-table*))
-            (div-port nil))
-        (cond (div (setq div-port (diversion*-port div)))
-              (t (setq div-port (make-string-output-stream))
+            (div-stream nil))
+        (cond (div (setq div-stream (diversion*-stream div)))
+              (t (setq div-stream (make-string-output-stream))
                  (setf (gethash w *diversion-table*)
-                       (make-diversion* :port div-port
+                       (make-diversion* :stream div-stream
                                        :return *out*))))
-        (setq *out* div-port)))))
+        (setq *out* div-stream)))))
 
 (defrequest "ds"
   (lambda ()
@@ -3044,7 +3044,7 @@
       (emit-verbatim align)
       (emit-verbatim ">")
       (let ((*groff-image-options* nil))
-        (call-with-image-port
+        (call-with-image-stream
          (lambda (o)
            (princ ".mso pspic.tmac" o) (terpri o)
            (princ ".PSPIC " o) (princ ps-file o)
@@ -4369,7 +4369,7 @@
   (lambda ()
     (do-writec :newlinep t)))
 
-(defun write-troff-macro-to-port (macro-name o)
+(defun write-troff-macro-to-stream (macro-name o)
   (let ((*outputting-to* :troff)
         (*out* o))
     (execute-macro macro-name)))
@@ -4380,7 +4380,7 @@
            (macro-name (expand-args (read-word)))
            (out (cdr (assoc stream-name *output-streams* :test #'string=))))
       ;(read-troff-line)  ; ? check
-      (write-troff-macro-to-port
+      (write-troff-macro-to-stream
         macro-name out))))
 
 ;* escapes
@@ -4582,13 +4582,13 @@
     (let (
 
           (*afterpar* nil)
-          (*aux-port* nil)
+          (*aux-stream* nil)
           (*blank-line-macro* nil)
           (*cascaded-if-p* nil)
           (*cascaded-if-stack* '())
           (*color-table* (make-hash-table :test #'equal))
           (*control-char* #\.)
-          (*css-port* nil)
+          (*css-stream* nil)
           (*current-diversion* nil)
           (*current-pageno* -1)
           (*current-source-file* input-doc)
@@ -4617,7 +4617,7 @@
           (*leading-spaces-macro* nil)
           (*leading-spaces-number* 0)
           (*lines-to-be-centered* 0)
-          (*log-port* nil)
+          (*log-stream* nil)
           (*macro-args* '(t))
           (*macro-copy-mode-p* nil)
           (*macro-package* :ms)

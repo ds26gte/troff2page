@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2015-09-28  \"last modified
+.ND 2016-02-14  \"last modified
 .
 .TL
 troff2page
@@ -798,12 +798,12 @@ The procedures \fCdefstring\fP, \fClink-start\fP, and
 .IX stylesheet, modifying
 \fC.ig ##\fP can be used to specify settings that are relevant only
 when troff2page is used on a document, e.g., stylesheet changes.
-troff2page uses the output-port \fC*css-port*\fP to
-write out style information.  The user can also write to this port, e.g.,
+troff2page uses the output-stream \fC*css-stream*\fP to
+write out style information.  The user can also write to this stream, e.g.,
 
 .EX
     .ig ##
-    (format *css-port* "
+    (format *css-stream* "
         h1,h2,h3,h4,h5,h6 {
             color: rgb(61,35,39); /* chocolate */
         }
@@ -812,7 +812,7 @@ write out style information.  The user can also write to this port, e.g.,
 .EE
 
 .ig ##
-    (format *css-port* "
+    (format *css-stream* "
         h1,h2,h3,h4,h5,h6 {
             color: rgb(61,35,39); /* chocolate */
         }
