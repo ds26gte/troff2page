@@ -2,6 +2,9 @@ Last change 2016-02-14
 
 2016 Feb 14
 
+Store log messages (which scroll on stdout) also in
+jobname-Z-L.log.
+
 bash/vim script html2info for convertinga
 troff2page-generated HTML doc into a GNU info doc.
 
