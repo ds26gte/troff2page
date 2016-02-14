@@ -1,0 +1,13 @@
+.\" last change 2016-02-12
+.
+.if !\n[.troff2page] .nx
+.
+.ig ##
+(defrequest "pca-eval:process-snippets"
+  (lambda ()
+    (read-troff-line)
+    (let ((f (concatenate 'string
+                (funcall (gethash "AUXF" *string-table*))
+                ".lisp")))
+      (when (probe-file f) (load f)))))
+.##
