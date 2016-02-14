@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20151119) ;last change
+(defparameter *troff2page-version* 20160214) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -603,7 +603,7 @@
                (verbatim lbl)
                (verbatim "\"></a>")))
 
-(defun link-start (link &key internal-node-p)
+(defun link-start (link &optional internal-node-p)
   (concatenate 'string
     (verbatim "<a")
     (verbatim (if internal-node-p
@@ -672,7 +672,7 @@
   (let (internal-node-p)
     (multiple-value-setq (url internal-node-p) (link-url url))
     (concatenate 'string
-      (link-start url :internal-node-p internal-node-p)
+      (link-start url internal-node-p)
       (expand-args link-text)
       (link-stop))))
 
@@ -1392,12 +1392,12 @@
 	   (emit-verbatim "<span")
 	   (when first-page-p (emit-verbatim " class=disable"))
 	   (emit-verbatim ">")
-	   (unless first-page-p  (emit (link-start (page-link 0))))
+	   (unless first-page-p  (emit (link-start (page-link 0) t)))
 	   (emit *navigation-first-name*)
 	   (unless first-page-p (emit (link-stop)))
 	   (emit-verbatim ", ")
 	   ;
-	   (unless first-page-p  (emit (link-start (page-link (- pageno 1)))))
+	   (unless first-page-p  (emit (link-start (page-link (- pageno 1)) t)))
 	   (emit *navigation-previous-name*)
 	   (unless first-page-p (emit (link-stop)))
 	   ;(emit ", ")
@@ -1409,7 +1409,7 @@
 	   (when first-page-p (emit-verbatim "<span class=disable>"))
 	   (emit-verbatim ", ")
 	   (when first-page-p (emit-verbatim "</span>"))
-	   (unless last-page-p  (emit (link-start (page-link (+ pageno 1)))))
+	   (unless last-page-p  (emit (link-start (page-link (+ pageno 1)) t)))
 	   (emit *navigation-next-name*)
 	   (unless last-page-p (emit (link-stop)))
 	   (emit-verbatim "</span>")
@@ -1432,7 +1432,7 @@
 	       (unless toc-page-p
 		 (emit (link-start (page-node-link
 				     toc-page
-                                     "TAG_troff2page_toc"))))
+                                     "TAG_troff2page_toc") t)))
 	       (emit *navigation-contents-name*)
 	       (unless toc-page-p (emit (link-stop)))
 	       (emit-verbatim "</span>"))
@@ -1452,7 +1452,7 @@
 	       (unless index-page-p
 		 (emit (link-start (page-node-link
 				     index-page
-				     "TAG_troff2page_index"))))
+				     "TAG_troff2page_index") t)))
 	       (emit *navigation-index-name*)
 	       (unless index-page-p (emit (link-stop)))
 	       (emit-verbatim "</span>")))
@@ -1852,7 +1852,7 @@
     (lambda ()
       (concatenate 'string
         (link-start
-          (page-node-link pageno node))
+          (page-node-link pageno node) t)
         (verbatim tag-value)
         (link-stop)))))
 
@@ -2303,7 +2303,7 @@
           (anchor (concatenate 'string *html-node-prefix*
                     "call_footnote_" n))
           (link-start (page-node-link
-			nil (concatenate 'string *html-node-prefix* "footnote_" n)))
+			nil (concatenate 'string *html-node-prefix* "footnote_" n)) t)
           (verbatim "<sup><small>")
           (verbatim n)
           (verbatim "</small></sup>")
@@ -2437,7 +2437,7 @@
                   (emit (link-start (page-node-link
 				      nil (concatenate 'string
 						       *html-node-prefix* "call_footnote_"
-						       fno-str))))
+						       fno-str)) t))
                   (emit-verbatim "<sup><small>")
                   (emit-verbatim fno-str)
                   (emit-verbatim "</small></sup>")
