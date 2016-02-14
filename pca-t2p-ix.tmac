@@ -1,4 +1,4 @@
-.\" last change 2015-10-13
+.\" last change 2016-02-14
 .
 .if !\n[.troff2page] .nx
 .
@@ -46,7 +46,7 @@
     (let* ((ix-tag (concatenate 'string "TAG_index_" ixno))
            (ix-pageno (gethash ix-tag *node-table*)))
       (concatenate 'string
-        (link-start (page-node-link ix-pageno ix-tag))
+        (link-start (page-node-link ix-pageno ix-tag) t)
         (verbatim ix-pageno)
         (cond ((gethash ix-pageno *index-pageno-mention-table*)
                (concatenate 'string
