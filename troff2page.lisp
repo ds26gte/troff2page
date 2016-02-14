@@ -770,9 +770,6 @@
 
 (defun tlog (fstr &rest args)
   (apply #'format t fstr args)
-  (unless *log-stream*
-    (let ((log-file (concatenate 'string *jobname* *log-file-suffix*)))
-      (setq *log-stream* (open log-file :direction :output :if-exists :supersede))))
   (apply #'format *log-stream* fstr args))
 
 (defun twarning (fstr &rest args)
@@ -2335,6 +2332,8 @@
       (delete-file aux-file))
     (when *html-head* (setq *html-head* (nreverse *html-head*)))
     (setq *aux-stream* (open aux-file :direction :output)))
+  (setq *log-stream* (open (concatenate 'string *jobname* *log-file-suffix*)
+                           :direction :output :if-exists :supersede))
   (start-css-file))
 
 (defun next-html-image-file-stem ()
