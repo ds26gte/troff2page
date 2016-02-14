@@ -1,0 +1,27 @@
+# last modified 2016-02-14
+# Dorai Sitaram
+
+# runs troff2page on input file, then
+#  runs html2info on the resultant HTML file
+
+f=$1
+
+fbase=$(echo $f | sed -e 's/\.[^.]\+$//')
+
+logf=$fbase-Z-L.log
+
+while true
+do
+  # run troff2page enough times so
+  #  all aux info is slurped
+  troff2page $f
+  if test ! -f $logf
+  then break
+  elif ! $(grep -q Rerun $logf)
+  then break
+  fi
+done
+
+html2info $fbase.html
+
+# vi:ft=sh
