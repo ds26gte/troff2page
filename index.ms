@@ -22,6 +22,7 @@ troff2page
 
 troff2page converts troff (man and ms) documents into HTML web pages.
 
+.TAG html-output
 .IX calling troff2page from the command-line
 To convert an input troff document named \fCjobname.ms\fP, type
 
@@ -863,6 +864,39 @@ argument is the filename.
 (This argument style works for \fIall\fP
 vi and emacs clones and I suspect most modern editors take care
 to recognize it, so it isn’t as restrictive as it sounds.)
+
+.SH 1
+9. GNU Info docs
+
+.IX Info files
+The troff2page distribution includes a couple of scripts for
+generating GNU Info docs.
+
+The script \fChtml2info\fP converts an HTML document, which must
+be produced by troff2page, into an Info doc.
+
+.EX
+    html2info jobname.html
+.EE
+
+Here \fCjobname.html\fP is the opening file of the HTML document
+(which may consist of other \fCjobname-Z-H-i.html\fP files, as
+described on page \*[TAG_html-output]). The result is a single
+file \fCjobname.info\fP that may then be displayed on any
+Info viewer.
+
+The script \fCtroff2info\fP converts an input troff document to
+Info.
+
+.EX
+    troff2info jobname.ms
+.EE
+
+It essentially first calls \fCtroff2page\fP on \fCjobname.ms\fP
+then passes the resultant \fCjobname.html\fP to \fChtml2info\fP,
+which produces \fCjobname.info\fP. However, \fCtroff2info\fP
+takes care to \fCtroff2page\fP enough times to make sure that all
+the aux file data has been included in the document.
 
 .if t \{\
 .SH 1
