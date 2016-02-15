@@ -74,9 +74,9 @@ do
   sil! %s/<a\s\+class=hrefinternal\s\+href="#TAG_index_.\{-}">/ÞI!$i::/g
 
   "all other doc-internal links become Info *note's
-  sil! %s!<a\s\+class=hrefinternal\s\+href="$fbase\.html.\{-}">!*note 0::!g
+  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase\.html.\{-}">/ÞN!0::/g
 
-  sil! %s!<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\([0-9]\+\)\.html.\{-}">!*note \1::!g
+  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\([0-9]\+\)\.html.\{-}">/ÞN!\1::/g
 
   "disable all doc-external links
   sil! %s!<a\s\+href=".\{-}">!!g
@@ -127,6 +127,7 @@ sil! /^\s*ÞTOC_MENU_BEGIN!/,/^\s*ÞTOC_MENU_END!/ s/^\(\s*\)\(\*\s\S\{-}::\)/\2
 
 sil! %s/^\s*ÞTOC_MENU_\%(BEGIN\|END\)!//
 
+sil! %s/ÞN!\(.\{-}::\)/*note \1/g
 sil! %s/ÞI!\(.\{-}\)::\1/*note \1::/g
 
 sil! %s/Þ!/Þ/g
