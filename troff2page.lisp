@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160215) ;last change
+(defparameter *troff2page-version* 20160216) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -495,6 +495,7 @@
 (defvar *ev-stack*)
 (defvar *ev-table*)
 (defvar *exit-status*)
+(defvar *file-postlude*)
 (defvar *font-alternating-style-p*)
 (defvar *footnote-buffer*)
 (defvar *footnote-count*)
@@ -2037,15 +2038,19 @@
   (cond ((or (not f) (not (probe-file f)))
          (twarning "can't open `~a': No such file or directory" f)
          ;(twarning 'ignoring-file f)
-	 (flag-missing-piece f))
-        (t (with-open-file (i f :direction :input)
-             (let* ((*current-troff-input* (make-bstream* :stream i))
-                    (*input-line-no* 0)
-                    (*current-source-file* f))
-               ;(emit-edit-source-doc)
-               (generate-html '(:ex))))
+         (flag-missing-piece f))
+        (t (let ((*file-postlude* nil))
+             (with-open-file (i f :direction :input)
+               (let* ((*current-troff-input* (make-bstream* :stream i))
+                      (*input-line-no* 0)
+                      (*current-source-file* f))
+                 ;(emit-edit-source-doc)
+                 (generate-html '(:ex))))
+             (when *file-postlude*
+               (funcall *file-postlude*))
+             )
            ;(emit-edit-source-doc)
-	   )))
+           )))
 
 (defun troff2page-help (f)
   (let ((situation (cond ((or (not f)
@@ -3332,7 +3337,7 @@
 
   (defrequest "so"
     (lambda ()
-      (let ((f  (car (read-args))))
+      (let ((f (car (read-args))))
         (when (eql *macro-package* :man)
           (let ((g (concatenate 'string "../" f)))
             (when (probe-file g)
@@ -4612,6 +4617,7 @@
         (*ev-stack* (list (make-ev* :name "*global*")))
         (*ev-table* (make-hash-table :test #'equal))
         (*exit-status* nil)
+        (*file-postlude* nil)
         (*font-alternating-style-p* nil)
         (*footnote-buffer* '())
         (*footnote-count* 0)
