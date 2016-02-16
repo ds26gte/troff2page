@@ -2,16 +2,15 @@
 .
 .if !\n[.troff2page] .nx
 .
-.nr index:location 0
-.
 .de IX
-.index:set_up_index
-.nr index:location +1
-.TAG index_\\n[index:location]
-.write index:idx_stream \\\\indexentry{\\$*|index:function}{\\n[index:location]}
+.pca-ix:set-up-index
+.nr pca-ix::location +1
+.TAG index_\\n[pca-ix::location]
+.write pca-ix:idx-stream \\\\indexentry{\\$*|pca-t2p-ix::function}{\\n[pca-ix::location]}
 ..
 .
-.am index:set_up_index
+.am pca-ix:set-up-index
+.nr pca-ix::location 0
 .ig ##
 (let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) ".ind")))
   (unless (probe-file f)
@@ -33,25 +32,25 @@
 .##
 ..
 .
-.am index:item0
+.am pca-ix:item0
 .ig ##
-(clrhash *index-pageno-mention-table*)
+(clrhash *pca-t2p-ix-pageno-mention-table*)
 .##
 ..
 .
-.am index:item1
+.am pca-ix:item1
 .ig ##
-(clrhash *index-pageno-mention-table*)
+(clrhash *pca-t2p-ix-pageno-mention-table*)
 .##
 ..
 .
-.am index:item2
+.am pca-ix:item2
 .ig ##
-(clrhash *index-pageno-mention-table*)
+(clrhash *pca-t2p-ix-pageno-mention-table*)
 .##
 ..
 .
-.de index:hook
+.de pca-ix:hook
 .ig ##
 (when (and (> *last-page-number* 0)
            (not (gethash "TAG_troff2page_index" *node-table*)))
@@ -61,24 +60,24 @@
 ..
 .
 .ig ##
-(defvar *index-pageno-mention-table* (make-hash-table))
+(defvar *pca-t2p-ix-pageno-mention-table* (make-hash-table))
 
-(defstring "index:function"
+(defstring "pca-t2p-ix::function"
   (lambda (ixno)
     (let* ((ix-tag (concatenate 'string "TAG_index_" ixno))
            (ix-pageno (gethash ix-tag *node-table*)))
       (concatenate 'string
         (link-start (page-node-link ix-pageno ix-tag) t)
         (verbatim ix-pageno)
-        (cond ((gethash ix-pageno *index-pageno-mention-table*)
+        (cond ((gethash ix-pageno *pca-t2p-ix-pageno-mention-table*)
                (concatenate 'string
                  ":"
                  (number-to-roman
-                   (incf (gethash ix-pageno *index-pageno-mention-table*))
+                   (incf (gethash ix-pageno *pca-t2p-ix-pageno-mention-table*))
                    :downcasep t)
                  ))
               (t
-                (setf (gethash ix-pageno *index-pageno-mention-table*)
+                (setf (gethash ix-pageno *pca-t2p-ix-pageno-mention-table*)
                       1)
                 ""))
         (link-stop)))))
