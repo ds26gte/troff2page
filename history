@@ -2,6 +2,11 @@ Last change 2016-02-16
 
 2016 Feb 15
 
+Let *log-stream* be a broadcast stream that combines log
+file and stdout. So logging info goes to both console and
+file. Have .sy use *log-stream*, so any messages generated
+by the system call also get both displayed and saved.
+
 Previously, the user was told to run troff2page again in
 order to resolve aux files. Now troff2page will itself take
 care to run a second pass. At most two passes are performed
