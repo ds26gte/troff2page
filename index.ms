@@ -204,11 +204,17 @@ mode or to process tables.
     % troff2page index.ms
 .ft CI
     index.ms:18: can't open `.troff2page_temp_index.toc': No such file or directory
-    Missing: (INDEX LAST-PAGE-NUMBER .troff2page_temp_index.toc TOC TITLE
-              STYLESHEET)
+    index.ms:932: can't open `.troff2page_temp_index.ind': No such file or directory
+    Missing: (.troff2page_temp_index.ind INDEX LAST-PAGE-NUMBER
+              .troff2page_temp_index.toc TOC TITLE STYLESHEET)
     Rerunning: troff2page index.ms
-    This is makeindex, ...
-    ...
+    This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
+    Scanning style file ./.troff2page_temp_index.mst...............done (15 attributes redefined, 0 ignored).
+    Scanning input file z.troff2page_temp_index.idx....done (58 entries accepted, 0 rejected).
+    Sorting entries....done (338 comparisons).
+    Generating output file z.troff2page_temp_index.ind....done (141 lines written, 0 warnings).
+    Output written in z.troff2page_temp_index.ind.
+    Transcript written in z.troff2page_temp_index.ilg.
 .EE
 
 The same holds if you run troff2page by calling
@@ -261,9 +267,9 @@ text and exits.  For example,
 .EX
     % troff2page --help
 .ft CI
-    troff2page version 20160215
-    Copyright (C) ...
-    For full details, please see http://...
+    troff2page version 20160216
+    Copyright (C) 2003-2016 Dorai Sitaram
+    For full details, please see http://ds26gte.github.io/troff2page/index.html
 .EE
 
 While this is intentionally similar to groff’s
