@@ -1,4 +1,18 @@
-Last change 2016-02-14
+Last change 2016-02-16
+
+2016 Feb 15
+
+Previously, the user was told to run troff2page again in
+order to resolve aux files. Now troff2page will itself take
+care to run a second pass. At most two passes are performed
+or needed.
+
+CL procedure troff2page:troff2page takes an optional second
+argument: If this is non-false, only a single pass is
+performed.
+
+pca-t2p-ix.tmac: Avoid requiring a third pass. This uses the
+*end-hooks* var in troff2page.lisp.
 
 2016 Feb 14
 
