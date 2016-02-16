@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160214) ;last change
+(defparameter *troff2page-version* 20160215) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -472,7 +472,6 @@
 
 (defvar *escape-table* (make-hash-table :test #'eql))
 (defvar *nroff-image-p* nil)
-(defvar *request-table* (make-hash-table :test #'equal))
 
 ;
 
@@ -483,12 +482,14 @@
 (defvar *cascaded-if-stack*)
 (defvar *color-table*)
 (defvar *control-char*)
+(defvar *request-table*)
 (defvar *css-stream*)
 (defvar *current-diversion*)
 (defvar *current-pageno*)
 (defvar *current-source-file*)
 (defvar *current-troff-input*)
 (defvar *diversion-table*)
+(defvar *end-hooks*)
 (defvar *end-macro*)
 (defvar *escape-char*)
 (defvar *ev-stack*)
@@ -509,7 +510,7 @@
 (defvar *keep-newline-p*)
 (defvar *last-input-milestone*)
 (defvar *last-page-number*)
-(defvar *log-stream* nil)
+(defvar *log-stream*)
 (defvar *leading-spaces-macro*)
 (defvar *leading-spaces-number*)
 (defvar *lines-to-be-centered*)
@@ -535,6 +536,7 @@
 (defvar *reading-table-header-p*)
 (defvar *reading-table-p*)
 (defvar *redirectedp*)
+(defvar *rerun-needed-p*)
 (defvar *saved-escape-char*)
 (defvar *slides*)
 (defvar *sourcing-ascii-file-p*)
@@ -694,6 +696,7 @@
              (return))
             (t (setq link-text (concatenate 'string link-text "\\")))))
     (unless url (setq url link-text))
+    (when (string= link-text "") (setq link-text url))
     (url-to-html url link-text)))
 
 ;** environments
@@ -775,7 +778,7 @@
 
 (defun twarning (fstr &rest args)
   (tlog "~a:~a: " *current-source-file* *input-line-no*)
-  (tlog fstr args)
+  (apply #'tlog fstr args)
   (tlog "~%"))
 
 (defun edit-offending-file ()
@@ -1574,7 +1577,7 @@
                 ((setq it (gethash *blank-line-macro* *request-table*))
                  (toss-back-char #\newline)
                  (funcall it))))
-        (t (emit-verbatim "<P>")
+        (t (emit-verbatim "<p>")
            ;(emit-para)
            ;(emit-verbatim "&#xa0;<br>")
            (emit-newline))))
@@ -1843,8 +1846,8 @@
     (format *css-stream* "~&.navigation { display: none; }~%"))
   (clear-per-doc-hash-tables)
   (when *missing-pieces*
-    (tlog "Missing: ~a~%" *missing-pieces*)
-    (tlog "Rerun: troff2page ~a~%" *main-troff-file*))
+    (setq *rerun-needed-p* t)
+    (tlog "Missing: ~a~%" *missing-pieces*))
   (close-all-open-streams))
 
 (defun !macro-package (m)
@@ -1913,9 +1916,9 @@
   )
 
 (defun close-all-open-streams ()
+  (mapc #'funcall *end-hooks*)
   (when *aux-stream* (close *aux-stream*))
   (when *css-stream* (close *css-stream*))
-  (when *log-stream* (close *log-stream*))
   (dolist (c *output-streams*)
     (close (cdr c))))
 
@@ -2231,15 +2234,14 @@
 (defun bool-to-num (b)
   (if b 1 0))
 
-(defun initialize-glyph-number-and-string-registers ()
-  ;
+(defun initialize-glyphs ()
   (defglyph "htmllt" "\\[htmllt]")
   (defglyph "htmlgt" "\\[htmlgt]")
   (defglyph "htmlquot" "\\[htmlquot]")
   (defglyph "htmlamp" "\\[htmlamp]")
   (defglyph "htmlbackslash" "\\[htmlbackslash]")
   (defglyph "htmlspace" "\\[htmlspace]")
-  ;
+
   (dotimes (i (length *standard-glyphs*))
     (when (evenp i)
       (defglyph (elt *standard-glyphs* i)
@@ -2247,7 +2249,9 @@
           (concatenate 'string "&#x"
             (write-to-string (elt *standard-glyphs* (1+ i)) :base 16)
             ";")))))
-  ;
+  )
+
+(defun initialize-numregs ()
   (defnumreg ".F" (make-counter* :format "s"
                                  :thunk (lambda () *current-source-file*)))
   (defnumreg ".z" (make-counter* :format "s"
@@ -2275,7 +2279,7 @@
     (defnumreg "mo" (make-counter* :value mo))
     (defnumreg "year" (make-counter* :value year))
     (defnumreg "yr" (make-counter* :value (- year 1900))))
-  ;
+
   (defnumreg "$$" (make-counter* :value (retrieve-pid)))
   (defnumreg ".g" (make-counter* :value 1))
   (defnumreg ".U" (make-counter* :value 1))
@@ -2291,17 +2295,18 @@
   ;(defnumreg "LL" (make-counter* :value (* 6.5 (point-equivalent-of #\i))))
   (defnumreg "lsn" (make-counter* :thunk (lambda () *leading-spaces-number*)))
   (defnumreg "lss" (make-counter* :thunk (lambda ()  (* *leading-spaces-number* (point-equivalent-of #\n)))))
-  ;
-  ;
+  )
+
+(defun initialize-strings ()
   (defstring ".T" (lambda () "webpage"))
   (defstring "-" (lambda () (verbatim "&#x2014;")))
-  ;
+
   (defstring "{" (lambda () (verbatim "<sup>")))
   (defstring "}" (lambda () (verbatim "</sup>")))
-  ;
+
   (defstring "AUXF"
     (lambda () (verbatim (concatenate 'string ".troff2page_temp_" *jobname*))))
-  ;
+
   (defstring "*"
     (lambda ()
       (setq *this-footnote-is-numbered-p* t)
@@ -2316,16 +2321,1153 @@
           (verbatim n)
           (verbatim "</small></sup>")
           (link-stop)))))
-  ;
+
   (defstring ":" #'urlh-string-value)
   (defstring "url" #'urlh-string-value)
   (defstring "urlh" #'urlh-string-value)
+  )
+
+(defun initialize-macros ()
+  ;we'll just use requests for predefined macros as it's easier
+  (defrequest "bp"
+    (lambda ()
+      (read-troff-line)
+      (unless *current-diversion*
+        (do-eject))))
+
+  (defrequest "rm"
+    (lambda ()
+      (let ((w (car (read-args))))
+        (remhash w *request-table*)
+        (remhash w *macro-table*)
+        (remhash w *string-table*))))
+
+  (defrequest "blm"
+    (lambda ()
+      (let ((w (car (read-args))))
+        (setq *blank-line-macro*
+          (if (not w) nil w)))))
+
+  (defrequest "lsm"
+    (lambda ()
+      (let ((w (car (read-args))))
+        (setq *leading-spaces-macro*
+          (if (not w) nil w)))))
+
+  (defrequest "em"
+    (lambda ()
+      (let ((w (car (read-args))))
+        (setq *end-macro* w))))
+
+  (defrequest "de"
+    (lambda ()
+      (let* ((args (read-args))
+             (w (car args))
+             (ender (or (cadr args) ".")))
+        (deftmacro w (collect-macro-body w ender))
+        (call-ender ender))))
+
+  (defrequest "shift"
+    (lambda ()
+      (let* ((args (read-args))
+             (n 1))
+        (when args (setq n (string-to-number (car args))))
+        (setf (cdr *macro-args*)
+              (nthcdr n (cdr *macro-args*))))))
+
+  (defrequest "ig"
+    (lambda ()
+      (let ((ender (or (car (read-args)) ".")))
+        (let* ((*turn-off-escape-char-p* t)
+               (contents
+                 (collect-macro-body :collecting-ig ender)))
+          (when (string= ender "##")
+            (eval-in-lisp contents))))))
+
+  (defrequest "als"
+    (lambda ()
+      (let* ((args (read-args))
+             (new (car args))
+             (old (cadr args))
+             it)
+        (cond ((setq it (gethash old *macro-table*))
+               (deftmacro new it))
+              ((setq it (gethash old *request-table*))
+               (defrequest new it))
+              (t (terror "als: unknown rhs ~a" old))))))
+
+  (defrequest "rn"
+    (lambda ()
+      (let* ((args (read-args))
+             (old (car args))
+             (new (cadr args))
+             it)
+        (cond ((setq it (gethash old *macro-table*))
+               (deftmacro new it)
+               (deftmacro old nil))
+              ((setq it (gethash old *request-table*))
+               (defrequest new it)
+               (defrequest old nil))
+              (t (terror "rn: unknown lhs ~a" old))))))
+
+  (defrequest "am"
+    (lambda ()
+      (let* ((args (read-args))
+             (w (car args))
+             (ender (or (cadr args) "."))
+             (extra-macro-body (collect-macro-body w ender))
+             it)
+        (cond ((not (eq (setq it (gethash w *macro-table* :undefined))
+                        :undefined))
+               (deftmacro w (nconc it extra-macro-body)))
+              ((setq it (gethash w *request-table*))
+               (let ((tmp (gen-temp-string)))
+                 (defrequest tmp it)
+                 (deftmacro w
+                   (cons
+                     (concatenate 'string "." tmp " \\$*")
+                     extra-macro-body))
+                 (defrequest w
+                   (lambda ()
+                     (execute-macro w)))))
+              (t (deftmacro w extra-macro-body)))
+        (call-ender ender))))
+
+  (defrequest "eo"
+    (lambda ()
+      (setq *turn-off-escape-char-p* t)
+      (read-troff-line)))
+
+  (defrequest "ec"
+    (lambda ()
+      (setq *escape-char*
+        (or (get-first-non-space-char-on-curr-line) #\\ ))
+      (setq *turn-off-escape-char-p* nil)))
+
+  (defrequest "ecs"
+    (lambda ()
+      (read-troff-line)
+      (setq *saved-escape-char* *escape-char*)))
+
+  (defrequest "ecr"
+    (lambda ()
+      (read-troff-line)
+      (setq *escape-char*
+        (or *saved-escape-char* #\\))))
+
+  (defrequest "cc"
+    (lambda ()
+      (setq *control-char*
+        (or (get-first-non-space-char-on-curr-line) #\.))))
+
+  (defrequest "c2"
+    (lambda ()
+      (setq *no-break-control-char*
+        (or (get-first-non-space-char-on-curr-line) #\'))))
+
+  (defrequest "di"
+    (lambda ()
+      (cond ((not *current-diversion*)
+             (let ((w (car (read-args))))
+               (unless w
+                 (terror "di: name missing"))
+               (setq *current-diversion* w)
+               (let ((o (make-string-output-stream)))
+                 (setf (gethash w *diversion-table*)
+                       (make-diversion* :stream o
+                                        :return *out*))
+                 (setq *out* o))))
+            (t
+              (let ((div (gethash *current-diversion* *diversion-table*)))
+                (unless div
+                  (terror "di: ~a doesn't exist" *current-diversion*))
+                (setq *current-diversion* nil)
+                (setq *out* (diversion*-return div)))))))
+
+  (defrequest "da"
+    (lambda ()
+      (let ((w (car (read-args))))
+        (unless w
+          (terror "da: name missing"))
+        (setq *current-diversion* w)
+        (let ((div (gethash w *diversion-table*))
+              (div-stream nil))
+          (cond (div (setq div-stream (diversion*-stream div)))
+                (t (setq div-stream (make-string-output-stream))
+                   (setf (gethash w *diversion-table*)
+                         (make-diversion* :stream div-stream
+                                          :return *out*))))
+          (setq *out* div-stream)))))
+
+  (defrequest "ds"
+    (lambda ()
+      (let* ((w (expand-args (read-word)))
+             (s (expand-args (read-troff-string-line))))
+        (defstring w
+          (lambda (&rest args)
+            (let ((*macro-args* (cons w args)))
+              (expand-args s)))))))
+
+  (defrequest "char"
+    (lambda ()
+      (ignore-spaces)
+      (unless (char= (get-char) *escape-char*)
+        (error "char"))
+      (let* ((glyph-name (read-escaped-word))
+             (unicode-char (unicode-escape glyph-name))
+             (s (expand-args (read-troff-string-line))))
+        (defglyph (or unicode-char glyph-name) s))))
+
+  (defrequest "substring"
+    (lambda ()
+      (let* ((args (read-args))
+             (s (car args))
+             (str (funcall (gethash s *string-table*)))
+             (str-new nil)
+             (n nil)
+             (n1 (string-to-number (cadr args)))
+             (n2 (let ((n2 (caddr args)))
+                   (and n2 (1+ (string-to-number n2))))))
+        (unless n2
+          (setq n (length str))
+          (setq n2 n))
+        (when (< n1 0)
+          (unless n (setq n (length str)))
+          (setq n1 (+ n n1 1)))
+        (when (< n2 0)
+          (unless n (setq n (length str)))
+          (setq n2 (+ n n2 1)))
+        (setq str-new (subseq str n1 n2))
+        (defstring s (lambda () str-new)))))
+
+  (defrequest "length"
+    (lambda ()
+      (let ((args (read-args)))
+        (setf (counter*-value (get-counter-named (car args)))
+              (length (cadr args))))))
+
+  (defrequest "PSPIC"
+    (lambda ()
+      (let ((align nil) (ps-file nil) (width nil) (height nil)
+                        (args (read-args))
+                        (w nil))
+        (setq w (car args))
+        (cond ((not w) (terror "pspic"))
+              ((string= w "-L") (setq align "left"))
+              ((string= w "-I") (read-word) (setq align "left"))
+              ((string= w "-R") (setq align "right")))
+        (cond (align
+                (setq ps-file (read-word)))
+              (t
+                (setq align "center")
+                (setq ps-file w)))
+        (setq width (cadr args))
+        (setq height (caddr args))
+        (emit-verbatim "<div align=")
+        (emit-verbatim align)
+        (emit-verbatim ">")
+        (let ((*groff-image-options* nil))
+          (call-with-image-stream
+            (lambda (o)
+              (princ ".mso pspic.tmac" o) (terpri o)
+              (princ ".PSPIC " o) (princ ps-file o)
+              (when width (princ " " o) (princ width o))
+              (when height (princ " " o) (princ height o))
+              (terpri o))))
+        (emit-verbatim "</div>"))))
+
+  (defrequest "PIMG"
+    (lambda ()
+      (let (align img-file width height)
+        (setq align (read-word))
+        (cond ((member align '("-L" "-C" "-R") :test #'string=)
+               (setq img-file (read-word)))
+              (t (setq img-file align)
+                 (setq align "-C")))
+        (setq width (read-length-in-pixels))
+        (setq height (read-length-in-pixels))
+        (read-troff-line)
+        (cond ((string= align "-L") (setq align "left"))
+              ((string= align "-C") (setq align "center"))
+              ((string= align "-R") (setq align "right")))
+        (emit-verbatim "<div align=")
+        (emit-verbatim align)
+        (emit-verbatim ">")
+        (emit-newline)
+        (emit-verbatim "<img src=\"")
+        (emit-verbatim img-file)
+        (emit-verbatim "\"")
+        (unless (= width 0)
+          (emit-verbatim " width=")
+          (emit-verbatim width))
+        (unless (= height 0)
+          (emit-verbatim " height=")
+          (emit-verbatim height))
+        (emit-verbatim ">")
+        (emit-newline)
+        (emit-verbatim "</div>")
+        (emit-newline))))
+
+  (defrequest "IMG"
+    (gethash "PIMG" *request-table*))
+
+  (defrequest "tmc"
+    (lambda ()
+      (do-tmc)))
+
+  (defrequest "tm"
+    (lambda ()
+      (do-tmc :newlinep t)))
+
+  ;(defrequest "sy"
+  ;  (lambda ()
+  ;    (ignore-spaces)
+  ;    (let ((systat
+  ;            (os-execute
+  ;              (with-output-to-string (o)
+  ;                (let ((*outputting-to* :troff)
+  ;                      (*out* o))
+  ;                  (emit (expand-args (read-troff-line)))
+  ;                  (terpri o))))))
+  ;      (cond ((eq systat t) (setq systat 0))
+  ;            ((not (numberp systat)) (setq systat 256)))
+  ;      (setf (counter*-value (get-counter-named "systat"))
+  ;            systat))))
+
+  (defrequest "sy"
+    (lambda ()
+      (ignore-spaces)
+      (let ((systat
+              (os-execute
+                (with-output-to-string (o)
+                  (princ (expand-args (read-troff-line)) o)
+                  (terpri o)))))
+        (cond ((eq systat t) (setq systat 0))
+              ((not (numberp systat)) (setq systat 256)))
+        (setf (counter*-value (get-counter-named "systat"))
+              systat))))
+
+  ;(defrequest "pso"
+  ;  (lambda ()
+  ;    (ignore-spaces)
+  ;    (os-execute
+  ;     (with-output-to-string (o)
+  ;       (let ((*outputting-to* :troff)
+  ;             (*out* o))
+  ;         (emit (expand-args (read-troff-line)))
+  ;         (emit (concatenate 'string " > "
+  ;                            *pso-temp-file*))
+  ;         (terpri o))))
+  ;    (troff2page-file *pso-temp-file*)))
+
+  (defrequest "pso"
+    (lambda ()
+      (ignore-spaces)
+      (os-execute
+        (with-output-to-string (o)
+          (let ((*turn-off-escape-char-p* t))
+            (princ (expand-args (read-troff-line)) o)
+            (princ " > " o)
+            (princ *pso-temp-file* o)
+            (terpri o))))
+      (troff2page-file *pso-temp-file*)))
+
+  (defrequest "FS"
+    (lambda ()
+      (let ((fnmark (car (read-args)))
+            (fno nil)
+            (fntag nil))
+        (cond (fnmark
+                (setq fntag (concatenate 'string "\\&" fnmark " ")))
+              (*this-footnote-is-numbered-p*
+                (setq *this-footnote-is-numbered-p* nil
+                  fno *footnote-count*)))
+        (let ((fnote-chars '()) x)
+          (loop
+            (setq x (read-one-line))
+            (when (zerop (or (search ".FE" x) -1)) (return))
+            (setq fnote-chars
+              (nconc fnote-chars
+                     (concatenate 'list x)
+                     (list #\newline))))
+          (push (make-footnote* :tag fntag
+                                :number fno
+                                :text fnote-chars)
+                *footnote-buffer*)))
+      ;(emit-edit-source-doc)
+      ))
+
+  (defrequest "RS"
+    (lambda ()
+      (read-troff-line)
+      (emit-para)
+      (emit-verbatim "<blockquote>")))
+
+  (defrequest "RE"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "</blockquote>")
+      (emit-newline)
+      (emit-para)))
+
+  (defrequest "DE"
+    (lambda ()
+      (read-troff-line)
+      (stop-display)))
+
+  (defrequest "par@reset"
+    (lambda ()
+      nil))
+
+  (defrequest "LP"
+    (lambda ()
+      (read-troff-line)
+      (emit-newline)
+      (emit-para :par-start-p t)))
+
+  (defrequest "RT" (gethash "LP" *request-table*))
+
+  (defrequest "lp" (gethash "LP" *request-table*))
+
+  (defrequest "PP"
+    (lambda ()
+      (read-troff-line)
+      (emit-newline)
+      (emit-para :par-start-p t :indentp t)))
+
+  (defrequest "P" (gethash "PP" *request-table*))
+
+  (defrequest "HP" (gethash "PP" *request-table*)) ;?
+
+  (defrequest "sp"
+    (lambda ()
+      (let ((num (read-number-or-length :unit #\v)))
+        (if (= num 0) (setq num (point-equivalent-of #\v)))
+        (read-troff-line)
+        ;for text-based browsers that don't convert the <div> to vert
+        ;space
+        ;(emit-verbatim "<br style=\"margin-top: 0; margin-bottom: 0\">")
+        (emit-verbatim "<br style=\"margin-top: ") ;was DIV
+        (emit-verbatim num)
+        (emit-verbatim "px; margin-bottom: ")
+        (emit-verbatim num)
+        (emit-verbatim "px\">")
+        ;(emit-verbatim "px\"></div>")
+        (emit-newline)
+        )))
+
+  (defrequest "br"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "<br>")
+      ))
+
+  (defrequest "ti"
+    (lambda ()
+      (toss-back-string (expand-args (read-word)))
+      (let ((arg (read-length-in-pixels)))
+        (read-troff-line)
+        (when (> arg 0)
+          (emit-verbatim "<br>")
+          (emit-nbsp (ceiling (/ arg 5)))))))
+
+  (defrequest "in"
+    (lambda ()
+      ;(gethash "ti" *request-table*)
+      (let* ((sign (read-opt-sign))
+             (num (read-number-or-length :unit #\m)))
+        (read-troff-line)
+        (when num
+          (case sign
+            (#\+ (incf *margin-left* num))
+            (#\- (decf *margin-left* num))
+            (t (setq *margin-left* num)))))
+      (emit-verbatim "<p ")
+      (specify-margin-left-style)
+      (emit-verbatim ">")))
+
+  (defrequest "TL"
+    (lambda ()
+      (read-troff-line)
+      (get-header
+        (lambda (title)
+          (unless (string= title "")
+            (store-title title :emitp t))))))
+
+  (defrequest "HTL"
+    (lambda ()
+      (read-troff-line)
+      (let ((title (read-one-line)))
+        (store-title title :preferredp t))))
+
+  (defrequest "@AU"
+    (lambda ()
+      (author-info :italicp t)))
+
+  (defrequest "AU"
+    (lambda ()
+      (funcall (gethash "@AU" *request-table*))))
+
+  (defrequest "AI"
+    (lambda ()
+      (author-info)))
+
+  (defrequest "AB"
+    (lambda ()
+      (let ((w (car (read-args))))
+        (emit-para)
+        (unless (and w (string= w "no"))
+          (emit-verbatim "<div align=center class=abstract><i>ABSTRACT</i></div>")
+          (emit-para))
+        (emit-verbatim "<blockquote>"))))
+
+  (defrequest "AE"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "</blockquote>")))
+
+  (defrequest "NH"
+    (lambda ()
+      (funcall (gethash "@NH" *request-table*))))
+
+  (defrequest "SH"
+    (lambda ()
+      (execute-macro "@SH")))
+
+  (defrequest "@NH"
+    (lambda ()
+      (let ((lvl (car (read-args))))
+        (emit-section-header (if lvl (string-to-number lvl) 1)
+                             :numberedp t))))
+
+  (defrequest "@SH"
+    (lambda ()
+      (let ((lvl (car (read-args))))
+        (emit-section-header (if lvl (string-to-number lvl) 1)))))
+
+  (defrequest "TH"
+    (lambda ()
+      (unless *th-already-called-p*
+        (setq *th-already-called-p* t)
+        (!macro-package :man)
+        (man-specific-defs)
+        (let ((args (read-args))
+              it)
+          (when (setq it (find-macro-file "man.local"))
+            (troff2page-file it))
+          (when (setq it (find-macro-file "pca-t2p-man.tmac"))
+            (troff2page-file it))
+          (cond ((setq it (gethash "TH" *macro-table*))
+                 (let ((*macro-args* (cons "TH" args)))
+                   (execute-macro-body it)))
+                (t (let ((title (car args))
+                         ;ignoring (cadr args), which is section number
+                         (date (caddr args)))
+                     (when title
+                       (setq title (string-trim-blanks title))
+                       (unless (string= title "")
+                         (store-title title :emitp t))
+                       (when date
+                         (setq date (string-trim-blanks date))
+                         (unless (string= date "")
+                           (defstring "DY" (lambda () date))))))))))))
+
+  (defrequest "SC"
+    (lambda ()
+      (unless (gethash "bell_localisms" *numreg-table*)
+        (defnumreg "bell_localisms" (make-counter*)))
+      (emit-section-header 1 :numberedp t)))
+
+  (defrequest "P1"
+    (lambda ()
+      (when (gethash "bell_localisms" *numreg-table*)
+        (start-display "L")
+        (emit (switch-font "C")))))
+
+  (defrequest "P2"
+    (lambda ()
+      (read-troff-line)
+      (when (gethash "bell_localisms" *numreg-table*)
+        (stop-display))))
+
+  (defrequest "EX"
+    (lambda ()
+      (start-display "L")
+      (emit (switch-font "C"))))
+
+  (defrequest "EE"
+    (lambda ()
+      (read-troff-line)
+      (stop-display)))
+
+  (defrequest "ND"
+    (lambda ()
+      (let ((w (expand-args (read-troff-line))))
+        ;possible trailing space?  shd i use all-args instead?
+        (defstring "DY" (lambda () w)))
+      ;(read-troff-line)
+      ))
+
+  (defrequest "CSS"
+    (lambda ()
+      (let ((f (car (read-args))))
+        (unless (member f *stylesheets* :test #'string=)
+          (flag-missing-piece :stylesheet))
+        (write-aux `(!stylesheet ,f)))))
+
+  (defrequest "REDIRECT"
+    (lambda ()
+      (unless *redirectedp*
+        (flag-missing-piece :redirect))
+      (let ((f (car (read-args))))
+        (write-aux `(!redirect ,f)))))
+
+  (defrequest "gcolor"
+    (lambda ()
+      (let ((c (car (read-args))))
+        (switch-glyph-color c))))
+
+  (defrequest "fcolor"
+    (lambda ()
+      (let ((c (car (read-args))))
+        (switch-fill-color c))))
+
+  (defrequest "I"
+    (lambda ()
+      (font-macro "I")))
+
+  (defrequest "B"
+    (lambda ()
+      (font-macro "B")))
+
+  (defrequest "RI"
+    (lambda ()
+      (man-alternating-font-macro nil "I")))
+
+  (defrequest "IR"
+    (lambda ()
+      (man-alternating-font-macro "I" nil)))
+
+  (defrequest "BI"
+    (lambda ()
+      (man-alternating-font-macro "B" "I")))
+
+  (defrequest "IB"
+    (lambda ()
+      (man-alternating-font-macro "I" "B")))
+
+  (defrequest "BR"
+    (lambda ()
+      (man-alternating-font-macro "B" nil)))
+
+  (defrequest "RB"
+    (lambda ()
+      (man-alternating-font-macro nil "B")))
+
+  (defrequest "C"
+    (lambda ()
+      (font-macro "C")))
+
+  (defrequest "CW"
+    (gethash "C" *request-table*))
+
+  (defrequest "R"
+    (lambda ()
+      (font-macro nil)))
+
+  (defrequest "DC"
+    (lambda ()
+      (let* ((args (read-args))
+             (big-letter (car args))
+             (extra (cadr args))
+             (color (caddr args)))
+        (emit (switch-glyph-color color))
+        (emit-verbatim "<span class=dropcap>")
+        (emit big-letter)
+        (emit-verbatim "</span>")
+        (emit (switch-glyph-color ""))
+        (when extra (emit  extra))
+        (emit-newline)
+        )))
+
+  (defrequest "BX"
+    (lambda ()
+      (let ((txt (car (read-args))))
+        (emit-verbatim "<span class=troffbox>")
+        (emit (expand-args txt))
+        (emit-verbatim "</span>")
+        (emit-newline))))
+
+  (defrequest "B1"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "<div class=troffbox>")
+      (emit-newline)))
+
+  (defrequest "B2"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "</div>")
+      (emit-newline)))
+
+  (defrequest "ft"
+    (lambda ()
+      (let ((f (car (read-args))))
+        ;(ms-font-macro f) ;CHECK
+        (emit (switch-font f))
+        )))
+
+  (defrequest "fam"
+    (lambda ()
+      (let ((f (car (read-args))))
+        (emit (switch-font-family f)))))
+
+  (defrequest "LG"
+    (lambda ()
+      (read-troff-line)
+      (emit (switch-size "+2"))))
+
+  (defrequest "SM"
+    (lambda ()
+      (read-troff-line)
+      (emit (switch-size "-2"))))
+
+  (defrequest "NL"
+    (lambda ()
+      (read-troff-line)
+      (emit (switch-size nil))))
+
+  (defrequest "URL"
+    (lambda ()
+      (let* ((args (read-args))
+             (url (car args))
+             (link-text  (cadr args))
+             (tack-on  (caddr args))
+             it)
+        (when (or (not link-text)
+                  (string= link-text ""))
+          (setq link-text
+            (cond ((char= (char url 0) #\#)
+                   (let ((s (concatenate 'string "TAG_"
+                              (subseq url 1))))
+                     (cond ((setq it (gethash s *string-table*))
+                            (funcall it))
+                           (t "see below"))))
+                  (t url))))
+        (emit-verbatim "<a href=\"")
+        (emit (link-url url))
+        (emit-verbatim "\">")
+        (emit link-text)
+        (emit-verbatim "</a>")
+        (when tack-on (emit tack-on))
+        (emit-newline)
+        ;(setq *keep-newline-p* t)
+        )))
+
+  (defrequest "TAG"
+    (lambda ()
+      (let* ((args (read-args))
+             (node (concatenate 'string "TAG_" (car args)))
+             (pageno *current-pageno*)
+             (tag-value (or (cadr args) (write-to-string pageno))))
+        ;(setq *keep-newline-p* nil)
+        (emit (anchor node))
+        ;(emit-edit-source-doc :interval 10)
+        (emit-newline)
+        (!node node pageno tag-value)
+        (write-aux `(!node ,node ,pageno ,tag-value)))))
+
+  (defrequest "ULS"
+    (lambda ()
+      (read-troff-line)
+      (emit-para)
+      (emit-verbatim "<ul>")))
+
+  (defrequest "ULE"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "</ul>")
+      (emit-para)))
+
+  (defrequest "OLS"
+    (lambda ()
+      (read-troff-line)
+      (emit-para)
+      (emit-verbatim "<ol>")))
+
+  (defrequest "OLE"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "</ol>")
+      (emit-para)))
+
+  (defrequest "LI"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "<li>")))
+
+  (defrequest "HR"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "<hr>")))
+
+  (defrequest "HTML"
+    (lambda ()
+      (emit-verbatim
+        (expand-args (read-troff-line)))
+      (emit-newline)))
+
+  (defrequest "CDS"
+    (lambda ()
+      (start-display "L")
+      (emit (switch-font "C"))))
+
+  (defrequest "CDE"
+    (lambda ()
+      (stop-display)))
+
+  (defrequest "QP"
+    (lambda ()
+      (read-troff-line)
+      (emit-para)
+      (emit-verbatim "<blockquote>")
+      (setq *afterpar*
+        (lambda () (emit-verbatim "</blockquote>")))))
+
+  (defrequest "QS"
+    (lambda ()
+      (read-troff-line)
+      (emit-para)
+      (emit-verbatim "<blockquote>")))
+
+  (defrequest "QE"
+    (lambda ()
+      (read-troff-line)
+      (emit-verbatim "</blockquote>")
+      (emit-para)))
+
+  (defrequest "IP"
+    (lambda ()
+      (let ((label (car (read-args))))
+        (emit-para)
+        (emit-verbatim "<dl><dt>")
+        (when label
+          (emit (expand-args label)))
+        (emit-verbatim "</dt><dd>")
+        (setq *afterpar*
+          (lambda ()
+            (emit-verbatim "</dd></dl>")
+            (emit-newline))))))
+
+  (defrequest "TP"
+    (lambda ()
+      (read-troff-line)
+      (emit-para)
+      (emit-verbatim "<dl")
+      (process-line)
+      (emit-verbatim "</dt><dd>")
+      (setq *afterpar*
+        (lambda ()
+          (emit-verbatim "</dd></dl>")
+          (emit-newline)))))
+
+  (defrequest "PS"
+    (lambda ()
+      (read-troff-line)
+      (make-image ".PS" ".PE")))
+
+  (defrequest "EQ"
+    (lambda ()
+      (destructuring-bind (&optional (w "C") eqno) (read-args)
+        (emit-verbatim "<div class=display align=")
+        (emit-verbatim (cond ((string= w "C") "center")
+                             (t "left")))
+        (emit-verbatim ">")
+        (when eqno
+          (emit-verbatim "<table><tr><td width=\"80%\" align=")
+          (emit-verbatim (cond ((string= w "C") "center")
+                               (t "left")))
+          (emit-verbatim ">")
+          (emit-newline))
+        (make-image ".EQ" ".EN")
+        (when eqno
+          (emit-newline)
+          (emit-verbatim "</td><td width=\"20%\" align=right>")
+          (emit-nbsp 16)
+          (troff2page-string eqno)
+          (emit-verbatim "</td></tr></table>"))
+        (emit-verbatim "</div>")
+        (emit-newline))))
+
+  (defrequest "TS"
+    (lambda ()
+      (let ((args (read-args)))
+        (let ((*reading-table-header-p* (and args (string= (car args) "H")))
+              (*reading-table-p* t)
+              (*table-format-table* (make-hash-table))
+              (*table-default-format-line* 0)
+              (*table-row-number* 0)
+              (*table-cell-number* 0)
+              (*table-colsep-char* #\tab)
+              (*table-options* " cellpadding=2") ;?
+              (*table-number-of-columns* 0)
+              (*table-align* nil) ;??
+              )
+          (table-do-global-options)
+          (table-do-format-section)
+          (emit-verbatim "<div")
+          (when *table-align*
+            (emit-verbatim " align=")
+            (emit-verbatim *table-align*))
+          (emit-verbatim ">")
+          (emit-newline)
+          (emit-verbatim "<table")
+          (princ *table-options* *out*)
+          (emit-verbatim ">")
+          (emit-newline)
+          (table-do-rows)
+          (emit-verbatim "</table>")
+          (emit-newline)
+          (emit-verbatim "</div>")
+          (clrhash *table-format-table*) ;shouldn't be necessary
+          ))))
+  (defrequest "if"
+    (lambda ()
+      (ignore-spaces)
+      (if (if-test-passed-p)
+          (ignore-spaces)
+          (ignore-branch))))
+
+  (defrequest "ie"
+    (lambda ()
+      (ignore-spaces)
+      (cond ((if-test-passed-p) (ignore-spaces))
+            (t (setq *cascaded-if-p* t)
+               (ignore-branch)))))
+
+  (defrequest "el"
+    (lambda ()
+      (ignore-spaces)
+      (cond  (*cascaded-if-p* (setq *cascaded-if-p* nil))
+             (t (ignore-branch)))))
+
+  (defrequest "nop"
+    ;eqv to .if 1
+    (lambda ()
+      (ignore-spaces)))
+
+  (defrequest "while"
+    (lambda ()
+      (ignore-spaces)
+      (let* ((test (read-test))
+             (body (read-block)))
+        (loop
+          (toss-back-string test)
+          (cond ((if-test-passed-p)
+                 (troff2page-string body)
+                 (when *exit-status*
+                   (case *exit-status*
+                     (:break (setq *exit-status* nil) (return))
+                     (:continue (setq *exit-status* nil))
+                     (t (return)))))
+                (t (return)))))))
+
+  (defrequest "do"
+    (lambda ()
+      (ignore-spaces)
+      (toss-back-char #\.)))
+
+  (defrequest "nx"
+    (lambda ()
+      (let ((args (read-args)))
+        (when args
+          (troff2page-file (car args)))
+        (setq *exit-status* :nx))))
+
+  (defrequest "return"
+    (lambda ()
+      (read-troff-line)
+      (setq *exit-status* :return)))
+
+  (defrequest "ex"
+    (lambda ()
+      (read-troff-line)
+      (setq *exit-status* :ex)))
+
+  (defrequest "ab"
+    (lambda ()
+      (do-tmc :newlinep t)
+      (setq *exit-status* :ex)))
+
+  (defrequest "break"
+    (lambda ()
+      (read-troff-line)
+      (setq *exit-status* :break)))
+
+  (defrequest "continue"
+    (lambda ()
+      (read-troff-line)
+      (setq *exit-status* :continue)))
+
+  (defrequest "nf"
+    (lambda ()
+      (read-troff-line)
+      ;(emit-verbatim "<div>")
+      (unless *previous-line-exec-p*
+        ;(emit-verbatim "<div ")
+        (emit-verbatim "<p ") ;  FIXME
+        (specify-margin-left-style)
+        (emit-verbatim ">")
+        (emit-newline))
+      (unfill-mode)))
+
+  (defrequest "fi"
+    (lambda ()
+      (read-troff-line)
+      (fill-mode)
+      ;(ugly-br-hack-for-firefox)
+      ;(emit-verbatim "</div>") ;FIXME
+      (emit-verbatim "<p>")
+      ))
+
+  (defrequest "so"
+    (lambda ()
+      (let ((f  (car (read-args))))
+        (when (eql *macro-package* :man)
+          (let ((g (concatenate 'string "../" f)))
+            (when (probe-file g)
+              (setq f g))))
+        (troff2page-file f))))
+
+  (defrequest "mso"
+    (lambda ()
+      (let ((f (car (read-args))))
+        (let ((f (and f (find-macro-file f))))
+          (when f (troff2page-file f))))))
+
   ;
+
+  (defrequest "HX"
+    (lambda ()
+      (setf (counter*-value (get-counter-named "www:HX"))
+            (string-to-number (car (read-args))))
+      ))
+
+  (defrequest "DS"
+    (lambda ()
+      (start-display (read-word))
+      ;(read-troff-line)
+      ))
+
+  (defrequest "LD" (lambda () (start-display "L")))
+  (defrequest "ID" (lambda () (start-display "I")))
+  (defrequest "BD" (lambda () (start-display "B")))
+  (defrequest "CD" (lambda () (start-display "C")))
+  (defrequest "RD" (lambda () (start-display "R")))
+
+  (defrequest "defcolor"
+    (lambda ()
+      (let* ((ident (read-word))
+             (rgb-color (read-rgb-color)))
+        (read-troff-line)
+        (setf (gethash ident *color-table*)
+              rgb-color))))
+
+  (defrequest "ce"
+    (lambda ()
+      (let ((n (or (string-to-number (or (car (read-args)) "1")) 1)))
+        (cond ((<= n 0) (when (> *lines-to-be-centered* 0)
+                          (setq *lines-to-be-centered* 0)
+                          ;(ugly-br-hack-for-firefox)
+                          (emit-verbatim "</div>")))
+              (t
+                (setq *lines-to-be-centered* n)
+                (emit-verbatim "<div align=center>")))
+        (emit-newline))))
+
+  (defrequest "nr"
+    (lambda ()
+      (let* ((n (read-word))
+             (c (get-counter-named n)))
+        (when (counter*-thunk c)
+          (terror "nr: cannot set readonly number register ~a" n))
+        (let* ((sign (read-opt-sign))
+               (num (read-number-or-length))
+               ;(num (string-to-number (expand-args (read-word))))
+               )
+          (read-troff-line)
+          ;(setq *keep-newline-p* nil)
+          (when num
+            (case sign
+              (#\+
+               (incf (counter*-value c) num))
+              (#\-
+               (decf (counter*-value c) num))
+              (t (setf (counter*-value c) num))))))))
+
+  (defrequest "af"
+    (lambda ()
+      (let* ((args (read-args))
+             (c (get-counter-named (car args)))
+             (f (cadr args)))
+        (read-troff-line)
+        (setf (counter*-format c) f))))
+
+  (defrequest "ev"
+    (lambda ()
+      (let ((ev-new-name (read-word)))
+        (if ev-new-name
+            (ev-push ev-new-name)
+            (ev-pop)))))
+
+  (defrequest "evc"
+    (lambda ()
+      (let ((ev-rhs (let ((ev-rhs-name (car (read-args))))
+                      (ev-named ev-rhs-name))))
+        (ev-copy (car *ev-stack*) ev-rhs))))
+
+  (defrequest "open"
+    (lambda ()
+      (let* ((args (read-args))
+             (stream-name (car args))
+             (file-name (cadr args)))
+        (troff-open stream-name file-name))))
+
+  (defrequest "close"
+    (lambda ()
+      (let ((stream-name (car (read-args))))
+        (troff-close stream-name))))
+
+  (defrequest "writec"
+    (lambda ()
+      (do-writec)))
+
+  (defrequest "write"
+    (lambda ()
+      (do-writec :newlinep t)))
+
+  (defrequest "writem"
+    (lambda ()
+      (let* ((stream-name (expand-args (read-word)))
+             (macro-name (expand-args (read-word)))
+             (out (cdr (assoc stream-name *output-streams* :test #'string=))))
+        ;(read-troff-line)  ; ? check
+        (write-troff-macro-to-stream
+          macro-name out))))
+
+  )
+
+(defun initialize-presets ()
+  (initialize-glyphs)
+  (initialize-numregs)
+  (initialize-strings)
+  (initialize-macros)
   )
 
 (defun load-aux-file ()
-  (initialize-glyph-number-and-string-registers)
+  (initialize-presets)
   ;
+  (setq *rerun-needed-p* nil)
   (setq *pso-temp-file* (concatenate 'string *jobname* *pso-file-suffix*))
   (let ((aux-file (concatenate 'string *jobname* *aux-file-suffix*)))
     (when (probe-file aux-file)
@@ -2333,8 +3475,6 @@
       (delete-file aux-file))
     (when *html-head* (setq *html-head* (nreverse *html-head*)))
     (setq *aux-stream* (open aux-file :direction :output)))
-  (setq *log-stream* (open (concatenate 'string *jobname* *log-file-suffix*)
-                           :direction :output :if-exists :supersede))
   (start-css-file))
 
 (defun next-html-image-file-stem ()
@@ -2783,57 +3923,11 @@
 
 ;* requests
 
-(defrequest "bp"
-  (lambda ()
-    (read-troff-line)
-    (unless *current-diversion*
-      (do-eject))))
-
-(defrequest "rm"
-  (lambda ()
-    (let ((w (car (read-args))))
-      (remhash w *request-table*)
-      (remhash w *macro-table*)
-      (remhash w *string-table*))))
-
-(defrequest "blm"
-  (lambda ()
-    (let ((w (car (read-args))))
-      (setq *blank-line-macro*
-        (if (not w) nil w)))))
-
-(defrequest "lsm"
-  (lambda ()
-    (let ((w (car (read-args))))
-      (setq *leading-spaces-macro*
-            (if (not w) nil w)))))
-
-(defrequest "em"
-  (lambda ()
-    (let ((w (car (read-args))))
-      (setq *end-macro* w))))
-
 (defun call-ender (ender)
   (unless *exit-status*
     (unless (string= ender ".")
       (toss-back-char #\newline)
       (execute-macro ender))))
-
-(defrequest "de"
-  (lambda ()
-    (let* ((args (read-args))
-           (w (car args))
-           (ender (or (cadr args) ".")))
-      (deftmacro w (collect-macro-body w ender))
-      (call-ender ender))))
-
-(defrequest "shift"
-  (lambda ()
-    (let* ((args (read-args))
-           (n 1))
-      (when args (setq n (string-to-number (car args))))
-      (setf (cdr *macro-args*)
-            (nthcdr n (cdr *macro-args*))))))
 
 (defun eval-in-lisp (ss)
   (let ((s (with-output-to-string (o)
@@ -2846,247 +3940,11 @@
           (when (not x) (return))
           (eval x))))))
 
-(defrequest "ig"
-  (lambda ()
-    (let ((ender (or (car (read-args)) ".")))
-      (let* ((*turn-off-escape-char-p* t)
-             (contents
-               (collect-macro-body :collecting-ig ender)))
-        (when (string= ender "##")
-          (eval-in-lisp contents))))))
-
-(defrequest "als"
-  (lambda ()
-    (let* ((args (read-args))
-           (new (car args))
-           (old (cadr args))
-           it)
-      (cond ((setq it (gethash old *macro-table*))
-             (deftmacro new it))
-            ((setq it (gethash old *request-table*))
-             (defrequest new it))
-            (t (terror "als: unknown rhs ~a" old))))))
-
-(defrequest "rn"
-  (lambda ()
-    (let* ((args (read-args))
-           (old (car args))
-           (new (cadr args))
-           it)
-      (cond ((setq it (gethash old *macro-table*))
-             (deftmacro new it)
-             (deftmacro old nil))
-            ((setq it (gethash old *request-table*))
-             (defrequest new it)
-             (defrequest old nil))
-            (t (terror "rn: unknown lhs ~a" old))))))
-
-(defrequest "am"
-  (lambda ()
-    (let* ((args (read-args))
-           (w (car args))
-           (ender (or (cadr args) "."))
-           (extra-macro-body (collect-macro-body w ender))
-           it)
-      (cond ((not (eq (setq it (gethash w *macro-table* :undefined))
-                      :undefined))
-             (deftmacro w (nconc it extra-macro-body)))
-            ((setq it (gethash w *request-table*))
-             (let ((tmp (gen-temp-string)))
-               (defrequest tmp it)
-               (deftmacro w
-                 (cons
-                   (concatenate 'string "." tmp " \\$*")
-                   extra-macro-body))
-               (defrequest w
-                 (lambda ()
-                   (execute-macro w)))))
-            (t (deftmacro w extra-macro-body)))
-      (call-ender ender))))
-
-(defrequest "eo"
-  (lambda ()
-    (setq *turn-off-escape-char-p* t)
-    (read-troff-line)))
-
 (defun get-first-non-space-char-on-curr-line ()
   (ignore-spaces)
   (let ((ln (read-troff-line)))
     (if (string= ln "") nil
         (char ln 0))))
-
-(defrequest "ec"
-  (lambda ()
-    (setq *escape-char*
-      (or (get-first-non-space-char-on-curr-line) #\\ ))
-    (setq *turn-off-escape-char-p* nil)))
-
-(defrequest "ecs"
-  (lambda ()
-    (read-troff-line)
-    (setq *saved-escape-char* *escape-char*)))
-
-(defrequest "ecr"
-  (lambda ()
-    (read-troff-line)
-    (setq *escape-char*
-      (or *saved-escape-char* #\\))))
-
-(defrequest "cc"
-  (lambda ()
-    (setq *control-char*
-      (or (get-first-non-space-char-on-curr-line) #\.))))
-
-(defrequest "c2"
-  (lambda ()
-    (setq *no-break-control-char*
-      (or (get-first-non-space-char-on-curr-line) #\'))))
-
-(defrequest "di"
-  (lambda ()
-    (cond ((not *current-diversion*)
-           (let ((w (car (read-args))))
-             (unless w
-               (terror "di: name missing"))
-             (setq *current-diversion* w)
-             (let ((o (make-string-output-stream)))
-               (setf (gethash w *diversion-table*)
-                           (make-diversion* :stream o
-                                           :return *out*))
-               (setq *out* o))))
-          (t
-            (let ((div (gethash *current-diversion* *diversion-table*)))
-              (unless div
-                (terror "di: ~a doesn't exist" *current-diversion*))
-              (setq *current-diversion* nil)
-              (setq *out* (diversion*-return div)))))))
-
-(defrequest "da"
-  (lambda ()
-    (let ((w (car (read-args))))
-      (unless w
-        (terror "da: name missing"))
-      (setq *current-diversion* w)
-      (let ((div (gethash w *diversion-table*))
-            (div-stream nil))
-        (cond (div (setq div-stream (diversion*-stream div)))
-              (t (setq div-stream (make-string-output-stream))
-                 (setf (gethash w *diversion-table*)
-                       (make-diversion* :stream div-stream
-                                       :return *out*))))
-        (setq *out* div-stream)))))
-
-(defrequest "ds"
-  (lambda ()
-    (let* ((w (expand-args (read-word)))
-           (s (expand-args (read-troff-string-line))))
-      (defstring w
-        (lambda (&rest args)
-          (let ((*macro-args* (cons w args)))
-            (expand-args s)))))))
-
-(defrequest "char"
-  (lambda ()
-    (ignore-spaces)
-    (unless (char= (get-char) *escape-char*)
-      (error "char"))
-    (let* ((glyph-name (read-escaped-word))
-           (unicode-char (unicode-escape glyph-name))
-           (s (expand-args (read-troff-string-line))))
-      (defglyph (or unicode-char glyph-name) s))))
-
-(defrequest "substring"
-  (lambda ()
-    (let* ((args (read-args))
-           (s (car args))
-           (str (funcall (gethash s *string-table*)))
-           (str-new nil)
-           (n nil)
-           (n1 (string-to-number (cadr args)))
-           (n2 (let ((n2 (caddr args)))
-                 (and n2 (1+ (string-to-number n2))))))
-      (unless n2
-        (setq n (length str))
-        (setq n2 n))
-      (when (< n1 0)
-        (unless n (setq n (length str)))
-        (setq n1 (+ n n1 1)))
-      (when (< n2 0)
-        (unless n (setq n (length str)))
-        (setq n2 (+ n n2 1)))
-      (setq str-new (subseq str n1 n2))
-      (defstring s (lambda () str-new)))))
-
-(defrequest "length"
-  (lambda ()
-    (let ((args (read-args)))
-      (setf (counter*-value (get-counter-named (car args)))
-            (length (cadr args))))))
-
-(defrequest "PSPIC"
-  (lambda ()
-    (let ((align nil) (ps-file nil) (width nil) (height nil)
-          (args (read-args))
-          (w nil))
-      (setq w (car args))
-      (cond ((not w) (terror "pspic"))
-            ((string= w "-L") (setq align "left"))
-            ((string= w "-I") (read-word) (setq align "left"))
-            ((string= w "-R") (setq align "right")))
-      (cond (align
-             (setq ps-file (read-word)))
-            (t
-             (setq align "center")
-             (setq ps-file w)))
-      (setq width (cadr args))
-      (setq height (caddr args))
-      (emit-verbatim "<div align=")
-      (emit-verbatim align)
-      (emit-verbatim ">")
-      (let ((*groff-image-options* nil))
-        (call-with-image-stream
-         (lambda (o)
-           (princ ".mso pspic.tmac" o) (terpri o)
-           (princ ".PSPIC " o) (princ ps-file o)
-           (when width (princ " " o) (princ width o))
-           (when height (princ " " o) (princ height o))
-           (terpri o))))
-      (emit-verbatim "</div>"))))
-
-(defrequest "PIMG"
-  (lambda ()
-    (let (align img-file width height)
-      (setq align (read-word))
-      (cond ((member align '("-L" "-C" "-R") :test #'string=)
-             (setq img-file (read-word)))
-            (t (setq img-file align)
-               (setq align "-C")))
-      (setq width (read-length-in-pixels))
-      (setq height (read-length-in-pixels))
-      (read-troff-line)
-      (cond ((string= align "-L") (setq align "left"))
-            ((string= align "-C") (setq align "center"))
-            ((string= align "-R") (setq align "right")))
-      (emit-verbatim "<div align=")
-      (emit-verbatim align)
-      (emit-verbatim ">")
-      (emit-newline)
-      (emit-verbatim "<img src=\"")
-      (emit-verbatim img-file)
-      (emit-verbatim "\"")
-      (unless (= width 0)
-        (emit-verbatim " width=")
-        (emit-verbatim width))
-      (unless (= height 0)
-        (emit-verbatim " height=")
-        (emit-verbatim height))
-      (emit-verbatim ">")
-      (emit-newline)
-      (emit-verbatim "</div>")
-      (emit-newline))))
-
-(defrequest "IMG"
-  (gethash "PIMG" *request-table*))
 
 ;(defun do-tmc (&key newlinep)
 ;  (ignore-spaces)
@@ -3100,227 +3958,11 @@
   (princ (expand-args (read-troff-line)))
   (when newlinep (terpri)))
 
-(defrequest "tmc"
-  (lambda ()
-    (do-tmc)))
-
-(defrequest "tm"
-  (lambda ()
-    (do-tmc :newlinep t)))
-
-;(defrequest "sy"
-;  (lambda ()
-;    (ignore-spaces)
-;    (let ((systat
-;            (os-execute
-;              (with-output-to-string (o)
-;                (let ((*outputting-to* :troff)
-;                      (*out* o))
-;                  (emit (expand-args (read-troff-line)))
-;                  (terpri o))))))
-;      (cond ((eq systat t) (setq systat 0))
-;            ((not (numberp systat)) (setq systat 256)))
-;      (setf (counter*-value (get-counter-named "systat"))
-;            systat))))
-
-(defrequest "sy"
-  (lambda ()
-    (ignore-spaces)
-    (let ((systat
-           (os-execute
-            (with-output-to-string (o)
-              (princ (expand-args (read-troff-line)) o)
-              (terpri o)))))
-      (cond ((eq systat t) (setq systat 0))
-            ((not (numberp systat)) (setq systat 256)))
-      (setf (counter*-value (get-counter-named "systat"))
-            systat))))
-
-;(defrequest "pso"
-;  (lambda ()
-;    (ignore-spaces)
-;    (os-execute
-;     (with-output-to-string (o)
-;       (let ((*outputting-to* :troff)
-;             (*out* o))
-;         (emit (expand-args (read-troff-line)))
-;         (emit (concatenate 'string " > "
-;                            *pso-temp-file*))
-;         (terpri o))))
-;    (troff2page-file *pso-temp-file*)))
-
-(defrequest "pso"
-  (lambda ()
-    (ignore-spaces)
-    (os-execute
-     (with-output-to-string (o)
-       (let ((*turn-off-escape-char-p* t))
-         (princ (expand-args (read-troff-line)) o)
-         (princ " > " o)
-         (princ *pso-temp-file* o)
-         (terpri o))))
-    (troff2page-file *pso-temp-file*)))
-
-(defrequest "FS"
-  (lambda ()
-    (let ((fnmark (car (read-args)))
-          (fno nil)
-          (fntag nil))
-      (cond (fnmark
-              (setq fntag (concatenate 'string "\\&" fnmark " ")))
-            (*this-footnote-is-numbered-p*
-              (setq *this-footnote-is-numbered-p* nil
-                    fno *footnote-count*)))
-      (let ((fnote-chars '()) x)
-        (loop
-          (setq x (read-one-line))
-          (when (zerop (or (search ".FE" x) -1)) (return))
-          (setq fnote-chars
-                (nconc fnote-chars
-                       (concatenate 'list x)
-                       (list #\newline))))
-        (push (make-footnote* :tag fntag
-                              :number fno
-                              :text fnote-chars)
-              *footnote-buffer*)))
-    ;(emit-edit-source-doc)
-    ))
-
-(defrequest "RS"
-  (lambda ()
-    (read-troff-line)
-    (emit-para)
-    (emit-verbatim "<blockquote>")))
-
-(defrequest "RE"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "</blockquote>")
-    (emit-newline)
-    (emit-para)))
-
-(defrequest "DE"
-  (lambda ()
-    (read-troff-line)
-    (stop-display)))
-
-(defrequest "par@reset"
-  (lambda ()
-    nil))
-
-(defrequest "LP"
-  (lambda ()
-    (read-troff-line)
-    (emit-newline)
-    (emit-para :par-start-p t)))
-
-(defrequest "RT" (gethash "LP" *request-table*))
-
-(defrequest "lp" (gethash "LP" *request-table*))
-
-(defrequest "PP"
-  (lambda ()
-    (read-troff-line)
-    (emit-newline)
-    (emit-para :par-start-p t :indentp t)))
-
-(defrequest "P" (gethash "PP" *request-table*))
-
-(defrequest "HP" (gethash "PP" *request-table*)) ;?
-
-(defrequest "sp"
-  (lambda ()
-    (let ((num (read-number-or-length :unit #\v)))
-      (if (= num 0) (setq num (point-equivalent-of #\v)))
-      (read-troff-line)
-      ;for text-based browsers that don't convert the <div> to vert
-      ;space
-      ;(emit-verbatim "<br style=\"margin-top: 0; margin-bottom: 0\">")
-      (emit-verbatim "<br style=\"margin-top: ") ;was DIV
-      (emit-verbatim num)
-      (emit-verbatim "px; margin-bottom: ")
-      (emit-verbatim num)
-      (emit-verbatim "px\">")
-      ;(emit-verbatim "px\"></div>")
-      (emit-newline)
-      )))
-
-(defrequest "br"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "<br>")
-    ))
-
-(defrequest "ti"
-  (lambda ()
-    (toss-back-string (expand-args (read-word)))
-    (let ((arg (read-length-in-pixels)))
-      (read-troff-line)
-      (when (> arg 0)
-        (emit-verbatim "<br>")
-        (emit-nbsp (ceiling (/ arg 5)))))))
-
 (defun specify-margin-left-style ()
   (unless (= *margin-left* 0)
     (emit-verbatim " style=\"margin-left: ")
     (emit-verbatim *margin-left*)
     (emit-verbatim "pt;\"")))
-
-(defrequest "in"
-  (lambda ()
-    ;(gethash "ti" *request-table*)
-    (let* ((sign (read-opt-sign))
-           (num (read-number-or-length :unit #\m)))
-      (read-troff-line)
-      (when num
-        (case sign
-          (#\+ (incf *margin-left* num))
-          (#\- (decf *margin-left* num))
-          (t (setq *margin-left* num)))))
-    (emit-verbatim "<p ")
-    (specify-margin-left-style)
-    (emit-verbatim ">")))
-
-(defrequest "TH"
-  (lambda ()
-    (unless *th-already-called-p*
-      (setq *th-already-called-p* t)
-      (!macro-package :man)
-      (man-specific-defs)
-      (let ((args (read-args))
-            it)
-        (when (setq it (find-macro-file "man.local"))
-          (troff2page-file it))
-        (when (setq it (find-macro-file "pca-t2p-man.tmac"))
-          (troff2page-file it))
-        (cond ((setq it (gethash "TH" *macro-table*))
-               (let ((*macro-args* (cons "TH" args)))
-                 (execute-macro-body it)))
-              (t (let ((title (car args))
-                       ;ignoring (cadr args), which is section number
-                       (date (caddr args)))
-                   (when title
-                     (setq title (string-trim-blanks title))
-                     (unless (string= title "")
-                       (store-title title :emitp t))
-                     (when date
-                       (setq date (string-trim-blanks date))
-                       (unless (string= date "")
-                         (defstring "DY" (lambda () date))))))))))))
-
-(defrequest "TL"
-  (lambda ()
-    (read-troff-line)
-    (get-header
-      (lambda (title)
-        (unless (string= title "")
-          (store-title title :emitp t))))))
-
-(defrequest "HTL"
-  (lambda ()
-    (read-troff-line)
-    (let ((title (read-one-line)))
-      (store-title title :preferredp t))))
 
 (defun author-info (&key italicp)
   (read-troff-line)
@@ -3334,51 +3976,6 @@
           (emit-verbatim "</div>")
           (emit-newline))))
 
-(defrequest "@AU"
-  (lambda ()
-    (author-info :italicp t)))
-
-(defrequest "AU"
-  (lambda ()
-    (funcall (gethash "@AU" *request-table*))))
-
-(defrequest "AI"
-  (lambda ()
-    (author-info)))
-
-(defrequest "AB"
-  (lambda ()
-    (let ((w (car (read-args))))
-      (emit-para)
-      (unless (and w (string= w "no"))
-        (emit-verbatim "<div align=center class=abstract><i>ABSTRACT</i></div>")
-        (emit-para))
-      (emit-verbatim "<blockquote>"))))
-
-(defrequest "AE"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "</blockquote>")))
-
-(defrequest "NH"
-  (lambda ()
-    (funcall (gethash "@NH" *request-table*))))
-
-(defrequest "@NH"
-  (lambda ()
-    (let ((lvl (car (read-args))))
-      (emit-section-header (if lvl (string-to-number lvl) 1)
-                  :numberedp t))))
-
-(defrequest "SH"
-  (lambda ()
-    (execute-macro "@SH")))
-
-(defrequest "@SH"
-  (lambda ()
-    (let ((lvl (car (read-args))))
-      (emit-section-header (if lvl (string-to-number lvl) 1)))))
-
 (defun man-specific-defs ()
   (defrequest "SH"
     (lambda ()
@@ -3387,366 +3984,6 @@
     (lambda ()
       (emit-section-header 2 :man-header-p t)))
   (defstring ":" #'man-url))
-
-(defrequest "SC"
-  (lambda ()
-    (unless (gethash "bell_localisms" *numreg-table*)
-      (defnumreg "bell_localisms" (make-counter*)))
-    (emit-section-header 1 :numberedp t)))
-
-(defrequest "P1"
-  (lambda ()
-    (when (gethash "bell_localisms" *numreg-table*)
-      (start-display "L")
-      (emit (switch-font "C")))))
-
-(defrequest "P2"
-  (lambda ()
-    (read-troff-line)
-    (when (gethash "bell_localisms" *numreg-table*)
-      (stop-display))))
-
-(defrequest "EX"
-  (lambda ()
-    (start-display "L")
-    (emit (switch-font "C"))))
-
-(defrequest "EE"
-  (lambda ()
-    (read-troff-line)
-    (stop-display)))
-
-(defrequest "ND"
-  (lambda ()
-    (let ((w (expand-args (read-troff-line))))
-      ;possible trailing space?  shd i use all-args instead?
-      (defstring "DY" (lambda () w)))
-    ;(read-troff-line)
-    ))
-
-(defrequest "CSS"
-  (lambda ()
-    (let ((f (car (read-args))))
-      (unless (member f *stylesheets* :test #'string=)
-        (flag-missing-piece :stylesheet))
-      (write-aux `(!stylesheet ,f)))))
-
-(defrequest "REDIRECT"
-  (lambda ()
-    (unless *redirectedp*
-      (flag-missing-piece :redirect))
-    (let ((f (car (read-args))))
-      (write-aux `(!redirect ,f)))))
-
-(defrequest "gcolor"
-  (lambda ()
-    (let ((c (car (read-args))))
-      (switch-glyph-color c))))
-
-(defrequest "fcolor"
-  (lambda ()
-    (let ((c (car (read-args))))
-      (switch-fill-color c))))
-
-(defrequest "I"
-  (lambda ()
-    (font-macro "I")))
-
-(defrequest "B"
-  (lambda ()
-    (font-macro "B")))
-
-(defrequest "RI"
-  (lambda ()
-    (man-alternating-font-macro nil "I")))
-
-(defrequest "IR"
-  (lambda ()
-    (man-alternating-font-macro "I" nil)))
-
-(defrequest "BI"
-  (lambda ()
-    (man-alternating-font-macro "B" "I")))
-
-(defrequest "IB"
-  (lambda ()
-    (man-alternating-font-macro "I" "B")))
-
-(defrequest "BR"
-  (lambda ()
-    (man-alternating-font-macro "B" nil)))
-
-(defrequest "RB"
-  (lambda ()
-    (man-alternating-font-macro nil "B")))
-
-(defrequest "C"
-  (lambda ()
-    (font-macro "C")))
-
-(defrequest "CW"
-  (gethash "C" *request-table*))
-
-(defrequest "R"
-  (lambda ()
-    (font-macro nil)))
-
-(defrequest "DC"
-  (lambda ()
-    (let* ((args (read-args))
-           (big-letter (car args))
-           (extra (cadr args))
-           (color (caddr args)))
-      (emit (switch-glyph-color color))
-      (emit-verbatim "<span class=dropcap>")
-      (emit big-letter)
-      (emit-verbatim "</span>")
-      (emit (switch-glyph-color ""))
-      (when extra (emit  extra))
-      (emit-newline)
-      )))
-
-(defrequest "BX"
-  (lambda ()
-    (let ((txt (car (read-args))))
-      (emit-verbatim "<span class=troffbox>")
-      (emit (expand-args txt))
-      (emit-verbatim "</span>")
-      (emit-newline))))
-
-(defrequest "B1"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "<div class=troffbox>")
-    (emit-newline)))
-
-(defrequest "B2"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "</div>")
-    (emit-newline)))
-
-(defrequest "ft"
-  (lambda ()
-    (let ((f (car (read-args))))
-      ;(ms-font-macro f) ;CHECK
-      (emit (switch-font f))
-      )))
-
-(defrequest "fam"
-  (lambda ()
-    (let ((f (car (read-args))))
-      (emit (switch-font-family f)))))
-
-(defrequest "LG"
-  (lambda ()
-    (read-troff-line)
-    (emit (switch-size "+2"))))
-
-(defrequest "SM"
-  (lambda ()
-    (read-troff-line)
-    (emit (switch-size "-2"))))
-
-(defrequest "NL"
-  (lambda ()
-    (read-troff-line)
-    (emit (switch-size nil))))
-
-(defrequest "URL"
-  (lambda ()
-    (let* ((args (read-args))
-           (url (car args))
-           (link-text  (cadr args))
-           (tack-on  (caddr args))
-           it)
-      (when (or (not link-text)
-                (string= link-text ""))
-        (setq link-text
-              (cond ((char= (char url 0) #\#)
-                     (let ((s (concatenate 'string "TAG_"
-                                (subseq url 1))))
-                       (cond ((setq it (gethash s *string-table*))
-                              (funcall it))
-                             (t "see below"))))
-                    (t url))))
-      (emit-verbatim "<a href=\"")
-      (emit (link-url url))
-      (emit-verbatim "\">")
-      (emit link-text)
-      (emit-verbatim "</a>")
-      (when tack-on (emit tack-on))
-      (emit-newline)
-      ;(setq *keep-newline-p* t)
-      )))
-
-(defrequest "TAG"
-  (lambda ()
-    (let* ((args (read-args))
-           (node (concatenate 'string "TAG_" (car args)))
-           (pageno *current-pageno*)
-           (tag-value (or (cadr args) (write-to-string pageno))))
-      ;(setq *keep-newline-p* nil)
-      (emit (anchor node))
-      ;(emit-edit-source-doc :interval 10)
-      (emit-newline)
-      (!node node pageno tag-value)
-      (write-aux `(!node ,node ,pageno ,tag-value)))))
-
-(defrequest "ULS"
-  (lambda ()
-    (read-troff-line)
-    (emit-para)
-    (emit-verbatim "<ul>")))
-
-(defrequest "ULE"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "</ul>")
-    (emit-para)))
-
-(defrequest "OLS"
-  (lambda ()
-    (read-troff-line)
-    (emit-para)
-    (emit-verbatim "<ol>")))
-
-(defrequest "OLE"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "</ol>")
-    (emit-para)))
-
-(defrequest "LI"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "<li>")))
-
-(defrequest "HR"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "<hr>")))
-
-(defrequest "HTML"
-  (lambda ()
-    (emit-verbatim
-     (expand-args (read-troff-line)))
-    (emit-newline)))
-
-(defrequest "CDS"
-  (lambda ()
-    (start-display "L")
-    (emit (switch-font "C"))))
-
-(defrequest "CDE"
-  (lambda ()
-    (stop-display)))
-
-(defrequest "QP"
-  (lambda ()
-    (read-troff-line)
-    (emit-para)
-    (emit-verbatim "<blockquote>")
-    (setq *afterpar*
-      (lambda () (emit-verbatim "</blockquote>")))))
-
-(defrequest "QS"
-  (lambda ()
-    (read-troff-line)
-    (emit-para)
-    (emit-verbatim "<blockquote>")))
-
-(defrequest "QE"
-  (lambda ()
-    (read-troff-line)
-    (emit-verbatim "</blockquote>")
-    (emit-para)))
-
-(defrequest "IP"
-  (lambda ()
-    (let ((label (car (read-args))))
-      (emit-para)
-      (emit-verbatim "<dl><dt>")
-      (when label
-        (emit (expand-args label)))
-      (emit-verbatim "</dt><dd>")
-      (setq *afterpar*
-        (lambda ()
-          (emit-verbatim "</dd></dl>")
-          (emit-newline))))))
-
-(defrequest "TP"
-  (lambda ()
-    (read-troff-line)
-    (emit-para)
-    (emit-verbatim "<dl")
-    (process-line)
-    (emit-verbatim "</dt><dd>")
-    (setq *afterpar*
-          (lambda ()
-            (emit-verbatim "</dd></dl>")
-            (emit-newline)))))
-
-(defrequest "PS"
-  (lambda ()
-    (read-troff-line)
-    (make-image ".PS" ".PE")))
-
-(defrequest "EQ"
-  (lambda ()
-    (destructuring-bind (&optional (w "C") eqno) (read-args)
-      (emit-verbatim "<div class=display align=")
-      (emit-verbatim (cond ((string= w "C") "center")
-                           (t "left")))
-      (emit-verbatim ">")
-      (when eqno
-        (emit-verbatim "<table><tr><td width=\"80%\" align=")
-        (emit-verbatim (cond ((string= w "C") "center")
-                             (t "left")))
-        (emit-verbatim ">")
-        (emit-newline))
-      (make-image ".EQ" ".EN")
-      (when eqno
-        (emit-newline)
-        (emit-verbatim "</td><td width=\"20%\" align=right>")
-        (emit-nbsp 16)
-        (troff2page-string eqno)
-        (emit-verbatim "</td></tr></table>"))
-      (emit-verbatim "</div>")
-      (emit-newline))))
-
-(defrequest "TS"
-  (lambda ()
-    (let ((args (read-args)))
-      (let ((*reading-table-header-p* (and args (string= (car args) "H")))
-            (*reading-table-p* t)
-            (*table-format-table* (make-hash-table))
-            (*table-default-format-line* 0)
-            (*table-row-number* 0)
-            (*table-cell-number* 0)
-            (*table-colsep-char* #\tab)
-            (*table-options* " cellpadding=2") ;?
-            (*table-number-of-columns* 0)
-            (*table-align* nil) ;??
-            )
-        (table-do-global-options)
-        (table-do-format-section)
-        (emit-verbatim "<div")
-        (when *table-align*
-          (emit-verbatim " align=")
-          (emit-verbatim *table-align*))
-        (emit-verbatim ">")
-        (emit-newline)
-        (emit-verbatim "<table")
-        (princ *table-options* *out*)
-        (emit-verbatim ">")
-        (emit-newline)
-        (table-do-rows)
-        (emit-verbatim "</table>")
-        (emit-newline)
-        (emit-verbatim "</div>")
-        (clrhash *table-format-table*) ;shouldn't be necessary
-        ))))
 
 (defun ignore-branch ()
   (ignore-spaces)
@@ -3941,31 +4178,6 @@
                   ;(terror 'unsupported-if-test c)
                   ))))))
 
-(defrequest "if"
-  (lambda ()
-    (ignore-spaces)
-    (if (if-test-passed-p)
-        (ignore-spaces)
-        (ignore-branch))))
-
-(defrequest "ie"
-  (lambda ()
-    (ignore-spaces)
-    (cond ((if-test-passed-p) (ignore-spaces))
-          (t (setq *cascaded-if-p* t)
-                (ignore-branch)))))
-
-(defrequest "el"
-  (lambda ()
-    (ignore-spaces)
-    (cond  (*cascaded-if-p* (setq *cascaded-if-p* nil))
-           (t (ignore-branch)))))
-
-(defrequest "nop"
-  ;eqv to .if 1
-  (lambda ()
-    (ignore-spaces)))
-
 (defun read-test ()
   (let ((r "") (nesting 0) c)
     (loop
@@ -4020,71 +4232,6 @@
             (t (get-char) (setq r (concatenate 'string r (string c))))))
     r))
 
-(defrequest "while"
-  (lambda ()
-    (ignore-spaces)
-    (let* ((test (read-test))
-           (body (read-block)))
-      (loop
-        (toss-back-string test)
-        (cond ((if-test-passed-p)
-               (troff2page-string body)
-               (when *exit-status*
-                 (case *exit-status*
-                   (:break (setq *exit-status* nil) (return))
-                   (:continue (setq *exit-status* nil))
-                   (t (return)))))
-              (t (return)))))))
-
-(defrequest "do"
-  (lambda ()
-    (ignore-spaces)
-    (toss-back-char #\.)))
-
-(defrequest "nx"
-  (lambda ()
-    (let ((args (read-args)))
-      (when args
-        (troff2page-file (car args)))
-    (setq *exit-status* :nx))))
-
-(defrequest "return"
-  (lambda ()
-    (read-troff-line)
-    (setq *exit-status* :return)))
-
-(defrequest "ex"
-  (lambda ()
-    (read-troff-line)
-    (setq *exit-status* :ex)))
-
-(defrequest "ab"
-  (lambda ()
-    (do-tmc :newlinep t)
-    (setq *exit-status* :ex)))
-
-(defrequest "break"
-  (lambda ()
-    (read-troff-line)
-    (setq *exit-status* :break)))
-
-(defrequest "continue"
-  (lambda ()
-    (read-troff-line)
-    (setq *exit-status* :continue)))
-
-(defrequest "nf"
-  (lambda ()
-    (read-troff-line)
-    ;(emit-verbatim "<div>")
-    (unless *previous-line-exec-p*
-      ;(emit-verbatim "<div ")
-      (emit-verbatim "<p ") ;  FIXME
-      (specify-margin-left-style)
-      (emit-verbatim ">")
-      (emit-newline))
-    (unfill-mode)))
-
 #|
 (defun ugly-br-hack-for-firefox ()
   (let ((curr-font (or (ev*-font (car *ev-stack*)) "")))
@@ -4097,24 +4244,6 @@
 
 (defun unfill-mode ()
   (setf (ev*-fill (car *ev-stack*)) nil))
-
-(defrequest "fi"
-  (lambda ()
-    (read-troff-line)
-    (fill-mode)
-    ;(ugly-br-hack-for-firefox)
-    ;(emit-verbatim "</div>") ;FIXME
-    (emit-verbatim "<p>")
-    ))
-
-(defrequest "so"
-  (lambda ()
-    (let ((f  (car (read-args))))
-      (when (eql *macro-package* :man)
-        (let ((g (concatenate 'string "../" f)))
-          (when (probe-file g)
-            (setq f g))))
-      (troff2page-file f))))
 
 (defun file-extension (f)
   (let ((slash (position #\/ f :test #'char= :from-end t))
@@ -4158,40 +4287,6 @@
         (or (some #'find-in-dir *groff-tmac-path*)
 	    (find-in-dir ".")
             (find-in-dir (retrieve-env "HOME")))))))
-
-(defrequest "mso"
-  (lambda ()
-    (let ((f (car (read-args))))
-      (let ((f (and f (find-macro-file f))))
-        (when f (troff2page-file f))))))
-
-;
-
-(defrequest "HX"
-  (lambda ()
-    (setf (counter*-value (get-counter-named "www:HX"))
-          (string-to-number (car (read-args))))
-    ))
-
-(defrequest "DS"
-  (lambda ()
-    (start-display (read-word))
-    ;(read-troff-line)
-    ))
-
-(defrequest "LD" (lambda () (start-display "L")))
-(defrequest "ID" (lambda () (start-display "I")))
-(defrequest "BD" (lambda () (start-display "B")))
-(defrequest "CD" (lambda () (start-display "C")))
-(defrequest "RD" (lambda () (start-display "R")))
-
-(defrequest "defcolor"
-  (lambda ()
-    (let* ((ident (read-word))
-           (rgb-color (read-rgb-color)))
-      (read-troff-line)
-      (setf (gethash ident *color-table*)
-            rgb-color))))
 
 (defun read-color-number (&key hashes)
   (case hashes
@@ -4261,64 +4356,11 @@
     (apply #'concatenate 'string
            "#" components)))
 
-(defrequest "ce"
-  (lambda ()
-    (let ((n (or (string-to-number (or (car (read-args)) "1")) 1)))
-      (cond ((<= n 0) (when (> *lines-to-be-centered* 0)
-                        (setq *lines-to-be-centered* 0)
-                        ;(ugly-br-hack-for-firefox)
-                        (emit-verbatim "</div>")))
-            (t
-              (setq *lines-to-be-centered* n)
-              (emit-verbatim "<div align=center>")))
-      (emit-newline))))
-
 (defun string-to-number (s &key (base 10))
   (if (position #\: s :test #'char=) nil
     (let* ((*read-base* base)
            (n (read-from-string s nil)))
       (if (numberp n) n nil))))
-
-(defrequest "nr"
-  (lambda ()
-    (let* ((n (read-word))
-           (c (get-counter-named n)))
-      (when (counter*-thunk c)
-        (terror "nr: cannot set readonly number register ~a" n))
-      (let* ((sign (read-opt-sign))
-             (num (read-number-or-length))
-             ;(num (string-to-number (expand-args (read-word))))
-             )
-        (read-troff-line)
-        ;(setq *keep-newline-p* nil)
-        (when num
-          (case sign
-            (#\+
-             (incf (counter*-value c) num))
-            (#\-
-             (decf (counter*-value c) num))
-            (t (setf (counter*-value c) num))))))))
-
-(defrequest "af"
-  (lambda ()
-    (let* ((args (read-args))
-           (c (get-counter-named (car args)))
-           (f (cadr args)))
-      (read-troff-line)
-      (setf (counter*-format c) f))))
-
-(defrequest "ev"
-  (lambda ()
-    (let ((ev-new-name (read-word)))
-      (if ev-new-name
-          (ev-push ev-new-name)
-          (ev-pop)))))
-
-(defrequest "evc"
-  (lambda ()
-    (let ((ev-rhs (let ((ev-rhs-name (car (read-args))))
-                    (ev-named ev-rhs-name))))
-      (ev-copy (car *ev-stack*) ev-rhs))))
 
 (defun troff-open (stream-name f)
   (push (cons stream-name (open f :direction :output
@@ -4331,18 +4373,6 @@
   (setq *output-streams*
         (delete-if (lambda (c) (string= (car c) stream-name))
                    *output-streams*)))
-
-(defrequest "open"
-  (lambda ()
-    (let* ((args (read-args))
-           (stream-name (car args))
-           (file-name (cadr args)))
-      (troff-open stream-name file-name))))
-
-(defrequest "close"
-  (lambda ()
-    (let ((stream-name (car (read-args))))
-      (troff-close stream-name))))
 
 ;(defun do-writec (&key newline)
 ;  (let ((stream-name (expand-args (read-word))))
@@ -4361,27 +4391,10 @@
     ;(setq *keep-newline-p* nil)
     (when newlinep (terpri o))))
 
-(defrequest "writec"
-  (lambda ()
-    (do-writec)))
-
-(defrequest "write"
-  (lambda ()
-    (do-writec :newlinep t)))
-
 (defun write-troff-macro-to-stream (macro-name o)
   (let ((*outputting-to* :troff)
         (*out* o))
     (execute-macro macro-name)))
-
-(defrequest "writem"
-  (lambda ()
-    (let* ((stream-name (expand-args (read-word)))
-           (macro-name (expand-args (read-word)))
-           (out (cdr (assoc stream-name *output-streams* :test #'string=))))
-      ;(read-troff-line)  ; ? check
-      (write-troff-macro-to-stream
-        macro-name out))))
 
 ;* escapes
 
@@ -4577,99 +4590,114 @@
 
 ;
 
-(defun troff2page (input-doc)
-  (unless (troff2page-help input-doc)
-    (let (
+(defun troff2page-1pass (input-doc)
+  (let (
 
-          (*afterpar* nil)
-          (*aux-stream* nil)
-          (*blank-line-macro* nil)
-          (*cascaded-if-p* nil)
-          (*cascaded-if-stack* '())
-          (*color-table* (make-hash-table :test #'equal))
-          (*control-char* #\.)
-          (*css-stream* nil)
-          (*current-diversion* nil)
-          (*current-pageno* -1)
-          (*current-source-file* input-doc)
-          (*current-troff-input* nil)
-          (*diversion-table* (make-hash-table :test #'equal))
-          (*end-macro* nil)
-          (*escape-char* #\\ )
-          (*ev-stack* (list (make-ev* :name "*global*")))
-          (*ev-table* (make-hash-table :test #'equal))
-          (*exit-status* nil)
-          (*font-alternating-style-p* nil)
-          (*footnote-buffer* '())
-          (*footnote-count* 0)
-          (*glyph-table* (make-hash-table :test #'equal))
-          (*groff-tmac-path* (split-string-at-char (retrieve-env "GROFF_TMAC_PATH") *path-separator*))
-          (*html-head* '())
-          (*html-page* nil)
-          (*image-file-count* 0)
-          (*input-line-no* 0)
-          (*inside-table-text-block-p* nil)
-          (*jobname* (file-stem-name input-doc))
-          (*just-after-par-start-p* nil)
-          (*keep-newline-p* t)
-          (*last-input-milestone* 0)
-          (*last-page-number* -1)
-          (*leading-spaces-macro* nil)
-          (*leading-spaces-number* 0)
-          (*lines-to-be-centered* 0)
-          (*log-stream* nil)
-          (*macro-args* '(t))
-          (*macro-copy-mode-p* nil)
-          (*macro-package* :ms)
-          (*macro-spill-over* nil)
-          (*macro-table* (make-hash-table :test #'equal))
-          (*main-troff-file* input-doc)
-          (*margin-left* 0)
-          (*missing-pieces* '())
-          (*no-break-control-char* #\')
-          (*node-table* (make-hash-table :test #'equal))
-          (*num-of-times-th-called* 0)
-          (*numreg-table* (make-hash-table :test #'equal))
-          (*out* nil)
-          (*output-streams* '())
-          (*outputting-to* :html)
-          (*previous-line-exec-p* nil)
-          (*reading-quoted-phrase-p* nil)
-          (*reading-string-call-p* nil)
-          (*reading-table-header-p* nil)
-          (*reading-table-p* nil)
-          (*redirectedp* nil)
-          (*saved-escape-char* nil)
-          (*slides* nil)
-          (*sourcing-ascii-file-p* nil)
-          (*string-table* (make-hash-table :test #'equal))
-          (*stylesheets* '())
-          (*table-align* nil)
-          (*table-cell-number* 0)
-          (*table-colsep-char* #\tab)
-          (*table-default-format-line* 0)
-          (*table-format-table* nil)
-          (*table-number-of-columns* 0)
-          (*table-options* "")
-          (*table-row-number* 0)
-          (*temp-string-count* 0)
-          (*th-already-called-p* nil)
-          (*this-footnote-is-numbered-p* nil)
-          (*title* nil)
-          (*turn-off-escape-char-p* nil)
-          (*verbatim-apostrophe-p* nil)
+        (*afterpar* nil)
+        (*aux-stream* nil)
+        (*blank-line-macro* nil)
+        (*cascaded-if-p* nil)
+        (*cascaded-if-stack* '())
+        (*color-table* (make-hash-table :test #'equal))
+        (*control-char* #\.)
+        (*css-stream* nil)
+        (*current-diversion* nil)
+        (*current-pageno* -1)
+        (*current-source-file* input-doc)
+        (*current-troff-input* nil)
+        (*diversion-table* (make-hash-table :test #'equal))
+        (*end-hooks* '())
+        (*end-macro* nil)
+        (*escape-char* #\\)
+        (*ev-stack* (list (make-ev* :name "*global*")))
+        (*ev-table* (make-hash-table :test #'equal))
+        (*exit-status* nil)
+        (*font-alternating-style-p* nil)
+        (*footnote-buffer* '())
+        (*footnote-count* 0)
+        (*glyph-table* (make-hash-table :test #'equal))
+        (*groff-tmac-path* (split-string-at-char (retrieve-env "GROFF_TMAC_PATH") *path-separator*))
+        (*html-head* '())
+        (*html-page* nil)
+        (*image-file-count* 0)
+        (*input-line-no* 0)
+        (*inside-table-text-block-p* nil)
+        (*just-after-par-start-p* nil)
+        (*keep-newline-p* t)
+        (*last-input-milestone* 0)
+        (*last-page-number* -1)
+        (*leading-spaces-macro* nil)
+        (*leading-spaces-number* 0)
+        (*lines-to-be-centered* 0)
+        (*macro-args* '(t))
+        (*macro-copy-mode-p* nil)
+        (*macro-package* :ms)
+        (*macro-spill-over* nil)
+        (*macro-table* (make-hash-table :test #'equal))
+        (*main-troff-file* input-doc)
+        (*margin-left* 0)
+        (*missing-pieces* '())
+        (*no-break-control-char* #\')
+        (*node-table* (make-hash-table :test #'equal))
+        (*num-of-times-th-called* 0)
+        (*numreg-table* (make-hash-table :test #'equal))
+        (*out* nil)
+        (*output-streams* '())
+        (*outputting-to* :html)
+        (*previous-line-exec-p* nil)
+        (*reading-quoted-phrase-p* nil)
+        (*reading-string-call-p* nil)
+        (*reading-table-header-p* nil)
+        (*reading-table-p* nil)
+        (*redirectedp* nil)
+        (*request-table* (make-hash-table :test #'equal))
+        (*saved-escape-char* nil)
+        (*slides* nil)
+        (*sourcing-ascii-file-p* nil)
+        (*string-table* (make-hash-table :test #'equal))
+        (*stylesheets* '())
+        (*table-align* nil)
+        (*table-cell-number* 0)
+        (*table-colsep-char* #\tab)
+        (*table-default-format-line* 0)
+        (*table-format-table* nil)
+        (*table-number-of-columns* 0)
+        (*table-options* "")
+        (*table-row-number* 0)
+        (*temp-string-count* 0)
+        (*th-already-called-p* nil)
+        (*this-footnote-is-numbered-p* nil)
+        (*title* nil)
+        (*turn-off-escape-char-p* nil)
+        (*verbatim-apostrophe-p* nil)
 
-          it
-          )
-      (load-aux-file)
-      (emit-start)
-      (when (setq it (find-macro-file ".troff2pagerc.tmac"))
-        (troff2page-file it))
-      (when (probe-file (setq it (concatenate 'string *jobname* ".t2p")))
-        (troff2page-file it))
-      (troff2page-file input-doc)
-      (do-bye))))
+        it
+        )
 
-(troff2page *troff2page-file-arg*)
+    (load-aux-file)
+    (emit-start)
+    (when (setq it (find-macro-file ".troff2pagerc.tmac"))
+      (troff2page-file it))
+    (when (probe-file (setq it (concatenate 'string *jobname* ".t2p")))
+      (troff2page-file it))
+    (troff2page-file input-doc)
+    (do-bye)))
+
+(defun troff2page (input-doc &optional single-pass-p)
+  (let ((*log-stream* nil))
+    (unless (troff2page-help input-doc)
+      (let ((*jobname* (file-stem-name input-doc)))
+        (with-open-file (*log-stream* (concatenate 'string *jobname* *log-file-suffix*)
+                                      :direction :output :if-exists :supersede)
+          (let (*rerun-needed-p*)
+            (troff2page-1pass input-doc)
+            (when *rerun-needed-p*
+              (cond (single-pass-p (tlog "Rerun: troff2page ~a~%" input-doc))
+                    (t (tlog "Rerunning: troff2page ~a~%" input-doc)
+                       (troff2page-1pass input-doc))))))))))
+
+(troff2page *troff2page-file-arg*
+            ;:single-pass
+            )
 
 ;eof
