@@ -14,29 +14,32 @@ directory in your `MANPATH`.
 Copy the file `man/man7/eval4troff.tmac.7` to the `man7` subdirectory of a
 directory in your `MANPATH`.
 
-For its documentation (see below), troff2page makes use of some
-`*.tmac` files, some of which are in the `troff2page` directory and
-the rest in the submodule `mpca` (available on its own at
-https://github.com/ds26gte/mpca).  To include the latter, do
+The troff2page documentation (see below) uses the
+`pca-t2p-*.tmac` files in the top-level `troff2page` directory,
+as also the `pca*.tmac` files from the `mpca` submodule.
+(available on its own at https://github.com/ds26gte/mpca). To
+include `mpca`, do
 
   git submodule init
   git submodule update
 
 This will create an `mpca` subdirectory.
 
-Copy the `pca*.tmac` files in the `mpca` subdirectory to a
-directory in your `GROFF_TMAC_PATH`, or your home directory.
+Copy these `pca*.tmac` files from `mpca`, as also the `pca-t2p-*.tmac` files
+in the top-level `troff2page` directory, to somewhere in your
+`GROFF_TMAC_PATH` (or include these directories or copies thereof
+in `GROFF_TMAC_PATH`). In a pinch, if you don’t want to mess with
+`GROFF_TMAC_PATH` just yet, you may simply copy these `*.tmac`
+files to your home directory.
+
 These `*.tmac` files, while generally useful, are specifically
 needed to typeset the supplied documentation, which is provided
-in `index.ms`. If you don’t need these macros for anything other
-than processing `index.ms`, you may make do by copying these
-files to the current directory, i.e., the directory containing
-`index.ms`.)
+in `doc/index.ms`. If you don’t need these macros for anything
+other than processing `index.ms`, you may make do by copying
+these files to the directory containing `index.ms`.
 
-The `pca-t2p-*.tmac` files may also be copied to your
-`GROFF_TMAC_PATH`, if you like to use them in your own
-documents. These macros are not used by groff; only by
-`troff2page`.
+The `pca-t2p-*.tmac` are only used by `troff2page`, never by
+`groff`.
 
 == Man pages
 
