@@ -44,13 +44,15 @@
         t)
       (retrieve-env "T2PARG")))
 
+(defvar *log-stream*)
+
 (defun os-execute (s)
   (or #+clisp (ext::shell s)
       #+clozure (ccl::os-command s)
       #+cmu (ext::run-program "sh" (list "-c" s) :output t)
       #+ecl (si::system s)
       #+sbcl
-      (let ((p (sb-ext::run-program "sh" (list "-c" s) :search t :output t)))
+      (let ((p (sb-ext::run-program "sh" (list "-c" s) :search t :output (or *log-stream* t))))
         (sb-ext::process-exit-code p))
       nil))
 
@@ -511,7 +513,6 @@
 (defvar *keep-newline-p*)
 (defvar *last-input-milestone*)
 (defvar *last-page-number*)
-(defvar *log-stream*)
 (defvar *leading-spaces-macro*)
 (defvar *leading-spaces-number*)
 (defvar *lines-to-be-centered*)
@@ -773,9 +774,8 @@
     c))
 
 (defun tlog (fstr &rest args)
-  (apply #'format t fstr args)
-  (when *log-stream*
-    (apply #'format *log-stream* fstr args)))
+  (apply #'format (or *log-stream* t)
+         fstr args))
 
 (defun twarning (fstr &rest args)
   (tlog "~a:~a: " *current-source-file* *input-line-no*)
@@ -4693,9 +4693,10 @@
   (let ((*log-stream* nil))
     (unless (troff2page-help input-doc)
       (let ((*jobname* (file-stem-name input-doc)))
-        (with-open-file (*log-stream* (concatenate 'string *jobname* *log-file-suffix*)
-                                      :direction :output :if-exists :supersede)
-          (let (*rerun-needed-p*)
+        (with-open-file (o (concatenate 'string *jobname* *log-file-suffix*)
+                           :direction :output :if-exists :supersede)
+          (let ((*log-stream* (make-broadcast-stream o *standard-output*))
+                *rerun-needed-p*)
             (troff2page-1pass input-doc)
             (when *rerun-needed-p*
               (cond (single-pass-p (tlog "Rerun: troff2page ~a~%" input-doc))
