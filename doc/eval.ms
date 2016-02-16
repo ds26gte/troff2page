@@ -80,7 +80,7 @@ The first groff call produces a Lisp file
 \fC.trofftemp.lisp\fP.\**
 .FS
 This name may be different based on
-your setting of \fC\e*[AUXF]\fP — see page \*[TAG_auxf].
+your setting of \fC\e*[AUXF]\fP — see page \*[TAG:auxf].
 .FE
 The second groff
 call invokes Lisp to create an auxiliary file for each \fC.eval\fP that gets sourced
@@ -97,7 +97,7 @@ resulting \fCtau.html\fP will show the same content.
 Furthermore, we can embed  \fC.eval\fP-enclosed Lisp code inside an
 \fC.if\fP (or \fC.ie\fP or \fC.el\fP) statement so that it gets executed
 only for troff or only for troff2page.  (Recall we used the number register
-\fC\en[.troff2page]\fP for this purpose on page \*[TAG_cond-bp].)  In
+\fC\en[.troff2page]\fP for this purpose on page \*[TAG:cond-bp].)  In
 particular, by calling Lisp code only for troff2page, the
 user has the
 means to extend troff2page to deal with things that the core

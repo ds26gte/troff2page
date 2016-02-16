@@ -14,7 +14,7 @@ be produced by troff2page, into an Info doc.
 
 Here \fCjobname.html\fP is the opening file of the HTML document
 (which may consist of other \fCjobname-Z-H-i.html\fP files, as
-described on page \*[TAG_html-output]). The result is a single
+described on page \*[TAG:html-output]). The result is a single
 file \fCjobname.info\fP that may then be displayed on any
 Info viewer.
 

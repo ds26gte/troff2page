@@ -33,16 +33,16 @@ obvious.
 .IX pca-ix.tmac, macro file
 .IX eval4troff.tmac, macro file
 .IX mso@.mso, groff request
-The troff2page distribution includes several files with
-extension \fCtmac\fP, e.g., \fCpca-tag.tmac\fP for inserting
-hyperlinks; \fCpca-ix.tmac\fP for index generation;
-\fCpca-eval.tmac\fP
-for extending troff using Common Lisp; and
-\fCdefhsl.tmac\fP for defining color names using the HSL scheme. (Some of these reside
-in the submodule directory called \fCmpca\fP, and may alternatively be downloaded from
-\*[url https://github.com/ds26gte/mpca]\&.)
+The troff2page distribution includes several troff macro
+or tmac
+files (with
+extension \fCtmac\fP), both in the main directory and in the
+sudirectory for the submodule \fCmpca\fP. They include general-purpose
+extensions to the \fCms\fP package, e.g., \fCpca-tag.tmac\fP for
+cross-references; \fCpca-ix.tmac\fP for index generation;
+\fCpca-eval.tmac\fP for extending troff using Common Lisp, etc.
 
-You should put these \fC.tmac\fP files in one of your
+You should put these tmac files in one of your
 macro directories, i.e., the directories that are searched by groff’s
 \fC-m\fP option and \fC.mso\fP request.  (See the section for “Macro
 Directories” in the groff info file for details.  In a pinch, your home
@@ -70,7 +70,7 @@ mode.
 .IX t@-t, groff option
 .IX z@-z, groff option
 As an example, consider \fCindex.ms\fP (the groff source for the
-document you’re reading).  The following is one
+document you’re reading, which is the \fCdoc\fP subdirectory).  The following is one
 way to get the correct PostScript output:
 
 .EX
@@ -78,13 +78,18 @@ way to get the correct PostScript output:
 .ft CI
     Rerun groff with -U
     index.ms:18: can't open `.trofftemp.toc': No such file or directory
-    index.ms:937: can't open `.trofftemp.ind': No such file or directory
+    index.ms:38: can't open `.trofftemp.ind': No such file or directory
 
 .ft C
     % groff -t -U index.ms > index.ps
 .ft CI
-    This is makeindex, ...
-    ...
+    This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
+    Scanning style file ./.trofftemp.mst...............done (15 attributes redefined, 0 ignored).
+    Scanning input file z.trofftemp.idx....done (58 entries accepted, 0 rejected).
+    Sorting entries....done (343 comparisons).
+    Generating output file z.trofftemp.ind....done (128 lines written, 0 warnings).
+    Output written in z.trofftemp.ind.
+    Transcript written in z.trofftemp.ilg.
 .EE
 
 The \fC-t\fP option (which calls the tbl
@@ -130,7 +135,7 @@ mode or to process tables.
 
 The same holds if you run troff2page by calling
 the CL procedure \fCtroff2page:troff2page\fP within CL, as described on
-page \*[TAG_calling_troff2page_within_cl].
+page \*[TAG:calling_troff2page_within_cl].
 
 If you wish to have
 the CL procedure perform just one pass on the document, give it a
@@ -157,7 +162,7 @@ write aux files.  It is a good idea to set it so that it
 remains
 different for troff and troff2page, so that the two
 programs’ aux files don’t clash.  The number register
-\fC\en[.troff2page]\fP (page \*[TAG_cond-bp]) suggests a way
+\fC\en[.troff2page]\fP (page \*[TAG:cond-bp]) suggests a way
 to do this.
 
 .SH 2

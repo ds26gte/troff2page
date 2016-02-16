@@ -11,24 +11,27 @@ similarly named macro in groff’s \fCwww.tmac\fP, in order to allow
 forward references.)
 
 .EX
-    .TAG sec:troffcl
+    .TAG sec_troffcl
 .EE
 
-associates the label \fCTAG_sec:troffcl\fP with the number of
-the current page.  The string \fC\e*[TAG_sec:troffcl]\fP
+associates the \fItag\fP \fCsec_troffcl\fP with the number of
+the current page.  The \fIstring\fP \fC\e*[TAG:sec_troffcl]\fP
 is defined to typeset as that page number.
 Thus, in a hand-crafted table of contents, you could
 use
 
 .EX
-    Extending troff using Common Lisp, \*[TAG_sec:troffcl]
+    Extending troff using Common Lisp, \*[TAG:sec_troffcl]
 .EE
 
-In the HTML output, the string \fC\e*[TAG_sec:troffcl]\fP
-furthermore is a link to where \fC.TAG sec:troffcl\fP was
+In the HTML output, the string \fC\e*[TAG:sec_troffcl]\fP
+furthermore is a link to where \fC.TAG sec_troffcl\fP was
 called.
 
-\fC.TAG\fP takes an optional second argument.  The label is
+The \fCpca\fP macros use tags for internal bookkeeping: to avoid
+name clashes, don’t start your own tags with two underscores.
+
+\fC.TAG\fP takes an optional second argument.  The tag is
 then associated with the text of the second argument instead
 of the current page number.
 
