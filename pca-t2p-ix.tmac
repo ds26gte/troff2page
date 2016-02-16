@@ -1,4 +1,4 @@
-.\" last change 2016-02-14
+.\" last change 2016-02-15
 .
 .if !\n[.troff2page] .nx
 .
@@ -9,6 +9,17 @@
 .nr index:location +1
 .TAG index_\\n[index:location]
 .write index:idx_stream \\\\indexentry{\\$*|index:function}{\\n[index:location]}
+..
+.
+.am index:set_up_index
+.ig ##
+(let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) ".ind")))
+  (unless (probe-file f)
+    (flag-missing-piece :index)
+    (with-open-file (o f :direction :output)
+      (format o ".TAG troff2page_index~%"))
+    (push #'(lambda () (delete-file f)) *end-hooks*)))
+.##
 ..
 .
 .am index:item0
