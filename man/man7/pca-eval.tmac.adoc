@@ -1,27 +1,31 @@
-= eval4troff(7)
+= pca-eval.tmac(7)
 
 == NAME
 
-eval4troff.tmac - groff macros for using Common Lisp as extension language
+pca-eval.tmac - groff macros for using Common Lisp as extension language
 
 == SYNOPSIS
 
-eval4troff.tmac can be loaded as the `groff(1)` command-line option
-`-meval4troff.tmac`.
+`pca-eval.tmac` loads one of `pca-eval-lisp.tmac` or
+`pca-eval-js.tmac`. Put all three files in your
+`GROFF_TMAC_PATH`.
+
+`pca-eval.tmac` can be loaded as the `groff(1)` command-line option
+`-mpca-eval`.
 
 Alternatively, it can loaded within a groff document as:
 
-    .mso eval4troff.tmac
+    .mso pca-eval.tmac
 
 == DESCRIPTION
 
-The groff macro file `eval4troff.tmac` allows you to extend groff using
+The groff macro file `pca-eval.tmac` allows you to extend groff using
 Common Lisp, i.e., Common Lisp code embedded in a groff document can
 be used to affect how `groff(1)` and `troff2page(1)` process the document.
 
-`eval4troff.tmac` provides two macros: `.eval` and its closer
+`pca-eval.tmac` provides two macros: `.eval` and its closer
 `.endeval`.  You
-should put `eval4troff.tmac` in a macro directory, so it can be
+should put `pca-eval.tmac` in a macro directory, so it can be
 conveniently loaded using the `.mso` request.
 
 `.eval` does only one thing: It allows you to place arbitrary Lisp code
@@ -30,7 +34,7 @@ by this Lisp code is substituted for the `.eval` ... `.endeval`.  The
 usefulness of this tactic will be apparent from an example.  Consider
 the following groff document, `tau.1`:
 
-    .mso eval4troff.tmac
+    .mso pca-eval.tmac
     .
     The ratio of the circumference of a circle to
     its radius is \(*t \(~=
@@ -114,7 +118,7 @@ implementing it using groff’s limited arithmetic is tedious.  Instead, we shal
 much easier Lisp procedure to do the same, and put it inside an
 `.eval`:
 
-    .mso eval4troff.tmac
+    .mso pca-eval.tmac
     .
     .eval
     (defun between-0-and-1 (n)
@@ -229,7 +233,7 @@ This sets the HTML headers with a foreground color of chocolate.
 
 == SYSTEM REQUIREMENTS
 
-`eval4troff.tmac` uses the Common Lisp implementation mentioned in the
+`pca-eval.tmac` uses the Common Lisp implementation mentioned in the
 shell environment variable `LISP`, which can currently be set to either
 `clisp`, `clozure`, `cmu`, or `sbcl`: the corresponding Lisp implementations
 being http://clisp.sf.net[CLISP],
@@ -245,7 +249,7 @@ systems.
 
 == AVAILABILITY
 
-`eval4troff.tmac` is included in the troff2page distribution, which is
+`pca-eval.tmac` is included in the troff2page distribution, which is
 downloadable from
 http://github.com/ds26gte/troff2page.
 
