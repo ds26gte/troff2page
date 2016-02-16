@@ -1,13 +1,16 @@
-.\" last modified 2016-02-14
+.\" last modified 2016-02-15
 .\" Dorai Sitaram
 .
 .if !\n[.troff2page] .nx
 .
 .de pca:toc-hook
 .ig ##
-(when (and (> *last-page-number* 0)
+(let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) ".toc")))
+  (unless (probe-file f)
+    (flag-missing-piece :toc)))
+(when (and (> *last-page-number* 0) nil ;needed?
            (not (gethash "TAG_troff2page_toc" *node-table*)))
-  (flag-missing-piece :toc))
+  (flag-missing-piece :toc-in-nav-bar))
 .##
 .TAG troff2page_toc
 ..
