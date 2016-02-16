@@ -53,26 +53,26 @@ do
   sil! g:^<div.\{-}class=navigation.\{-}</div>:d
 
   "mark beginning and end of ToC
-  sil! %s/^<a\s\+name="TAG_troff2page_toc">/<!-- ÞTOC_MENU_BEGIN! -->ÞTOC_MENU_BEGIN!* Menu:<br>/
+  sil! %s/^<a\s\+name="TAG:__troff2page_toc">/<!-- ÞINFO_MENU_BEGIN! -->ÞINFO_MENU_BEGIN!* Menu:<br>/
 
-  sil! %s/^<a\s\+name="TAG_troff2page_toc_end">/<!-- ÞTOC_MENU_END! -->ÞTOC_MENU_END!/
+  sil! %s/^<a\s\+name="TAG:__troff2page_toc_end">/<!-- ÞINFO_MENU_END! -->ÞINFO_MENU_END!/
 
   "create an Info menu entry for all doc-internal links within ToC
-  sil! /^<!-- ÞTOC_MENU_BEGIN! -->/,/^<!-- ÞTOC_MENU_END! -->/ s!<a\s\+class=hrefinternal\s\+href="$fbase\.html#.\{-}">!* 0:: !
+  sil! /^<!-- ÞINFO_MENU_BEGIN! -->/,/^<!-- ÞINFO_MENU_END! -->/ s!<a\s\+class=hrefinternal\s\+href="$fbase\.html#.\{-}">!* 0:: !
 
-  sil! /^<!-- ÞTOC_MENU_BEGIN! -->/,/^<!-- ÞTOC_MENU_END! -->/  s!<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\(.\{-}\)\.html#.\{-}">!* \1:: !
+  sil! /^<!-- ÞINFO_MENU_BEGIN! -->/,/^<!-- ÞINFO_MENU_END! -->/  s!<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\(.\{-}\)\.html#.\{-}">!* \1:: !
 
-  sil! /^<!-- ÞTOC_MENU_BEGIN! -->/,/^<!-- ÞTOC_MENU_END! -->/ s!<a\s\+class=hrefinternal\s\+href="#.\{-}">!* $i:: !
+  sil! /^<!-- ÞINFO_MENU_BEGIN! -->/,/^<!-- ÞINFO_MENU_END! -->/ s!<a\s\+class=hrefinternal\s\+href="#.\{-}">!* $i:: !
 
   "disable all page-internal links
   sil! %s:<a\s\+class=hrefinternal\s\+href="#.\{-}">::g
 
   "mark all doc-internal links within the index (if any)
-  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase\.html#TAG_index_.\{-}">/ÞI!0::/g
+  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase\.html#TAG:__troff2page_index_.\{-}">/ÞI!0::/g
 
-  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\([0-9]\+\)\.html#TAG_index_.\{-}">/ÞI!\1::/g
+  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\([0-9]\+\)\.html#TAG:__troff2page_index_.\{-}">/ÞI!\1::/g
 
-  sil! %s/<a\s\+class=hrefinternal\s\+href="#TAG_index_.\{-}">/ÞI!$i::/g
+  sil! %s/<a\s\+class=hrefinternal\s\+href="#TAG:__troff2page_index_.\{-}">/ÞI!$i::/g
 
   "all other doc-internal links become Info *note's
   sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase\.html.\{-}">/ÞN!0::/g
@@ -124,9 +124,9 @@ done
 
 nvim -es $infofile <<EOF
 
-sil! /^\s*ÞTOC_MENU_BEGIN!/,/^\s*ÞTOC_MENU_END!/ s/^\(\s*\)\(\*\s\S\{-}::\)/\2\1/
+sil! /^\s*ÞINFO_MENU_BEGIN!/,/^\s*ÞINFO_MENU_END!/ s/^\(\s*\)\(\*\s\S\{-}::\)/\2\1/
 
-sil! %s/^\s*ÞTOC_MENU_\%(BEGIN\|END\)!//
+sil! %s/^\s*ÞINFO_MENU_\%(BEGIN\|END\)!//
 
 sil! %s/ÞN!\(.\{-}::\)/*note \1/g
 sil! %s/ÞI!\(.\{-}\)::\1/*note \1::/g

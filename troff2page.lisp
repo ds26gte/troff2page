@@ -2318,9 +2318,9 @@
       (incf *footnote-count*)
       (let ((n (write-to-string *footnote-count*)))
         (concatenate 'string
-          (anchor (concatenate 'string "TAG:__call_footnote_" n))
+          (anchor (concatenate 'string "TAG:__troff2page_call_footnote_" n))
           (link-start (page-node-link
-			nil (concatenate 'string "TAG:__footnote_" n)) t)
+			nil (concatenate 'string "TAG:__troff2page_footnote_" n)) t)
           (verbatim "<sup><small>")
           (verbatim n)
           (verbatim "</small></sup>")
@@ -3585,10 +3585,10 @@
               (fno
                 (let ((fno-str (write-to-string fno)))
                   (let ((node-name
-                          (concatenate 'string "TAG:__footnote_" fno-str)))
+                          (concatenate 'string "TAG:__troff2page_footnote_" fno-str)))
                     (emit (anchor node-name)))
                   (emit (link-start (page-node-link
-				      nil (concatenate 'string "TAG:__call_footnote_"
+				      nil (concatenate 'string "TAG:__troff2page_call_footnote_"
 						       fno-str)) t))
                   (emit-verbatim "<sup><small>")
                   (emit-verbatim fno-str)

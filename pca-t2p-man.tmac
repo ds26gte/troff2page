@@ -36,7 +36,7 @@
 .nr pca-t2p-man:toc-item-indent \\$1
 .shift
 \h'\\n[pca-t2p-man:toc-item-indent]m'
-\\*[url #TAG:__sec_\\n[pca-t2p-man:sec-count] "\\$*"]
+\\*[url #TAG:__pca_sec_\\n[pca-t2p-man:sec-count] "\\$*"]
 .br
 ..
 .
@@ -47,7 +47,7 @@
 .open pca:toc-stream \\*[AUXF].toc
 .\}
 .nr pca-toc:count +1
-.TAG __sec_\\n[pca-toc:count]
+.TAG __pca_sec_\\n[pca-toc:count]
 .write pca:toc-stream .TOCLINE-PLAIN \\n[pca-toc:count] \\$*
 ..
 .
