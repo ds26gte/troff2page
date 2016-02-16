@@ -1,4 +1,4 @@
-.\" last change 2016-02-15
+.\" last change 2016-02-16
 .
 .if !\n[.troff2page] .nx
 .
@@ -15,10 +15,21 @@
 .ig ##
 (let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) ".ind")))
   (unless (probe-file f)
-    (flag-missing-piece :index)
     (with-open-file (o f :direction :output)
-      (format o ".TAG troff2page_index~%"))
-    (push #'(lambda () (delete-file f)) *end-hooks*)))
+      (format o ".TAG troff2page_index~%")
+      (format o ".pca-t2p-ix::cant-open-ind-file~%"))))
+.##
+..
+.
+.de pca-t2p-ix::cant-open-ind-file
+.ig ##
+(flag-missing-piece :index)
+(let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) ".ind")))
+  (flag-missing-piece f)
+  (setq *file-postlude*
+    (lambda ()
+      (delete-file f)
+      (twarning "can't open `~a': No such file or directory" f))))
 .##
 ..
 .
