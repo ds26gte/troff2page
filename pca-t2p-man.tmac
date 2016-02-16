@@ -1,4 +1,4 @@
-.\" last modified 2016-02-14
+.\" last modified 2016-02-16
 .\" Dorai Sitaram
 .
 .\" these macros are relevant only for troff2page,
@@ -21,10 +21,10 @@
 .pca-t2p-man:orig-TH \\$*
 .ig ##
 (when (and (> *last-page-number* 0)
-           (not (gethash "TAG_troff2page_toc" *node-table*)))
+           (not (gethash "TAG:__troff2page_toc" *node-table*)))
   (flag-missing-piece :toc))
 .##
-.TAG troff2page_toc
+.TAG __troff2page_toc
 .so \\*[AUXF].toc
 .nr pca:next-graf-without-indent 1
 .nr pca-t2p-man:enable-toc-entries 1
@@ -36,7 +36,7 @@
 .nr pca-t2p-man:toc-item-indent \\$1
 .shift
 \h'\\n[pca-t2p-man:toc-item-indent]m'
-\\*[url #TAG_sec_\\n[pca-t2p-man:sec-count] "\\$*"]
+\\*[url #TAG:__sec_\\n[pca-t2p-man:sec-count] "\\$*"]
 .br
 ..
 .
@@ -47,7 +47,7 @@
 .open pca:toc-stream \\*[AUXF].toc
 .\}
 .nr pca-toc:count +1
-.TAG sec_\\n[pca-toc:count]
+.TAG __sec_\\n[pca-toc:count]
 .write pca:toc-stream .TOCLINE-PLAIN \\n[pca-toc:count] \\$*
 ..
 .

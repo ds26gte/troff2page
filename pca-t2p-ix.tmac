@@ -5,7 +5,7 @@
 .de IX
 .pca-ix:set-up-index
 .nr pca-ix::location +1
-.TAG index_\\n[pca-ix::location]
+.TAG __index_\\n[pca-ix::location]
 .write pca-ix:idx-stream \\\\indexentry{\\$*|pca-t2p-ix::function}{\\n[pca-ix::location]}
 ..
 .
@@ -15,7 +15,7 @@
 (let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) ".ind")))
   (unless (probe-file f)
     (with-open-file (o f :direction :output)
-      (format o ".TAG troff2page_index~%")
+      (format o ".TAG __troff2page_index~%")
       (format o ".pca-t2p-ix::cant-open-ind-file~%"))))
 .##
 ..
@@ -53,10 +53,10 @@
 .de pca-ix:hook
 .ig ##
 (when (and (> *last-page-number* 0)
-           (not (gethash "TAG_troff2page_index" *node-table*)))
+           (not (gethash "TAG:__troff2page_index" *node-table*)))
   (flag-missing-piece :index-in-nav-bar))
 .##
-.TAG troff2page_index
+.TAG __troff2page_index
 ..
 .
 .ig ##
@@ -64,7 +64,7 @@
 
 (defstring "pca-t2p-ix::function"
   (lambda (ixno)
-    (let* ((ix-tag (concatenate 'string "TAG_index_" ixno))
+    (let* ((ix-tag (concatenate 'string "TAG:__index_" ixno))
            (ix-pageno (gethash ix-tag *node-table*)))
       (concatenate 'string
         (link-start (page-node-link ix-pageno ix-tag) t)

@@ -1,4 +1,4 @@
-.\" last modified 2016-02-15
+.\" last modified 2016-02-16
 .\" Dorai Sitaram
 .
 .if !\n[.troff2page] .nx
@@ -9,14 +9,14 @@
   (unless (probe-file f)
     (flag-missing-piece :toc)))
 (when (and (> *last-page-number* 0) nil ;needed?
-           (not (gethash "TAG_troff2page_toc" *node-table*)))
+           (not (gethash "TAG:__troff2page_toc" *node-table*)))
   (flag-missing-piece :toc-in-nav-bar))
 .##
-.TAG troff2page_toc
+.TAG __troff2page_toc
 ..
 .
 .am TOC
-.TAG troff2page_toc_end
+.TAG __troff2page_toc_end
 ..
 .
 .de pca-toc:write-toc-line
@@ -56,6 +56,6 @@
             (let ((x (read-line i nil)))
               (unless x (return))
               (princ x o) (terpri o))))
-        (url-to-html (concatenate 'string "#TAG_sec_" n)
+        (url-to-html (concatenate 'string "#TAG:__sec_" n)
           (get-output-stream-string o))))))
 .##

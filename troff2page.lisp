@@ -110,7 +110,7 @@
 (defparameter *aux-file-suffix* "-Z-A.lisp")
 (defparameter *css-file-suffix* "-Z-S.css")
 (defparameter *html-conversion-by* "HTML conversion by")
-(defparameter *html-node-prefix* "node_")
+;(defparameter *html-id-prefix* "TAG:__")
 (defparameter *html-page-suffix* "-Z-H-")
 (defparameter *image-file-suffix* "-Z-G-")
 (defparameter *last-modified* "Last modified: ")
@@ -1390,9 +1390,9 @@
 	 (let* ((pageno *current-pageno*)
 		(first-page-p (= pageno 0))
 		(last-page-p (= pageno *last-page-number*))
-                (toc-page (gethash "TAG_troff2page_toc" *node-table*))
+                (toc-page (gethash "TAG:__troff2page_toc" *node-table*))
 		(toc-page-p (and toc-page (= pageno toc-page)))
-		(index-page (gethash "TAG_troff2page_index" *node-table*))
+		(index-page (gethash "TAG:__troff2page_index" *node-table*))
 		(index-page-p (and index-page (= pageno index-page))))
 	   ;(emit-para)
 	   (emit-verbatim "<div align=right class=navigation><i>")
@@ -1443,7 +1443,7 @@
 	       (unless toc-page-p
 		 (emit (link-start (page-node-link
 				     toc-page
-                                     "TAG_troff2page_toc") t)))
+                                     "TAG:__troff2page_toc") t)))
 	       (emit *navigation-contents-name*)
 	       (unless toc-page-p (emit (link-stop)))
 	       (emit-verbatim "</span>"))
@@ -1463,7 +1463,7 @@
 	       (unless index-page-p
 		 (emit (link-start (page-node-link
 				     index-page
-				     "TAG_troff2page_index") t)))
+				     "TAG:__troff2page_index") t)))
 	       (emit *navigation-index-name*)
 	       (unless index-page-p (emit (link-stop)))
 	       (emit-verbatim "</span>")))
@@ -2318,10 +2318,9 @@
       (incf *footnote-count*)
       (let ((n (write-to-string *footnote-count*)))
         (concatenate 'string
-          (anchor (concatenate 'string *html-node-prefix*
-                    "call_footnote_" n))
+          (anchor (concatenate 'string "TAG:__call_footnote_" n))
           (link-start (page-node-link
-			nil (concatenate 'string *html-node-prefix* "footnote_" n)) t)
+			nil (concatenate 'string "TAG:__footnote_" n)) t)
           (verbatim "<sup><small>")
           (verbatim n)
           (verbatim "</small></sup>")
@@ -3053,7 +3052,7 @@
                   (string= link-text ""))
           (setq link-text
             (cond ((char= (char url 0) #\#)
-                   (let ((s (concatenate 'string "TAG_"
+                   (let ((s (concatenate 'string "TAG:"
                               (subseq url 1))))
                      (cond ((setq it (gethash s *string-table*))
                             (funcall it))
@@ -3072,7 +3071,7 @@
   (defrequest "TAG"
     (lambda ()
       (let* ((args (read-args))
-             (node (concatenate 'string "TAG_" (car args)))
+             (node (concatenate 'string "TAG:" (car args)))
              (pageno *current-pageno*)
              (tag-value (or (cadr args) (write-to-string pageno))))
         ;(setq *keep-newline-p* nil)
@@ -3586,12 +3585,10 @@
               (fno
                 (let ((fno-str (write-to-string fno)))
                   (let ((node-name
-                          (concatenate 'string *html-node-prefix*
-                            "footnote_" fno-str)))
+                          (concatenate 'string "TAG:__footnote_" fno-str)))
                     (emit (anchor node-name)))
                   (emit (link-start (page-node-link
-				      nil (concatenate 'string
-						       *html-node-prefix* "call_footnote_"
+				      nil (concatenate 'string "TAG:__call_footnote_"
 						       fno-str)) t))
                   (emit-verbatim "<sup><small>")
                   (emit-verbatim fno-str)
