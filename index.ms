@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.ms
 .
-.ND 2016-02-14  \"last modified
+.ND 2016-02-16  \"last modified
 .
 .TL
 troff2page
@@ -69,6 +69,7 @@ in the distribution.
 .SH 2
 Calling troff2page from within Lisp
 
+.TAG calling_troff2page_within_cl
 .IX calling troff2page from Common Lisp
 It is not necessary to run the file \fCtroff2page\fP as a
 Unix script.  You can simply load \fCtroff2page\fP (it is
@@ -122,11 +123,14 @@ obvious.
 .IX eval4troff.tmac, macro file
 .IX mso@.mso, groff request
 The troff2page distribution includes several files with
-extension \fCtmac\fP, viz., \fCpca-tag.tmac\fP for inserting
+extension \fCtmac\fP, e.g., \fCpca-tag.tmac\fP for inserting
 hyperlinks; \fCpca-ix.tmac\fP for index generation;
-\fCeval4troff.tmac\fP
+\fCpca-eval.tmac\fP
 for extending troff using Common Lisp; and
-\fCdefhsl.tmac\fP for defining color names using the HSL scheme.
+\fCdefhsl.tmac\fP for defining color names using the HSL scheme. (Some of these reside
+in the submodule directory called \fCmpca\fP, and may alternatively be downloaded from
+\*[url https://github.com/ds26gte/mpca]\&.)
+
 You should put these \fC.tmac\fP files in one of your
 macro directories, i.e., the directories that are searched by groff’s
 \fC-m\fP option and \fC.mso\fP request.  (See the section for “Macro
@@ -161,13 +165,15 @@ way to get the correct PostScript output:
 .EX
     % groff -t -U -z index.ms
 .ft CI
-    defhsl.tmac:8: can't open `.trofftemp_lisp_1.tmp' ...
     Rerun groff with -U
-    index.ms:187: can't open `.trofftemp.aux' ...
-    index.ms:799: can't open `.trofftemp.ind' ...
+    index.ms:18: can't open `.trofftemp.toc': No such file or directory
+    index.ms:937: can't open `.trofftemp.ind': No such file or directory
 
 .ft C
     % groff -t -U index.ms > index.ps
+.ft CI
+    This is makeindex, ...
+    ...
 .EE
 
 The \fC-t\fP option (which calls the tbl
@@ -185,22 +191,41 @@ with the \fC-U\fP, as all the required aux files are made.
 (You will need the option again, if the aux files’ content
 changes.)
 
-troff2page is also run twice on the document to absorb
-information from the aux files.  However, troff2page doesn’t
-need any special option as it is always run in what groff
-would consider “unsafe” mode, and it processes tables by
-itself.
+troff2page also needs to process the document twice in order to absorb
+information from the aux files. However:
+
+(1) troff2page will automatically do the second processing
+without needing the user to explicitly call it a second time; and
+
+(2) troff2page doesn’t need any special option to run in “unsafe”
+mode or to process tables.
 
 .EX
     % troff2page index.ms
 .ft CI
-    Missing: (.troff2page_temp_index.ind .troff2page_temp_index.aux
-    LAST-PAGE-NUMBER TOC TITLE .troff2page_temp_index_lisp_1.tmp)
-    Rerun: troff2page index.ms
-
-.ft C
-    % troff2page index.ms
+    index.ms:18: can't open `.troff2page_temp_index.toc': No such file or directory
+    Missing: (INDEX LAST-PAGE-NUMBER .troff2page_temp_index.toc TOC TITLE
+              STYLESHEET)
+    Rerunning: troff2page index.ms
+    This is makeindex, ...
+    ...
 .EE
+
+The same holds if you run troff2page by calling
+the CL procedure \fCtroff2page:troff2page\fP within CL, as described on
+page \*[TAG_calling_troff2page_within_cl].
+
+If you wish to have
+the CL procedure perform just one pass on the document, give it a
+second argument that is non-false, e.g.,
+
+.EX
+    (troff2page:troff2page "index.ms" :single-pass)
+.EE
+
+Call it the same way a second time to run the second pass, which
+resolve the aux files. This is exactly analogous to calling
+\fCgroff\fP twice on the same document to resolve aux files.
 
 .TAG auxf
 .IX auxiliary files, naming of
@@ -236,9 +261,9 @@ text and exits.  For example,
 .EX
     % troff2page --help
 .ft CI
-    troff2page version 20111124
+    troff2page version 20160215
     Copyright (C) ...
-    For full details, please see http://www...
+    For full details, please see http://...
 .EE
 
 While this is intentionally similar to groff’s
@@ -892,11 +917,9 @@ Info.
     troff2info jobname.ms
 .EE
 
-It essentially first calls \fCtroff2page\fP on \fCjobname.ms\fP
+It first calls \fCtroff2page\fP on \fCjobname.ms\fP,
 then passes the resultant \fCjobname.html\fP to \fChtml2info\fP,
-which produces \fCjobname.info\fP. However, \fCtroff2info\fP
-takes care to \fCtroff2page\fP enough times to make sure that all
-the aux file data has been included in the document.
+which produces \fCjobname.info\fP.
 
 .if t \{\
 .SH 1
