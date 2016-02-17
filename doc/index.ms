@@ -21,7 +21,7 @@ troff2page
 .so troff-cmds.ms
 .so page-layout.ms
 .so xrefs.ms
-.so making-index.ms
+.so genindex.ms
 .so slideshow.ms
 .so eval.ms
 .so error-recovery.ms
