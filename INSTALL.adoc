@@ -6,12 +6,12 @@ Get the troff2page distribution from GitHub:
 
 This creates a directory `troff2page`.  `cd` to it.
 
-Copy the script `troff2page` to a directory in your PATH.
+Copy the scripts `troff2page` and `html2info` to a directory in your PATH.
 
 Copy the file `man/man1/troff2page.1` to the `man1` subdirectory of a
 directory in your `MANPATH`.
 
-Copy the file `man/man7/eval4troff.tmac.7` to the `man7` subdirectory of a
+Copy the file `man/man7/pca-eval.tmac.7` to the `man7` subdirectory of a
 directory in your `MANPATH`.
 
 The troff2page documentation (see below) uses the
