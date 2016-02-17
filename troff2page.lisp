@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160216) ;last change
+(defparameter *troff2page-version* 20160217) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -484,7 +484,7 @@
 (defvar *cascaded-if-stack*)
 (defvar *color-table*)
 (defvar *control-char*)
-(defvar *request-table*)
+(defvar *convert-to-info-p*)
 (defvar *css-stream*)
 (defvar *current-diversion*)
 (defvar *current-pageno*)
@@ -538,6 +538,7 @@
 (defvar *reading-table-header-p*)
 (defvar *reading-table-p*)
 (defvar *redirectedp*)
+(defvar *request-table*)
 (defvar *rerun-needed-p*)
 (defvar *saved-escape-char*)
 (defvar *slides*)
@@ -3459,6 +3460,10 @@
         (write-troff-macro-to-stream
           macro-name out))))
 
+  (defrequest "troff2info"
+    (lambda ()
+      (read-troff-line)
+      (setq *convert-to-info-p* t)))
   )
 
 (defun initialize-presets ()
@@ -3471,6 +3476,7 @@
 (defun load-aux-file ()
   (initialize-presets)
   ;
+  (setq *convert-to-info-p* nil)
   (setq *rerun-needed-p* nil)
   (setq *pso-temp-file* (concatenate 'string *jobname* *pso-file-suffix*))
   (let ((aux-file (concatenate 'string *jobname* *aux-file-suffix*)))
@@ -4693,12 +4699,16 @@
         (with-open-file (o (concatenate 'string *jobname* *log-file-suffix*)
                            :direction :output :if-exists :supersede)
           (let ((*log-stream* (make-broadcast-stream o *standard-output*))
-                *rerun-needed-p*)
-            (troff2page-1pass input-doc)
-            (when *rerun-needed-p*
-              (cond (single-pass-p (tlog "Rerun: troff2page ~a~%" input-doc))
-                    (t (tlog "Rerunning: troff2page ~a~%" input-doc)
-                       (troff2page-1pass input-doc))))))))))
+                *convert-to-info-p*
+                *rerun-needed-p*))
+          (troff2page-1pass input-doc)
+          (when *rerun-needed-p*
+            (cond (single-pass-p (tlog "Rerun: troff2page ~a~%" input-doc))
+                  (t (tlog "Rerunning: troff2page ~a~%" input-doc)
+                     (troff2page-1pass input-doc))))
+          (when (and (not *rerun-needed-p*) *convert-to-info-p*)
+            (os-execute (concatenate 'string
+                          "html2info " *jobname* ".html"))))))))
 
 (troff2page *troff2page-file-arg*
             ;:single-pass
