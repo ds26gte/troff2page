@@ -2,12 +2,12 @@
 .\"     Title: troff2page
 .\"    Author: [see the "AUTHORS" section]
 .\" Generator: Asciidoctor 1.5.4
-.\"      Date: 2015-12-28
+.\"      Date: 2016-02-17
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "TROFF2PAGE" "1" "2015-12-28" "\ \&" "\ \&"
+.TH "TROFF2PAGE" "1" "2016-02-17" "\ \&" "\ \&"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -194,18 +194,17 @@ immediately obvious.
 The troff2page distribution includes several macro files (aka tmac
 files) with extension \f[CR]tmac\fP,
 viz., \f[CR]pca\-*.tmac\fP for various useful extensions;
-\f[CR]eval4troff.tmac(7)\fP for extending troff using Common Lisp; and
+\f[CR]pca\-eval.tmac(7)\fP for extending troff using Common Lisp; and
 \f[CR]defhsl.tmac\fP for defining color names using the HSL scheme.  You should
 put these \f[CR]tmac\fP files in one of your macro directories, i.e., the
 directories that are searched by groff’s \f[CR]\-m\fP option and \f[CR].mso\fP request.
 (See \f[CR]groff_tmac(5)\fP, section FILES, for
 details.  In a pinch, your home directory works as a macro directory.)
 .sp
-Note that it is best to load these \f[CR]tmac\fP files into your document with
-an \f[CR].mso\fP request rather than through groff’s command\-line option
-\f[CR]\-m\fP.
-This is because troff2page doesn’t support the same kind of command\-line
-arguments that groff does.
+Note that it is best to load these \f[CR]tmac\fP files into your
+document with an \f[CR].mso\fP request rather than through groff’s
+command\-line option \f[CR]\-m\fP. This is because troff2page doesn’t
+support the same kind of command\-line arguments that groff does.
 .SH "AUXILIARY FILES"
 .sp
 Many of the macros defined in these \f[CR]tmac\fP files write
@@ -222,21 +221,13 @@ way to get the correct PostScript output:
 .RS 4
 .\}
 .nf
-% groff \-t \-U \-z troff2page.ms
-defhsl.tmac:8: can\(aqt open `.trofftemp_lisp_1.tmp\(aq ...
-Rerun groff with \-U
-troff2page.ms:187: can\(aqt open `.trofftemp.aux\(aq ...
-troff2page.ms:799: can\(aqt open `.trofftemp.ind\(aq ...
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-% groff \-t \-U troff2page.ms > troff2page.ps
+    % groff \-t \-U \-z troff2page.ms
+    defhsl.tmac:8: can\(aqt open `.trofftemp_lisp_1.tmp\(aq ...
+    Rerun groff with \-U
+    troff2page.ms:187: can\(aqt open `.trofftemp.aux\(aq ...
+    troff2page.ms:799: can\(aqt open `.trofftemp.ind\(aq ...
+
+    % groff \-t \-U troff2page.ms > troff2page.ps
 .fi
 .if n \{\
 .RE
@@ -650,6 +641,22 @@ argument is the filename.
 (This argument style works for all
 vi and emacs clones and I suspect most modern editors take care
 to recognize it, so it isn’t as restrictive as it sounds.)
+.SH "INFO DOCS"
+.sp
+You can call the macro
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.troff2info
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+within your document to signal to troff2page that it should also
+create an Info document.
 .SH "AVAILABILITY"
 .sp
 troff2page is downloadable from
@@ -657,5 +664,4 @@ troff2page is downloadable from
 .SH "SEE ALSO"
 .sp
 groff(1), groff_tmac(5), groff_man(7), groff_ms(7),
-eval4troff.tmac(7),
-clisp(1), cmucl(1), ecl(1), lisp(1), sbcl(1)
+pca\-eval.tmac(7), clisp(1), cmucl(1), ecl(1), lisp(1), sbcl(1)

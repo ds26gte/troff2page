@@ -462,6 +462,15 @@ argument is the filename.
 vi and emacs clones and I suspect most modern editors take care
 to recognize it, so it isn’t as restrictive as it sounds.)
 
+== INFO DOCS
+
+You can call the macro
+
+  .troff2info
+
+within your document to signal to troff2page that it should also
+create an Info document.
+
 == AVAILABILITY
 
 troff2page is downloadable from

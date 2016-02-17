@@ -1,11 +1,13 @@
 .SH 1
 1. Introduction
 
+.IX troff2page, script
 troff2page converts troff (man and ms) documents into HTML web pages.
 
 .TAG html-output
 .IX calling troff2page from the command-line
-To convert an input troff document named \fCjobname.ms\fP, type
+To convert an input troff document named \fCjobname.ms\fP, use
+the script \fCtroff2page\fP on the operating-system command line.
 
 .EX
     troff2page jobname.ms
@@ -38,6 +40,10 @@ the corresponding Lisp implementations being
 \*[url http://cmucl.org]CMUCL\&,
 \*[url http://ecls.sf.net]ECL\&, and
 \*[url http://sbcl.sf.net]SBCL\&.
+
+Copy the script \fCtroff2page\fP to your \fCPATH\fP. If you wish
+to generate Info output, also add the script \fChtml2info\fP,
+described on page \*[TAG:gnuinfo], to your \fCPATH\fP.
 
 If \fCLISP\fP is not
 set, some default Lisp implementation is assumed.
