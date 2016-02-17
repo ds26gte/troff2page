@@ -1,7 +1,7 @@
 .SH 1
 9. GNU Info docs
 
-.IX Info files
+.IX Info files, generating
 The troff2page distribution includes a couple of scripts for
 generating GNU Info docs.
 
@@ -28,3 +28,17 @@ Info.
 It first calls \fCtroff2page\fP on \fCjobname.ms\fP,
 then passes the resultant \fCjobname.html\fP to \fChtml2info\fP,
 which produces \fCjobname.info\fP.
+
+.IX troff2info@.troff2info, macro
+.IX troff2pagerc@.troff2pagerc.tmac, macro file
+You can also call the macro
+
+.EX
+    .troff2info
+.EE
+
+within your document to signal to \fCtroff2page\fP that it should
+also create an Info-file output.  Since \fCtroff2page\fP doesn’t
+accept options, a good place to set \fC.troff2info\fP is in the
+\fC.troff2pagerc.tmac\fP file, described on page
+\*[TAG:troff2pagerc].
