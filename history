@@ -1,4 +1,16 @@
-Last change 2016-02-16
+Last change 2016-02-17
+
+2016 Feb 16
+
+html2info -- replace calls to 'nvim -e' with sed, as (1) 'nvim
+-e' temporarily takes over screen flashing alarming messages
+(even when all commands are marked silent), and (2) Lisp
+can't call a shell script containing 'nvim -e' without
+hanging.
+
+Macro .troff2info causes troff2page to further convert the HTML doc
+to Info doc. This is only done if troff2page can determine
+that all aux files have been resolved.
 
 2016 Feb 15
 
