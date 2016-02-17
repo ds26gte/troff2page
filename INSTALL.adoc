@@ -15,7 +15,7 @@ Copy the file `man/man7/pca-eval.tmac.7` to the `man7` subdirectory of a
 directory in your `MANPATH`.
 
 The troff2page documentation (see below) uses the
-`pca-t2p-*.tmac` files in the top-level `troff2page` directory,
+`pca-t2p-\*.tmac` files in the top-level `troff2page` directory,
 as also the `pca*.tmac` files from the `mpca` submodule.
 (available on its own at https://github.com/ds26gte/mpca). To
 include `mpca`, do
@@ -25,7 +25,7 @@ include `mpca`, do
 
 This will create an `mpca` subdirectory.
 
-Copy these `pca*.tmac` files from `mpca`, as also the `pca-t2p-*.tmac` files
+Copy these `pca*.tmac` files from `mpca`, as also the `pca-t2p-\*.tmac` files
 in the top-level `troff2page` directory, to somewhere in your
 `GROFF_TMAC_PATH` (or include these directories or copies thereof
 in `GROFF_TMAC_PATH`). In a pinch, if you don’t want to mess with
@@ -43,11 +43,11 @@ The `pca-t2p-*.tmac` are only used by `troff2page`, never by
 
 == Man pages
 
-You can now consult the man pages `troff2page(1)` and `eval4troff.tmac(7)`
+You can now consult the man pages `troff2page(1)` and `pca-eval.tmac(7)`
 to get started with using troff2page.
 
   man troff2page
-  man eval4troff.tmac
+  man pca-eval.tmac
 
 == Lisp implementions
 
@@ -73,30 +73,34 @@ unset):
   % troff2page jobname.ms
 
 To have troff2page run on Common Lisp implementations other than these,
-you will have to add lines to the head of the `troff2page` file.
+you will have to modify lines at the head of the `troff2page` file.
 
 To have `.eval` work for groff (and not just troff2page), you will have to
-add lines in the corresponding area in the file `eval4troff.tmac` as well.
+modify similar lines in the file `pca-eval-lisp.tmac` as well.
 
 == Documentation
 
-The file `index.ms` provides complete documentation for troff2page
-and can be processed with either groff or troff2page.  To process
-`index.ms`, you must have installed troff2page, including the macro
-files that come with this distribution, as described above.
+Documentation for troff2page is available online at
+http://ds26gte.github.io/troff2page/index.html.
 
-You will need to run groff or troff2page more than once in order to
-pick up all the auxiliary file info.  Both programs will give out
-information on the console telling you when you need to re-run them and
-how.  Follow that information.
+The troff source for this document, `index.ms`, is available in
+the `doc` subdirectory of the distribution. It can be processed
+with either groff or troff2page.  You must
+have installed troff2page, including the macro files that come
+with this distribution, as described above.
+
+If calling groff on `index.ms`, you will need to run groff twice
+in order to pick up all the auxiliar file info. (There will be a
+message reminding you to do so.)
 
 == Running troff2page as a Lisp procedure
 
-It is not necessary to use the file `troff2page` as a Unix script.
-You can simply load `troff2page` (which is really a Lisp file)
-into your Common Lisp, and then call the Lisp procedure
-`troff2page:troff2page` (i.e., the procedure named `troff2page`
-in the package `troff2page`) on your source document.  E.g.,
+It is not necessary to use the file `troff2page` as a Unix
+script. You can simply load `troff2page` (which is really a Lisp
+file, `troff2page.lisp`) into your Common Lisp, and then call the
+Lisp procedure `troff2page:troff2page` (i.e., the procedure named
+`troff2page` in the package `troff2page`) on your source
+document.  E.g.,
 
   (load "pathname/of/troff2page")
   (troff2page:troff2page "my-troff-document.1")
