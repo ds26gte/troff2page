@@ -28,11 +28,11 @@
           (subseq (format nil "~a" *troff2page-version*) 0 4)))
 
 (defun retrieve-env (s)
-  (or #+clisp (ext::getenv s)
-      #+clozure (ccl::getenv s)
+  (or #+clisp (ext:getenv s)
+      #+clozure (ccl:getenv s)
       #+cmu (cdr (assoc s ext::*environment-list* :test #'string=))
-      #+ecl (si::getenv s)
-      #+sbcl (sb-ext::posix-getenv s)
+      #+ecl (ext:getenv s)
+      #+sbcl (sb-ext:posix-getenv s)
       nil))
 
 (defvar *troff2page-file-arg*
@@ -47,13 +47,13 @@
 (defvar *log-stream*)
 
 (defun os-execute (s)
-  (or #+clisp (ext::shell s)
+  (or #+clisp (ext:shell s)
       #+clozure (ccl::os-command s)
       #+cmu (ext::run-program "sh" (list "-c" s) :output t)
-      #+ecl (si::system s)
+      #+ecl (ext:system s)
       #+sbcl
-      (let ((p (sb-ext::run-program "sh" (list "-c" s) :search t :output (or *log-stream* t))))
-        (sb-ext::process-exit-code p))
+      (let ((p (sb-ext:run-program "sh" (list "-c" s) :search t :output (or *log-stream* t))))
+        (sb-ext:process-exit-code p))
       nil))
 
 (defun retrieve-pid ()
@@ -64,8 +64,8 @@
                  (find-symbol "GETPPID" :posix)))
       #+clozure (ccl::getpid)
       #+cmu (unix::unix-getpid)
-      #+ecl (si::getpid)
-      #+sbcl (sb-unix::unix-getpid)
+      #+ecl (ext:getpid)
+      #+sbcl (sb-unix:unix-getpid)
       999))
 
 ;
