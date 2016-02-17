@@ -1,4 +1,4 @@
-# last modified 2016-02-16
+# last modified 2016-02-17
 # Dorai Sitaram
 
 debugmode=false
@@ -44,52 +44,50 @@ do
 
   cp $ifile $tmpfile
 
-  nvim -es $tmpfile <<EOF
+  # use an unabbrev for literal Þ as we'll be using Þ for intermediate tokens
+  sed -i $tmpfile -e 's/Þ/&!/g'
 
-  "use an unabbreviation for literal Þ as we'll be using Þ for intermediate tokens
-  sil! %s/Þ/&!/g
+  # delete navigation lines
+  sed -i $tmpfile -e '/^<div\s\+\S\+\s\+class=navigation.\+<\/div>/d'
 
-  "navigation lines can go. Info has its own navigation
-  sil! g:^<div.\{-}class=navigation.\{-}</div>:d
+  # mark beginning and end of ToC
+  sed -i $tmpfile -e 's/^<a\s\+name="TAG:__t\(roff\|tex\)2page_toc">/<!-- ÞINFO_MENU_BEGIN! -->ÞINFO_MENU_BEGIN!* Menu:<br>/'
 
-  "mark beginning and end of ToC
-  sil! %s/^<a\s\+name="TAG:__t\(roff\|ex\)2page_toc">/<!-- ÞINFO_MENU_BEGIN! -->ÞINFO_MENU_BEGIN!* Menu:<br>/
+  sed -i $tmpfile -e 's/^<a\s\+name="TAG:__t\(roff\|tex\)2page_toc_end">/<!-- ÞINFO_MENU_END! -->ÞINFO_MENU_END!/'
 
-  sil! %s/^<a\s\+name="TAG:__t\(roff\|ex\)2page_toc_end">/<!-- ÞINFO_MENU_END! -->ÞINFO_MENU_END!/
+  # create Info menu entry for all doc-internal links within ToC
+  sed -i $tmpfile -e '/^<!--\s\+ÞINFO_MENU_BEGIN!\s\+-->/,/^<!--\s\+ÞINFO_MENU_END!\s\+-->/ s/<a\s\+class=hrefinternal\s\+href="'$fbase'\.html#[^"]*">/* 0:: /g'
 
-  "create an Info menu entry for all doc-internal links within ToC
-  sil! /^<!-- ÞINFO_MENU_BEGIN! -->/,/^<!-- ÞINFO_MENU_END! -->/ s!<a\s\+class=hrefinternal\s\+href="$fbase\.html#.\{-}">!* 0:: !
+  sed -i $tmpfile -e '/^<!--\s\+ÞINFO_MENU_BEGIN!\s\+-->/,/^<!--\s\+ÞINFO_MENU_END!\s\+-->/ s/<a\s\+class=hrefinternal\s\+href="'$fbase'-Z-H-\([0-9]\+\)\.html#[^"]*">/* \1:: /g'
 
-  sil! /^<!-- ÞINFO_MENU_BEGIN! -->/,/^<!-- ÞINFO_MENU_END! -->/  s!<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\(.\{-}\)\.html#.\{-}">!* \1:: !
+  sed -i $tmpfile -e '/^<!--\s\+ÞINFO_MENU_BEGIN!\s\+-->/,/^<!--\s\+ÞINFO_MENU_END!\s\+-->/ s/<a\s\+class=hrefinternal\s\+href="#[^"]*>"/* '$i':: /g'
 
-  sil! /^<!-- ÞINFO_MENU_BEGIN! -->/,/^<!-- ÞINFO_MENU_END! -->/ s!<a\s\+class=hrefinternal\s\+href="#.\{-}">!* $i:: !
+  # disable all other page-internal links
 
-  "disable all page-internal links
-  sil! %s:<a\s\+class=hrefinternal\s\+href="#.\{-}">::g
+  sed -i $tmpfile -e 's/<a\s\+class=hrefinternal\s\+href="#[^"]\+">//g'
 
-  "mark all doc-internal links within the index (if any)
-  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase\.html#TAG:__t\(roff\|ex\)2page_index_.\{-}">/ÞI!0::/g
+  # mark all doc-internal links in the index (if any)
 
-  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\([0-9]\+\)\.html#TAG:__t\(roff\|ex\)2page_index_.\{-}">/ÞI!\1::/g
+  sed -i $tmpfile -e 's/<a\s\+class=hrefinternal\s\+href="'$fbase'\.html#TAG:__t\(roff\|ex\)2page_index_[^"]\+">/ÞI!0::/g'
 
-  sil! %s/<a\s\+class=hrefinternal\s\+href="#TAG:__t\(roff\|ex\)2page_index_.\{-}">/ÞI!$i::/g
+  sed -i $tmpfile -e 's/<a\s\+class=hrefinternal\s\+href="'$fbase'-Z-H-\([0-9]\+\)\.html#TAG:__t\(roff\|ex\)2page_index_[^"]\+">/ÞI!\1::/g'
 
-  "all other doc-internal links become Info *note's
-  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase\.html.\{-}">/ÞN!0::/g
+  sed -i $tmpfile -e 's/<a\s\+class=hrefinternal\s\+href="#TAG:__t\(roff\|ex\)2page_index_[^"]\+">/ÞI!'$i'::/g'
 
-  sil! %s/<a\s\+class=hrefinternal\s\+href="$fbase-Z-H-\([0-9]\+\)\.html.\{-}">/ÞN!\1::/g
+  # all other doc-internal links become Info *note's
 
-  "disable all doc-external links
-  sil! %s!<a\s\+href=".\{-}">!!g
+  sed -i $tmpfile -e 's/<a\s\+class=hrefinternal\s\+href="'$fbase'\.html.[^"]*">/ÞN!0::/g'
 
-  "delete all anchors
-  sil! %s!<a name=".\{-}">!!g
+  sed -i $tmpfile -e 's/<a\s\+class=hrefinternal\s\+href="'$fbase'-Z-H-\([0-9]\+\)\.html.[^"]*">/ÞN!\1::/g'
 
-  "</a> are all orphans now -- delete
-  sil! %s!</a>!!g
+  # disable all doc-external links
+  sed -i $tmpfile -e 's/<a\s\+href="[^=]\+">//g'
 
-  x
-EOF
+  # delete all anchors
+  sed -i $tmpfile -e 's/<a\s\+name="[^"]\+">//g'
+
+  # </a> are all orphans now -- delete
+  sed -i $tmpfile -e 's/<\/a>//g'
 
   infotitleline="File: $infofile"
 
@@ -122,18 +120,19 @@ EOF
   i=$(expr $i + 1)
 done
 
-nvim -es $infofile <<EOF
+  # flushleft menu entries
+  sed -i $infofile -e '/^\s*ÞINFO_MENU_BEGIN!/,/^\s*ÞINFO_MENU_END!/ s/^\(\s*\)\(\*\s\+[^:]\+::\)/\2\1/'
 
-sil! /^\s*ÞINFO_MENU_BEGIN!/,/^\s*ÞINFO_MENU_END!/ s/^\(\s*\)\(\*\s\S\{-}::\)/\2\1/
+  # delete menu markers
+  sed -i $infofile -e 's/^\s*ÞINFO_MENU_\(BEGIN\|END\)!//'
 
-sil! %s/^\s*ÞINFO_MENU_\%(BEGIN\|END\)!//
+  # expand doc-internal notes (not index)
+  sed -i $infofile -e 's/ÞN!\([0-9]\+::\)/*note \1/g'
 
-sil! %s/ÞN!\(.\{-}::\)/*note \1/g
-sil! %s/ÞI!\(.\{-}\)::\1/*note \1::/g
+  # expand doc-internal notes in index
+  sed -i $infofile -e 's/ÞI!\([0-9]\+\)::\1/*note \1::/g'
 
-sil! %s/Þ!/Þ/g
-
-x
-EOF
+  # restore Þ
+  sed -i $infofile -e 's/Þ!/Þ/g'
 
 # vi:ft=sh
