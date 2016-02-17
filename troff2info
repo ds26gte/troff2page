@@ -3,10 +3,10 @@
 
 # convert a troff document to its Info counterpart
 
-fbase=$(echo $1 | sed -e 's/\.[^.]\+$//')
+f=$1
 
-troff2page $1
+troff2page $f
 
-html2info $fbase.html
+html2info ${f%.*}.html
 
 # vi:ft=sh

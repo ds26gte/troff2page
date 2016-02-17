@@ -1,4 +1,6 @@
-Last modified 2015-10-02
+Last modified 2016-02-17
+
+Gnu's Info viewer freezes on reaching very end of html2info-generated Info file. Other viewers seem fine.
 
 table column specifier w
 
