@@ -44,7 +44,7 @@
         t)
       (retrieve-env "T2PARG")))
 
-(defvar *log-stream*)
+(defvar *log-stream* t)
 
 (defun os-execute (s)
   (or #+clisp (ext:shell s)
@@ -52,7 +52,7 @@
       #+cmu (ext::run-program "sh" (list "-c" s) :output t)
       #+ecl (ext:system s)
       #+sbcl
-      (let ((p (sb-ext:run-program "sh" (list "-c" s) :search t :output (or *log-stream* t))))
+      (let ((p (sb-ext:run-program "sh" (list "-c" s) :search t :output *log-stream*)))
         (sb-ext:process-exit-code p))
       nil))
 
@@ -508,7 +508,7 @@
 (defvar *image-file-count*)
 (defvar *input-line-no*)
 (defvar *inside-table-text-block-p*)
-(defvar *jobname*)
+(defvar *jobname* nil)
 (defvar *just-after-par-start-p*)
 (defvar *keep-newline-p*)
 (defvar *last-input-milestone*)
@@ -775,8 +775,7 @@
     c))
 
 (defun tlog (fstr &rest args)
-  (apply #'format (or *log-stream* t)
-         fstr args))
+  (apply #'format *log-stream* fstr args))
 
 (defun twarning (fstr &rest args)
   (tlog "~a:~a: " *current-source-file* *input-line-no*)
@@ -3477,8 +3476,10 @@
   (initialize-presets)
   ;
   (setq *convert-to-info-p* nil)
-  (setq *rerun-needed-p* nil)
+  (unless *jobname* (setq *jobname* (file-stem-name *main-troff-file*)))
   (setq *pso-temp-file* (concatenate 'string *jobname* *pso-file-suffix*))
+  (setq *rerun-needed-p* nil)
+  ;
   (let ((aux-file (concatenate 'string *jobname* *aux-file-suffix*)))
     (when (probe-file aux-file)
       (load-troff2page-data-file aux-file)
@@ -4693,22 +4694,23 @@
     (do-bye)))
 
 (defun troff2page (input-doc &optional single-pass-p)
-  (let ((*log-stream* nil))
+  (let (*convert-to-info-p*
+         *jobname*
+         (*log-stream* t)
+         *rerun-needed-p*)
     (unless (troff2page-help input-doc)
-      (let ((*jobname* (file-stem-name input-doc)))
-        (with-open-file (o (concatenate 'string *jobname* *log-file-suffix*)
-                           :direction :output :if-exists :supersede)
-          (let ((*log-stream* (make-broadcast-stream o *standard-output*))
-                *convert-to-info-p*
-                *rerun-needed-p*))
-          (troff2page-1pass input-doc)
-          (when *rerun-needed-p*
-            (cond (single-pass-p (tlog "Rerun: troff2page ~a~%" input-doc))
-                  (t (tlog "Rerunning: troff2page ~a~%" input-doc)
-                     (troff2page-1pass input-doc))))
-          (when (and (not *rerun-needed-p*) *convert-to-info-p*)
-            (os-execute (concatenate 'string
-                          "html2info " *jobname* ".html"))))))))
+      (setq *jobname* (file-stem-name input-doc))
+      (with-open-file (o (concatenate 'string *jobname* *log-file-suffix*)
+                         :direction :output :if-exists :supersede)
+        (setq *log-stream* (make-broadcast-stream o *standard-output*))
+        (troff2page-1pass input-doc)
+        (when *rerun-needed-p*
+          (cond (single-pass-p (tlog "Rerun: troff2page ~a~%" input-doc))
+                (t (tlog "Rerunning: troff2page ~a~%" input-doc)
+                   (troff2page-1pass input-doc))))
+        (when (and (not *rerun-needed-p*) *convert-to-info-p*)
+          (os-execute (concatenate 'string
+                        "html2info " *jobname* ".html")))))))
 
 (troff2page *troff2page-file-arg*
             ;:single-pass
