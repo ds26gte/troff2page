@@ -4731,8 +4731,6 @@
                              (if (= i 0) "" (format nil "-Z-H-~a" i)) ".html")
                            tmp-html-file)
 
-        (html2info-tweak-html-file tmp-html-file i)
-
         (format o "~c~%File: ~a" (code-char 31) info-file)
 
         (when (= i 0) (format o ", Node: Top"))
@@ -4745,10 +4743,15 @@
 
         (format o ", Up: Top~%")
 
+        (html2info-tweak-html-file tmp-html-file i)
+
         (os-execute
           (concatenate 'string
             "lynx -dump -nolist " tmp-html-file " > " tmp-info-file))
+        (delete-file tmp-html-file)
+
         (copy-file-to-stream tmp-info-file o)
+        (delete-file tmp-info-file)
 
         (incf i)))
 
