@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160217) ;last change
+(defparameter *troff2page-version* 20160218) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -47,8 +47,14 @@
 (defvar *log-stream* t)
 
 (defun os-execute (s)
-  (or #+clisp (ext:shell s)
-      #+clozure (ccl::os-command s)
+  (or #+clisp
+      (let ((st (ext:shell s)))
+        (not st))
+      #+clozure
+      (let ((p (ccl:run-program "sh" (list "-c" s) :output t)))
+        (multiple-value-bind (status exit-code) (ccl:external-process-status p)
+          (declare (ignore status))
+          exit-code))
       #+cmu (ext::run-program "sh" (list "-c" s) :output t)
       #+ecl (ext:system s)
       #+sbcl
@@ -497,6 +503,7 @@
 (defvar *ev-stack*)
 (defvar *ev-table*)
 (defvar *exit-status*)
+(defvar *file-copy-buffer*)
 (defvar *file-postlude*)
 (defvar *font-alternating-style-p*)
 (defvar *footnote-buffer*)
@@ -580,6 +587,8 @@
   (prevbgcolor nil))
 
 (defun defrequest (w th)
+  (when (gethash w *macro-table*)
+    (setf (gethash w *macro-table*) nil))
   (setf (gethash w *request-table*) th))
 
 (defun deftmacro (w ss)
@@ -2431,7 +2440,9 @@
                    (cons
                      (concatenate 'string "." tmp " \\$*")
                      extra-macro-body))
+                 #+(and nil wrong)
                  (defrequest w
+                   ;wrong!
                    (lambda ()
                      (execute-macro w)))))
               (t (deftmacro w extra-macro-body)))
@@ -4572,6 +4583,7 @@
            (ig (read-opt-pipe))
            (x (read-length-in-pixels))
            (delim2 (get-char)))
+      (declare (ignore ig))
       (unless (char= delim delim2)
         (error "\\h bad delims ~c ~c" delim delim2))
       ;assume 1 space = 5 pixels and 1 pixel = 1 point
@@ -4643,7 +4655,6 @@
         (*just-after-par-start-p* nil)
         (*keep-newline-p* t)
         (*last-input-milestone* 0)
-        (*last-page-number* -1)
         (*leading-spaces-macro* nil)
         (*leading-spaces-number* 0)
         (*lines-to-be-centered* 0)
@@ -4695,9 +4706,136 @@
     (troff2page-file input-doc)
     (do-bye)))
 
+(defun copy-file-to-stream (fi o &aux n)
+  (with-open-file (i fi :direction :input)
+    (loop
+      (setq n (read-sequence *file-copy-buffer* i))
+      (unless (> n 0) (return))
+      (write-sequence *file-copy-buffer* o :end n))))
+
+(defun copy-file-to-file (fi fo)
+  (with-open-file (o fo :direction :output :if-exists :supersede)
+    (copy-file-to-stream fi o)))
+
+(defun html2info ()
+  (let ((tmp-html-file (concatenate 'string *jobname* "-Z-T.html"))
+        (tmp-info-file (concatenate 'string *jobname* "-Z-T.info"))
+        (info-file (concatenate 'string *jobname* ".info"))
+        (i 0))
+    (setq *file-copy-buffer* (make-string 4096))
+
+    (with-open-file (o info-file :direction :output :if-exists :supersede)
+      (loop
+        (when (> i *last-page-number*) (return))
+
+        (copy-file-to-file (concatenate 'string *jobname*
+                             (if (= i 0) "" (format nil "-Z-H-~a" i)) ".html")
+                           tmp-html-file)
+
+        (html2info-tweak-html-file tmp-html-file i)
+
+        (format o "~c~%File: ~a" (code-char 31) info-file)
+
+        (when (= i 0) (format o ", Node: Top"))
+        (when (> i 0) (format o ", Node: ~a" i))
+
+        (when (= i 1) (format o ", Prev: Top"))
+        (when (> i 1) (format o ", Prev: ~a" (- i 1)))
+
+        (when (/= i *last-page-number*) (format o ", Next: ~a" (+ i 1)))
+
+        (format o ", Up: Top~%")
+
+        (os-execute
+          (concatenate 'string
+            "lynx -dump -nolist " tmp-html-file " > " tmp-info-file))
+        (copy-file-to-stream tmp-info-file o)
+
+        (incf i)))
+
+    (html2info-tweak-info-file info-file)))
+
+#+(and nil obsolete)
+(defun html2info ()
+  (os-execute (concatenate 'string "html2info " *jobname* ".html")))
+
+(defun sed (f &rest ee)
+  (let ((s (concatenate 'string "sed -i"
+             (apply #'concatenate 'string
+                    (mapcar (lambda (x) (concatenate 'string " -e '" x "'")) ee))
+             " " f)))
+    ;ECL can't stomach non-ascii in strings sent to ext procs
+    #+ecl
+    (setq s (nsubstitute #\@ #\Þ s))
+    (os-execute s)))
+
+(defun html2info-tweak-html-file (f i)
+
+  ; use an unabbrev for literal Þ as we'll be using Þ for intermediate tokens
+  (sed f "s/Þ/&!/g"
+
+       ; delete navigation lines
+       "/^<div\\s\\+\\S\\+\\s\\+class=navigation.\\+<\\/div>/d"
+
+       ; mark beginning and end of ToC
+       "s/^<a\\s\\+name=\"TAG:__t\\(roff\\|tex\\)2page_toc\">/<!-- ÞINFO_MENU_BEGIN! -->ÞINFO_MENU_BEGIN!* Menu:<br>/"
+
+       "s/^<a\\s\\+name=\"TAG:__t\\(roff\\|tex\\)2page_toc_end\">/<!-- ÞINFO_MENU_END! -->ÞINFO_MENU_END!/"
+
+       ; create Info menu entry for all doc-internal links within ToC
+       (format nil "/^<!--\\s\\+ÞINFO_MENU_BEGIN!\\s\\+-->/,/^<!--\\s\\+ÞINFO_MENU_END!\\s\\+-->/ s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a\\.html#[^\"]*\">/* 0:: /g" *jobname*)
+
+       (format nil "/^<!--\\s\\+ÞINFO_MENU_BEGIN!\\s\\+-->/,/^<!--\\s\\+ÞINFO_MENU_END!\\s\\+-->/ s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a-Z-H-\\([0-9]\\+\\)\\.html#[^\"]*\">/* \\1:: /g" *jobname*)
+
+       (format nil "/^<!--\\s\\+ÞINFO_MENU_BEGIN!\\s\\+-->/,/^<!--\\s\\+ÞINFO_MENU_END!\\s\\+-->/ s/<a\\s\\+class=hrefinternal\\s\\+href=\"#[^\"]*>\"/* ~a:: /g" i)
+
+       ; disable all other page-internal links
+
+       "s/<a\\s\\+class=hrefinternal\\s\\+href=\"#[^\"]\\+\">//g"
+
+       ; mark all doc-internal links in the index (if any
+
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a\\.html#TAG:__t\\(roff\\|ex\\)2page_index_[^\"]\\+\">/ÞI!0::/g" *jobname*)
+
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a-Z-H-\\([0-9]\\+\\)\\.html#TAG:__t\\(roff\\|ex\\)2page_index_[^\"]\\+\">/ÞI!\\1::/g" *jobname*)
+
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"#TAG:__t\\(roff\\|ex\\)2page_index_[^\"]\\+\">/ÞI!~a::/g" i)
+
+       ; all other doc-internal links become Info *note's
+
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a\\.html.[^\"]*\">/ÞN!0::/g" *jobname*)
+
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a-Z-H-\\([0-9]\\+\\)\\.html.[^\"]*\">/ÞN!\\1::/g" *jobname*)
+
+       ; disable all doc-external links
+       "s/<a\\s\\+href=\"[^=]\\+\">//g"
+
+       ; delete all anchors
+       "s/<a\\s\\+name=\"[^\"]\\+\">//g"
+
+       ; </a> are all orphans now -- delete
+       "s/<\\/a>//g"))
+
+(defun html2info-tweak-info-file (f)
+  ; flushleft menu entries)
+  (sed f "/^\\s*ÞINFO_MENU_BEGIN!/,/^\\s*ÞINFO_MENU_END!/ s/^\\(\\s*\\)\\(\\*\\s\\+[^:]\\+::\\)/\\2\\1/"
+
+       ; delete menu markers)
+       "s/^\\s*ÞINFO_MENU_\\(BEGIN\\|END\\)!//"
+
+       ; expand doc-internal notes (not index))
+       "s/ÞN!\\([0-9]\\+::\\)/*note \\1/g"
+
+       ; expand doc-internal notes in index)
+       "s/ÞI!\\([0-9]\\+\\)::\\1/*note \\1::/g"
+
+       ; restore Þ)
+       "s/Þ!/Þ/g"))
+
 (defun troff2page (input-doc &optional single-pass-p)
   (let (*convert-to-info-p*
          *jobname*
+         (*last-page-number* -1)
          (*log-stream* t)
          *rerun-needed-p*)
     (unless (troff2page-help input-doc)
@@ -4710,9 +4848,10 @@
           (cond (single-pass-p (tlog "Rerun: troff2page ~a~%" input-doc))
                 (t (tlog "Rerunning: troff2page ~a~%" input-doc)
                    (troff2page-1pass input-doc))))
-        (when (and (not *rerun-needed-p*) *convert-to-info-p*)
-          (os-execute (concatenate 'string
-                        "html2info " *jobname* ".html")))))))
+        (when *convert-to-info-p*
+          (if *rerun-needed-p*
+              (tlog "Unable to create Info doc because aux files unresolved~%")
+              (html2info)))))))
 
 (troff2page *troff2page-file-arg*
             ;:single-pass
