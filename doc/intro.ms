@@ -41,9 +41,7 @@ the corresponding Lisp implementations being
 \*[url http://ecls.sf.net]ECL\&, and
 \*[url http://sbcl.sf.net]SBCL\&.
 
-Copy the script \fCtroff2page\fP to your \fCPATH\fP. If you wish
-to generate Info output, also add the script \fChtml2info\fP,
-described on page \*[TAG:gnuinfo], to your \fCPATH\fP.
+Copy the script \fCtroff2page\fP to your \fCPATH\fP.
 
 If \fCLISP\fP is not
 set, some default Lisp implementation is assumed.
