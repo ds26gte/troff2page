@@ -1,7 +1,7 @@
 = troff2page
 
 troff2page is a Common Lisp program for making Web
-pages from troff documents.  Consult
+pages and Info documents from troff documents.  Consult
 
 http://ds26gte.github.io/troff2page/index.html
 
