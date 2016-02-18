@@ -19,10 +19,8 @@
 .if \n[.g] .mso www.tmac
 .LINKSTYLE blue R < >
 .SH "NAME"
-troff2page \- troff to HTML converter
+troff2page \- makes Web pages from troff documents
 .SH "SYNOPSIS"
-.sp
-From the shell prompt:
 .sp
 .if n \{\
 .RS 4
@@ -35,34 +33,11 @@ troff2page \-\-version
 .if n \{\
 .RE
 .\}
-.sp
-It is not necessary to run the file \f[CR]troff2page\fP as a Unix script.  You
-can simply load \f[CR]troff2page\fP (it is a Lisp file) into your Common Lisp,
-and then call the Lisp procedure \f[CR]troff2page:troff2page\fP (i.e., the
-procedure named \f[CR]troff2page\fP in the package \f[CR]troff2page\fP) on your source
-document.  E.g.,
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-(load "pathname/of/troff2page")
-(troff2page:troff2page "my\-troff\-document.ms")
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-The procedure \f[CR]troff2page:troff2page\fP can be called
-several times, on the same or different documents, from
-within the same Lisp session.
 .SH "DESCRIPTION"
 .sp
-troff2page converts troff (man and ms) documents into HTML web pages.
-.sp
-The program \f[CR]troff2page\fP takes a single argument.  Typically this is a
-filename specifying the input document file.  Thus, to convert an input
-troff document named \f[CR]jobname.ms\fP, type
+troff2page converts troff (man and ms) documents into HTML web
+pages. With the aid of html2info(1), it can also convert them to
+GNU Info documents.
 .sp
 .if n \{\
 .RS 4
@@ -74,100 +49,72 @@ troff2page jobname.ms
 .RE
 .\}
 .sp
-at your operating\-system prompt.  This creates an output HTML file
-\f[CR]jobname.html\fP in the current directory.  (This HTML file has the same
-basename as the input troff file (i.e., \f[CR]jobname\fP), but its extension is
-\f[CR].html\fP.)
-.sp
-If the input troff uses the page\-break request \f[CR].bp\fP,
-then the output HTML consists of a series of interlinked files: The
-first file is named \f[CR]jobname.html\fP; the rest are
-\f[CR]jobname\-Z\-H\-1.html\fP,
-\f[CR]jobname\-Z\-H\-2.html\fP, etc.
-.sp
-If \f[CR]troff2page\fP’s argument is \f[CR]\-\-help\fP or \f[CR]\-\-version\fP,
-troff2page displays an appropriate informative
-text and exits.  For example,
+creates an output HTML document that consists of \f[CR]jobname.html\fP
+and possibly other files \f[CR]jobname\-Z\-H\-1.html\fP,
+\f[CR]jobname\-Z\-H\-2.html\fP, etc., which are linked by navigation to
+\f[CR]jobname.html\fP.
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-% troff2page \-\-help
-troff2page version ...
-Copyright (C) ...
-For full details, please see http://www...
+troff2page \-\-version
 .fi
 .if n \{\
 .RE
 .\}
 .sp
-While this is intentionally similar to groff’s \f[CR]\-\-help\fP and
-\f[CR]\-\-version\fP
-options, troff2page cannot process true options as groff can.  Indeed,
-if \f[CR]\-\-help\fP and \f[CR]\-\-version\fP happen to be the names of input documents,
-troff2page will process them as such.
+displays the troff2page version.
 .sp
-If troff2page’s argument is not \f[CR]\-\-help\fP or \f[CR]\-\-version\fP and does not name a
-file, troff2page exits with a “could not find file” message.
+.if n \{\
+.RS 4
+.\}
+.nf
+troff2page \-\-help
+.fi
+.if n \{\
+.RE
+.\}
 .sp
-If troff2page is called with no argument, it exits with a “called with
-no argument” message.
-.SH "SYSTEM REQUIREMENTS"
+displays the version and a pointer to the comprehensive online
+manual, \c
+.URL "http://ds26gte.github.io/troff2page/index.html" "" ","
+whose
+troff source is included in the troff2page distribution.
 .sp
-The script \f[CR]troff2page\fP runs on the Unix command\-line on Cygwin, Linux,
-Mac OS X, and Solaris.  It uses the Common Lisp implementation mentioned
-in the shell environment variable \f[CR]LISP\fP, which can currently be set to
-either \f[CR]clisp\fP, \f[CR]clozure\fP, \f[CR]cmu\fP, \f[CR]ecl\fP or \f[CR]sbcl\fP: the corresponding Lisp
-implementations being
-.URL "http://clisp.sf.net" "CLISP" ","
-.URL "http://ccl.clozure.com" "Clozure CL" ","
-.URL "http://cmucl.org" "CMUCL" ","
-.URL "http://ecls.sf.net" "ECL" ","
-and
-.URL "http://sbcl.sf.net" "SBCL" "."
+troff2page called with no argument exits with a “called with no
+argument” message.
+.SH "OPTIONS"
 .sp
-If \f[CR]LISP\fP is not
-set, some default Lisp implementation is assumed.
+troff2page does not support true options as groff can. Indeed,
+\f[CR]\-\-help\fP and \f[CR]\-\-version\fP are not true options: if they happen to
+name actual files, troff2page will attempt to process them as
+input documents.
 .sp
-For more information, please see the file \f[CR]INSTALL.adoc\fP in the
-distribution.
-.SH "SIMULATING TROFF OPTIONS"
+However, additional information may fed to troff2page via the
+specially named macro file \f[CR].troff2pagerc.tmac\fP. Thus, a \f[CR]\-mpca\fP
+groff option would translate to the line
 .sp
-In contrast to troff2page’s single argument, groff allows you to specify
-on the command\-line not just the input file but also various options for
-additional information, e.g.,
-\f[CR]\-m\fP to load macro files;
-\f[CR]\-r\fP to pre\-set number registers;
-\f[CR]\-d\fP to pre\-define strings;
-\f[CR]\-f\fP to set default font family; etc. (See \f[CR]groff(1)\fP
-for details on all the provided options.)
-The options can be usefully varied
-with each call to groff.
+.if n \{\
+.RS 4
+.\}
+.nf
+\&.mso pca.tmac
+.fi
+.if n \{\
+.RE
+.\}
 .sp
-For options that do not make sense for HTML — e.g., the setting of
-\f[CR]PO\fP (adjusting the left margin to suit a particular printer) —, it is fine
-that they cannot also be fed to troff2page.  For the options
-that are valid for both print and HTML — e.g., loading a macro
-file that works for both output formats —, you
-may need to add this information explicitly within the input document.
-Thus, a \f[CR]\-m\fP command\-line option would be replaced by an explicit call
-to \f[CR].mso\fP within the document.
+in \f[CR].troff2pagerc.tmac\fP.
 .sp
-However, this will not be a workable approach for some options that do
-not quite belong to the document, or that may potentially need to
-be varied for the same document, when processed by different users or
-in different environments, e.g., settings for registers like
-\f[CR]GROWPS\fP and \f[CR]PSINCR\fP.  For such cases, you may place the
-information in a troff macro file \f[CR].troff2pagerc.tmac\fP in your
-home directory.  troff2page will load this file, if it exists,
-before processing its argument file.
+troff2page loads \f[CR].troff2pagerc.tmac\fP, if it can find it in
+directories for macro files, before processing its argument file.
 .sp
-(Note that groff or troff
-will not load \f[CR].troff2pagerc.tmac\fP automatically.  But that is
-presumably OK, since you are using command\-line options to specify the
-same information anyway.  If you do want groff to pick up this file,
-you can use the option \f[CR]\-m.troff2pagerc\fP.)
+Note that groff itself does not load \f[CR].troff2pagerc.tmac\fP
+automatically.  But that is presumably OK, since you are using
+command\-line options to specify the same information anyway.  If
+you do want groff to pick up this file, you can use the option
+\f[CR]\-m.troff2pagerc\fP.
 .sp
 If the input file is recognizably a man page (i.e., it has the command
 \f[CR].TH\fP), both troff2page and groff will load, if it exists, the init file
@@ -186,461 +133,12 @@ commands are converted to their obvious HTML equivalent.  E.g., ms’s
 footnotes have a straightforward translation in the HTML, with the
 footnote text set at the bottom of the HTML page, and with the footnote
 markers in the body and the footnote hyperlinking to each other.  Please
-consult troff and groff documentation for the commands.  We will
-concentrate here on those commands whose HTML counterpart is not
-immediately obvious.
-.SH "MACRO FILES"
-.sp
-The troff2page distribution includes several macro files (aka tmac
-files) with extension \f[CR]tmac\fP,
-viz., \f[CR]pca\-*.tmac\fP for various useful extensions;
-\f[CR]pca\-eval.tmac(7)\fP for extending troff using Common Lisp; and
-\f[CR]defhsl.tmac\fP for defining color names using the HSL scheme.  You should
-put these \f[CR]tmac\fP files in one of your macro directories, i.e., the
-directories that are searched by groff’s \f[CR]\-m\fP option and \f[CR].mso\fP request.
-(See \f[CR]groff_tmac(5)\fP, section FILES, for
-details.  In a pinch, your home directory works as a macro directory.)
-.sp
-Note that it is best to load these \f[CR]tmac\fP files into your
-document with an \f[CR].mso\fP request rather than through groff’s
-command\-line option \f[CR]\-m\fP. This is because troff2page doesn’t
-support the same kind of command\-line arguments that groff does.
-.SH "AUXILIARY FILES"
-.sp
-Many of the macros defined in these \f[CR]tmac\fP files write
-auxiliary files that are absorbed into the document during a
-second run.  Note that in order to write these aux files,
-groff must be run with the \f[CR]\-U\fP option for “unsafe”
-mode.
-.sp
-As an example, consider \f[CR]troff2page.ms\fP (the groff source for the
-troff2page full manual).  The following is one
-way to get the correct PostScript output:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-    % groff \-t \-U \-z troff2page.ms
-    defhsl.tmac:8: can\(aqt open `.trofftemp_lisp_1.tmp\(aq ...
-    Rerun groff with \-U
-    troff2page.ms:187: can\(aqt open `.trofftemp.aux\(aq ...
-    troff2page.ms:799: can\(aqt open `.trofftemp.ind\(aq ...
-
-    % groff \-t \-U troff2page.ms > troff2page.ps
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-The \f[CR]\-t\fP option (which calls the tbl
-preprocessor) is needed because the
-document \f[CR]troff2page.ms\fP
-uses a table.  The first run uses the \f[CR]\-z\fP option to disable
-writing an output file, which we don’t need until the second
-run.
-.sp
-In both runs, we use the \f[CR]\-U\fP option: The first run
-needs unsafe mode to write the aux files, and the second run
-needs it to process some of them with external programs to
-create additional aux files.  Subsequent runs may dispense
-with the \f[CR]\-U\fP, as all the required aux files are made.
-(You will need the option again, if the aux files’ content
-changes.)
-.sp
-troff2page is also run twice on the document to absorb
-information from the aux files.  However, troff2page doesn’t
-need any special option as it is always run in what groff
-would consider “unsafe” mode, and it processes tables by
-itself.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-% troff2page troff2page.ms
-Missing: (LAST\-PAGE\-NUMBER .troff2page_temp_troff2page.ind
-LISP\-AUX\-FILES .troff2page_temp_troff2page.aux
-TOC TITLE STYLESHEET)
-Rerun: troff2page troff2page.ms
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-% troff2page troff2page.ms
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-The groff string \f[CR]\(rs*[AUXF]\fP is used to construct the names of the
-auxiliary files.  By default it will be quietly set to
-\f[CR].trofftemp\fP for
-groff and something slightly different for troff2page.  You can change
-it to anything else in your document before the first use of any macros
-that use or write aux files.  It is a good idea to set it so that it
-remains different for troff and troff2page, so that the two programs’
-aux files don’t clash.  The number register \f[CR]\(rsn[.troff2page]\fP suggests a
-way to do this.
-.SH "PAGE LAYOUT"
-.sp
-The page\-break command .bp ends the current HTML page and start a new
-one.  \f[CR].bp\fP causes a page\-break in both the HTML and the print outputs.
-.sp
-Generally, page\-breaks require a different aesthetic in HTML than in
-print.  You can use troff conditionals to express this difference:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.if \(rsn[.troff2page] .bp
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-causes a page\-break only in the HTML, whereas
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.if !\(rsn[.troff2page] .bp
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-causes a page\-break only in print.
-.sp
-As can be seen, the number register \f[CR]\(rsn[.troff2page]\fP has a true value,
-i.e., a number greater than zero, only when troff2page processes the
-document.  This number is in fact the version number of the troff2page
-program processing the document.  It is a number such as 20050327, which
-would be the version number of the troff2page released on 2005 March 27.
-\f[CR]\(rsn[.troff2page]\fP could plausibly be used to distinguish not just
-troff2page from troff, but also between various versions of troff2page.
-Thus, one could, if the need were dire, write a document that translates
-differently with different versions of troff2page.
-.sp
-If may be convenient to define a \f[CR].HBP\fP macro that causes a page\-break
-only for HTML:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.de HBP
-\&.if \(rsn[.troff2page] .bp
-\&..
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-Note that troff2page, like troff, does not automatically cause a page break
-at the sectioning commands.  Use \f[CR].bp\fP or a macro like \f[CR].HBP\fP to
-explicitly insert breaks as needed.
-.sp
-Each page in a multiple\-page HTML output has a navigation bar at its
-head and foot.  The bar contains links to the first, previous, and next
-page, and the table\-of\-contents and index pages.  If any of these pages
-doesn’t exist, or if it is the same as the page containing the
-navigation bar, then the link for it is disabled.
-.SH "HTML PARAGRAPHS"
-.sp
-By default, troff2page sets paragraphs exactly as groff does: the first
-lines of paragraphs are indented (unless explicitly disabled via an
-\f[CR].LP\fP), and
-the vertical distance between adjacent paragraphs is the same smallish
-amount that groff employs.  These two values are given by the number
-registers \f[CR]PI\fP and \f[CR]PD\fP, which (for the ms format) are 0.3n and 0.3v
-respectively.
-.sp
-If you wish to have the kind of block paragraphs customary in HTML, it
-is not enough to set \f[CR]PI\fP to 0, for the prevailing value of \f[CR]PD\fP is too
-small to comfortably tell adjacent paragraphs apart.  You could
-set \f[CR]PD\fP
-to a larger value, but as a convenience, troff2page allows you to
-set \f[CR]PD\fP
-to a negative value, which leads to whatever default paragraph
-separation that HTML uses.  Note that setting \f[CR]PD\fP to a negative value
-should be done only for HTML, as groff will happily overstrike
-text in order to respect a negative \f[CR]PD\fP:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.if \(rsn[.troff2page] \(rs{\(rs
-\&.nr PI 0n
-\&.nr PD 0\-1p
-\&.\(rs}
-.fi
-.if n \{\
-.RE
-.\}
-.SH "HTML PAGE WIDTH"
-.sp
-Unlike groff ms, which uses the line length given by the register
-\f[CR]LL\fP,
-troff2page by default does not restrict the width of its HTML pages.
-Text will narrow or widen to fit the current browser window width.  However, if
-you explicitly set \f[CR]LL\fP (instead of relying on ms’s default), troff2page
-will respect that line length.  Nevertheless, if the user shrinks the
-browser window to a width less than LL, the text will correspondingly
-shrink too to fit the window.  This is to avoid the need for horizontal
-scrolling.
-.sp
-Note that a good \f[CR]LL\fP value for troff2page should be a bit larger than
-ms’s 6 inches, which is too narrow for browser.  The following sets it
-to 18 cm, making sure it takes effect only for HTML:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.if \(rsn[.troff2page] .nr LL 18c
-.fi
-.if n \{\
-.RE
-.\}
-.SH "CROSS\-REFERENCES"
-.sp
-troff2page provides a \f[CR].TAG\fP macro for managing cross\-references.
-(This overrides the \f[CR].TAG\fP macro of groff’s \f[CR]www.tmac\fP, in order to
-allow forward references.)
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.TAG sec:troffcl
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-associates the label \f[CR]TAG_sec:troffcl\fP with the number of the
-current page. The string \f[CR]\(rs*[TAG_sec:troffcl]\fP is defined
-to typeset as that page number. Thus, in a hand\-crafted table of
-contents, you could use
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-Extending troff using Common Lisp, \(rs*[TAG_sec:troffcl]
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-In the HTML output, the string \f[CR]\(rs*[TAG_sec:troffcl]\fP is not just a page
-number but also a link to
-where \f[CR].TAG sec:troffcl\fP was called.
-.sp
-\f[CR].TAG\fP takes an optional second argument. The label is then
-associated with the text of the second argument instead of the
-current page number.
-.sp
-The macro file \f[CR]pca\-toc.tmac\fP supplies a \f[CR].TOC\fP macro for automatic
-generation of a table of contents. This can be used by both groff
-and troff2page.
-.sp
-The troff2page aspect of \f[CR]pca\-toc.tmac\fP uses \f[CR].TAG\fP. For both
-outputs, TOC entries are created for headers of level
-\f[CR]\(rsn[GROWPS]\fP
-or lower. By default, \f[CR]GROWPS\fP is set to 0, so you should set it to
-at least 1 to see a TOC.
-.sp
-\f[CR]pca\-toc.tmac\fP doesn’t require you to modify how you use your
-header macros (\f[CR].SH\fP or \f[CR].NH\fP). It is a solution to the following
-statement from the groff manual:
-.sp
-“Altering the ‘NH’ macro to automatically build the table of
-contents is perhaps initially more difficult, but would save a
-great deal of time in the long run if you use ‘ms’ regularly.”
-.sp
-troff2page uses the macro file \f[CR]pca\-t2p\-man.tmac\fP (if it can find
-it in \f[CR]GROFF_TMAC_PATH\fP) to automatically generate a TOC for man
-pages, with a TOC entry for each \f[CR].SH\fP in the input.
-.SH "MAKING AN INDEX"
-.sp
-The supplied macro file \f[CR]pca\-ix.tmac\fP
-creates a sorted
-index, with the aid of the external program makeindex.
-makeindex is included with TeX distributions, but you can
-obtain just the makeindex distribution from
-.URL "http://stuff.mit.edu/afs/sipb/project/tex\-dev/src/tar/makeindex.tar.gz" "" "."
-.sp
-Note that the indexes created by groff and troff2page are
-necessarily different, because the respective paginations
-are different.  In addition, the index generated for
-troff2page has the additional feature of hyperlinking to the
-appropriate locations in the body text.
-.sp
-The call
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.IX item
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-marks the text “item” as an indexable item.  The metacharacters
-\f[CR]@\fP, \f[CR]!\fP,
-\f[CR]"\fP, and \f[CR]|\fP can be used to respectively specify (a) alternate
-alphabetization, (b) subitems, (c) literal metacharacters, and (d)
-encapsulation of the page number.  Please see the makeindex
-documentation (\c
-.URL "http://tex.loria.fr/bibdex/makeindex.pdf" "" ")"
-for all the details.
-Essentially, the syntax for entering index entries is the same as for
-LaTeX, except that in troff we use “\f[CR].IX item\fP” where in LaTeX one would
-use “\f[CR]\(rsindex{item}\fP”.
-.sp
-\f[CR]index.tmac\fP will call makeindex to create a
-sorted index in the auxiliary file \f[CR]\(rs*[AUXF].ind\fP, which can be
-slurped back into the input document:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.so \(rs*[AUXF].ind
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-Adding a section header on top is up to you.
-.SH "SLIDESHOWS"
-.sp
-To cause your troff source to be converted into slideshow\-ready HTML,
-have it source the provided macro file \f[CR]t2pslides.tmac\fP.  This macro file
-uses a version of the Mozpoint library (\c
-.URL "http://mozpoint.mozdev.org" "" ")"
-to produce the appropriate JavaScript and style sheets to convert your
-sequence of HTML pages into a Web presentation.
-.sp
-HTML pages meant for presentation use larger, bolder fonts, and do not have
-navigation bars.
-.sp
-The following table describes the keys used to control the
-presentation:
-.TS
-allbox tab(:);
-lt lt.
-T{
-.sp
-Action
-T}:T{
-.sp
-Effect
-T}
-T{
-.sp
-n, space, mouse-click
-T}:T{
-.sp
-Next slide
-T}
-T{
-.sp
-p, backspace
-T}:T{
-.sp
-Previous Slide
-T}
-T{
-.sp
-t, 0
-T}:T{
-.sp
-Title, or 0pening, slide
-T}
-T{
-.sp
-n (integer \(&gt;= 0)
-T}:T{
-.sp
-nth slide
-T}
-T{
-.sp
-b
-T}:T{
-.sp
-toggle current slide with Black screen
-T}
-T{
-.sp
-w
-T}:T{
-.sp
-toggle current slide with White screen
-T}
-.TE
-.sp
-.sp
-Note that the slides are numbered from 0 onward (rather than 1).  Also,
-when typing a number n that’s two or more digits long to get the nth
-slide, the digits should be pressed fairly rapidly so they are
-interpreted together.
-.SH "EXTENDING TROFF USING COMMON LISP"
-.sp
-The groff macro file \f[CR]eval4troff.tmac\fP allows you to extend groff using
-Common Lisp, i.e., Common Lisp code embedded in a groff document can be
-used to affect how groff and troff2page process the document.
-.sp
-Please see \f[CR]eval4troff.tmac(7)\fP for details.
-.SH "RECOVERY FROM ERRORS"
-.sp
-If troff2page fails on your document, it will display a message giving its
-best guess on what the problem is and where it occurred in the source
-document, and will offer to take you there so you can fix it immediately.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-filename:lineno: error description
-Type e to edit file filename at line lineno; x to quit
-?
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-In the first line, or the error diagnostic line,
-filename is the particular source file (which need not be the
-main document file) and lineno is the estimated number of the line in
-that file that caused the error.  (This is a popular error\-reporting format
-and is exploited by text editors for helping the debugging process.)
-.sp
-In the second line, troff2page offers to fire up a text editor with the cursor
-approximately close to the
-offending line.
-.sp
-If you type \f[CR]e\fP at the \f[CR]?\fP prompt, troff2page starts the editor specified in your
-\f[CR]EDITOR\fP environment variable, or if that is not set, the editor named
-\f[CR]vi\fP on your system.  troff2page calls the editor with two arguments:
-the first argument is \f[CR]+\fP followed by the line number, and the second
-argument is the filename.
-(This argument style works for all
-vi and emacs clones and I suspect most modern editors take care
-to recognize it, so it isn’t as restrictive as it sounds.)
+consult troff and groff documentation for the commands.
+.sp
+The troff2page distribution also includes the \f[CR]mpca\fP submodule
+that contains several useful macro files. Both groff and
+troff2page can process these macro files, and give compatible
+results. Please see the troff2page manual for further details.
 .SH "INFO DOCS"
 .sp
 You can call the macro
@@ -657,6 +155,50 @@ You can call the macro
 .sp
 within your document to signal to troff2page that it should also
 create an Info document.
+.sp
+A good place to place the \f[CR].troff2info\fP call is in your
+\f[CR].troff2pagerc.tmac\fP file, as it is relevant only to troff2page
+and not to groff.
+.SH "SYSTEM REQUIREMENTS"
+.sp
+The script \f[CR]troff2page\fP runs on the Unix command\-line on Cygwin, Linux,
+Mac OS X, and Solaris.  It uses the Common Lisp implementation mentioned
+in the shell environment variable \f[CR]LISP\fP, which can currently be set to
+either \f[CR]clisp\fP, \f[CR]clozure\fP, \f[CR]cmu\fP, \f[CR]ecl\fP or \f[CR]sbcl\fP: the corresponding Lisp
+implementations being
+.URL "http://clisp.sf.net" "CLISP" ","
+.URL "http://ccl.clozure.com" "Clozure CL" ","
+.URL "http://cmucl.org" "CMUCL" ","
+.URL "http://ecls.sf.net" "ECL" ","
+and
+.URL "http://sbcl.sf.net" "SBCL" "."
+.sp
+If \f[CR]LISP\fP is not
+set, some default Lisp implementation is assumed.
+.sp
+It is not necessary to run the file \f[CR]troff2page\fP as a Unix script.  You
+can simply load \f[CR]troff2page\fP (it is a Lisp file) into your Common Lisp,
+and then call the Lisp procedure \f[CR]troff2page:troff2page\fP (i.e., the
+procedure named \f[CR]troff2page\fP in the package \f[CR]troff2page\fP) on your source
+document.  E.g.,
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+(load "pathname/of/troff2page")
+(troff2page:troff2page "pathname/of/troff\-document.ms")
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The procedure \f[CR]troff2page:troff2page\fP can be called
+several times, on the same or different documents, from
+within the same Lisp session.
+.sp
+For more information, please see the file \f[CR]INSTALL.adoc\fP in the
+distribution.
 .SH "AVAILABILITY"
 .sp
 troff2page is downloadable from
@@ -664,4 +206,5 @@ troff2page is downloadable from
 .SH "SEE ALSO"
 .sp
 groff(1), groff_tmac(5), groff_man(7), groff_ms(7),
-pca\-eval.tmac(7), clisp(1), cmucl(1), ecl(1), lisp(1), sbcl(1)
+html2info(1),
+clisp(1), cmucl(1), ecl(1), lisp(1), sbcl(1)
