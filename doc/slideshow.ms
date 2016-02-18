@@ -3,7 +3,7 @@
 
 .IX slideshow
 To cause your troff source to be converted into slideshow-ready HTML, have
-it source the provided macro file \fCt2pslides.tmac\fP.
+it source the provided macro file \fCpca-t2p-slides.tmac\fP.
 This macro file uses a version of the \*[url \
 http://mozpoint.mozdev.org]MozPoint\& library to
 produce the appropriate JavaScript and style sheets to
