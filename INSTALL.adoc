@@ -15,8 +15,7 @@ Copy the file `man/man7/pca-eval.tmac.7` to the `man7` subdirectory of a
 directory in your `MANPATH`.
 
 The troff2page documentation (see below) uses the
-`pca-t2p-\*.tmac` files in the top-level `troff2page` directory,
-as also the `pca*.tmac` files from the `mpca` submodule.
+`pca*.tmac` files from the `mpca` submodule
 (available on its own at https://github.com/ds26gte/mpca). To
 include `mpca`, do
 
@@ -25,8 +24,8 @@ include `mpca`, do
 
 This will create an `mpca` subdirectory.
 
-Copy these `pca*.tmac` files from `mpca`, as also the `pca-t2p-\*.tmac` files
-in the top-level `troff2page` directory, to somewhere in your
+Copy these `pca*.tmac` files from `mpca`
+to somewhere in your
 `GROFF_TMAC_PATH` (or include these directories or copies thereof
 in `GROFF_TMAC_PATH`). In a pinch, if you don’t want to mess with
 `GROFF_TMAC_PATH` just yet, you may simply copy these `*.tmac`
