@@ -2434,17 +2434,16 @@
                         :undefined))
                (deftmacro w (nconc it extra-macro-body)))
               ((setq it (gethash w *request-table*))
-               (let ((tmp (gen-temp-string)))
-                 (defrequest tmp it)
-                 (deftmacro w
+               (let ((tmp-old-req (gen-temp-string))
+                     (tmp-new-mac (gen-temp-string)))
+                 (defrequest tmp-old-req it)
+                 (deftmacro tmp-new-mac
                    (cons
-                     (concatenate 'string "." tmp " \\$*")
+                     (concatenate 'string "." tmp-old-req " \\$*")
                      extra-macro-body))
-                 #+(and nil wrong)
                  (defrequest w
-                   ;wrong!
                    (lambda ()
-                     (execute-macro w)))))
+                     (execute-macro tmp-new-mac)))))
               (t (deftmacro w extra-macro-body)))
         (call-ender ender))))
 
