@@ -3483,7 +3483,12 @@
   ;
   (setq *convert-to-info-p* nil)
   ;
-  (unless *jobname* (setq *jobname* (file-stem-name *main-troff-file*)))
+  (unless *jobname*
+    ;i.e., not called by troff2page
+    (setq *jobname* (file-stem-name *main-troff-file*)
+          *log-stream* t))
+  ;
+  (setq *last-page-number* -1)
   ;
   (setq *pso-temp-file* (concatenate 'string *jobname* *pso-file-suffix*))
   ;
@@ -4835,12 +4840,12 @@
        "s/Þ!/Þ/g"))
 
 (defun troff2page (input-doc &optional single-pass-p)
-  (let (*convert-to-info-p*
-         *jobname*
-         (*last-page-number* -1)
-         (*log-stream* t)
-         *rerun-needed-p*)
-    (unless (troff2page-help input-doc)
+  (unless (troff2page-help input-doc)
+    (let (*convert-to-info-p*
+           *jobname*
+           *last-page-number* ;needs to be visible to (html2info)
+           *log-stream*
+           *rerun-needed-p*)
       (setq *jobname* (file-stem-name input-doc))
       (with-open-file (o (concatenate 'string *jobname* *log-file-suffix*)
                          :direction :output :if-exists :supersede)
