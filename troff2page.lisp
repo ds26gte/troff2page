@@ -3465,28 +3465,36 @@
       (setq *convert-to-info-p* t)))
   )
 
-(defun initialize-presets ()
+(defun begin-html-document (&aux it)
   (initialize-glyphs)
   (initialize-numregs)
   (initialize-strings)
   (initialize-macros)
-  )
-
-(defun load-aux-file ()
-  (initialize-presets)
   ;
   (setq *convert-to-info-p* nil)
+  ;
   (unless *jobname* (setq *jobname* (file-stem-name *main-troff-file*)))
+  ;
   (setq *pso-temp-file* (concatenate 'string *jobname* *pso-file-suffix*))
+  ;
   (setq *rerun-needed-p* nil)
   ;
-  (let ((aux-file (concatenate 'string *jobname* *aux-file-suffix*)))
-    (when (probe-file aux-file)
-      (load-troff2page-data-file aux-file)
-      (delete-file aux-file))
-    (when *html-head* (setq *html-head* (nreverse *html-head*)))
-    (setq *aux-stream* (open aux-file :direction :output)))
-  (start-css-file))
+  (when (probe-file (setq it (concatenate 'string *jobname* *aux-file-suffix*)))
+    (load-troff2page-data-file it)
+    (delete-file it)
+    (when *html-head* (setq *html-head* (nreverse *html-head*))))
+  ;
+  (setq *aux-stream* (open it :direction :output))
+  ;
+  (start-css-file)
+  ;
+  (emit-start)
+  ;
+  (when (setq it (find-macro-file ".troff2pagerc.tmac"))
+    (troff2page-file it))
+  (when (probe-file (setq it (concatenate 'string *jobname* ".t2p")))
+    (troff2page-file it))
+  )
 
 (defun next-html-image-file-stem ()
   (incf *image-file-count*)
@@ -4681,15 +4689,9 @@
         (*turn-off-escape-char-p* nil)
         (*verbatim-apostrophe-p* nil)
 
-        it
         )
 
-    (load-aux-file)
-    (emit-start)
-    (when (setq it (find-macro-file ".troff2pagerc.tmac"))
-      (troff2page-file it))
-    (when (probe-file (setq it (concatenate 'string *jobname* ".t2p")))
-      (troff2page-file it))
+    (begin-html-document)
     (troff2page-file input-doc)
     (do-bye)))
 
