@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160218) ;last change
+(defparameter *troff2page-version* 20160219) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -30,13 +30,13 @@
 (defun retrieve-env (s)
   (or #+clisp (ext:getenv s)
       #+clozure (ccl:getenv s)
-      #+cmu (cdr (assoc s ext::*environment-list* :test #'string=))
+      #+cmucl (cdr (assoc s ext:*environment-list* :test #'string=))
       #+ecl (ext:getenv s)
       #+sbcl (sb-ext:posix-getenv s)
       nil))
 
 (defvar *troff2page-file-arg*
-  (or #-(or clisp clozure cmu ecl sbcl)
+  (or #-(or clisp clozure cmucl ecl sbcl)
       (progn
         (tlog "! Don't know how to read your Common Lisp's command-line.~%")
         (tlog "! Please load the file troff2page into your CL and then~%")
@@ -47,19 +47,16 @@
 (defvar *log-stream* t)
 
 (defun os-execute (s)
-  (or #+clisp
-      (let ((st (ext:shell s)))
-        (not st))
-      #+clozure
-      (let ((p (ccl:run-program "sh" (list "-c" s) :output t)))
-        (multiple-value-bind (status exit-code) (ccl:external-process-status p)
-          (declare (ignore status))
-          exit-code))
-      #+cmu (ext::run-program "sh" (list "-c" s) :output t)
+  (or #+clisp (or (ext:shell s) 0)
+      #+clozure (multiple-value-bind (status exit-code)
+                  (ccl:external-process-status (ccl:run-program "sh" (list "-c" s) :output t))
+                  (declare (ignore status))
+                  exit-code)
+      #+cmucl (ext:process-exit-code
+                (ext:run-program "sh" (list "-c" s) :output t))
       #+ecl (ext:system s)
-      #+sbcl
-      (let ((p (sb-ext:run-program "sh" (list "-c" s) :search t :output *log-stream*)))
-        (sb-ext:process-exit-code p))
+      #+sbcl (sb-ext:process-exit-code
+               (sb-ext:run-program "sh" (list "-c" s) :search t :output *log-stream*))
       nil))
 
 (defun retrieve-pid ()
@@ -69,7 +66,7 @@
                  (find-symbol "GETPID" :linux)
                  (find-symbol "GETPPID" :posix)))
       #+clozure (ccl::getpid)
-      #+cmu (unix::unix-getpid)
+      #+cmucl (unix:unix-getpid)
       #+ecl (ext:getpid)
       #+sbcl (sb-unix:unix-getpid)
       999))
@@ -2656,7 +2653,7 @@
                 (with-output-to-string (o)
                   (princ (expand-args (read-troff-line)) o)
                   (terpri o)))))
-        (cond ((eq systat t) (setq systat 0))
+        (cond ((eq systat t) (setq systat 0)) ;needed?
               ((not (numberp systat)) (setq systat 256)))
         (setf (counter*-value (get-counter-named "systat"))
               systat))))
