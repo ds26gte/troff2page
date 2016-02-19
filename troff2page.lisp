@@ -1,5 +1,5 @@
 ":"; export T2PARG=$1
-":"; if test "$LISP" = abcl; then exec abcl --load $0 --eval '(ext::quit)'
+":"; if test "$LISP" = abcl; then exec abcl --noinform --load $0 --eval '(ext::quit)'
 ":"; elif test "$LISP" = allegro; then exec alisp -L $0 -kill
 ":"; elif test "$LISP" = clisp; then exec clisp -q $0
 ":"; elif test "$LISP" = clozure; then exec ccl -l $0 -e '(ccl:quit)'
@@ -28,26 +28,17 @@
           (subseq (format nil "~a" *troff2page-version*) 0 4)))
 
 (defun retrieve-env (s)
-  (or #+clisp (ext:getenv s)
+  (or #+(or abcl clisp ecl) (ext:getenv s)
       #+clozure (ccl:getenv s)
       #+cmucl (cdr (assoc s ext:*environment-list* :test #'string=))
-      #+ecl (ext:getenv s)
       #+sbcl (sb-ext:posix-getenv s)
       nil))
-
-(defvar *troff2page-file-arg*
-  (or #-(or clisp clozure cmucl ecl sbcl)
-      (progn
-        (tlog "! Don't know how to read your Common Lisp's command-line.~%")
-        (tlog "! Please load the file troff2page into your CL and then~%")
-        (tlog "!   call the procedure troff2page:troff2page on your troff document(s)~%")
-        t)
-      (retrieve-env "T2PARG")))
 
 (defvar *log-stream* t)
 
 (defun os-execute (s)
-  (or #+clisp (or (ext:shell s) 0)
+  (or #+abcl (ext:run-shell-command s)
+      #+clisp (or (ext:shell s) 0)
       #+clozure (multiple-value-bind (status exit-code)
                   (ccl:external-process-status (ccl:run-program "sh" (list "-c" s) :output t))
                   (declare (ignore status))
@@ -57,10 +48,15 @@
       #+ecl (ext:system s)
       #+sbcl (sb-ext:process-exit-code
                (sb-ext:run-program "sh" (list "-c" s) :search t :output *log-stream*))
-      nil))
+      1))
 
 (defun retrieve-pid ()
-  (or #+clisp
+  (or #+abcl
+      (let ((i (sys:process-output
+                 (sys:run-program "sh" (list "-c" "echo $$")))))
+        ;this actually gives ppid, but what to do
+        (if i (read i) #xbadc0de))
+      #+clisp
       (funcall (if (find-package :linux)
                  ;CLISP has different names for this function in Ubuntu and Darwin
                  (find-symbol "GETPID" :linux)
@@ -69,7 +65,7 @@
       #+cmucl (unix:unix-getpid)
       #+ecl (ext:getpid)
       #+sbcl (sb-unix:unix-getpid)
-      999))
+      #xbadc0de))
 
 ;
 
@@ -2653,8 +2649,10 @@
                 (with-output-to-string (o)
                   (princ (expand-args (read-troff-line)) o)
                   (terpri o)))))
-        (cond ((eq systat t) (setq systat 0)) ;needed?
-              ((not (numberp systat)) (setq systat 256)))
+        ;following cond shouldn't be necessary
+        (cond ((eq systat t) (setq systat 0))
+              ((not (numberp systat)) (setq systat 1)))
+        ;
         (setf (counter*-value (get-counter-named "systat"))
               systat))))
 
@@ -4856,6 +4854,15 @@
           (if *rerun-needed-p*
               (tlog "Unable to create Info doc because aux files unresolved~%")
               (html2info)))))))
+
+(defvar *troff2page-file-arg*
+  (or #-(or abcl clisp clozure cmucl ecl sbcl)
+      (progn
+        (tlog "! Don't know how to read your Common Lisp's command-line.~%")
+        (tlog "! Please load the file troff2page into your CL and then~%")
+        (tlog "!   call the procedure troff2page:troff2page on your troff document(s)~%")
+        t)
+      (retrieve-env "T2PARG")))
 
 (troff2page *troff2page-file-arg*
             ;:single-pass
