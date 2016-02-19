@@ -4717,6 +4717,9 @@
     (copy-file-to-stream fi o)))
 
 (defun html2info ()
+  (when *rerun-needed-p*
+    (tlog "Unable to create Info doc because aux files unresolved~%")
+    (return-from html2info))
   (let ((tmp-html-file (concatenate 'string *jobname* "-Z-T.html"))
         (tmp-info-file (concatenate 'string *jobname* "-Z-T.info"))
         (info-file (concatenate 'string *jobname* ".info"))
@@ -4851,9 +4854,7 @@
                 (t (tlog "Rerunning: troff2page ~a~%" input-doc)
                    (troff2page-1pass input-doc))))
         (when *convert-to-info-p*
-          (if *rerun-needed-p*
-              (tlog "Unable to create Info doc because aux files unresolved~%")
-              (html2info)))))))
+          (html2info))))))
 
 (defvar *troff2page-file-arg*
   (or #-(or abcl clisp clozure cmucl ecl sbcl)
