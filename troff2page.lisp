@@ -2828,10 +2828,14 @@
         (emit-section-header (if lvl (string-to-number lvl) 1)))))
 
   (defrequest "TH"
-    (lambda ()
-      ;first call to .TH; identify doc as man page
+    (lambda (&aux it)
+      ;first call to .TH; disable future calls
+      (defrequest "TH" nil)
+      ;identify doc as man page
       (!macro-package :man)
-      (let ((args (read-args)) it)
+      (let ((disabled-TH (lambda ()
+                           (read-troff-line)
+                           (twarning "Calling .TH twice in man page"))))
         ;source man.local if present
         (when (setq it (find-macro-file "man.local"))
           (troff2page-file it))
@@ -2839,32 +2843,36 @@
         (when (setq it (find-macro-file "pca-t2p-man.tmac"))
           (troff2page-file it))
         (cond ((setq it (gethash "TH" *macro-table*))
-               ;if macro .TH defined, call it with current args
-               (let ((*macro-args* (cons "TH" args)))
+               ;if macro .TH defined, call it with current args, but make it one-shot
+               (defrequest "TH" disabled-TH)
+               (let ((*macro-args* (cons "TH" (read-args))))
                  (execute-macro-body it)))
-              ;otherwise, pca-t2p-man.tmac missing!
-              (t (twarning "Couldn't find pca-t2p-man.tmac in any macro directory")
-                 ;disable .TH request being called again
-                 (defrequest "TH"
-                   (lambda ()
-                     (twarning "Calling .TH twice in man page")))
-                 ;define makeshift .SH and .SS
-                 (defrequest "SH"
-                   (lambda ()
-                     (emit-section-header 1 :man-header-p t)))
-                 (defrequest "SS"
-                   (lambda ()
-                     (emit-section-header 2 :man-header-p t)))
-                 ;process args to set title and last-modified-date
-                 (when (setq it (car args))
-                   (setq it (string-trim-blanks it))
-                   (unless (string= it "")
-                     (store-title it :emitp t))
-                   (let ((date (caddr args)))
-                     (when date
-                       (setq date (string-trim-blanks date))
-                       (unless (string= date "")
-                         (defstring "DY" (lambda () date)))))))))))
+              ((setq it (gethash "TH" *request-table*))
+               ;in case, the macro files above used Lisp to redefine .TH
+               ;as a request
+               (funcall it))
+              (t ;otherwise, pca-t2p-man.tmac missing!
+                (twarning "Couldn't find pca-t2p-man.tmac in any macro directory")
+                (defrequest "TH" disabled-TH)
+                ;define makeshift .SH and .SS
+                (defrequest "SH"
+                  (lambda ()
+                    (emit-section-header 1 :man-header-p t)))
+                (defrequest "SS"
+                  (lambda ()
+                    (emit-section-header 2 :man-header-p t)))
+                ;process args to set title and last-modified-date
+                (let ((args (read-args)))
+                  (when (setq it (car args)) ;title
+                    (setq it (string-trim-blanks it))
+                    (unless (string= it "")
+                      (store-title it :emitp t))
+                    ;ignore (cadr args), which is section number
+                    (let ((date (caddr args)))
+                      (when date
+                        (setq date (string-trim-blanks date))
+                        (unless (string= date "")
+                          (defstring "DY" (lambda () date))))))))))))
 
   (defrequest "SC"
     (lambda ()
