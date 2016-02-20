@@ -11,9 +11,6 @@ Copy the scripts `troff2page` and `html2info` to a directory in your PATH.
 Copy the file `man/man1/troff2page.1` to the `man1` subdirectory of a
 directory in your `MANPATH`.
 
-Copy the file `man/man7/pca-eval.tmac.7` to the `man7` subdirectory of a
-directory in your `MANPATH`.
-
 The troff2page documentation (see below) uses the
 `pca*.tmac` files from the `mpca` submodule
 (available on its own at https://github.com/ds26gte/mpca). To
@@ -42,7 +39,7 @@ The `pca-t2p-*.tmac` are only used by `troff2page`, never by
 
 == Man pages
 
-You can now consult the man pages `troff2page(1)` and `pca-eval.tmac(7)`
+You can now consult the man page `troff2page(1)`
 to get started with using troff2page.
 
   man troff2page
