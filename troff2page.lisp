@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160219) ;last change
+(defparameter *troff2page-version* 20160220) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -34,7 +34,7 @@
       #+sbcl (sb-ext:posix-getenv s)
       nil))
 
-(defvar *log-stream* t)
+(defparameter *log-stream* t)
 
 (defun os-execute (s)
   (or #+abcl (ext:run-shell-command s)
@@ -127,7 +127,7 @@
 
 ;
 
-(defvar *standard-glyphs*
+(defparameter *standard-glyphs*
   '(
     ;refer groff_char(7)
 
@@ -471,8 +471,8 @@
 
 ;
 
-(defvar *escape-table* (make-hash-table :test #'eql))
-(defvar *nroff-image-p* nil)
+(defparameter *escape-table* (make-hash-table :test #'eql))
+(defparameter *nroff-image-p* nil)
 
 ;
 
@@ -554,7 +554,6 @@
 (defvar *table-options*)
 (defvar *table-row-number*)
 (defvar *temp-string-count*)
-(defvar *th-already-called-p*)
 (defvar *this-footnote-is-numbered-p*)
 (defvar *title*)
 (defvar *turn-off-escape-char-p*)
@@ -650,33 +649,6 @@
 	 (values (page-node-link it url) t))
         (t (values "[???]" nil))))
 
-(defun man-url ()
-  (let ((url "")
-        url-more c c2)
-    (loop
-      (setq url-more (read-till-chars '(#\space #\tab #\newline
-                                         #\, #\" #\' #\)
-                                         #\\
-                                         #\: #\.)))
-      (setq url (concatenate 'string url url-more))
-      (setq c (snoop-char))
-      (cond ((not c) (return))
-            ((member c '(#\: #\.))
-             (get-char)
-             (setq c2 (snoop-char))
-             (cond ((or (not c2)
-                        (member c2 '(#\space #\tab #\newline))
-                        (and (char= c #\.)
-                             (member c2 '(#\" #\' #\)))))
-                    (toss-back-char c)
-                    (return))
-                   (t (setq url (concatenate 'string url (string c))))))
-            (t (return))))
-    (concatenate 'string
-                (link-start url)
-                 url
-                 (link-stop))))
-
 (defun url-to-html (url link-text)
   (let (internal-node-p)
     (multiple-value-setq (url internal-node-p) (link-url url))
@@ -685,24 +657,23 @@
       (expand-args link-text)
       (link-stop))))
 
-(defun urlh-string-value (&optional url)
-  (let ((link-text "")
-        link-text-more
-        c)
-    (loop
-      (setq link-text-more (read-till-char #\\ :eat-delim-p t))
-      (setq link-text (concatenate 'string link-text link-text-more))
-      (setq c (snoop-char))
-      (cond ((not c)
-             (setq link-text (concatenate 'string link-text "\\"))
-             (return))
-            ((char= c #\&)
-             (get-char)
-             (return))
-            (t (setq link-text (concatenate 'string link-text "\\")))))
-    (unless url (setq url link-text))
-    (when (string= link-text "") (setq link-text url))
-    (url-to-html url link-text)))
+(defun urlh-string-value (&optional url link-text)
+  (unless link-text
+    (let (link-text-more c)
+      (loop
+        (setq link-text-more (read-till-char #\\ :eat-delim-p t))
+        (setq link-text (concatenate 'string link-text link-text-more))
+        (setq c (snoop-char))
+        (cond ((not c)
+               (setq link-text (concatenate 'string link-text "\\"))
+               (return))
+              ((char= c #\&)
+               (get-char)
+               (return))
+              (t (setq link-text (concatenate 'string link-text "\\")))))))
+  (unless url (setq url link-text))
+  (when (string= link-text "") (setq link-text url))
+  (url-to-html url link-text))
 
 ;** environments
 
@@ -1802,9 +1773,11 @@
     (emit-verbatim "<div align=right class=colophon>")
     (emit-newline)
     (when (setq it (gethash "DY" *string-table*))
-      (emit *last-modified*)
-      (emit (funcall it)) (emit-verbatim "<br>")
-      (emit-newline))
+      (setq it (funcall it))
+      (unless (string= it "")
+        (emit *last-modified*)
+        (emit it) (emit-verbatim "<br>")
+        (emit-newline)))
     (unless
       nil
       ;(eql *macro-package* :man) ;no colophon for man pages
@@ -2856,30 +2829,42 @@
 
   (defrequest "TH"
     (lambda ()
-      (unless *th-already-called-p*
-        (setq *th-already-called-p* t)
-        (!macro-package :man)
-        (man-specific-defs)
-        (let ((args (read-args))
-              it)
-          (when (setq it (find-macro-file "man.local"))
-            (troff2page-file it))
-          (when (setq it (find-macro-file "pca-t2p-man.tmac"))
-            (troff2page-file it))
-          (cond ((setq it (gethash "TH" *macro-table*))
-                 (let ((*macro-args* (cons "TH" args)))
-                   (execute-macro-body it)))
-                (t (let ((title (car args))
-                         ;ignoring (cadr args), which is section number
-                         (date (caddr args)))
-                     (when title
-                       (setq title (string-trim-blanks title))
-                       (unless (string= title "")
-                         (store-title title :emitp t))
-                       (when date
-                         (setq date (string-trim-blanks date))
-                         (unless (string= date "")
-                           (defstring "DY" (lambda () date))))))))))))
+      ;first call to .TH; identify doc as man page
+      (!macro-package :man)
+      (let ((args (read-args)) it)
+        ;source man.local if present
+        (when (setq it (find-macro-file "man.local"))
+          (troff2page-file it))
+        ;source pca-t2p-man.tmac if present
+        (when (setq it (find-macro-file "pca-t2p-man.tmac"))
+          (troff2page-file it))
+        (cond ((setq it (gethash "TH" *macro-table*))
+               ;if macro .TH defined, call it with current args
+               (let ((*macro-args* (cons "TH" args)))
+                 (execute-macro-body it)))
+              ;otherwise, pca-t2p-man.tmac missing!
+              (t (twarning "Couldn't find pca-t2p-man.tmac in any macro directory")
+                 ;disable .TH request being called again
+                 (defrequest "TH"
+                   (lambda ()
+                     (twarning "Calling .TH twice in man page")))
+                 ;define makeshift .SH and .SS
+                 (defrequest "SH"
+                   (lambda ()
+                     (emit-section-header 1 :man-header-p t)))
+                 (defrequest "SS"
+                   (lambda ()
+                     (emit-section-header 2 :man-header-p t)))
+                 ;process args to set title and last-modified-date
+                 (when (setq it (car args))
+                   (setq it (string-trim-blanks it))
+                   (unless (string= it "")
+                     (store-title it :emitp t))
+                   (let ((date (caddr args)))
+                     (when date
+                       (setq date (string-trim-blanks date))
+                       (unless (string= date "")
+                         (defstring "DY" (lambda () date)))))))))))
 
   (defrequest "SC"
     (lambda ()
@@ -4003,15 +3988,6 @@
           (emit-verbatim "</div>")
           (emit-newline))))
 
-(defun man-specific-defs ()
-  (defrequest "SH"
-    (lambda ()
-      (emit-section-header 1 :man-header-p t)))
-  (defrequest "SS"
-    (lambda ()
-      (emit-section-header 2 :man-header-p t)))
-  (defstring ":" #'man-url))
-
 (defun ignore-branch ()
   (ignore-spaces)
   (let (bracep c)
@@ -4693,7 +4669,6 @@
         (*table-options* "")
         (*table-row-number* 0)
         (*temp-string-count* 0)
-        (*th-already-called-p* nil)
         (*this-footnote-is-numbered-p* nil)
         (*title* nil)
         (*turn-off-escape-char-p* nil)
@@ -4856,7 +4831,7 @@
         (when *convert-to-info-p*
           (html2info))))))
 
-(defvar *troff2page-file-arg*
+(defparameter *troff2page-file-arg*
   (or #-(or abcl clisp clozure cmucl ecl sbcl)
       (progn
         (tlog "! Don't know how to read your Common Lisp's command-line.~%")
