@@ -98,7 +98,7 @@ and not to groff.
 
 .SH SYSTEM REQUIREMENTS
 
-The script troff2page runs on the Unix command-line on Cygwin,
+The script “troff2page” runs on the Unix command-line on Cygwin,
 Linux, Mac OS X, and Solaris.  It uses the Common Lisp
 implementation mentioned in the shell environment variable LISP,
 which can currently be set to either clisp, clozure, cmu, ecl or
@@ -114,8 +114,8 @@ into your Common Lisp, and then call the Lisp procedure
 ‘troff2page:troff2page’ (i.e., the procedure named ‘troff2page’
 in the package ‘troff2page’) on your source document.  E.g.,
 
-    (load “pathname/of/troff2page”)
-    (troff2page:troff2page “pathname/of/troff-document.ms”)
+    (load "pathname/of/troff2page")
+    (troff2page:troff2page "pathname/of/troff-document.ms")
 
 The procedure troff2page:troff2page can be called several
 times, on the same or different documents, from within the same
