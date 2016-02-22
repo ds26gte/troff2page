@@ -1,210 +1,134 @@
-'\" t
-.\"     Title: troff2page
-.\"    Author: [see the "AUTHORS" section]
-.\" Generator: Asciidoctor 1.5.4
-.\"      Date: 2016-02-17
-.\"    Manual: \ \&
-.\"    Source: \ \&
-.\"  Language: English
-.\"
-.TH "TROFF2PAGE" "1" "2016-02-17" "\ \&" "\ \&"
-.ie \n(.g .ds Aq \(aq
-.el       .ds Aq '
-.ss \n[.ss] 0
-.nh
-.ad l
-.de URL
-\\$2 \(laURL: \\$1 \(ra\\$3
-..
-.if \n[.g] .mso www.tmac
-.LINKSTYLE blue R < >
-.SH "NAME"
+.TH troff2page 1 2016-02-22 \" last modified
+
+.SH NAME
+
 troff2page \- makes Web pages from troff documents
-.SH "SYNOPSIS"
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page <pathname>
-troff2page \-\-help
-troff2page \-\-version
-.fi
-.if n \{\
-.RE
-.\}
-.SH "DESCRIPTION"
-.sp
-troff2page converts troff (man and ms) documents into HTML web
-pages. With the aid of html2info(1), it can also convert them to
-GNU Info documents.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page jobname.ms
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-creates an output HTML document that consists of \f[CR]jobname.html\fP
-and possibly other files \f[CR]jobname\-Z\-H\-1.html\fP,
-\f[CR]jobname\-Z\-H\-2.html\fP, etc., which are linked by navigation to
-\f[CR]jobname.html\fP.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page \-\-version
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+.SH SYNOPSIS
+
+    troff2page <pathname>
+    troff2page --help
+    troff2page --version
+
+.SH DESCRIPTION
+
+troff2page converts troff (-man and -ms) documents into HTML web
+pages and Info documents. E.g.,
+
+    troff2page jobname.ms
+
+creates an output HTML document that consists of “jobname.html”
+and possibly other files “jobname-Z-H-1.html”,
+“jobname-Z-H-2.html”, etc., which are linked by navigation to
+“jobname.html”.
+
+    troff2page --version
+
 displays the troff2page version.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page \-\-help
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+    troff2page --help
+
 displays the version and a pointer to the comprehensive online
-manual, \c
-.URL "http://ds26gte.github.io/troff2page/index.html" "" ","
-whose
-troff source is included in the troff2page distribution.
-.sp
+manual, ds26gte.github.io/troff2page/index.html, whose troff
+source is included in the troff2page distribution.
+
 troff2page called with no argument exits with a “called with no
 argument” message.
-.SH "OPTIONS"
-.sp
-troff2page does not support true options as groff can. Indeed,
-\f[CR]\-\-help\fP and \f[CR]\-\-version\fP are not true options: if they happen to
-name actual files, troff2page will attempt to process them as
-input documents.
-.sp
-However, additional information may fed to troff2page via the
-specially named macro file \f[CR].troff2pagerc.tmac\fP. Thus, a \f[CR]\-mpca\fP
+
+.SH OPTIONS
+
+troff2page does not support options as groff can. Indeed,
+‘--help’ and ‘--version’ are not really options: if they happen
+to name actual files, troff2page will happily attempt to process
+them as input documents.
+
+However, additional information may be fed to troff2page via the
+specially named macro file “.troff2pagerc.tmac”. Thus, a ‘-mpca’
 groff option would translate to the line
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.mso pca.tmac
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-in \f[CR].troff2pagerc.tmac\fP.
-.sp
-troff2page loads \f[CR].troff2pagerc.tmac\fP, if it can find it in
-directories for macro files, before processing its argument file.
-.sp
-Note that groff itself does not load \f[CR].troff2pagerc.tmac\fP
+
+    .mso pca.tmac
+
+in “.troff2pagerc.tmac”.
+
+troff2page loads “.troff2pagerc.tmac”, if it can find it in the
+macro directories, before processing its argument file.
+
+Note that groff itself does not load “.troff2pagerc.tmac”
 automatically.  But that is presumably OK, since you are using
-command\-line options to specify the same information anyway.  If
-you do want groff to pick up this file, you can use the option
-\f[CR]\-m.troff2pagerc\fP.
-.sp
-If the input file is recognizably a man page (i.e., it has the command
-\f[CR].TH\fP), both troff2page and groff will load, if it exists, the init file
-\f[CR]man.local\fP in the home directory.
-.SH "COMMANDS"
-.sp
+groff command-line options to specify the same information
+anyway.  If you do want groff to pick up this file, you can use
+the option ‘-m.troff2pagerc’.
+
+If the input file is recognizably a man page (i.e., it has the
+command ‘.TH’), both troff2page and groff will load, if it
+exists, the init file “man.local” in the home directory.
+
+.SH COMMANDS
+
 troff2page recognizes most of the commands (requests, macros,
-diversions, strings, escapes, glyphs) of raw troff and its ms and man
-macro packages. The syntax recognized is the improved kind supported by
-.URL "http://groff.ffii.org" "groff" " "
-and
-.URL "http://heirloom.sf.net/doctools.html" "Heirloom troff" ","
-i.e., macro, string, and glyph names
-can be arbitrarily long, and strings can have arguments.  Most of the
-commands are converted to their obvious HTML equivalent.  E.g., ms’s
-footnotes have a straightforward translation in the HTML, with the
-footnote text set at the bottom of the HTML page, and with the footnote
-markers in the body and the footnote hyperlinking to each other.  Please
+diversions, strings, escapes, glyphs) of raw troff and its -ms
+and -man macro packages. The syntax recognized is the improved
+kind supported by groff (gnu.org/software/groff) and Heirloom
+troff (github.com/n-t-roff/heirloom-doctools), i.e., macro,
+string, and glyph names can be arbitrarily long, and strings can
+have arguments.  Most of the commands are converted to their
+obvious HTML equivalent.  E.g., -ms’s footnotes have a
+straightforward translation in the HTML, with the footnote text
+set at the bottom of the HTML page, and with the footnote markers
+in the body and the footnote hyperlinking to each other.  Please
 consult troff and groff documentation for the commands.
-.sp
-The troff2page distribution also includes the \f[CR]mpca\fP submodule
+
+The troff2page distribution also includes the -mpca submodule
 that contains several useful macro files. Both groff and
 troff2page can process these macro files, and give compatible
 results. Please see the troff2page manual for further details.
-.SH "INFO DOCS"
-.sp
+
+.SH INFO DOCS
+
 You can call the macro
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.troff2info
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+  .troff2info
+
 within your document to signal to troff2page that it should also
 create an Info document.
-.sp
-A good place to place the \f[CR].troff2info\fP call is in your
-\f[CR].troff2pagerc.tmac\fP file, as it is relevant only to troff2page
+
+A good place to place the ‘.troff2info’ call is in your
+“.troff2pagerc.tmac” file, as it is relevant only to troff2page
 and not to groff.
-.SH "SYSTEM REQUIREMENTS"
-.sp
-The script \f[CR]troff2page\fP runs on the Unix command\-line on Cygwin, Linux,
-Mac OS X, and Solaris.  It uses the Common Lisp implementation mentioned
-in the shell environment variable \f[CR]LISP\fP, which can currently be set to
-either \f[CR]clisp\fP, \f[CR]clozure\fP, \f[CR]cmu\fP, \f[CR]ecl\fP or \f[CR]sbcl\fP: the corresponding Lisp
-implementations being
-.URL "http://clisp.sf.net" "CLISP" ","
-.URL "http://ccl.clozure.com" "Clozure CL" ","
-.URL "http://cmucl.org" "CMUCL" ","
-.URL "http://ecls.sf.net" "ECL" ","
-and
-.URL "http://sbcl.sf.net" "SBCL" "."
-.sp
-If \f[CR]LISP\fP is not
-set, some default Lisp implementation is assumed.
-.sp
-It is not necessary to run the file \f[CR]troff2page\fP as a Unix script.  You
-can simply load \f[CR]troff2page\fP (it is a Lisp file) into your Common Lisp,
-and then call the Lisp procedure \f[CR]troff2page:troff2page\fP (i.e., the
-procedure named \f[CR]troff2page\fP in the package \f[CR]troff2page\fP) on your source
-document.  E.g.,
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-(load "pathname/of/troff2page")
-(troff2page:troff2page "pathname/of/troff\-document.ms")
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-The procedure \f[CR]troff2page:troff2page\fP can be called
-several times, on the same or different documents, from
-within the same Lisp session.
-.sp
-For more information, please see the file \f[CR]INSTALL.adoc\fP in the
+
+.SH SYSTEM REQUIREMENTS
+
+The script troff2page runs on the Unix command-line on Cygwin,
+Linux, Mac OS X, and Solaris.  It uses the Common Lisp
+implementation mentioned in the shell environment variable LISP,
+which can currently be set to either clisp, clozure, cmu, ecl or
+sbcl: the corresponding Lisp implementations being CLISP
+(clisp.sf.net), Clozure CL (ccl.clozure.com), CMUCL (cmucl.org),
+ECL (ecls.sf.net), and SBCL (sbcl.sf.net).
+
+If LISP is not set, sbcl is assumed.
+
+It is not necessary to run the file “troff2page” as a Unix
+script.  You can simply load “troff2page” (it is a Lisp file)
+into your Common Lisp, and then call the Lisp procedure
+‘troff2page:troff2page’ (i.e., the procedure named ‘troff2page’
+in the package ‘troff2page’) on your source document.  E.g.,
+
+    (load “pathname/of/troff2page”)
+    (troff2page:troff2page “pathname/of/troff-document.ms”)
+
+The procedure troff2page:troff2page can be called several
+times, on the same or different documents, from within the same
+Lisp session.
+
+For more information, please see the file INSTALL.adoc in the
 distribution.
-.SH "AVAILABILITY"
-.sp
-troff2page is downloadable from
-.URL "https://github.com/ds26gte/troff2page" "" "."
-.SH "SEE ALSO"
-.sp
-groff(1), groff_tmac(5), groff_man(7), groff_ms(7),
-html2info(1),
-clisp(1), cmucl(1), ecl(1), lisp(1), sbcl(1)
+
+.SH AVAILABILITY
+
+troff2page is downloadable from github.com/ds26gte/troff2page.
+
+.SH SEE ALSO
+
+groff(1), groff_tmac(5), groff_man(7), groff_ms(7), clisp(1),
+cmucl(1), ecl(1), lisp(1), sbcl(1)
