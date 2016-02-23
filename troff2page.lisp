@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160220) ;last change
+(defparameter *troff2page-version* 20160223) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -2868,11 +2868,10 @@
                     (unless (string= it "")
                       (store-title it :emitp t))
                     ;ignore (cadr args), which is section number
-                    (let ((date (caddr args)))
-                      (when date
-                        (setq date (string-trim-blanks date))
-                        (unless (string= date "")
-                          (defstring "DY" (lambda () date))))))))))))
+                    (when (setq it (caddr args))
+                      (setq it (string-trim-blanks it))
+                      (unless (string= it "")
+                        (defstring "DY" (lambda () it)))))))))))
 
   (defrequest "SC"
     (lambda ()
