@@ -7,4 +7,6 @@
 .trofftemp*
 ?.lisp
 ?.ms
+doc/*[!sc]
 examples/*.ms
+man/man1/*[!1]

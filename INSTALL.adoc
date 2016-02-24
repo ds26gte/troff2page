@@ -53,7 +53,7 @@ are:
 
   clisp
   clozure
-  cmu
+  cmucl
   ecl
   sbcl
 
