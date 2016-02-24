@@ -109,7 +109,6 @@
 (defparameter *aux-file-suffix* "-Z-A.lisp")
 (defparameter *css-file-suffix* "-Z-S.css")
 (defparameter *html-conversion-by* "HTML conversion by")
-;(defparameter *html-id-prefix* "TAG:__")
 (defparameter *html-page-suffix* "-Z-H-")
 (defparameter *image-file-suffix* "-Z-G-")
 (defparameter *last-modified* "Last modified: ")
@@ -511,7 +510,6 @@
 (defvar *jobname* nil)
 (defvar *just-after-par-start-p*)
 (defvar *keep-newline-p*)
-(defvar *last-input-milestone*)
 (defvar *last-page-number*)
 (defvar *leading-spaces-macro*)
 (defvar *leading-spaces-number*)
@@ -1467,6 +1465,7 @@
 
 #|
 ;let's not do this -- takes up time and not necessarily all that helpful
+(defvar *last-input-milestone* 0)
 
 (defun emit-edit-source-doc (&key (interval 0))
   ;the first call for any file will always have interval=0,
@@ -4636,7 +4635,6 @@
         (*inside-table-text-block-p* nil)
         (*just-after-par-start-p* nil)
         (*keep-newline-p* t)
-        (*last-input-milestone* 0)
         (*leading-spaces-macro* nil)
         (*leading-spaces-number* 0)
         (*lines-to-be-centered* 0)
