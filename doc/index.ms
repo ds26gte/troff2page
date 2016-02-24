@@ -1,4 +1,4 @@
-.so troff2page-doc-macs.tmac
+.so style.tmac
 .
 .ND 2016-02-24  \"last modified
 .

@@ -1,4 +1,4 @@
-.\" last change 2016-02-11
+.\" last change 2016-02-24
 .
 .ie \n[.X] \{\
 .mso s  \" heirloom troff
@@ -60,10 +60,10 @@
 .
 .rn @SH @SH_orig
 .de @SH
-.nr troff2page-doc-macs.ms:@SH:arg1 \\$1
+.nr style:@SH:arg1 \\$1
 .shift
-.if '\\n[troff2page-doc-macs.ms:@SH:arg1]'1' .HBP
-.@SH_orig \\n[troff2page-doc-macs.ms:@SH:arg1] \\$*
+.if '\\n[style:@SH:arg1]'1' .HBP
+.@SH_orig \\n[style:@SH:arg1] \\$*
 ..
 .als SH @SH
 .\}
