@@ -1,6 +1,6 @@
 .so troff2page-doc-macs.tmac
 .
-.ND 2016-02-16  \"last modified
+.ND 2016-02-24  \"last modified
 .
 .TL
 troff2page
@@ -18,14 +18,14 @@ troff2page
 .TOC
 
 .so intro.ms
-.so troff-cmds.ms
-.so page-layout.ms
+.so commands.ms
+.so layout.ms
 .so xrefs.ms
 .so genindex.ms
 .so slideshow.ms
 .so eval.ms
-.so error-recovery.ms
-.so gnu-info.ms
+.so error.ms
+.so infodoc.ms
 
 .if t \{\
 .SH 1
