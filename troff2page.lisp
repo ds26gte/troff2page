@@ -1,5 +1,5 @@
 ":"; export T2PARG=$1
-":"; if test "$LISP" = abcl; then exec abcl --noinform --load $0 --eval '(ext::quit)'
+":"; if test "$LISP" = abcl; then exec abcl --batch --noinform --load $0
 ":"; elif test "$LISP" = allegro; then exec alisp -L $0 -kill
 ":"; elif test "$LISP" = clisp; then exec clisp -q $0
 ":"; elif test "$LISP" = clozure; then exec ccl -l $0 -e '(ccl:quit)'
@@ -17,7 +17,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160223) ;last change
+(defparameter *troff2page-version* 20160224) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
