@@ -4765,9 +4765,9 @@
        "/^<div\\s\\+\\S\\+\\s\\+class=navigation.\\+<\\/div>/d"
 
        ; mark beginning and end of ToC
-       "s/^<a\\s\\+name=\"TAG:__t\\(roff\\|tex\\)2page_toc\">/<!-- ÞINFO_MENU_BEGIN! -->ÞINFO_MENU_BEGIN!* Menu:<br>/"
+       "s/^<a\\s\\+name=\"TAG:__troff2page_toc\">/<!-- ÞINFO_MENU_BEGIN! -->ÞINFO_MENU_BEGIN!* Menu:<br>/"
 
-       "s/^<a\\s\\+name=\"TAG:__t\\(roff\\|tex\\)2page_toc_end\">/<!-- ÞINFO_MENU_END! -->ÞINFO_MENU_END!/"
+       "s/^<a\\s\\+name=\"TAG:__troff2page_toc_end\">/<!-- ÞINFO_MENU_END! -->ÞINFO_MENU_END!/"
 
        ; create Info menu entry for all doc-internal links within ToC
        (format nil "/^<!--\\s\\+ÞINFO_MENU_BEGIN!\\s\\+-->/,/^<!--\\s\\+ÞINFO_MENU_END!\\s\\+-->/ s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a\\.html#[^\"]*\">/* 0:: /g" *jobname*)
@@ -4782,11 +4782,11 @@
 
        ; mark all doc-internal links in the index (if any
 
-       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a\\.html#TAG:__t\\(roff\\|ex\\)2page_index_[^\"]\\+\">/ÞI!0::/g" *jobname*)
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a\\.html#TAG:__troff2page_index_[^\"]\\+\">/ÞI!0::/g" *jobname*)
 
-       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a-Z-H-\\([0-9]\\+\\)\\.html#TAG:__t\\(roff\\|ex\\)2page_index_[^\"]\\+\">/ÞI!\\1::/g" *jobname*)
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"~a-Z-H-\\([0-9]\\+\\)\\.html#TAG:__troff2page_index_[^\"]\\+\">/ÞI!\\1::/g" *jobname*)
 
-       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"#TAG:__t\\(roff\\|ex\\)2page_index_[^\"]\\+\">/ÞI!~a::/g" i)
+       (format nil "s/<a\\s\\+class=hrefinternal\\s\\+href=\"#TAG:__troff2page_index_[^\"]\\+\">/ÞI!~a::/g" i)
 
        ; all other doc-internal links become Info *note's
 
