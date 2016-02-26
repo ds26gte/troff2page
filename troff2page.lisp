@@ -5,6 +5,7 @@
 ":"; elif test "$LISP" = clozure; then exec ccl -l $0 -e '(ccl:quit)'
 ":"; elif test "$LISP" = cmucl; then exec lisp -quiet -load $0 -eval '(ext::quit)'
 ":"; elif test "$LISP" = ecl; then exec ecl -shell $0
+":"; elif test "$LISP" = gcl; then gcl -load $0 -eval '(sys:quit)'
 ":"; else exec sbcl --script $0
 ":"; fi
 
@@ -17,7 +18,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160224) ;last change
+(defparameter *troff2page-version* 20160226) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -31,6 +32,7 @@
   (or #+(or abcl clisp ecl) (ext:getenv s)
       #+clozure (ccl:getenv s)
       #+cmucl (cdr (assoc s ext:*environment-list* :test #'string=))
+      #+gcl (sys:getenv s)
       #+sbcl (sb-ext:posix-getenv s)
       nil))
 
@@ -46,6 +48,7 @@
       #+cmucl (ext:process-exit-code
                 (ext:run-program "sh" (list "-c" s) :output t))
       #+ecl (ext:system s)
+      #+gcl (sys:system s)
       #+sbcl (sb-ext:process-exit-code
                (sb-ext:run-program "sh" (list "-c" s) :search t :output *log-stream*))
       1))
@@ -64,6 +67,7 @@
       #+clozure (ccl::getpid)
       #+cmucl (unix:unix-getpid)
       #+ecl (ext:getpid)
+      #+gcl (sys:getpid)
       #+sbcl (sb-unix:unix-getpid)
       #xbadc0de))
 
@@ -497,7 +501,6 @@
 (defvar *exit-status*)
 (defvar *file-copy-buffer*)
 (defvar *file-postlude*)
-(defvar *font-alternating-style-p*)
 (defvar *footnote-buffer*)
 (defvar *footnote-count*)
 (defvar *glyph-table*)
@@ -4623,7 +4626,6 @@
         (*ev-table* (make-hash-table :test #'equal))
         (*exit-status* nil)
         (*file-postlude* nil)
-        (*font-alternating-style-p* nil)
         (*footnote-buffer* '())
         (*footnote-count* 0)
         (*glyph-table* (make-hash-table :test #'equal))
@@ -4714,7 +4716,7 @@
                              (if (= i 0) "" (format nil "-Z-H-~a" i)) ".html")
                            tmp-html-file)
 
-        (format o "~c~%File: ~a" (code-char 31) info-file)
+        (format o "~c~%File: ~a" (code-char #x1f) info-file)
 
         (when (= i 0) (format o ", Node: Top"))
         (when (> i 0) (format o ", Node: ~a" i))
@@ -4815,7 +4817,12 @@
        "s/ÞI!\\([0-9]\\+\\)::\\1/*note \\1::/g"
 
        ; restore Þ)
-       "s/Þ!/Þ/g"))
+       "s/Þ!/Þ/g"
+
+       ; gcl writes (code-char #x1f) as circumflex-underscore; use sed to get true \x1f
+       #+gcl
+       "s/^\\^_/\\x1f/"
+       ))
 
 (defun troff2page (input-doc &optional single-pass-p)
   (unless (troff2page-help input-doc)
@@ -4837,7 +4844,7 @@
           (html2info))))))
 
 (defparameter *troff2page-file-arg*
-  (or #-(or abcl clisp clozure cmucl ecl sbcl)
+  (or #-(or abcl clisp clozure cmucl ecl gcl sbcl)
       (progn
         (tlog "! Don't know how to read your Common Lisp's command-line.~%")
         (tlog "! Please load the file troff2page into your CL and then~%")

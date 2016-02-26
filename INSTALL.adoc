@@ -55,6 +55,7 @@ are:
   clozure
   cmucl
   ecl
+  gcl
   sbcl
 
 If `LISP` is not set, some default implementation is assumed.

@@ -33,12 +33,14 @@ The script \fCtroff2page\fP runs on the Unix command-line on Cygwin,
 Linux, Mac
 OS X, and Solaris.  It uses the Common Lisp implementation mentioned in
 the shell environment variable \fCLISP\fP, which can currently be set to
-either \fCclisp\fP, \fCclozure\fP, \fCcmu\fP, \fCecl\fP, or \fCsbcl\fP:
+either \fCclisp\fP, \fCclozure\fP, \fCcmu\fP, \fCecl\fP,
+\fCgcl\fP or \fCsbcl\fP:
 the corresponding Lisp implementations being
 \*[url http://clisp.sf.net]CLISP\&,
 \*[url http://ccl.clozure.com]Clozure CL\&,
 \*[url http://cmucl.org]CMUCL\&,
-\*[url http://ecls.sf.net]ECL\&, and
+\*[url http://ecls.sf.net]ECL\&,
+\*[url http://gnu.org/software/gcl]GCL\&, and
 \*[url http://sbcl.sf.net]SBCL\&.
 
 Copy the script \fCtroff2page\fP to your \fCPATH\fP.
