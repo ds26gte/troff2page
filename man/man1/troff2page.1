@@ -1,4 +1,4 @@
-.TH troff2page 1 2016-02-26 \" last modified
+.TH troff2page 1 2016-02-27 \" last modified
 
 .SH NAME
 
@@ -17,10 +17,10 @@ pages and Info documents. E.g.,
 
     troff2page jobname.ms
 
-creates an output HTML document that consists of “jobname.html”
-and possibly other files “jobname-Z-H-1.html”,
-“jobname-Z-H-2.html”, etc., which are linked by navigation to
-“jobname.html”.
+creates an output HTML document that consists of ‘jobname.html’
+and possibly other files ‘jobname-Z-H-1.html’,
+‘jobname-Z-H-2.html’, etc., which are linked by navigation to
+‘jobname.html’.
 
     troff2page --version
 
@@ -32,8 +32,8 @@ displays the version and a pointer to the comprehensive online
 manual, ds26gte.github.io/troff2page/index.html, whose troff
 source is included in the troff2page distribution.
 
-troff2page called with no argument exits with a “called with no
-argument” message.
+troff2page called with no argument exits with a ‘called with no
+argument’ message.
 
 .SH OPTIONS
 
@@ -43,17 +43,17 @@ to name actual files, troff2page will happily attempt to process
 them as input documents.
 
 However, additional information may be fed to troff2page via the
-specially named macro file “.troff2pagerc.tmac”. Thus, a ‘-mpca’
+specially named macro file ‘.troff2pagerc.tmac’. Thus, a ‘-mpca’
 groff option would translate to the line
 
     .mso pca.tmac
 
-in “.troff2pagerc.tmac”.
+in ‘.troff2pagerc.tmac’.
 
-troff2page loads “.troff2pagerc.tmac”, if it can find it in the
+troff2page loads ‘.troff2pagerc.tmac’, if it can find it in the
 macro directories, before processing its argument file.
 
-Note that groff itself does not load “.troff2pagerc.tmac”
+Note that groff itself does not load ‘.troff2pagerc.tmac’
 automatically.  But that is presumably OK, since you are using
 groff command-line options to specify the same information
 anyway.  If you do want groff to pick up this file, you can use
@@ -61,7 +61,7 @@ the option ‘-m.troff2pagerc’.
 
 If the input file is recognizably a man page (i.e., it has the
 command ‘.TH’), both troff2page and groff will load, if it
-exists, the init file “man.local” in the home directory.
+exists, the init file ‘man.local’ in the home directory.
 
 .SH COMMANDS
 
@@ -78,7 +78,7 @@ set at the bottom of the HTML page, and with the footnote markers
 in the body and the footnote hyperlinking to each other.  Please
 consult troff and groff documentation for the commands.
 
-The troff2page distribution also includes the -mpca submodule
+The troff2page distribution also includes the ‘mpca’ submodule
 that contains several useful macro files. Both groff and
 troff2page can process these macro files, and give compatible
 results. Please see the troff2page manual for further details.
@@ -93,24 +93,24 @@ within your document to signal to troff2page that it should also
 create an Info document.
 
 A good place to place the ‘.troff2info’ call is in your
-“.troff2pagerc.tmac” file, as it is relevant only to troff2page
+‘.troff2pagerc.tmac’ file, as it is relevant only to troff2page
 and not to groff.
 
 .SH SYSTEM REQUIREMENTS
 
-The script “troff2page” runs on the Unix command-line on Cygwin,
+The script ‘troff2page’ runs on the Unix command-line on Cygwin,
 Linux, Mac OS X, and Solaris.  It uses the Common Lisp
-implementation mentioned in the shell environment variable LISP,
-which can currently be set to either clisp, clozure, cmucl, ecl
-or sbcl: the corresponding Lisp implementations being CLISP
-(clisp.sf.net), Clozure CL (ccl.clozure.com), CMUCL (cmucl.org),
-ECL (ecls.sf.net), GCL (gnu.org/software/gcl) and SBCL
-(sbcl.sf.net).
+implementation mentioned in the shell environment variable ‘LISP’,
+which can currently be set to either ‘clisp’, ‘clozure’, ‘cmucl’,
+‘ecl’ or ‘sbcl’: the corresponding Lisp implementations being
+CLISP (clisp.sf.net), Clozure CL (ccl.clozure.com), CMUCL
+(cmucl.org), ECL (ecls.sf.net), GCL (gnu.org/software/gcl) and
+SBCL (sbcl.sf.net).
 
-If LISP is not set, sbcl is assumed.
+If ‘LISP’ is not set, ‘sbcl’ is assumed.
 
-It is not necessary to run the file “troff2page” as a Unix
-script.  You can simply load “troff2page” (it is a Lisp file)
+It is not necessary to run the file ‘troff2page’ as a Unix
+script.  You can simply load ‘troff2page’ (it is a Lisp file)
 into your Common Lisp, and then call the Lisp procedure
 ‘troff2page:troff2page’ (i.e., the procedure named ‘troff2page’
 in the package ‘troff2page’) on your source document.  E.g.,
@@ -118,11 +118,11 @@ in the package ‘troff2page’) on your source document.  E.g.,
     (load "pathname/of/troff2page")
     (troff2page:troff2page "pathname/of/troff-document.ms")
 
-The procedure troff2page:troff2page can be called several
+The procedure ‘troff2page:troff2page’ can be called several
 times, on the same or different documents, from within the same
 Lisp session.
 
-For more information, please see the file INSTALL.adoc in the
+For more information, please see the file ‘INSTALL.adoc’ in the
 distribution.
 
 .SH AVAILABILITY
