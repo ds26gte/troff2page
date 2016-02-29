@@ -9,4 +9,4 @@
 ?.ms
 doc/*[!sc]
 examples/*.ms
-man/man1/*[!1]
+man/man1/*[!1c]
