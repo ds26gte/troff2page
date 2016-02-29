@@ -4,12 +4,12 @@
 .IX extending troff and troff2page with Common Lisp
 .IX eval@.eval, macro
 .IX endeval@.endeval, macro
-.IX eval4troff.tmac, macro file
+.IX pca-eval.tmac, macro file
 To invoke Common Lisp from troff, we use the macro \fC.eval\fP with its closer
 \fC.endeval\fP.   These are
 defined in the
 supplied
-troff macro file \fCeval4troff.tmac\fP, which you should put
+troff macro file \fCpca-eval.tmac\fP, which you should put
 in a macro directory.
 
 \&\fC.eval\fP does only one thing: It
@@ -22,7 +22,7 @@ example.
 Consider the following troff document, \fCtau.ms\fP:
 
 .EX
-    .mso eval4troff.tmac
+    .mso pca-eval.tmac
     .
     The ratio of the circumference of a circle to
     its radius is \(*t \(~=
@@ -129,7 +129,7 @@ we’ll define a
 much easier Lisp procedure to do the same, and put it inside an \fC.eval\fP:
 
 .EX
-    .mso eval4troff.tmac
+    .mso pca-eval.tmac
     .
     .eval
     (defun between-0-and-1 (n)
