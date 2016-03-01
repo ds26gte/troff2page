@@ -12,3 +12,5 @@ index.info: $(troff-files)
 
 clean:
 	rm -f *-Z-* *.html *.info
+
+.PHONY: all clean
