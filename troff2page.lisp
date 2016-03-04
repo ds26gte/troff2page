@@ -18,7 +18,7 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160226) ;last change
+(defparameter *troff2page-version* 20160303) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -4821,7 +4821,7 @@
 
        ; gcl writes (code-char #x1f) as circumflex-underscore; use sed to get true \x1f
        #+gcl
-       "s/^\\^_/\\x1f/"
+       "s/^\\^_$/\\x1f/"
        ))
 
 (defun troff2page (input-doc &optional single-pass-p)
