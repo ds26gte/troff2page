@@ -6,6 +6,7 @@
 ":"; elif test "$LISP" = cmucl; then exec lisp -quiet -load $0 -eval '(ext::quit)'
 ":"; elif test "$LISP" = ecl; then exec ecl -shell $0
 ":"; elif test "$LISP" = gcl; then gcl -load $0 -eval '(sys:quit)'
+":"; elif test "$LISP" = mkcl; then exec mkcl -shell $0
 ":"; else exec sbcl --script $0
 ":"; fi
 
@@ -18,7 +19,11 @@
 
 (in-package :troff2page)
 
-(defparameter *troff2page-version* 20160303) ;last change
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (setq *print-case* :downcase
+        *load-verbose* nil))
+
+(defparameter *troff2page-version* 20170804) ;last change
 
 (defparameter *troff2page-website*
   ;for details, please see
@@ -33,12 +38,14 @@
       #+clozure (ccl:getenv s)
       #+cmucl (cdr (assoc s ext:*environment-list* :test #'string=))
       #+gcl (sys:getenv s)
+      #+mkcl (mkcl:getenv s)
       #+sbcl (sb-ext:posix-getenv s)
       nil))
 
 (defparameter *log-stream* t)
 
 (defun os-execute (s)
+  (declare (string s))
   (or #+abcl (ext:run-shell-command s)
       #+clisp (or (ext:shell s) 0)
       #+clozure (multiple-value-bind (status exit-code)
@@ -49,6 +56,7 @@
                 (ext:run-program "sh" (list "-c" s) :output t))
       #+ecl (ext:system s)
       #+gcl (sys:system s)
+      #+mkcl (mkcl:system s)
       #+sbcl (sb-ext:process-exit-code
                (sb-ext:run-program "sh" (list "-c" s) :search t :output *log-stream*))
       1))
@@ -68,6 +76,7 @@
       #+cmucl (unix:unix-getpid)
       #+ecl (ext:getpid)
       #+gcl (sys:getpid)
+      #+mkcl (mkcl:getpid)
       #+sbcl (sb-unix:unix-getpid)
       #xbadc0de))
 
@@ -80,8 +89,6 @@
   (or #+unix :unix
       #+darwin :unix  ;ECL on Mac doesn't have #+unix ?
       (if (retrieve-env "COMSPEC") :windows :unix)))
-
-(setq *load-verbose* nil)
 
 (defparameter *ghostscript*
   ;the name of the Ghostscript executable.  You
@@ -510,6 +517,7 @@
 (defvar *image-file-count*)
 (defvar *input-line-no*)
 (defvar *inside-table-text-block-p*)
+(defvar *it*)
 (defvar *jobname* nil)
 (defvar *just-after-par-start-p*)
 (defvar *keep-newline-p*)
@@ -643,11 +651,11 @@
       (when node "#")
       node)))
 
-(defun link-url (url &aux it)
+(defun link-url (url)
   (cond ((not (char= (char url 0) #\#)) (values url nil))
 	((setq url (subseq url 1)
-	       it (gethash url *node-table*))
-	 (values (page-node-link it url) t))
+	       *it* (gethash url *node-table*))
+	 (values (page-node-link *it* url) t))
         (t (values "[???]" nil))))
 
 (defun url-to-html (url link-text)
@@ -724,11 +732,12 @@
 
 ;** input
 
-(defun get-char (&aux it)
+(defun get-char ()
   (cond ((consp (bstream*-buffer *current-troff-input*))
          (pop (bstream*-buffer *current-troff-input*)))
-        ((setq it (bstream*-stream *current-troff-input*))
-         (let ((c (read-char it nil)))
+        ((setq *it* (bstream*-stream *current-troff-input*))
+         (let* ((it *it*)
+                (c (read-char it nil)))
            (when c
              (when (char= c #\return)
                (setq c #\newline)
@@ -776,13 +785,14 @@
   (error "troff2page fatal error"))
 
 (defun read-till-chars (delims &key eat-delim-p)
+  (declare (list delims))
   (let ((newline-is-delim-p (member #\newline delims :test #'char=))
         (r "") c)
     (loop
       (setq c (snoop-char))
       (cond ((not c)
              (if newline-is-delim-p
-                 (if (string= r "") c r)
+                 (return (if (string= r "") c r))
                  (progn
                    (terror "read-till-chars: could not find closer ~a" r)
                    (return))))
@@ -793,17 +803,20 @@
                (setq r (concatenate 'string r (string c))))))))
 
 (defun read-till-char (delim &key eat-delim-p)
+  (declare (character delim))
   (read-till-chars (list delim) :eat-delim-p eat-delim-p))
 
 (defun read-one-line ()
   (read-till-char #\newline :eat-delim-p t))
 
 (defun toss-back-string (s)
+  (declare (string s))
   (setf (bstream*-buffer *current-troff-input*)
         (nconc (concatenate 'list s)
                (bstream*-buffer *current-troff-input*))))
 
 (defun toss-back-line (s)
+  (declare (string s))
   (setf (bstream*-buffer *current-troff-input*)
         (nconc (concatenate 'list s)
                (cons #\newline
@@ -819,6 +832,7 @@
             (t (return))))))
 
 (defun ignore-char (c)
+  (declare (character c))
   (unless (or (char= c #\space) (char= c #\tab))
     (ignore-spaces))
   (let ((d (snoop-char)))
@@ -826,6 +840,7 @@
           ((char= d c) (get-char)))))
 
 (defun escape-char-p (c)
+  (declare (character c))
   (and (not *turn-off-escape-char-p*)
        (char= c *escape-char*)))
 
@@ -973,7 +988,7 @@
       (setq x (string-trim-blanks (read-one-line)))
       (setq xn (length x))
       (table-do-global-option-1 x)
-      (when (and (> xn 0) (char= (char x (- xn 1)) #\;))
+      (when (and (> xn 0) (char= (char x (1- xn)) #\;))
         (return)))))
 
 (defun table-do-global-option-1 (x)
@@ -1017,7 +1032,7 @@
       (setq xn (length x))
       (incf *table-default-format-line*)
       (table-do-format-1 x)
-      (when (and (> xn 0) (char= (char x (- xn 1)) #\.))
+      (when (and (> xn 0) (char= (char x (1- xn)) #\.))
         (return)))))
 
 (defun table-do-format-1 (x)
@@ -1280,7 +1295,8 @@
                            (#\& "\\[htmlamp]")
                            (#\\ "\\[htmlbackslash]")
                            (#\space "\\[htmlspace]")
-                           (t (string c))))))))))
+                           (t (string c))))))
+             r))))
 
 ;**
 
@@ -1343,12 +1359,12 @@
     (if blank-line-p (emit-blank-line)
         (emit r))))
 
-(defun expand-escape (c &aux it)
+(defun expand-escape (c)
   ;c is the char after escape -- it is still un-got
   (cond ((not c) (setq c #\newline))
         (t (get-char)))
   (cond (*turn-off-escape-char-p* (s-string *escape-char* c)) ;shdnt be needed
-        ((setq it (gethash c *escape-table*)) (funcall it))
+        ((setq *it* (gethash c *escape-table*)) (funcall *it*))
         ((gethash (string c) *glyph-table*))
         (t (verbatim (string c)))))
 
@@ -1377,12 +1393,12 @@
 	   (emit-verbatim "<span")
 	   (when first-page-p (emit-verbatim " class=disable"))
 	   (emit-verbatim ">")
-	   (unless first-page-p  (emit (link-start (page-link 0) t)))
+	   (unless first-page-p (emit (link-start (page-link 0) t)))
 	   (emit *navigation-first-name*)
 	   (unless first-page-p (emit (link-stop)))
 	   (emit-verbatim ", ")
 	   ;
-	   (unless first-page-p  (emit (link-start (page-link (- pageno 1)) t)))
+	   (unless first-page-p (emit (link-start (page-link (1- pageno)) t)))
 	   (emit *navigation-previous-name*)
 	   (unless first-page-p (emit (link-stop)))
 	   ;(emit ", ")
@@ -1394,7 +1410,7 @@
 	   (when first-page-p (emit-verbatim "<span class=disable>"))
 	   (emit-verbatim ", ")
 	   (when first-page-p (emit-verbatim "</span>"))
-	   (unless last-page-p  (emit (link-start (page-link (+ pageno 1)) t)))
+	   (unless last-page-p (emit (link-start (page-link (1+ pageno)) t)))
 	   (emit *navigation-next-name*)
 	   (unless last-page-p (emit (link-stop)))
 	   (emit-verbatim "</span>")
@@ -1543,47 +1559,47 @@
 
 ;
 
-(defun emit-blank-line (&aux it)
+(defun emit-blank-line ()
   (cond ((eq *outputting-to* :troff) (emit-newline))
         (*blank-line-macro*
           (setq *keep-newline-p* nil)
           (setq *previous-line-exec-p* t)
-          (cond ((setq it (gethash *blank-line-macro* *macro-table*))
-                 (execute-macro-body it))
-                ((setq it (gethash *blank-line-macro* *request-table*))
+          (cond ((setq *it* (gethash *blank-line-macro* *macro-table*))
+                 (execute-macro-body *it*))
+                ((setq *it* (gethash *blank-line-macro* *request-table*))
                  (toss-back-char #\newline)
-                 (funcall it))))
+                 (funcall *it*))))
         (t (emit-verbatim "<p>")
            ;(emit-para)
            ;(emit-verbatim "&#xa0;<br>")
            (emit-newline))))
 
-(defun emit-leading-spaces (num-leading-spaces &key insert-line-break-p &aux it)
+(defun emit-leading-spaces (num-leading-spaces &key insert-line-break-p)
   (when (> num-leading-spaces 0)
     (setq *leading-spaces-number* num-leading-spaces)
     (cond (*leading-spaces-macro*
-            (cond ((setq it (gethash *leading-spaces-macro* *macro-table*))
-                   (execute-macro-body it))
-                  ((setq it (gethash *leading-spaces-macro* *request-table*))
-                   (funcall it))))
+            (cond ((setq *it* (gethash *leading-spaces-macro* *macro-table*))
+                   (execute-macro-body *it*))
+                  ((setq *it* (gethash *leading-spaces-macro* *request-table*))
+                   (funcall *it*))))
           (t (when insert-line-break-p
                (emit-verbatim "<!---***---><Br>"))
              (dotimes (i *leading-spaces-number*)
                (emit "\\[htmlnbsp]"))))))
 
-(defun do-afterpar (&aux it)
-  (when (setq it *afterpar*)
+(defun do-afterpar ()
+  (when (setq *it* *afterpar*)
     (setq *afterpar* nil)
-    (funcall it)))
+    (funcall *it*)))
 
-(defun emit-para (&key par-start-p indentp firstp lastp &aux it)
+(defun emit-para (&key par-start-p indentp firstp lastp)
   (unless firstp
     (do-afterpar)
     (emit-verbatim "</p>")
     (emit-newline))
   (setq *margin-left* 0)
-  (when (setq it (gethash "par@reset" *request-table*))
-    (funcall it))
+  (when (setq *it* (gethash "par@reset" *request-table*))
+    (funcall *it*))
   (emit (switch-style :font nil :color nil :bgcolor nil :size nil))
   (fill-mode)
   ;(emit-newline)
@@ -1770,15 +1786,15 @@
       )
     ))
 
-(defun emit-colophon (&aux it)
+(defun emit-colophon ()
     (emit-para)
     (emit-verbatim "<div align=right class=colophon>")
     (emit-newline)
-    (when (setq it (gethash "DY" *string-table*))
-      (setq it (funcall it))
-      (unless (string= it "")
+    (when (setq *it* (gethash "DY" *string-table*))
+      (setq *it* (funcall *it*))
+      (unless (string= *it* "")
         (emit *last-modified*)
-        (emit it) (emit-verbatim "<br>")
+        (emit *it*) (emit-verbatim "<br>")
         (emit-newline)))
     (unless
       nil
@@ -1803,10 +1819,10 @@
   (prin1 e *aux-stream*)
   (terpri *aux-stream*))
 
-(defun do-end-macro (&aux it)
+(defun do-end-macro ()
   (when (and *end-macro*
-             (setq it (gethash *end-macro* *macro-table*)))
-    (troff2page-lines it)))
+             (setq *it* (gethash *end-macro* *macro-table*)))
+    (troff2page-lines *it*)))
 
 (defun do-bye ()
   (let ((*blank-line-macro* nil))
@@ -1913,7 +1929,7 @@
 (defun execute-macro-body (ss)
   (let ((*macro-spill-over* nil))
     (let ((*current-troff-input* (make-bstream*))
-          (i (- (length ss) 1)))
+          (i (1- (length ss))))
       (loop (when (< i 0) (return))
             (toss-back-line (elt ss i))
             (decf i))
@@ -1932,23 +1948,24 @@
              (setf (diversion*-value div) value)
              value))))
 
-(defun execute-macro (w &aux it)
+(defun execute-macro (w)
   (cond ((not w)
          nil)
-        ((setq it (gethash w *diversion-table*))
-         (read-troff-line)
-         (toss-back-string (retrieve-diversion it)))
-        ((setq it (gethash w *macro-table*))
-         (let* ((mac it)
+        ((setq *it* (gethash w *diversion-table*))
+         (let ((it *it*))
+           (read-troff-line)
+           (toss-back-string (retrieve-diversion it))))
+        ((setq *it* (gethash w *macro-table*))
+         (let* ((mac *it*)
                 (args (read-args))
                 (*macro-args* (cons w args)))
            (execute-macro-body mac)))
-        ((setq it (gethash w *string-table*))
-         (let ((str it))
+        ((setq *it* (gethash w *string-table*))
+         (let ((str *it*))
            (read-troff-line)
            (toss-back-string (funcall str))))
-        ((setq it (gethash w *request-table*))
-         (funcall it))
+        ((setq *it* (gethash w *request-table*))
+         (funcall *it*))
         (t
           (read-troff-line))))
 
@@ -2057,7 +2074,7 @@
         (when (or (not c) (char= c #\newline))
           (get-char)
           (return (nreverse r)))
-        (push  (read-word) r)))))
+        (push (read-word) r)))))
 
 (defun start-css-file ()
   (let ((css-file (concatenate 'string *jobname* *css-file-suffix*)))
@@ -2240,7 +2257,7 @@
                                  :thunk (lambda () *current-diversion*)))
   (defnumreg "%" (make-counter* :thunk (lambda () *current-pageno*)))
   (defnumreg ".$" (make-counter* :thunk
-                                 (lambda () (- (length *macro-args*) 1))))
+                                 (lambda () (1- (length *macro-args*)))))
   (defnumreg ".c" (make-counter* :thunk (lambda () *input-line-no*)))
   (defnumreg "c." (make-counter* :thunk (lambda () *input-line-no*)))
   (defnumreg ".i" (make-counter* :thunk (lambda () *margin-left*)))
@@ -2249,9 +2266,8 @@
                                    (bool-to-num (ev*-fill (car *ev-stack*))))))
   (defnumreg ".ce" (make-counter* :thunk (lambda () *lines-to-be-centered*)))
   ;current-time -related registers
-  (multiple-value-bind (seconds minutes hours dy mo year dw dst tz)
+  (multiple-value-bind (seconds minutes hours dy mo year dw)
     (get-decoded-time)
-    (declare (ignore dst tz))
     (incf dw 2) (when (> dw 7) (decf dw 7))
     (defnumreg "seconds" (make-counter* :value seconds))
     (defnumreg "minutes" (make-counter* :value minutes))
@@ -2276,7 +2292,7 @@
   (defnumreg "PD" (make-counter* :value (* .3 (point-equivalent-of #\v))))
   ;(defnumreg "LL" (make-counter* :value (* 6.5 (point-equivalent-of #\i))))
   (defnumreg "lsn" (make-counter* :thunk (lambda () *leading-spaces-number*)))
-  (defnumreg "lss" (make-counter* :thunk (lambda ()  (* *leading-spaces-number* (point-equivalent-of #\n)))))
+  (defnumreg "lss" (make-counter* :thunk (lambda () (* *leading-spaces-number* (point-equivalent-of #\n)))))
   )
 
 (defun initialize-strings ()
@@ -2353,8 +2369,14 @@
       (let* ((args (read-args))
              (n 1))
         (when args (setq n (string-to-number (car args))))
+        #|
         (setf (cdr *macro-args*)
-              (nthcdr n (cdr *macro-args*))))))
+              (nthcdr n (cdr *macro-args*)))
+        |#
+        (setq *macro-args*
+              (cons (car *macro-args*)
+                    (nthcdr n (cdr *macro-args*))))
+                    )))
 
   (defrequest "ig"
     (lambda ()
@@ -2830,7 +2852,7 @@
         (emit-section-header (if lvl (string-to-number lvl) 1)))))
 
   (defrequest "TH"
-    (lambda (&aux it)
+    (lambda ()
       ;first call to .TH; disable future calls
       (defrequest "TH" nil)
       ;identify doc as man page
@@ -2839,20 +2861,21 @@
                            (read-troff-line)
                            (twarning "Calling .TH twice in man page"))))
         ;source man.local if present
-        (when (setq it (find-macro-file "man.local"))
-          (troff2page-file it))
+        (when (setq *it* (find-macro-file "man.local"))
+          (troff2page-file *it*))
         ;source pca-t2p-man.tmac if present
-        (when (setq it (find-macro-file "pca-t2p-man.tmac"))
-          (troff2page-file it))
-        (cond ((setq it (gethash "TH" *macro-table*))
+        (when (setq *it* (find-macro-file "pca-t2p-man.tmac"))
+          (troff2page-file *it*))
+        (cond ((setq *it* (gethash "TH" *macro-table*))
                ;if macro .TH defined, call it with current args, but make it one-shot
-               (defrequest "TH" disabled-TH)
-               (let ((*macro-args* (cons "TH" (read-args))))
-                 (execute-macro-body it)))
-              ((setq it (gethash "TH" *request-table*))
+               (let ((it *it*))
+                 (defrequest "TH" disabled-TH)
+                 (let ((*macro-args* (cons "TH" (read-args))))
+                   (execute-macro-body it))))
+              ((setq *it* (gethash "TH" *request-table*))
                ;in case, the macro files above used Lisp to redefine .TH
                ;as a request
-               (funcall it))
+               (funcall *it*))
               (t ;otherwise, pca-t2p-man.tmac missing!
                 (twarning "Couldn't find pca-t2p-man.tmac in any macro directory")
                 (defrequest "TH" disabled-TH)
@@ -2865,15 +2888,16 @@
                     (emit-section-header 2 :man-header-p t)))
                 ;process args to set title and last-modified-date
                 (let ((args (read-args)))
-                  (when (setq it (car args)) ;title
-                    (setq it (string-trim-blanks it))
-                    (unless (string= it "")
-                      (store-title it :emitp t))
+                  (when (setq *it* (car args)) ;title
+                    (setq *it* (string-trim-blanks *it*))
+                    (unless (string= *it* "")
+                      (store-title *it* :emitp t))
                     ;ignore (cadr args), which is section number
-                    (when (setq it (caddr args))
-                      (setq it (string-trim-blanks it))
-                      (unless (string= it "")
-                        (defstring "DY" (lambda () it)))))))))))
+                    (when (setq *it* (caddr args))
+                      (setq *it* (string-trim-blanks *it*))
+                      (unless (string= *it* "")
+                        (let ((it *it*))
+                          (defstring "DY" (lambda () it))))))))))))
 
   (defrequest "SC"
     (lambda ()
@@ -2989,7 +3013,7 @@
         (emit big-letter)
         (emit-verbatim "</span>")
         (emit (switch-glyph-color ""))
-        (when extra (emit  extra))
+        (when extra (emit extra))
         (emit-newline)
         )))
 
@@ -3044,8 +3068,8 @@
     (lambda ()
       (let* ((args (read-args))
              (url (car args))
-             (link-text  (cadr args))
-             (tack-on  (caddr args))
+             (link-text (cadr args))
+             (tack-on (caddr args))
              it)
         (when (or (not link-text)
                   (string= link-text ""))
@@ -3251,8 +3275,8 @@
   (defrequest "el"
     (lambda ()
       (ignore-spaces)
-      (cond  (*cascaded-if-p* (setq *cascaded-if-p* nil))
-             (t (ignore-branch)))))
+      (cond (*cascaded-if-p* (setq *cascaded-if-p* nil))
+            (t (ignore-branch)))))
 
   (defrequest "nop"
     ;eqv to .if 1
@@ -3464,7 +3488,7 @@
       (setq *convert-to-info-p* t)))
   )
 
-(defun begin-html-document (&aux it)
+(defun begin-html-document ()
   (initialize-glyphs)
   (initialize-numregs)
   (initialize-strings)
@@ -3483,21 +3507,22 @@
   ;
   (setq *rerun-needed-p* nil)
   ;
-  (when (probe-file (setq it (concatenate 'string *jobname* *aux-file-suffix*)))
-    (load-troff2page-data-file it)
-    (delete-file it)
-    (when *html-head* (setq *html-head* (nreverse *html-head*))))
-  ;
-  (setq *aux-stream* (open it :direction :output))
+  (let ((f (concatenate 'string *jobname* *aux-file-suffix*)))
+    (when (probe-file f)
+      (load-troff2page-data-file f)
+      (delete-file f)
+      (when *html-head* (setq *html-head* (nreverse *html-head*))))
+    ;
+    (setq *aux-stream* (open f :direction :output)))
   ;
   (start-css-file)
   ;
   (emit-start)
   ;
-  (when (setq it (find-macro-file ".troff2pagerc.tmac"))
-    (troff2page-file it))
-  (when (probe-file (setq it (concatenate 'string *jobname* ".t2p")))
-    (troff2page-file it))
+  (when (setq *it* (find-macro-file ".troff2pagerc.tmac"))
+    (troff2page-file *it*))
+  (when (probe-file (setq *it* (concatenate 'string *jobname* ".t2p")))
+    (troff2page-file *it*))
   )
 
 (defun next-html-image-file-stem ()
@@ -3506,6 +3531,7 @@
                (write-to-string *image-file-count*)))
 
 (defun call-with-image-stream (p)
+  (declare (function p))
   (let* ((img-file-stem (next-html-image-file-stem))
          (aux-file (concatenate 'string img-file-stem ".troff")))
     (with-open-file (o aux-file :direction :output
@@ -3518,6 +3544,7 @@
              (source-image-file img-file-stem)))))
 
 (defun ps-to-image/png (f)
+  (declare (string f))
   (os-execute
     (concatenate 'string *ghostscript* *ghostscript-options* " -sOutputFile=" f ".ppm.1 "
       f ".ps quit.ps"))
@@ -3526,42 +3553,46 @@
   ;(os-execute
   ;   (concatenate 'string "ppmquant 256 < " f ".ppm.tmp > " f ".ppm"))
   (os-execute
-    (concatenate 'string "pnmtopng -interlace -transparent \"nilFFFFF\" "
+    (concatenate 'string "pnmtopng -interlace -transparent \"#FFFFF\" "
       " < " f ".ppm.tmp > " f ".png"))
   (dolist (e '(".ppm.1" ".ppm.tmp" ".ppm"))
     (ensure-file-deleted (concatenate 'string f e))))
 
 (defun ps-to-image/gif (f)
-    (os-execute
-      (concatenate 'string *ghostscript* *ghostscript-options*
-                     " -sOutputFile=" f ".ppm.1 "
-                     f ".ps quit.ps"))
-    (os-execute
-      (concatenate 'string "pnmcrop " f ".ppm.1 > " f ".ppm.tmp"))
-    (os-execute
-      (concatenate 'string "ppmquant 256 < " f ".ppm.tmp > " f ".ppm"))
-    (os-execute
-      (concatenate 'string "ppmtogif -transparent rgb:ff/ff/ff < "
-                     f ".ppm > " f ".gif")))
+  (declare (string f))
+  (os-execute
+    (concatenate 'string *ghostscript* *ghostscript-options*
+      " -sOutputFile=" f ".ppm.1 "
+      f ".ps quit.ps"))
+  (os-execute
+    (concatenate 'string "pnmcrop " f ".ppm.1 > " f ".ppm.tmp"))
+  (os-execute
+    (concatenate 'string "ppmquant 256 < " f ".ppm.tmp > " f ".ppm"))
+  (os-execute
+    (concatenate 'string "ppmtogif -transparent rgb:ff/ff/ff < "
+      f ".ppm > " f ".gif")))
 
 (defun source-image-file (f)
-    (emit-verbatim "<img src=\"")
-    (emit-verbatim f)
-    (emit-verbatim ".gif\" border=\"0\" alt=\"[")
-    (emit-verbatim f)
-    (emit-verbatim ".gif]\">"))
+  (declare (string f))
+  (emit-verbatim "<img src=\"")
+  (emit-verbatim f)
+  (emit-verbatim ".gif\" border=\"0\" alt=\"[")
+  (emit-verbatim f)
+  (emit-verbatim ".gif]\">"))
 
 (defun source-ascii-file (f)
-    (let ((f.ascii (concatenate 'string f ".ascii")))
-      (start-display "I")
-      (emit (switch-font "C"))
-      (let ((*turn-off-escape-char-p* t)
-                  (*sourcing-ascii-file-p* t))
-        (troff2page-file f.ascii))
-      (stop-display)
-      ))
+  (declare (string f))
+  (let ((f.ascii (concatenate 'string f ".ascii")))
+    (start-display "I")
+    (emit (switch-font "C"))
+    (let ((*turn-off-escape-char-p* t)
+          (*sourcing-ascii-file-p* t))
+      (troff2page-file f.ascii))
+    (stop-display)
+    ))
 
 (defun troff-to-image (f)
+  (declare (string f))
   (let ((f.img (concatenate 'string f ".gif")))
     (unless (probe-file f.img)
       (os-execute
@@ -3572,6 +3603,7 @@
       (ps-to-image/gif f))))
 
 (defun troff-to-ascii (f)
+  (declare (string f))
   (let ((f.ascii (concatenate 'string f ".ascii")))
     (unless nil ;(probe-file f.ascii)
       (os-execute
@@ -3579,6 +3611,7 @@
           "groff -pte -ms -Tascii " f ".troff > " f.ascii)))))
 
 (defun make-image (env endenv)
+  (declare (string env endenv))
   (let ((i (bstream*-stream *current-troff-input*)))
     (call-with-image-stream
       (lambda (o)
@@ -3747,20 +3780,20 @@
               (t nil)))
   (switch-style :font f))
 
-(defun switch-glyph-color (c &aux it)
+(defun switch-glyph-color (c)
   (cond ((not c))
         ((string= c "") (setq c :previous))
-        ((setq it (gethash c *color-table*))
-         (setq c it)))
+        ((setq *it* (gethash c *color-table*))
+         (setq c *it*)))
   (when (stringp c)
     (setq c (concatenate 'string "color: " c)))
   (switch-style :color c))
 
-(defun switch-fill-color (c &aux it)
+(defun switch-fill-color (c)
   (cond ((not c))
         ((string= c "") (setq c :previous))
-        ((setq it (gethash c *color-table*))
-         (setq c it)))
+        ((setq *it* (gethash c *color-table*))
+         (setq c *it*)))
   (when (stringp c)
     (setq c (concatenate 'string "background-color: " c)))
   (switch-style :bgcolor c))
@@ -3773,10 +3806,10 @@
 		(case (char n 0)
 		  (#\+ (setq n (subseq n 1))
 		   (let ((m (read-from-string n)))
-		     (setq n  (* 100 (+ 1 (/ m 10))))))
+		     (setq n (* 100 (1+ (/ m 10))))))
 		  (#\- (setq n (subseq n 1))
 		   (let ((m (read-from-string n)))
-		     (setq n  (* 100 (- 1 (/ m 10))))))
+		     (setq n (* 100 (- 1 (/ m 10))))))
 		  (t (let ((m (read-from-string n)))
 		       (setq n (* 10 m)))))
 		(setq n (round n))
@@ -3836,46 +3869,47 @@
         (t "indent")))
 
 (defun start-display (w)
-    (setq w (troff-align-to-html w))
-    (read-troff-line)
-    (emit-para)
-    (emit-verbatim "<div class=display align=")
-    (emit-verbatim
-      (cond ((string= w "block") "center")
-            ((string= w "indent") "left")
-            (t w)))
-    (when (string= w "indent")
-      (emit-verbatim " style=\"margin-left: ")
-      (emit-verbatim (raw-counter-value "DI"))
-      (emit-verbatim "px;\"")
-      )
-    (emit-verbatim ">")
-    ;(emit-edit-source-doc)
-    (emit-newline)
-    ;
-    ;(emit-verbatim "<table")
-;    (unless (string= w "block")
-;      (emit-verbatim " align=")
-;      (emit-verbatim
-;        (cond ((string= w "indent") "left")
-;              (t w))))
-    ;(emit-verbatim ">")
-    ;
-;    (emit-verbatim "<tr>")
-;    (when (string= w "indent")
-;      (emit-verbatim "<td class=princindent>&#xa0;</td>")
-;      (emit-newline))
-;    ;
-;    (emit-verbatim "<td align=")
-;    (emit-verbatim
-;      (cond ((string= w "block") "left")
-;            ((string= w "indent") "left")
-;            (t w)))
-;    (emit-verbatim ">")
-    (ev-push "display_environment")
-    (unfill-mode)
-    ;(setf (ev*-fill (car *ev-stack*)) nil)
+  (declare (string w))
+  (setq w (troff-align-to-html w))
+  (read-troff-line)
+  (emit-para)
+  (emit-verbatim "<div class=display align=")
+  (emit-verbatim
+    (cond ((string= w "block") "center")
+          ((string= w "indent") "left")
+          (t w)))
+  (when (string= w "indent")
+    (emit-verbatim " style=\"margin-left: ")
+    (emit-verbatim (raw-counter-value "DI"))
+    (emit-verbatim "px;\"")
     )
+  (emit-verbatim ">")
+  ;(emit-edit-source-doc)
+  (emit-newline)
+  ;
+  ;(emit-verbatim "<table")
+  ;    (unless (string= w "block")
+  ;      (emit-verbatim " align=")
+  ;      (emit-verbatim
+  ;        (cond ((string= w "indent") "left")
+  ;              (t w))))
+  ;(emit-verbatim ">")
+  ;
+  ;    (emit-verbatim "<tr>")
+  ;    (when (string= w "indent")
+  ;      (emit-verbatim "<td class=princindent>&#xa0;</td>")
+  ;      (emit-newline))
+  ;    ;
+  ;    (emit-verbatim "<td align=")
+  ;    (emit-verbatim
+  ;      (cond ((string= w "block") "left")
+  ;            ((string= w "indent") "left")
+  ;            (t w)))
+  ;    (emit-verbatim ">")
+  (ev-push "display_environment")
+  (unfill-mode)
+  ;(setf (ev*-fill (car *ev-stack*)) nil)
+  )
 
 (defun stop-display ()
   (emit (switch-style))
@@ -3889,6 +3923,7 @@
   (emit-para))
 
 (defun number-to-roman (n &key downcasep)
+  (declare (integer n))
   (format nil (if downcasep "~(~@R~)" "~@R") n))
 
 (defun s-string (&rest cc)
@@ -3923,15 +3958,38 @@
           (t (write-to-string v)))))
 
 (defun raw-counter-value (str)
+  (declare (string str))
   (counter*-value (get-counter-named str)))
 
 (defun formatted-counter-value (str)
+  (declare (string str))
   (get-counter-value (get-counter-named str)))
 
 (defun load-troff2page-data-file (f)
-  (let ((*input-line-no* 0)
-        (*package* (find-package :troff2page)))
-    (load f)))
+  (declare (string f))
+  (with-open-file (i f :direction :input :if-does-not-exist nil)
+    (when i
+      (let ((*current-source-file* f)
+            (*input-line-no* 0)
+            e directive)
+        (loop
+          (setq e (read i nil nil))
+          (unless e (return))
+          (setq directive (car e))
+          (incf *input-line-no*)
+          (apply
+            (case directive
+              (!header #'!header)
+              (!last-page-number #'!last-page-number)
+              (!macro-package #'!macro-package)
+              (!node #'!node)
+              (!redirect #'!redirect)
+              (!stylesheet #'!stylesheet)
+              (!title #'!title)
+              (!verbatim-apostrophe #'!verbatim-apostrophe)
+              (t (terror 'load-tex2page-data-file
+                         "Fatal aux file error " directive "; I'm stymied.")))
+            (cdr e)))))))
 
 (defun unicode-escape (s)
   (and (= (length s) 5)
@@ -4232,7 +4290,7 @@
              (get-char)
              (setq c (get-char))
              (case c
-               (#\newline)
+               (#\newline t)
                (#\{ (incf nesting)
                 (unless (= nesting 1)
                   (setq r (concatenate 'string r (list *escape-char* #\{ )))))
@@ -4262,7 +4320,7 @@
         (dot (position #\. f :test #'char= :from-end t)))
     (if (and dot (/= dot 0)
              (or (not slash)
-                 (< (+ slash 1) dot)))
+                 (< (1+ slash) dot)))
       (subseq f dot)
       "")))
 
@@ -4270,9 +4328,9 @@
   (let ((slash (position #\/ f :test #'char= :from-end t))
         (dot (position #\. f :test #'char= :from-end t)))
     (cond ((and slash dot) (if (> dot slash)
-                             (subseq f (+ slash 1) dot)
-                             (subseq f (+ slash 1))))
-          (slash (subseq f (+ slash 1)))
+                             (subseq f (1+ slash) dot)
+                             (subseq f (1+ slash))))
+          (slash (subseq f (1+ slash)))
           (dot (subseq f 0 dot))
           (t f))))
 
@@ -4285,7 +4343,7 @@
             (push (subseq p start) r)
             (return (nreverse r)))
           (push (subseq p start i) r)
-          (setq start (+ i 1))))))
+          (setq start (1+ i))))))
 
 (defun find-macro-file (f)
   (let ((f-stem (file-stem-name f))
@@ -4687,12 +4745,12 @@
     (troff2page-file input-doc)
     (do-bye)))
 
-(defun copy-file-to-stream (fi o &aux n)
+(defun copy-file-to-stream (fi o)
   (with-open-file (i fi :direction :input)
     (loop
-      (setq n (read-sequence *file-copy-buffer* i))
-      (unless (> n 0) (return))
-      (write-sequence *file-copy-buffer* o :end n))))
+      (setq *it* (read-sequence *file-copy-buffer* i))
+      (unless (> *it* 0) (return))
+      (write-sequence *file-copy-buffer* o :end *it*))))
 
 (defun copy-file-to-file (fi fo)
   (with-open-file (o fo :direction :output :if-exists :supersede)
@@ -4722,9 +4780,9 @@
         (when (> i 0) (format o ", Node: ~a" i))
 
         (when (= i 1) (format o ", Prev: Top"))
-        (when (> i 1) (format o ", Prev: ~a" (- i 1)))
+        (when (> i 1) (format o ", Prev: ~a" (1- i)))
 
-        (when (/= i *last-page-number*) (format o ", Next: ~a" (+ i 1)))
+        (when (/= i *last-page-number*) (format o ", Next: ~a" (1+ i)))
 
         (format o ", Up: Top~%")
 
@@ -4804,6 +4862,7 @@
        "s/<\\/a>//g"))
 
 (defun html2info-tweak-info-file (f)
+  (declare (string f))
   ; flushleft menu entries)
   (sed f "/^\\s*ÞINFO_MENU_BEGIN!/,/^\\s*ÞINFO_MENU_END!/ s/^\\(\\s*\\)\\(\\*\\s\\+[^:]\\+::\\)/\\2\\1/"
 
@@ -4829,7 +4888,7 @@
     (let (*convert-to-info-p*
            *jobname*
            *last-page-number* ;needs to be visible to (html2info)
-           *log-stream*
+           (*log-stream* t)
            *rerun-needed-p*)
       (setq *jobname* (file-stem-name input-doc))
       (with-open-file (o (concatenate 'string *jobname* *log-file-suffix*)

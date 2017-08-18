@@ -1,4 +1,14 @@
-Last change 2016-02-26
+Last change 2017-08-18
+
+2017 Aug 18
+
+Create separate git branch for Lisp version.
+
+2017 Aug 04
+
+Added port for MKCL.
+Don't use 'load' to load &aux file; don't use &aux. This is
+to ease potential translation to Racket.
 
 2016 Feb 26
 
