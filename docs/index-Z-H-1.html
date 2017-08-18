@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<!--
+Generated from index.ms by troff2page, v. 20170816
+Copyright (C) 2017 Dorai Sitaram
+(running on Lua 5.3)
+http://ds26gte.github.io/troff2page/index.html
+-->
+<head>
+<meta charset="utf-8">
+<title>
+troff2page
+</title>
+<link rel="stylesheet" href="index-Z-S.css" title=default>
+<link rel="stylesheet" href="default.css" title=default>
+<meta name=robots content="index,follow">
+</head>
+<body>
+<p>
+<div>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-2.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
+
+</p>
+<p class=indent>
+</p>
+<p>
+<h1 style="font-size: 160%"><a name="TAG:__pca_sec_1"></a>
+1. Introduction</h1>
+</p>
+<p>
+
+</p>
+<p class=indent>
+
+</p>
+<p>
+
+</p>
+<p class=indent>
+<a name="TAG:__troff2page_index_1"></a>
+troff2page is a <a href="http://www.lua.org"><span class=hreftext>Lua</span></a> scrit that converts troff (man and ms) documents into HTML web pages.
+
+</p>
+<p class=indent>
+<a name="TAG:html-output"></a>
+<a name="TAG:__troff2page_index_2"></a>
+To convert an input troff document named <span style="font-family: monospace; ">jobname.ms</span>, use
+the script <span style="font-family: monospace; ">troff2page</span> on the operating-system command line.
+
+</p>
+<p class=indent>
+
+</p>
+<p>
+<p >
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;troff2page&#xa0;jobname.ms<Br>
+<p>
+</p>
+</span><p>
+
+
+</p>
+<p>
+at your operating-system prompt.  This creates an output HTML file
+<span style="font-family: monospace; ">jobname.html</span> in the current directory.  (This HTML file has the same basename as the
+input troff file (i.e., <span style="font-family: monospace; ">jobname</span>), but its extension is
+<span style="font-family: monospace; ">.html</span>.)
+
+</p>
+<p class=indent>
+<a name="TAG:__troff2page_index_3"></a>
+If the input troff uses the page-break request
+<span style="font-family: monospace; ">.bp</span>,
+then the output
+HTML consists of a series of interlinked files: The first file is named
+<span style="font-family: monospace; ">jobname.html</span>;
+the rest are
+<span style="font-family: monospace; ">jobname-Z-H-1.html</span>,
+<span style="font-family: monospace; ">jobname-Z-H-2.html</span>,
+&#x26;c.
+
+</p>
+<p class=indent>
+The script <span style="font-family: monospace; ">troff2page</span> runs on the Unix command-line on Cygwin,
+Linux, Mac
+OS X, and Solaris.  
+
+</p>
+<p class=indent>
+Copy the script <span style="font-family: monospace; ">troff2page</span> to your <span style="font-family: monospace; ">PATH</span>.
+
+</p>
+<p class=indent>
+
+</p>
+<p class=indent>
+For more information,
+please see the file <a href="https://github.com/ds26gte/troff2page/blob/master/INSTALL"><span class=hreftext>INSTALL</span></a>
+in the distribution.
+
+</p>
+<p class=indent>
+
+
+</p>
+<p class=indent>
+</p>
+<p>
+<h2 style="font-size: 130%"><a name="TAG:__pca_sec_2"></a>
+Calling troff2page from within Lua</h2>
+</p>
+<p>
+
+</p>
+<p class=indent>
+
+</p>
+<p>
+<a name="TAG:calling_troff2page_within_lua"></a>
+<a name="TAG:__troff2page_index_4"></a>
+It is not necessary to run the file <span style="font-family: monospace; ">troff2page</span> as a
+Unix script.  You can simply load <span style="font-family: monospace; ">troff2page.lua</span> (<span style="font-family: monospace; ">troff2page</span> is a soft link
+to the Lua file <span style="font-family: monospace; ">troff2page.lua</span>) into Lua, and then call the
+Lua procedure <span style="font-family: monospace; ">troff2page</span> on your source document.  E.g.,
+
+</p>
+<p class=indent>
+
+</p>
+<p>
+<p >
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;dofile('troff2page.lua')<Br>
+&#xa0;&#xa0;&#xa0;&#xa0;troff2page('my-troff-document.ms')<Br>
+<p>
+</p>
+</span><p>
+
+
+</p>
+<p>
+The procedure <span style="font-family: monospace; ">troff2page</span> can be called
+several times, on the same or different documents, from
+within the same Lua session.
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-2.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></p>
+
+</div>
+</body>
+</html>

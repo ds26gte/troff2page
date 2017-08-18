@@ -1,0 +1,47 @@
+-- last modified 2017-08-17
+
+function nb_macro_package(m)
+  Macro_package = m
+end
+
+function nb_last_page_number(n)
+  Last_page_number = n
+end
+
+function nb_node(node, pageno, tag_value)
+--  print('doing nb_node')
+  Node_table[node] = pageno
+  defstring(node, function()
+    return link_start(page_node_link(pageno, node), true) ..
+    verbatim(tag_value) .. link_stop()
+  end)
+end
+
+function nb_header(s)
+  table.insert(Html_head, s)
+end
+
+function nb_redirect(f)
+  Redirected_p = true
+  nb_header('<meta http-equiv=refresh content="0;' .. f .. '">')
+end
+
+function nb_verbatim_apostrophe()
+  Verbatim_apostrophe_p = true
+end
+
+function nb_title(title) 
+  Title = title
+end
+
+function nb_stylesheet(css)
+  table.insert(Stylesheets, css)
+end 
+
+function nb_script(jsf)
+  table.insert(Scripts, jsf)
+end
+
+function nb_slides()
+  Slides_p = true
+end

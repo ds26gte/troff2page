@@ -41,7 +41,7 @@ extension \fCtmac\fP), both in the main directory and in the
 sudirectory for the submodule \fCmpca\fP. They include general-purpose
 extensions to the \fCms\fP package, e.g., \fCpca-tag.tmac\fP for
 cross-references; \fCpca-ix.tmac\fP for index generation;
-\fCpca-eval.tmac\fP for extending troff using Common Lisp, etc.
+\fCpca-eval.tmac\fP for extending troff using Lua, etc.
 
 You should put these tmac files in one of your macro directories,
 i.e., the directories that are searched by groff’s \fC-m\fP
@@ -87,11 +87,11 @@ way to get the correct PostScript output:
 .ft C
     % groff -t -U index.ms > index.ps
 .ft CI
-    This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
+    This is makeindex, version 2.15 [TeX Live 2016] (kpathsea + Thai support).
     Scanning style file ./.trofftemp.mst...............done (15 attributes redefined, 0 ignored).
-    Scanning input file z.trofftemp.idx....done (58 entries accepted, 0 rejected).
-    Sorting entries....done (343 comparisons).
-    Generating output file z.trofftemp.ind....done (128 lines written, 0 warnings).
+    Scanning input file z.trofftemp.idx....done (61 entries accepted, 0 rejected).
+    Sorting entries....done (393 comparisons).
+    Generating output file z.trofftemp.ind....done (132 lines written, 0 warnings).
     Output written in z.trofftemp.ind.
     Transcript written in z.trofftemp.ilg.
 .EE
@@ -123,30 +123,29 @@ mode or to process tables.
 .EX
     % troff2page index.ms
 .ft CI
-    index.ms:18: can't open `.troff2page_temp_index.toc': No such file or directory
-    index.ms:932: can't open `.troff2page_temp_index.ind': No such file or directory
-    Missing: (.troff2page_temp_index.ind INDEX LAST-PAGE-NUMBER
-              .troff2page_temp_index.toc TOC TITLE STYLESHEET)
+    index.ms:18: cannot open .troff2page_temp_index.toc: No such file or directory
+    index.ms:38: can't open .troff2page_temp_index.ind: No such file or directory
+    Missing: {eval, stylesheet, title, toc, .troff2page_temp_index.toc, last_page_number, index}
     Rerunning: troff2page index.ms
-    This is makeindex, version 2.15 [TeX Live 2015] (kpathsea + Thai support).
+    This is makeindex, version 2.15 [TeX Live 2016] (kpathsea + Thai support).
     Scanning style file ./.troff2page_temp_index.mst...............done (15 attributes redefined, 0 ignored).
-    Scanning input file z.troff2page_temp_index.idx....done (58 entries accepted, 0 rejected).
-    Sorting entries....done (338 comparisons).
-    Generating output file z.troff2page_temp_index.ind....done (141 lines written, 0 warnings).
+    Scanning input file z.troff2page_temp_index.idx....done (61 entries accepted, 0 rejected).
+    Sorting entries....done (406 comparisons).
+    Generating output file z.troff2page_temp_index.ind....done (151 lines written, 0 warnings).
     Output written in z.troff2page_temp_index.ind.
     Transcript written in z.troff2page_temp_index.ilg.
 .EE
 
 The same holds if you run troff2page by calling
-the CL procedure \fCtroff2page:troff2page\fP within CL, as described on
-page \*[TAG:calling_troff2page_within_cl].
+the Lua procedure \fCtroff2page\fP within Lua, as described on
+page \*[TAG:calling_troff2page_within_lua].
 
 If you wish to have
-the CL procedure perform just one pass on the document, give it a
+the Lua procedure perform just one pass on the document, give it a
 second argument that is non-false, e.g.,
 
 .EX
-    (troff2page:troff2page "index.ms" :single-pass)
+    troff2page('index.ms', 'single-pass')
 .EE
 
 Call it the same way a second time to run the second pass, which

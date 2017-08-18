@@ -1,4 +1,9 @@
-Last change 2016-02-26
+Last change 2017-08-18
+
+2017 Aug 18
+
+Ported to Lua. Retain 'master' branch for the Lua version, 'lisp'
+for the CL.
 
 2016 Feb 26
 

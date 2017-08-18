@@ -1,6 +1,6 @@
 .so style.tmac
 .
-.ND 2016-02-24  \"last modified
+.ND 2017-08-16  \"last modified
 .
 .TL
 troff2page

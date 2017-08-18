@@ -11,21 +11,21 @@ similarly named macro in groff’s \fCwww.tmac\fP, in order to allow
 forward references.)
 
 .EX
-    .TAG sec_troffcl
+    .TAG sec_trofflua
 .EE
 
-associates the \fItag\fP \fCsec_troffcl\fP with the number of
-the current page.  The \fIstring\fP \fC\e*[TAG:sec_troffcl]\fP
+associates the \fItag\fP \fCsec_trofflua\fP with the number of
+the current page.  The \fIstring\fP \fC\e*[TAG:sec_trofflua]\fP
 is defined to typeset as that page number.
 Thus, in a hand-crafted table of contents, you could
 use
 
 .EX
-    Extending troff using Common Lisp, \*[TAG:sec_troffcl]
+    Extending troff using Lua, \*[TAG:sec_trofflua]
 .EE
 
-In the HTML output, the string \fC\e*[TAG:sec_troffcl]\fP
-furthermore is a link to where \fC.TAG sec_troffcl\fP was
+In the HTML output, the string \fC\e*[TAG:sec_trofflua]\fP
+furthermore is a link to where \fC.TAG sec_trofflua\fP was
 called.
 
 The \fCpca\fP macros use tags for internal bookkeeping: to avoid

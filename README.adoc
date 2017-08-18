@@ -1,6 +1,6 @@
 = troff2page
 
-troff2page is a Common Lisp program for making Web
+troff2page is a Lua program for making Web
 pages and Info documents from troff documents.  Consult
 
 http://ds26gte.github.io/troff2page/index.html

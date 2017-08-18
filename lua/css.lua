@@ -1,0 +1,221 @@
+-- last modified 2017-08-17
+
+function link_stylesheets()
+  emit_verbatim '<link rel="stylesheet" href="'
+  emit_verbatim(Jobname)
+  emit_verbatim(Css_file_suffix)
+  emit_verbatim '" title=default>'
+  emit_newline()
+  for _,css in pairs(Stylesheets) do
+    emit_verbatim '<link rel="stylesheet" href="'
+    emit_verbatim(css)
+    emit_verbatim '" title=default>'
+    emit_newline()
+  end
+end
+
+function link_scripts()
+  for _,jsf in pairs(Scripts) do
+    emit_verbatim '<script src="'
+    emit(jsf)
+    emit_verbatim '"></script>\n'
+  end
+end
+
+function start_css_file()
+  local css_file = Jobname .. Css_file_suffix
+  ensure_file_deleted(css_file)
+  Css_stream = io.open(css_file, 'w')
+  Css_stream:write([[
+  body {
+    /* color: black;
+    background-color: #ffffff; */
+    margin-top: 2em;
+    margin-bottom: 2em;
+  }
+
+  /*
+  p.noindent {
+    text-indent: 0;
+  }
+  */
+
+  .title {
+    font-size: 200%;
+    /* font-weight: normal; */
+    margin-top: 2.8em;
+    text-align: center;
+  }
+
+  .dropcap {
+    line-height: 80%; /* was 90 */
+    font-size: 410%;  /* was 400 */
+    float: left;
+    padding-right: 5px;
+  }
+
+  pre {
+    margin-left: 2em;
+  }
+
+  blockquote {
+    margin-left: 2em;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ol ol {
+    list-style-type: lower-alpha;
+  }
+
+  ol ol ol {
+    list-style-type: lower-roman;
+  }
+
+  ol ol ol ol {
+    list-style-type: upper-alpha;
+  }
+
+  tr.tableheader {
+    font-weight: bold
+  }
+
+  tt i {
+    font-family: serif;
+  }
+
+  .verbatim em {
+    font-family: serif;
+  }
+
+  .troffbox {
+    background-color: lightgray;
+  }
+
+  .navigation {
+    color: #72010f; /* venetian red */
+    text-align: right;
+    font-size: medium;
+    font-style: italic;
+  }
+
+  .disable {
+    color: gray;
+  }
+
+  .footnote hr {
+    text-align: left;
+    width: 40%;
+  }
+
+  .colophon {
+    color: gray;
+    font-size: 80%;
+    font-style: italic;
+    text-align: right;
+  }
+
+  .colophon a {
+    color: gray;
+  }
+
+  @media screen {
+
+    body {
+      margin-left: 8%;
+      margin-right: 8%;
+    }
+
+    /*
+    this ruins paragraph spacing on Firefox -- don't know why
+    a {
+      padding-left: 2px; padding-right: 2px;
+    }
+
+    a:hover {
+      padding-left: 1px; padding-right: 1px;
+      border: 1px solid #000000;
+    }
+    */
+
+  } /* media screen */
+
+  @media print {
+
+    body {
+      text-align: justify;
+    }
+
+    a:link, a:visited {
+      text-decoration: none;
+      color: black;
+    }
+
+    /*
+    p {
+      margin-top: 1ex;
+      margin-bottom: 0;
+    }
+    */
+
+    .pagebreak {
+      page-break-after: always;
+    }
+
+    .navigation {
+      display: none;
+    }
+
+    .colophon .advertisement {
+      display: none;
+    }
+
+  } /* media print */
+  ]])
+end
+
+function collect_css_info_from_preamble()
+  local ps = raw_counter_value 'PS'
+  local p_i = raw_counter_value 'PI'
+  local pd = raw_counter_value 'PD'
+  local ll = raw_counter_value 'LL'
+  local html1 = raw_counter_value 'HTML1'
+  if ps ~= 10 then
+    Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
+  end
+  if ll ~= 0 then
+    Css_stream:write(string.format('\nbody { max-width: %spx; }\n', ll))
+  end
+  if Macro_package ~= 'man' then
+    if p_i ~= 0 then
+      Css_stream:write(string.format('\np.indent { text-indent: %spx; }\n', p_i))
+    end
+    if pd >= 0 then
+      local p_margin = pd
+      local display_margin = pd*2
+      local fnote_rule_margin = pd*2
+      local navbar_margin = ps*2
+      Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n', p_margin, p_margin))
+      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; }\n', display_margin, display_margin))
+      Css_stream:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
+      Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n', navbar_margin, navbar_margin))
+      Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n', display_margin, display_margin))
+    end
+  end
+  if html1 ~= 0 then
+    Css_stream:write '\n@media print {\n'
+    Css_stream:write '\na.hrefinternal::after { content: target-counter(attr(href), page); }\n'
+    Css_stream:write '\na.hrefinternal .hreftext { display: none; }\n'
+    Css_stream:write '\n}\n'
+  end
+end 
+
+function specify_margin_left_style()
+  if Margin_left ~= 0 then
+    emit_verbatim ' style="margin-left: '
+    emit_verbatim(Margin_left)
+    emit_verbatim 'pt;"'
+  end
+end

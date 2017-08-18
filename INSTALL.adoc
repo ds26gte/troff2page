@@ -30,50 +30,26 @@ files to your home directory.
 
 These `*.tmac` files, while generally useful, are specifically
 needed to typeset the supplied documentation, which is provided
-in `doc/index.ms`. If you don’t need these macros for anything
+in `docs/index.ms`. If you don’t need these macros for anything
 other than processing `index.ms`, you may make do by copying
 these files to the directory containing `index.ms`.
 
 The `pca-t2p-*.tmac` are only used by `troff2page`, never by
 `groff`.
 
-== Man pages
+== Man page
 
 You can now consult the man page `troff2page(1)`
 to get started with using troff2page.
 
   man troff2page
-  man pca-eval.tmac
 
-== Lisp implementions
+== System requirements
 
-The script `troff2page` uses the Common Lisp implementation mentioned by the shell
-environment variable `LISP`.  Currently, the values supported for `LISP`
-are:
+The script `troff2page` works on Lua 5.3.
 
-  clisp
-  clozure
-  cmucl
-  ecl
-  gcl
-  sbcl
-
-If `LISP` is not set, some default implementation is assumed.
-Here are some ways to invoke troff2page (assume `LISP`
-unset):
-
-  % troff2page jobname.ms    # uses some default Lisp impl
-
-  % LISP=clozure troff2page jobname.ms  # uses Clozure
-
-  % export LISP=sbcl         # uses SBCL henceforth
-  % troff2page jobname.ms
-
-To have troff2page run on Common Lisp implementations other than these,
-you will have to modify lines at the head of the `troff2page` file.
-
-To have `.eval` work for groff (and not just troff2page), you will have to
-modify similar lines in the file `pca-eval-lisp.tmac` as well.
+The branch `lisp` in the troff2page repository contains an
+implementation in Common Lisp.
 
 == Documentation
 
@@ -81,7 +57,7 @@ Documentation for troff2page is available online at
 http://ds26gte.github.io/troff2page/index.html.
 
 The troff source for this document, `index.ms`, is available in
-the `doc` subdirectory of the distribution. It can be processed
+the `docs` subdirectory of the distribution. It can be processed
 with either groff or troff2page.  You must
 have installed troff2page, including the macro files that come
 with this distribution, as described above.
@@ -89,18 +65,3 @@ with this distribution, as described above.
 If calling groff on `index.ms`, you will need to run groff twice
 in order to pick up all the auxiliar file info. (There will be a
 message reminding you to do so.)
-
-== Running troff2page as a Lisp procedure
-
-It is not necessary to use the file `troff2page` as a Unix
-script. You can simply load `troff2page` (which is really a Lisp
-file, `troff2page.lisp`) into your Common Lisp, and then call the
-Lisp procedure `troff2page:troff2page` (i.e., the procedure named
-`troff2page` in the package `troff2page`) on your source
-document.  E.g.,
-
-  (load "pathname/of/troff2page")
-  (troff2page:troff2page "my-troff-document.1")
-
-The procedure `troff2page:troff2page` can be called several times, on the
-same or different documents, from within the same Lisp session.
