@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2017-08-19
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -994,4 +994,7 @@ function initialize_macros()
     Convert_to_info_p = true
   end)
 
+  defrequest('AM', function()
+    accent_marks()
+  end)
 end

@@ -48,7 +48,7 @@ to get started with using troff2page.
 
 The script `troff2page` works on Lua 5.3.
 
-The branch `lisp` in the troff2page repository contains an
+The branch `lisp` in the troff2page git repository contains an
 implementation in Common Lisp.
 
 == Documentation

@@ -1,7 +1,11 @@
--- last modified 2017-08-17
+-- last modified 2017-08-19
 
 function nb_macro_package(m)
   Macro_package = m
+  if m=='ms' then
+    local r = get_counter_named('GS')
+    r.value = 1
+  end
 end
 
 function nb_last_page_number(n)
@@ -30,13 +34,13 @@ function nb_verbatim_apostrophe()
   Verbatim_apostrophe_p = true
 end
 
-function nb_title(title) 
+function nb_title(title)
   Title = title
 end
 
 function nb_stylesheet(css)
   table.insert(Stylesheets, css)
-end 
+end
 
 function nb_script(jsf)
   table.insert(Scripts, jsf)

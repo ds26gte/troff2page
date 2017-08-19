@@ -1,175 +1,112 @@
-'\" t
-.\"     Title: troff2page
-.\"    Author: [see the "AUTHORS" section]
-.\" Generator: Asciidoctor 1.5.6.1
-.\"      Date: 2017-08-16
-.\"    Manual: \ \&
-.\"    Source: \ \&
-.\"  Language: English
-.\"
-.TH "TROFF2PAGE" "1" "2017-08-16" "\ \&" "\ \&"
-.ie \n(.g .ds Aq \(aq
-.el       .ds Aq '
-.ss \n[.ss] 0
+.TH TROFF2PAGE 1 "2017-08-19" \" last modified
 .nh
 .ad l
-.de URL
-\\$2 \(laURL: \\$1 \(ra\\$3
-..
-.if \n[.g] .mso www.tmac
-.LINKSTYLE blue R < >
-.SH "NAME"
+.SH NAME
+
 troff2page \- makes Web pages from troff documents
-.SH "SYNOPSIS"
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page <pathname>
-troff2page \-\-help
-troff2page \-\-version
-.fi
-.if n \{\
-.RE
-.\}
-.SH "DESCRIPTION"
-.sp
-troff2page converts troff (\fI\-man\fP and \fI\-ms\fP) documents into HTML web
+
+.SH SYNOPSIS
+
+    troff2page <pathname>
+    troff2page --help
+    troff2page --version
+
+.SH DESCRIPTION
+
+troff2page converts troff (\fI-man\fP and \fI-ms\fP) documents into HTML web
 pages and Info documents. E.g.,
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page jobname.ms
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+    troff2page jobname.ms
+
 creates an output HTML document that consists of \fIjobname.html\fP
-and possibly other files \fIjobname\-Z\-H\-1.html\fP,
-\fIjobname\-Z\-H\-2.html\fP, etc., which are linked by navigation to
+and possibly other files \fIjobname-Z-H-1.html\fP,
+\fIjobname-Z-H-2.html\fP, etc., which are linked by navigation to
 \fIjobname.html\fP.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page \-\-version
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+    troff2page --version
+
 displays the troff2page version.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-troff2page \-\-help
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+    troff2page --help
+
 displays the version and a pointer to the comprehensive online
-manual, \c
-.URL "http://ds26gte.github.io/troff2page/index.html" "" ","
-whose troff
+manual, http://ds26gte.github.io/troff2page/index.html, whose troff
 source is included in the troff2page distribution.
-.sp
+
 troff2page called with no argument exits with a “called with no
 argument” message.
-.SH "OPTIONS"
-.sp
+
+.SH OPTIONS
+
 troff2page does not support options as groff can. Indeed,
-\fI\-\-help\fP and \fI\-\-version\fP are not really options: if they happen
+\fI--help\fP and \fI--version\fP are not really options: if they happen
 to name actual files, troff2page will happily attempt to process
 them as input documents.
-.sp
+
 However, additional information may be fed to troff2page via the
-specially named macro file \fI.troff2pagerc.tmac\fP. Thus, a \fI\-mpca\fP
+specially named macro file \fI.troff2pagerc.tmac\fP. Thus, a \fI-mpca\fP
 groff option would translate to the line
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.mso pca.tmac
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+    .mso pca.tmac
+
 in \fI.troff2pagerc.tmac\fP.
-.sp
+
 troff2page loads \fI.troff2pagerc.tmac\fP, if it can find it in the
 macro directories, before processing its argument file.
-.sp
+
 Note that groff itself does not load \fI.troff2pagerc.tmac\fP
 automatically.  But that is presumably OK, since you are using
-groff command\-line options to specify the same information
+groff command-line options to specify the same information
 anyway.  If you do want groff to pick up this file, you can use
-the option \fI\-m.troff2pagerc\fP.
-.sp
+the option \fI-m.troff2pagerc\fP.
+
 If the input file is recognizably a man page (i.e., it has the
 command \fI.TH\fP), both troff2page and groff will load, if it
 exists, the init file \fIman.local\fP in the home directory.
-.SH "COMMANDS"
-.sp
+
+.SH COMMANDS
+
 troff2page recognizes most of the commands (requests, macros,
-diversions, strings, escapes, glyphs) of raw troff and its \fI\-ms\fP
-and \fI\-man\fP macro packages. The syntax recognized is the improved
-kind supported by groff (\c
-.URL "http://gnu.org/software/groff" "" ")"
-and Heirloom
-troff (\c
-.URL "http://github.com/n\-t\-roff/heirloom\-doctools" "" "),"
-i.e., macro,
+diversions, strings, escapes, glyphs) of raw troff and its \fI-ms\fP
+and \fI-man\fP macro packages. The syntax recognized is the improved
+kind supported by groff (http://gnu.org/software/groff) and Heirloom
+troff (http://github.com/n-t-roff/heirloom-doctools), i.e., macro,
 string, and glyph names can be arbitrarily long, and strings can
 have arguments.  Most of the commands are converted to their
-obvious HTML equivalent.  E.g., \fI\-ms\fP’s footnotes have a
+obvious HTML equivalent.  E.g., \fI-ms\fP’s footnotes have a
 straightforward translation in the HTML, with the footnote text
 set at the bottom of the HTML page, and with the footnote markers
 in the body and the footnote hyperlinking to each other.  Please
 consult troff and groff documentation for the commands.
-.sp
+
 The troff2page distribution also includes the \fImpca\fP submodule
 that contains several useful macro files. Both groff and
 troff2page can process these macro files, and give compatible
 results. Please see the troff2page manual for further details.
-.SH "INFO DOCS"
-.sp
+
+.SH INFO DOCS
+
 You can call the macro
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-\&.troff2info
-.fi
-.if n \{\
-.RE
-.\}
-.sp
+
+  .troff2info
+
 within your document to signal to troff2page that it should also
 create an Info document.
-.sp
+
 A good place to place the \fI.troff2info\fP call is in your
 \fI.troff2pagerc.tmac\fP file, as it is relevant only to troff2page
 and not to groff.
-.SH "SYSTEM REQUIREMENTS"
-.sp
-\fItroff2page\fP requires Lua. For more information, please see the
+
+.SH SYSTEM REQUIREMENTS
+
+\fItroff2page\fP requires Lua. For more information, please see the 
 file \fIINSTALL.adoc\fP in the
 distribution.
-.SH "AVAILABILITY"
-.sp
-troff2page is downloadable from \c
-.URL "http://github.com/ds26gte/troff2page" "" "."
-.SH "SEE ALSO"
-.sp
+
+.SH AVAILABILITY
+
+troff2page is downloadable from http://github.com/ds26gte/troff2page.
+
+.SH SEE ALSO
+
 groff(1), groff_tmac(5), groff_man(7), groff_ms(7)
