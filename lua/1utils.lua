@@ -1,5 +1,11 @@
--- last modified 2017-08-17
---
+-- last modified 2017-08-20
+
+function dprint(...)
+  if Debug_p then
+    io.write(...); io.write('\n')
+  end
+end
+
 function flet(opts, thunk) 
   --print('flet starts...')
   local alcove = {}

@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2017-08-19
 
 function make_bstream(opts)
   return {
@@ -420,7 +420,7 @@ end
 function author_info(italic_p)
   read_troff_line()
   emit_para()
-  emit_verbatim '<div align=center class=author'
+  emit_verbatim '<div align=center class=author>'
   if italic_p then emit(switch_font 'I') end
   unfill_mode()
   Afterpar = function()

@@ -997,4 +997,14 @@ function initialize_macros()
   defrequest('AM', function()
     accent_marks()
   end)
+
+  defrequest('DEBUG', function()
+    local w = read_args()[1] or ''
+    local it = tonumber(w)
+    if it then Debug_p = (it>0)
+    else it = string.lower(w)
+      Debug_p = (it=='on') or (it=='t') or (it=='true') or (it=='y') or (it=='yes')
+    end
+  end)
+
 end

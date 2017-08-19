@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2017-08-19
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -127,3 +127,5 @@ This_footnote_is_numbered_p = nil
 Title = nil
 Turn_off_escape_char_p = nil
 Verbatim_apostrophe_p = nil
+
+Debug_p = nil
