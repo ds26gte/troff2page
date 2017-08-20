@@ -264,7 +264,7 @@ function emit_blank_line()
     it = Request_table[Blank_line_macro]
     if it then --print('BLM req found');
       toss_back_char('\n'); it(); return end
-  else emit_verbatim '<p>\n'
+  else emit_verbatim '<br>&#xa0;<br>'
   end
 end
 
@@ -280,7 +280,7 @@ function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
       end
     else
       if insert_line_break_p then
-        emit_verbatim '<!---***---><Br>'
+        emit_verbatim '<!---***---><br>'
       end
       for j=1,Leading_spaces_number do
         emit '\\[htmlnbsp]'
@@ -295,7 +295,7 @@ function emit_end_para()
     --print('doing eep')
     In_para_p=false
     --print('doing emit_end_para')
-    emit_verbatim '</P>\n'
+    emit_verbatim '</p>\n'
     Margin_left = 0
     local it = Request_table['par@reset']
     if it then it() end
@@ -307,7 +307,6 @@ function emit_end_para()
     --print('eep setting ipp=false')
   end
 end
-
 
 function emit_para(opts)
   --print('doing emit_para')

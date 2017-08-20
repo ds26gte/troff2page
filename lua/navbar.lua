@@ -2,7 +2,7 @@
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
-    emit_verbatim '<div class=navigation>&#xa0;</div>'
+    emit_verbatim '<div class=navigation>&#xa0;</div>\n'
     return
   end
   if Last_page_number == 0 then return end

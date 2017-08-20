@@ -12,3 +12,5 @@ DEBUG=false
 echo "troff2page(Troff2page_file_arg, $DEBUG)" >> ../troff2page.lua 
 
 chmod +x ../troff2page.lua
+
+nvim -es ../troff2page.lua -cwq

@@ -1,5 +1,5 @@
--- last modified 2017-08-17
---
+-- last modified 2017-08-20
+
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
   local returned_status_value
@@ -57,7 +57,7 @@ function process_line()
       Keep_newline_p and
       not Previous_line_exec_p then
       --print('ctr lines 1')
-      emit_verbatim '<Br>'
+      emit_verbatim '<br>'
     end
     if Keep_newline_p and Lines_to_be_centered > 0 then
       --print('ctr lines 2')

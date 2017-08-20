@@ -1,6 +1,6 @@
 #! /usr/bin/env lua5.3
 
-Troff2page_version = 20170816 -- last modified
+Troff2page_version = 20170820 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page/index.html'
 
 Troff2page_copyright_notice = 
@@ -1370,7 +1370,7 @@ function emit_blank_line()
     it = Request_table[Blank_line_macro]
     if it then --print('BLM req found');
       toss_back_char('\n'); it(); return end
-  else emit_verbatim '<p>\n'
+  else emit_verbatim '<br>&#xa0;<br>'
   end
 end
 
@@ -1386,7 +1386,7 @@ function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
       end
     else
       if insert_line_break_p then
-        emit_verbatim '<!---***---><Br>'
+        emit_verbatim '<!---***---><br>'
       end
       for j=1,Leading_spaces_number do
         emit '\\[htmlnbsp]'
@@ -1401,7 +1401,7 @@ function emit_end_para()
     --print('doing eep')
     In_para_p=false
     --print('doing emit_end_para')
-    emit_verbatim '</P>\n'
+    emit_verbatim '</p>\n'
     Margin_left = 0
     local it = Request_table['par@reset']
     if it then it() end
@@ -1413,7 +1413,6 @@ function emit_end_para()
     --print('eep setting ipp=false')
   end
 end
-
 
 function emit_para(opts)
   --print('doing emit_para')
@@ -1682,19 +1681,6 @@ end)
 
 defescape('E', Escape_table.e) 
 
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
-end
-
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -1754,6 +1740,19 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
+end
+
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
 end
 
 
@@ -1843,7 +1842,7 @@ function process_line()
       Keep_newline_p and
       not Previous_line_exec_p then
       --print('ctr lines 1')
-      emit_verbatim '<Br>'
+      emit_verbatim '<br>'
     end
     if Keep_newline_p and Lines_to_be_centered > 0 then
       --print('ctr lines 2')
@@ -1993,6 +1992,51 @@ function make_image(env, endenv)
 end
 
 
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  if not Jobname then
+    Jobname = file_stem_name(Main_troff_file)
+    Log_stream = io.stdout
+  end
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
+end 
 
 
 --refer groff_char(7)
@@ -2351,51 +2395,6 @@ function initialize_glyphs()
 
   for k,v in pairs(Standard_glyphs) do
     defglyph(k, verbatim(string.format('&#x%x;', v)))
-  end
-end 
-
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
-end
-
-function begin_html_document()
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  if not Jobname then
-    Jobname = file_stem_name(Main_troff_file)
-    Log_stream = io.stdout
-  end
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
-  end
-
-  start_css_file()
-
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
   end
 end 
 
@@ -3608,7 +3607,7 @@ end
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
-    emit_verbatim '<div class=navigation>&#xa0;</div>'
+    emit_verbatim '<div class=navigation>&#xa0;</div>\n'
     return
   end
   if Last_page_number == 0 then return end
