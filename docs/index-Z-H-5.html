@@ -16,23 +16,15 @@ troff2page
 <meta name=robots content="index,follow">
 </head>
 <body>
-<p>
 <div>
 <div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
-
-</p>
 <p class=indent>
-</p>
-<p>
+</P>
 <h1 style="font-size: 160%"><a name="TAG:__pca_sec_9"></a>
 5. Making an index</h1>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_40"></a>
 <a name="TAG:__troff2page_index_41"></a>
@@ -44,7 +36,7 @@ makeindex is included with TeX distributions, but you can
 also obtain <a href="http://stuff.mit.edu/afs/sipb/project/tex-dev/src/tar/makeindex.tar.gz"><span class=hreftext>just
 the makeindex distribution</span></a>.
 
-</p>
+</P>
 <p class=indent>
 Note that the indexes created by groff and troff2page are
 necessarily different, because the respective paginations
@@ -52,24 +44,23 @@ are different.  In addition, the index generated for
 troff2page has the additional feature of hyperlinking to the
 appropriate locations in the body text.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_43"></a>
 The call
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.IX&#xa0;item<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 marks the text “item” as an indexable item.  The metacharacters <span style="font-family: monospace; ">@</span>,
 <span style="font-family: monospace; ">!</span>, <span style="font-family: monospace; ">&#x22;</span>, and <span style="font-family: monospace; ">|</span> can be used to respectively specify (a)
@@ -81,29 +72,27 @@ index entries is the same <a href="http://tex.loria.fr/bibdex/makeindex.pdf"><sp
 “<span style="font-family: monospace; ">.IX item</span>” where in LaTeX one would use
 “<span style="font-family: monospace; ">\index{item}</span>”.
 
-</p>
+</P>
 <p class=indent>
 <span style="font-family: monospace; ">pca-ix.tmac</span> will call makeindex to create a
 sorted index in the auxiliary file <span style="font-family: monospace; ">\*[AUXF].ind</span>, which can be
 slurped back into the input document:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.so&#xa0;\*[AUXF].ind<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 Adding a section header on top is up to you.
-<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></p>
-
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></P>
 </div>
 </body>
 </html>

@@ -1,4 +1,4 @@
--- last modified 2017-08-19
+-- last modified 2017-08-20
 
 function make_bstream(opts)
   return {
@@ -418,12 +418,20 @@ function read_arith_expr(opts)
 end
 
 function author_info(italic_p)
+  --print('doing author_info')
   read_troff_line()
-  emit_para()
+  --print('authorinfo calling eep')
+  emit_end_para()
   emit_verbatim '<div align=center class=author>'
+  --print('authorinfo calling par')
+  emit_para()
+  --print('authorinfo setting style to italic')
+  --dprint('switching font to I')
   if italic_p then emit(switch_font 'I') end
+  --dprint('calling unfill')
   unfill_mode()
   Afterpar = function()
+    --print('doing authorinfo afterpar')
     emit_verbatim '</div>\n'
   end
 end
@@ -451,7 +459,10 @@ function ignore_branch()
   local brace_p; local c
   while true do
     c = snoop_char()
-    if not c or c == '\n' then break
+    if not c then break
+    elseif c=='\n' then --get_char(); 
+      --if not fillp() then get_char() end
+      break
     elseif c == Escape_char then get_char()
       c = snoop_char()
       if not c or c == '\n' then break

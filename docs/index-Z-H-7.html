@@ -16,23 +16,15 @@ troff2page
 <meta name=robots content="index,follow">
 </head>
 <body>
-<p>
 <div>
 <div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-8.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
-
-</p>
 <p class=indent>
-</p>
-<p>
+</P>
 <h1 style="font-size: 160%"><a name="TAG:__pca_sec_11"></a>
 7. Extending troff using Lua</h1>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_47"></a>
 <a name="TAG:__troff2page_index_48"></a>
@@ -45,7 +37,7 @@ supplied
 troff macro file <span style="font-family: monospace; ">pca-eval.tmac</span>, which you should put
 in a macro directory.
 
-</p>
+</P>
 <p class=indent>
 <span style="font-family: monospace; ">.eval</span> does only one thing: It
 allows you to place arbitrary Lua code until the following
@@ -56,10 +48,10 @@ The usefulness of this tactic will be apparent from an
 example.
 Consider the following troff document, <span style="font-family: monospace; ">tau.ms</span>:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.mso&#xa0;pca-eval.tmac<Br>
@@ -71,84 +63,79 @@ Consider the following troff document, <span style="font-family: monospace; ">ta
 &#xa0;&#xa0;&#xa0;&#xa0;io.write(2*math.acos(-1),&#xa0;'.\n')<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;.endeval<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_51"></a>
 <a name="TAG:__troff2page_index_52"></a>
 <a name="TAG:__troff2page_index_53"></a>
 Run troff (actually groff, and in unsafe mode too) on <span style="font-family: monospace; ">tau.ms</span>:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;groff&#xa0;-z&#xa0;-U&#xa0;-ms&#xa0;tau.ms<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 (The <span style="font-family: monospace; ">-z</span> avoids generating output, because we are not ready for it
 yet.  The <span style="font-family: monospace; ">-U</span> runs in “unsafe” mode, i.e., it allows the writing of
 aux files.)
 You will find that the groff asks you to run it again:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;</span><span style="font-style: oblique; font-family: monospace;&#xa0;">Rerun&#xa0;groff&#xa0;with&#xa0;-U<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 Call groff again as follows:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;groff&#xa0;-U&#xa0;-ms&#xa0;tau.ms&#xa0;&#x3e;&#xa0;tau.ps<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 <span style="font-family: monospace; ">tau.ps</span> will now look like:
 
-</p>
+</P>
 <p class=indent>
-</p>
-<p>
-<blockquote>The ratio of the circumference of a circle to
+</P>
+<blockquote><p>
+The ratio of the circumference of a circle to
 its radius is &#x3c4; &#x2248;
-
 6.2831853071796.
 
-</p>
+</P>
 <p class=indent>
+</P>
 </blockquote>
-</p>
 <p>
 
-</p>
+</P>
 <p class=indent>
 The first groff call produces a Lua file
 <span style="font-family: monospace; ">.trofftemp.lua</span>.<a name="TAG:__troff2page_call_footnote_3"></a><a class=hrefinternal href="#TAG:__troff2page_footnote_3"><span class=hreftext><sup><small>3</small></sup></span></a>
@@ -156,7 +143,7 @@ The second groff
 call invokes Lua to create an auxiliary file for each <span style="font-family: monospace; ">.eval</span> that gets sourced
 back into the document.
 
-</p>
+</P>
 <p class=indent>
 It is clear that Lua code via <span style="font-family: monospace; ">.eval</span> can
 serve as a very powerful <span style="font-style: italic; ">second extension language</span>
@@ -165,7 +152,7 @@ is processed by troff2page:
 We could run troff2page on the same document, <span style="font-family: monospace; ">tau.ms</span>, and the
 resulting <span style="font-family: monospace; ">tau.html</span> will show the same content.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_54"></a>
 Furthermore, we can embed  <span style="font-family: monospace; ">.eval</span>-enclosed Lua code inside an
@@ -178,7 +165,7 @@ means to extend troff2page to deal with things that the core
 program as supplied does
 not.
 
-</p>
+</P>
 <p class=indent>
 Note that when troff2page sees
 <span style="font-family: monospace; ">.eval</span>-enclosed Lua
@@ -187,23 +174,17 @@ Lua language but also includes the procedures and data structures
 defined in troff2page.  These extras are not available (and are arguably
 not useful) to the <span style="font-family: monospace; ">.eval</span> code seen by troff.
 
-</p>
+</P>
 <p class=indent>
 
-
-</p>
+</P>
 <p class=indent>
-</p>
-<p>
+</P>
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_12"></a>
 Defining color names using HSL</h2>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_55"></a>
 For a more substantial example of <span style="font-family: monospace; ">.eval</span>’s use, consider defining
@@ -213,17 +194,17 @@ define the color Venetian red using its HSL spec (357&#xb0;, 49%,
 24%), which to many is a more intuitive description than RGB
 (91, 31, 34).
 
-</p>
+</P>
 <p class=indent>
 While there is an <a href="http://en.wikipedia.org/wiki/HSL_color_space"><span class=hreftext>algorithm</span></a> to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lua procedure to do the same, and put it inside an <span style="font-family: monospace; ">.eval</span>:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.mso&#xa0;pca-eval.tmac<Br>
@@ -239,7 +220,6 @@ much easier Lua procedure to do the same, and put it inside an <span style="font
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;n<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-<Br>
 <br style="margin-top: 6px; margin-bottom: 6px">
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;tc_to_c(tc,&#xa0;p,&#xa0;q)<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;if&#xa0;tc&#xa0;&#x3c;&#xa0;1/6&#xa0;then<Br>
@@ -252,7 +232,6 @@ much easier Lua procedure to do the same, and put it inside an <span style="font
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;p<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-<Br>
 <br style="margin-top: 6px; margin-bottom: 6px">
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;hsl_to_rgb(h,&#xa0;s,&#xa0;l)<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;h&#xa0;=&#xa0;(h&#xa0;%&#xa0;360)&#xa0;/&#xa0;360<Br>
@@ -270,7 +249,6 @@ much easier Lua procedure to do the same, and put it inside an <span style="font
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;tc_to_c(tg,&#xa0;p,&#xa0;q),<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;tc_to_c(tb,&#xa0;p,&#xa0;q)<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-<Br>
 <br style="margin-top: 6px; margin-bottom: 6px">
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;function&#xa0;def_hsl_color(name,&#xa0;h,&#xa0;s,&#xa0;l)<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;r,&#xa0;g,&#xa0;b&#xa0;=&#xa0;hsl_to_rgb(h,&#xa0;s,&#xa0;l)<Br>
@@ -279,90 +257,80 @@ much easier Lua procedure to do the same, and put it inside an <span style="font
 &#xa0;&#xa0;&#xa0;&#xa0;end<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;.endeval<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 Here, the Lua procedure <span style="font-family: monospace; ">def-hsl-color</span> takes an HSL spec and
 writes out the equivalent RGB groff definition. (The troff2page
 distribution provides <span style="font-family: monospace; ">def-hsl-color</span> in the macro file
 <span style="font-family: monospace; ">defhsl.tmac</span>.)
 
-</p>
+</P>
 <p class=indent>
 We can call this Lua procedure inside another <span style="font-family: monospace; ">.eval</span> to define
 <span style="font-family: monospace; ">venetianred</span> using its HSL spec:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.eval<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;def_hsl_color('venetianred',&#xa0;357,&#xa0;.49,&#xa0;.24)<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;.endeval<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 
-
-</p>
+</P>
 <p class=indent>
 The color name <span style="font-family: monospace; ">venetianred</span> can now be used like any other groff color name:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;Prismacolor’s&#xa0;burnt&#xa0;ochre&#xa0;pencil&#xa0;is&#xa0;a&#xa0;close&#xa0;match&#xa0;for&#xa0;Derwent’s<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;\fB\m[venetianred]Venetian&#xa0;red\m[]\fP,&#xa0;and&#xa0;either&#xa0;can&#xa0;be&#xa0;used&#xa0;to<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;emulate&#xa0;the&#xa0;sanguine&#xa0;chalk&#xa0;drawings&#xa0;of&#xa0;the&#xa0;Old&#xa0;Masters.<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 This produces:
 
-</p>
+</P>
 <p class=indent>
-</p>
-<p>
-<blockquote>Prismacolor’s burnt ochre pencil is a close match for Derwent’s
+</P>
+<blockquote><p>
+Prismacolor’s burnt ochre pencil is a close match for Derwent’s
 <span style="font-weight: bold; "></span><span style="font-weight: bold; color: #5c1f22; ">Venetian red</span><span style="font-weight: bold; color: previous; "></span><span style="color: previous; ">, and either can be used to
 emulate the sanguine chalk drawings of the Old Masters.
-</blockquote>
-</p>
-</span><p>
-
-</p>
-<p class=indent>
-
-
-</p>
-<p class=indent>
-</p>
+</P>
+</span></blockquote>
 <p>
+
+</P>
+<p class=indent>
+
+</P>
+<p class=indent>
+</P>
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_13"></a>
 Extending troff2page only</h2>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_56"></a>
 <a name="TAG:__troff2page_index_57"></a>
@@ -372,7 +340,7 @@ containing Lua code that can be used to extend
 troff2page.  This syntactic overloading of <span style="font-family: monospace; ">.ig ##</span> is an innovation introduced by
 Oliver Laumann’s <a href="http://www-rn.informatik.uni-bremen.de/software/unroff"><span class=hreftext>unroff</span></a>.
 
-</p>
+</P>
 <p class=indent>
 Any Lua code enclosed within
 <span style="font-family: monospace; ">.ig ##</span> ... <span style="font-family: monospace; ">.##</span> will be processed by
@@ -386,25 +354,24 @@ comment.  However, you can add Lua code within <span style="font-family: monospa
 to influence how troff2page — but not troff! — processes the rest of the
 document.
 
-</p>
+</P>
 <p class=indent>
 For example, let’s define a
 <span style="font-family: monospace; ">\*[url ...]</span> string register that simply typesets its URL
 argument within angle brackets.
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ds&#xa0;url&#xa0;\(la\fC\\$1\fP\(ra<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 This is adequate for the print output.
 For troff2page though, we’d like to
@@ -413,10 +380,10 @@ We enclose this re-definition in a <span style="font-family: monospace; ">.ig ##
 only allows it to be in Lua, but also makes it apply only
 when troff2page reads it:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ig&#xa0;##<Br>
@@ -425,16 +392,15 @@ when troff2page reads it:
 &#xa0;&#xa0;&#xa0;&#xa0;end)<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;.##<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 The procedures <span style="font-family: monospace; ">defstring</span>, <span style="font-family: monospace; ">link_start</span>, and
 <span style="font-family: monospace; ">link_stop</span> are defined in the troff2page code.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_58"></a>
 <span style="font-family: monospace; ">.ig ##</span> can be used to specify settings that are relevant only
@@ -442,10 +408,10 @@ when troff2page is used on a document, e.g., stylesheet changes.
 troff2page uses the output-stream <span style="font-family: monospace; ">Css_stream</span> to
 write out style information.  The user can also write to this stream, e.g.,
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ig&#xa0;##<Br>
@@ -456,32 +422,28 @@ write out style information.  The user can also write to this stream, e.g.,
 &#xa0;&#xa0;&#xa0;&#xa0;]])<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;.##<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 This sets the HTML headers
 with a foreground color
 of chocolate.<a name="TAG:__troff2page_call_footnote_4"></a><a class=hrefinternal href="#TAG:__troff2page_footnote_4"><span class=hreftext><sup><small>4</small></sup></span></a>
-</p>
-<p>
-<div class=footnote><hr align=left width="40%"></p>
-<p>
+</P>
+<div class=footnote><hr align=left width="40%"><p>
 <a name="TAG:__troff2page_footnote_3"></a><a class=hrefinternal href="#TAG:__troff2page_call_footnote_3"><span class=hreftext><sup><small>3</small></sup></span></a>
 This name may be different based on
 your setting of <span style="font-family: monospace; ">\*[AUXF]</span> — see page <a class=hrefinternal href="index-Z-H-2.html#TAG:auxf"><span class=hreftext>2</span></a>.
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_footnote_4"></a><a class=hrefinternal href="#TAG:__troff2page_call_footnote_4"><span class=hreftext><sup><small>4</small></sup></span></a>
 The RGB values used in this manual for
 the colors chocolate,
 terracotta pink,
 and Venetian red are all courtesy <a href="http://www.resene.co.nz/swatches"><span class=hreftext>Resene Paints</span></a>.
+</P>
 </div>
-<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-8.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></p>
-
-</div>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-8.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></div>
 </body>
 </html>

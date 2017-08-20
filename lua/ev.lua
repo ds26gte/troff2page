@@ -1,5 +1,5 @@
 function ev_copy(lhs, rhs)
-  lhs.fill = rhs.fill
+  lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
   lhs.color = rhs.color
   lhs.bgcolor = rhs.bgcolor
@@ -48,13 +48,13 @@ function ev_named(s)
 end 
 
 function fill_mode()
-  Ev_stack[1].fill = true
+  Ev_stack[1].hardlines = false
 end
 
 function unfill_mode()
-  Ev_stack[1].fill = false
+  Ev_stack[1].hardlines = true
 end 
 
 function fillp()
-  return Ev_stack[1].fill
+  return not Ev_stack[1].hardlines
 end

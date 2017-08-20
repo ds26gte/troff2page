@@ -1,4 +1,4 @@
--- last modified 2017-08-19
+-- last modified 2017-08-20
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -373,14 +373,16 @@ function initialize_macros()
 
   defrequest('RS', function()
     read_troff_line()
-    emit_para()
+    --print('RS calling eep')
+    emit_end_para()
     emit_verbatim '<blockquote>'
+    emit_para()
   end)
 
   defrequest('RE', function()
     read_troff_line()
-    emit_verbatim '</blockquote>'
-    emit_newline()
+    emit_end_para()
+    emit_verbatim '</blockquote>\n'
     emit_para()
   end)
 
@@ -396,10 +398,14 @@ function initialize_macros()
   defrequest('LP', function()
     read_troff_line()
     emit_newline()
+    --print('LP calling emit_para')
     emit_para{par_start_p = true}
   end)
 
-  defrequest('RT', Request_table.LP)
+  defrequest('RT', function()
+    --print('RT calling LP')
+    Request_table.LP()
+  end)
 
   defrequest('lp', Request_table.LP)
 
@@ -464,6 +470,8 @@ function initialize_macros()
 
   defrequest('TL', function()
     read_troff_line()
+    --print('TL calling eep')
+    emit_end_para()
     get_header(function(title)
       if title ~= '' then
         store_title(title, {emit_p = true})
@@ -478,7 +486,7 @@ function initialize_macros()
   end)
 
   defrequest('@AU', function()
-    author_info(true)
+    author_info('italic')
   end)
 
   defrequest('AU', function()
@@ -489,7 +497,8 @@ function initialize_macros()
 
   defrequest('AB', function()
     local w = read_args()[1]
-    emit_para()
+    --print('AB calling eep')
+    emit_end_para()
     if w ~= 'no' then
       emit_verbatim '<div align=center class=abstract><i>ABSTRACT</i></div>'
       emit_para()

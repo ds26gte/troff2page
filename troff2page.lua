@@ -11,7 +11,13 @@ string.format('Copyright (C) 2017 Dorai Sitaram'
 
 Troff2page_file_arg = ...
 
---
+
+function dprint(...)
+  if Debug_p then
+    io.write(...); io.write('\n')
+  end
+end
+
 function flet(opts, thunk) 
   --print('flet starts...')
   local alcove = {}
@@ -286,6 +292,7 @@ Groff_tmac_path = nil
 Html_head = nil
 Html_page = nil
 Image_file_count = nil
+In_para_p = nil
 Input_line_no = nil
 Inside_table_text_block_p = nil
 It = nil
@@ -339,6 +346,8 @@ This_footnote_is_numbered_p = nil
 Title = nil
 Turn_off_escape_char_p = nil
 Verbatim_apostrophe_p = nil
+
+Debug_p = nil
 
 
 function accent_marks()
@@ -1067,16 +1076,18 @@ function do_eject()
   end
   if Slides_p then
     --print('eject for slides')
-    emit_para{last_p = true}
+    --print('eject/slides calling eep')
+    emit_end_para()
     emit_verbatim '</div>\n'
     emit_verbatim '<div class=slide>\n'
-    emit_para{first_p = true}
+    emit_para()
     --print('done ejecting for slides')
   elseif page_break_p then
     emit_end_page(); emit_start()
   else
+    emit_end_para()
     emit_verbatim '<div class=pagebreak></div>'
-    emit_newline()
+    emit_para()
   end
 end
 
@@ -1246,7 +1257,7 @@ function check_verbatim_apostrophe_status()
 end
 
 function emit_expanded_line()
-  --print('doing emit_expanded_line', Macro_copy_mode_p)
+  --print('doing emit_expanded_line')
   local r = ''
   local num_leading_spaces = 0
   local blank_line_p = true
@@ -1332,14 +1343,14 @@ function emit_html_preamble()
   for _,h in pairs(Html_head) do emit_verbatim(h) end
   emit_verbatim '</head>\n'
   emit_verbatim '<body>\n'
-  emit_para{first_p = true}
   emit_verbatim '<div'
   if Slides_p then emit_verbatim ' class=slide' end
   emit_verbatim '>\n'
 end
 
 function emit_html_postamble()
-  emit_para{last_p = true}
+  --print('emit_html_postamble calling eep')
+  emit_end_para()
   emit_verbatim '</div>\n'
   emit_verbatim '</body>\n'
   emit_verbatim '</html>\n'
@@ -1384,28 +1395,42 @@ function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
   end
 end
 
-function emit_para(opts)
-  opts = opts or {}
-  if not opts.first_p then
+function emit_end_para()
+  --print('In_para_p =', In_para_p)
+  if In_para_p then
+    --print('doing eep')
+    In_para_p=false
+    --print('doing emit_end_para')
+    emit_verbatim '</P>\n'
+    Margin_left = 0
+    local it = Request_table['par@reset']
+    if it then it() end
+    --print('eep switch style to default')
+    emit(switch_style())
+    fill_mode()
     do_afterpar()
-    emit_verbatim '</p>\n'
+    --print('eep/ipp should be true', In_para_p)
+    --print('eep setting ipp=false')
   end
-  Margin_left = 0
-  local it = Request_table['par@reset']
-  if it then it() end
-  emit(switch_style())
-  fill_mode()
-  if not opts.last_p then
-    emit_verbatim '<p'
-    if opts.indent_p then emit_verbatim ' class=indent' end
-    if opts.incremental_p then emit_verbatim ' class=incremental' end
-    emit_verbatim '>'
-    Just_after_par_start_p = opts.par_start_p
-  end
+end
+
+
+function emit_para(opts)
+  --print('doing emit_para')
+  opts = opts or {}
+  --print('emit_para calling eep')
+  emit_end_para()
+  emit_verbatim '<p'
+  if opts.indent_p then emit_verbatim ' class=indent' end
+  if opts.incremental_p then emit_verbatim ' class=incremental' end
+  emit_verbatim '>'
+  In_para_p=true
+  Just_after_par_start_p = opts.par_start_p
   emit_newline()
 end
 
 function emit_start()
+  --print('emit_start stdout=', io.stdout)
   Current_pageno = Current_pageno + 1
   local html_page_count = Current_pageno
   if html_page_count == 1 and Last_page_number == -1 then
@@ -1546,14 +1571,15 @@ defescape('\\', function()
 end)
 
 defescape('{', function()
-  --print('doing \\{')
+  --dprint('doing \\{')
   table.insert(Cascaded_if_stack, 1, Cascaded_if_p)
   Cascaded_if_p = false
+  Keep_newline_p=false
   return ''
 end)
 
 defescape('}', function()
-  --print('doing \\}')
+  --dprint('doing \\}')
   read_troff_line()
   Cascaded_if_p = table.remove(Cascaded_if_stack, 1)
   return ''
@@ -1637,6 +1663,8 @@ defescape('v', function()
 end)
 
 defescape('\n', function()
+  --dprint('doing \\n')
+  Keep_newline_p=false
   return ''
 end)
 
@@ -1668,7 +1696,7 @@ function eval_in_lua(tbl)
 end
 
 function ev_copy(lhs, rhs)
-  lhs.fill = rhs.fill
+  lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
   lhs.color = rhs.color
   lhs.bgcolor = rhs.bgcolor
@@ -1717,21 +1745,22 @@ function ev_named(s)
 end 
 
 function fill_mode()
-  Ev_stack[1].fill = true
+  Ev_stack[1].hardlines = false
 end
 
 function unfill_mode()
-  Ev_stack[1].fill = false
+  Ev_stack[1].hardlines = true
 end 
 
 function fillp()
-  return Ev_stack[1].fill
+  return not Ev_stack[1].hardlines
 end
 
 
 function emit_footnotes()
   if #Footnote_buffer == 0 then return end
-  emit_para()
+  --print('emitfootnotes FS calling eep')
+  emit_end_para()
   emit_verbatim '<div class=footnote><hr align=left width="40%">'
   for i = 1, #Footnote_buffer do
     emit_para()
@@ -1750,6 +1779,8 @@ function emit_footnotes()
     end
     troff2page_chars(fnc)
   end
+  --print('emitfootnotes FE calling eep')
+  emit_end_para()
   emit_verbatim '</div>\n'
   Footnote_buffer = {}
 end
@@ -2742,14 +2773,16 @@ function initialize_macros()
 
   defrequest('RS', function()
     read_troff_line()
-    emit_para()
+    --print('RS calling eep')
+    emit_end_para()
     emit_verbatim '<blockquote>'
+    emit_para()
   end)
 
   defrequest('RE', function()
     read_troff_line()
-    emit_verbatim '</blockquote>'
-    emit_newline()
+    emit_end_para()
+    emit_verbatim '</blockquote>\n'
     emit_para()
   end)
 
@@ -2765,10 +2798,14 @@ function initialize_macros()
   defrequest('LP', function()
     read_troff_line()
     emit_newline()
+    --print('LP calling emit_para')
     emit_para{par_start_p = true}
   end)
 
-  defrequest('RT', Request_table.LP)
+  defrequest('RT', function()
+    --print('RT calling LP')
+    Request_table.LP()
+  end)
 
   defrequest('lp', Request_table.LP)
 
@@ -2833,6 +2870,8 @@ function initialize_macros()
 
   defrequest('TL', function()
     read_troff_line()
+    --print('TL calling eep')
+    emit_end_para()
     get_header(function(title)
       if title ~= '' then
         store_title(title, {emit_p = true})
@@ -2847,7 +2886,7 @@ function initialize_macros()
   end)
 
   defrequest('@AU', function()
-    author_info(true)
+    author_info('italic')
   end)
 
   defrequest('AU', function()
@@ -2858,7 +2897,8 @@ function initialize_macros()
 
   defrequest('AB', function()
     local w = read_args()[1]
-    emit_para()
+    --print('AB calling eep')
+    emit_end_para()
     if w ~= 'no' then
       emit_verbatim '<div align=center class=abstract><i>ABSTRACT</i></div>'
       emit_para()
@@ -3366,6 +3406,16 @@ function initialize_macros()
   defrequest('AM', function()
     accent_marks()
   end)
+
+  defrequest('DEBUG', function()
+    local w = read_args()[1] or ''
+    local it = tonumber(w)
+    if it then Debug_p = (it>0)
+    else it = string.lower(w)
+      Debug_p = (it=='on') or (it=='t') or (it=='true') or (it=='y') or (it=='yes')
+    end
+  end)
+
 end
 
 
@@ -3382,7 +3432,7 @@ function initialize_numregs()
   defnumreg('.c', {thunk = function() return Input_line_no; end})
   defnumreg('c.', {thunk = function() return Input_line_no; end})
   defnumreg('.i', {thunk = function() return Margin_left; end})
-  defnumreg('.u', {thunk = function() return bool_to_num(Ev_stack[1].fill); end})
+  defnumreg('.u', {thunk = function() return bool_to_num(not Ev_stack[1].hardlines); end})
   defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
   defnumreg('lss', {thunk = function() return Leading_spaces_number * point_equivalent_of('n'); end})
@@ -3650,7 +3700,8 @@ function emit_navigation_bar(headerp)
 end
 
 function emit_colophon()
-  emit_para()
+  --print('colophon calling eep')
+  emit_end_para()
   emit_verbatim '<div align=right class=colophon>'
   emit_newline()
   local it = String_table.DY
@@ -4143,12 +4194,20 @@ function read_arith_expr(opts)
 end
 
 function author_info(italic_p)
+  --print('doing author_info')
   read_troff_line()
+  --print('authorinfo calling eep')
+  emit_end_para()
+  emit_verbatim '<div align=center class=author>'
+  --print('authorinfo calling par')
   emit_para()
-  emit_verbatim '<div align=center class=author'
+  --print('authorinfo setting style to italic')
+  --dprint('switching font to I')
   if italic_p then emit(switch_font 'I') end
+  --dprint('calling unfill')
   unfill_mode()
   Afterpar = function()
+    --print('doing authorinfo afterpar')
     emit_verbatim '</div>\n'
   end
 end
@@ -4176,7 +4235,10 @@ function ignore_branch()
   local brace_p; local c
   while true do
     c = snoop_char()
-    if not c or c == '\n' then break
+    if not c then break
+    elseif c=='\n' then --get_char(); 
+      --if not fillp() then get_char() end
+      break
     elseif c == Escape_char then get_char()
       c = snoop_char()
       if not c or c == '\n' then break
@@ -4298,7 +4360,8 @@ function store_title(title, opts)
   end
   Title = title
   if opts.emit_p then
-    emit_para()
+    --print('storetitle calling eep')
+    emit_end_para()
     emit_verbatim '<h1 align=center class=title>'
     emit(title)
     emit_verbatim '</h1>\n'
@@ -4325,14 +4388,22 @@ function get_header(k, opts)
     --print('not manheaderp')
     local old_Out = Out
     local o = make_string_output_stream()
-    --print('string out = Out=', o)
+    --print('get_header setting Out to (string stream)', o)
     Out = o
+    --print('get_header starts a new para')
+    emit_para()
     Afterpar = function()
+      --print('calling get_headers afterpar')
       Out = old_Out
       --print('doing afterpar in getheader')
+      --print('gh/apar ipp=', In_para_p)
       local res = o:get_output_stream_string()
-      --print('res=', res)
-      k(string_trim_blanks(res))
+      --io.write('orig res= ->', res, '<-')
+      res = string.gsub(res, '^%s*<[pP]>%s*', '')
+      res = string.gsub(res, '%s*</[pP]>%s*$', '')
+      --io.write('res= ->', res, '<-')
+      k(res)
+      --k(string_trim_blanks(res))
     end
   else
     k(with_output_to_string(function(o)
@@ -4362,7 +4433,8 @@ function emit_section_header(level, opts)
   --
   local this_section_num = false
   local growps = raw_counter_value('GROWPS')
-  emit_para()
+  --print('emitsectionheader calling eep')
+  emit_end_para()
   if opts.numbered_p then
     get_counter_named('nh*hl').value = level
     increment_section_counter(level)
@@ -4378,7 +4450,7 @@ function emit_section_header(level, opts)
   end
   ignore_spaces()
   get_header(function(header)
-   --print('get_header arg header=', header)
+    --print('get_header arg header=', header)
     local hnum = math.max(1, math.min(6, level))
     emit_verbatim '<h'
     emit(hnum)
@@ -4744,6 +4816,7 @@ function troff2page_1pass(input_doc)
        Html_head = {},
        Html_page = false,
        Image_file_count = 0,
+       In_para_p = false,
        Input_line_no = 0,
        Inside_table_text_block_p = false,
        Just_after_par_start_p = false,
@@ -4795,8 +4868,10 @@ function troff2page_1pass(input_doc)
      }, function() 
        --print('mp =', Macro_package)
      begin_html_document()
+     --print('bhd done, Out=', Out)
        --print('mp1 =', Macro_package)
      troff2page_file(input_doc)
+     --print('t2pf done, Out=', Out)
        --print('mp2 =', Macro_package)
      do_bye()
        --print('mp3 =', Macro_package)
@@ -4996,4 +5071,4 @@ function table_do_cell()
   emit_verbatim '</td>'
 end 
 
-troff2page(Troff2page_file_arg)
+troff2page(Troff2page_file_arg, false)

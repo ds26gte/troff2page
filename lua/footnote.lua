@@ -1,8 +1,9 @@
--- last modified 2017-08-16
+-- last modified 2017-08-20
 
 function emit_footnotes()
   if #Footnote_buffer == 0 then return end
-  emit_para()
+  --print('emitfootnotes FS calling eep')
+  emit_end_para()
   emit_verbatim '<div class=footnote><hr align=left width="40%">'
   for i = 1, #Footnote_buffer do
     emit_para()
@@ -21,6 +22,8 @@ function emit_footnotes()
     end
     troff2page_chars(fnc)
   end
+  --print('emitfootnotes FE calling eep')
+  emit_end_para()
   emit_verbatim '</div>\n'
   Footnote_buffer = {}
 end

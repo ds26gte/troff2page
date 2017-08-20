@@ -1,4 +1,4 @@
--- last modified 2017-08-19
+-- last modified 2017-08-20
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -74,6 +74,7 @@ Groff_tmac_path = nil
 Html_head = nil
 Html_page = nil
 Image_file_count = nil
+In_para_p = nil
 Input_line_no = nil
 Inside_table_text_block_p = nil
 It = nil

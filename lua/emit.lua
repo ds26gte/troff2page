@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2017-08-20
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -151,7 +151,7 @@ function check_verbatim_apostrophe_status()
 end
 
 function emit_expanded_line()
-  --print('doing emit_expanded_line', Macro_copy_mode_p)
+  --print('doing emit_expanded_line')
   local r = ''
   local num_leading_spaces = 0
   local blank_line_p = true
@@ -237,14 +237,14 @@ function emit_html_preamble()
   for _,h in pairs(Html_head) do emit_verbatim(h) end
   emit_verbatim '</head>\n'
   emit_verbatim '<body>\n'
-  emit_para{first_p = true}
   emit_verbatim '<div'
   if Slides_p then emit_verbatim ' class=slide' end
   emit_verbatim '>\n'
 end
 
 function emit_html_postamble()
-  emit_para{last_p = true}
+  --print('emit_html_postamble calling eep')
+  emit_end_para()
   emit_verbatim '</div>\n'
   emit_verbatim '</body>\n'
   emit_verbatim '</html>\n'
@@ -289,28 +289,42 @@ function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
   end
 end
 
-function emit_para(opts)
-  opts = opts or {}
-  if not opts.first_p then
+function emit_end_para()
+  --print('In_para_p =', In_para_p)
+  if In_para_p then
+    --print('doing eep')
+    In_para_p=false
+    --print('doing emit_end_para')
+    emit_verbatim '</P>\n'
+    Margin_left = 0
+    local it = Request_table['par@reset']
+    if it then it() end
+    --print('eep switch style to default')
+    emit(switch_style())
+    fill_mode()
     do_afterpar()
-    emit_verbatim '</p>\n'
+    --print('eep/ipp should be true', In_para_p)
+    --print('eep setting ipp=false')
   end
-  Margin_left = 0
-  local it = Request_table['par@reset']
-  if it then it() end
-  emit(switch_style())
-  fill_mode()
-  if not opts.last_p then
-    emit_verbatim '<p'
-    if opts.indent_p then emit_verbatim ' class=indent' end
-    if opts.incremental_p then emit_verbatim ' class=incremental' end
-    emit_verbatim '>'
-    Just_after_par_start_p = opts.par_start_p
-  end
+end
+
+
+function emit_para(opts)
+  --print('doing emit_para')
+  opts = opts or {}
+  --print('emit_para calling eep')
+  emit_end_para()
+  emit_verbatim '<p'
+  if opts.indent_p then emit_verbatim ' class=indent' end
+  if opts.incremental_p then emit_verbatim ' class=incremental' end
+  emit_verbatim '>'
+  In_para_p=true
+  Just_after_par_start_p = opts.par_start_p
   emit_newline()
 end
 
 function emit_start()
+  --print('emit_start stdout=', io.stdout)
   Current_pageno = Current_pageno + 1
   local html_page_count = Current_pageno
   if html_page_count == 1 and Last_page_number == -1 then

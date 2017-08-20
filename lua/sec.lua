@@ -1,4 +1,4 @@
--- last modified 2017-08-18
+-- last modified 2017-08-20
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -13,7 +13,8 @@ function store_title(title, opts)
   end
   Title = title
   if opts.emit_p then
-    emit_para()
+    --print('storetitle calling eep')
+    emit_end_para()
     emit_verbatim '<h1 align=center class=title>'
     emit(title)
     emit_verbatim '</h1>\n'
@@ -40,14 +41,22 @@ function get_header(k, opts)
     --print('not manheaderp')
     local old_Out = Out
     local o = make_string_output_stream()
-    --print('string out = Out=', o)
+    --print('get_header setting Out to (string stream)', o)
     Out = o
+    --print('get_header starts a new para')
+    emit_para()
     Afterpar = function()
+      --print('calling get_headers afterpar')
       Out = old_Out
       --print('doing afterpar in getheader')
+      --print('gh/apar ipp=', In_para_p)
       local res = o:get_output_stream_string()
-      --print('res=', res)
-      k(string_trim_blanks(res))
+      --io.write('orig res= ->', res, '<-')
+      res = string.gsub(res, '^%s*<[pP]>%s*', '')
+      res = string.gsub(res, '%s*</[pP]>%s*$', '')
+      --io.write('res= ->', res, '<-')
+      k(res)
+      --k(string_trim_blanks(res))
     end
   else
     k(with_output_to_string(function(o)
@@ -77,7 +86,8 @@ function emit_section_header(level, opts)
   --
   local this_section_num = false
   local growps = raw_counter_value('GROWPS')
-  emit_para()
+  --print('emitsectionheader calling eep')
+  emit_end_para()
   if opts.numbered_p then
     get_counter_named('nh*hl').value = level
     increment_section_counter(level)
@@ -93,7 +103,7 @@ function emit_section_header(level, opts)
   end
   ignore_spaces()
   get_header(function(header)
-   --print('get_header arg header=', header)
+    --print('get_header arg header=', header)
     local hnum = math.max(1, math.min(6, level))
     emit_verbatim '<h'
     emit(hnum)

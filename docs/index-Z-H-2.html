@@ -16,23 +16,15 @@ troff2page
 <meta name=robots content="index,follow">
 </head>
 <body>
-<p>
 <div>
 <div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-1.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-3.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
-
-</p>
 <p class=indent>
-</p>
-<p>
+</P>
 <h1 style="font-size: 160%"><a name="TAG:__pca_sec_3"></a>
 2. troff and troff2page commands</h1>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_5"></a>
 <span style="color: #9b3d3d; "><span class=dropcap>T</span></span><span style="color: previous; ">ROFF2PAGE
@@ -50,7 +42,7 @@ Please consult troff and groff documentation for these commands.  We will
 concentrate here on those commands whose HTML counterpart is not immediately
 obvious.
 
-</p>
+</P>
 </span><p class=indent>
 <a name="TAG:__troff2page_index_6"></a>
 <a name="TAG:__troff2page_index_7"></a>
@@ -67,7 +59,7 @@ extensions to the <span style="font-family: monospace; ">ms</span> package, e.g.
 cross-references; <span style="font-family: monospace; ">pca-ix.tmac</span> for index generation;
 <span style="font-family: monospace; ">pca-eval.tmac</span> for extending troff using Lua, etc.
 
-</p>
+</P>
 <p class=indent>
 You should put these tmac files in one of your macro directories,
 i.e., the directories that are searched by groff’s <span style="font-family: monospace; ">-m</span>
@@ -77,7 +69,7 @@ working directory, and finally in your home directory. See the
 section for “Macro Directories” in the groff info file for
 details.)
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_12"></a>
 Note that it is best to load these <span style="font-family: monospace; ">.tmac</span> files into
@@ -87,23 +79,17 @@ troff2page doesn’t support the same kind of command-line
 arguments that groff does. But see below for avoiding cluttering
 your source document.
 
-</p>
+</P>
 <p class=indent>
 
-
-</p>
+</P>
 <p class=indent>
-</p>
-<p>
+</P>
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_4"></a>
 Auxiliary files</h2>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_13"></a>
 <a name="TAG:__troff2page_index_14"></a>
@@ -114,7 +100,7 @@ second run.  Note that in order to write these aux files,
 groff must be run with the <span style="font-family: monospace; ">-U</span> option for “unsafe”
 mode.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_16"></a>
 <a name="TAG:__troff2page_index_17"></a>
@@ -122,17 +108,16 @@ As an example, consider <span style="font-family: monospace; ">index.ms</span> (
 document you’re reading, which is the <span style="font-family: monospace; ">doc</span> subdirectory).  The following is one
 way to get the correct PostScript output:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;%&#xa0;groff&#xa0;-t&#xa0;-U&#xa0;-z&#xa0;index.ms<Br>
 </span><span style="font-style: oblique; font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;Rerun&#xa0;groff&#xa0;with&#xa0;-U<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;index.ms:18:&#xa0;can't&#xa0;open&#xa0;`.trofftemp.toc':&#xa0;No&#xa0;such&#xa0;file&#xa0;or&#xa0;directory<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;index.ms:38:&#xa0;can't&#xa0;open&#xa0;`.trofftemp.ind':&#xa0;No&#xa0;such&#xa0;file&#xa0;or&#xa0;directory<Br>
-<Br>
 <br style="margin-top: 6px; margin-bottom: 6px">
 </span><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;%&#xa0;groff&#xa0;-t&#xa0;-U&#xa0;index.ms&#xa0;&#x3e;&#xa0;index.ps<Br>
 </span><span style="font-style: oblique; font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;This&#xa0;is&#xa0;makeindex,&#xa0;version&#xa0;2.15&#xa0;[TeX&#xa0;Live&#xa0;2016]&#xa0;(kpathsea&#xa0;+&#xa0;Thai&#xa0;support).<Br>
@@ -143,11 +128,10 @@ way to get the correct PostScript output:
 &#xa0;&#xa0;&#xa0;&#xa0;Output&#xa0;written&#xa0;in&#xa0;z.trofftemp.ind.<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;Transcript&#xa0;written&#xa0;in&#xa0;z.trofftemp.ilg.<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 The <span style="font-family: monospace; ">-t</span> option (which calls the tbl
 preprocessor) is needed because the
@@ -156,7 +140,7 @@ uses a table.  The first run uses the <span style="font-family: monospace; ">-z<
 writing an output file, which we don’t need until the second
 run.
 
-</p>
+</P>
 <p class=indent>
 In both runs, we use the <span style="font-family: monospace; ">-U</span> option: The first run
 needs unsafe mode to write the aux files, and the second run
@@ -166,25 +150,25 @@ with the <span style="font-family: monospace; ">-U</span>, as all the required a
 (You will need the option again, if the aux files’ content
 changes.)
 
-</p>
+</P>
 <p class=indent>
 troff2page also needs to process the document twice in order to absorb
 information from the aux files. However:
 
-</p>
+</P>
 <p class=indent>
 (1) troff2page will automatically do the second processing
 without needing the user to explicitly call it a second time; and
 
-</p>
+</P>
 <p class=indent>
 (2) troff2page doesn’t need any special option to run in “unsafe”
 mode or to process tables.
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;%&#xa0;troff2page&#xa0;index.ms<Br>
@@ -200,41 +184,39 @@ mode or to process tables.
 &#xa0;&#xa0;&#xa0;&#xa0;Output&#xa0;written&#xa0;in&#xa0;z.troff2page_temp_index.ind.<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;Transcript&#xa0;written&#xa0;in&#xa0;z.troff2page_temp_index.ilg.<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 The same holds if you run troff2page by calling
 the Lua procedure <span style="font-family: monospace; ">troff2page</span> within Lua, as described on
 page <a class=hrefinternal href="index-Z-H-1.html#TAG:calling_troff2page_within_lua"><span class=hreftext>1</span></a>.
 
-</p>
+</P>
 <p class=indent>
 If you wish to have
 the Lua procedure perform just one pass on the document, give it a
 second argument that is non-false, e.g.,
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;troff2page('index.ms',&#xa0;'single-pass')<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 Call it the same way a second time to run the second pass, which
 resolve the aux files. This is exactly analogous to calling
 <span style="font-family: monospace; ">groff</span> twice on the same document to resolve aux files.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:auxf"></a>
 <a name="TAG:__troff2page_index_18"></a>
@@ -252,23 +234,17 @@ programs’ aux files don’t clash.  The number register
 <span style="font-family: monospace; ">\n[.troff2page]</span> (page <a class=hrefinternal href="index-Z-H-3.html#TAG:cond-bp"><span class=hreftext>3</span></a>) suggests a way
 to do this.
 
-</p>
+</P>
 <p class=indent>
 
-
-</p>
+</P>
 <p class=indent>
-</p>
-<p>
+</P>
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_5"></a>
 Simulating troff options</h2>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_20"></a>
 The program <span style="font-family: monospace; ">troff2page</span> just takes a single argument.  Typically
@@ -276,7 +252,7 @@ this is a filename specifying
 the input document file.  If the file so named does not exist, <span style="font-family: monospace; ">troff2page</span>
 exits with a “could not find” message.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_21"></a>
 <a name="TAG:__troff2page_index_22"></a>
@@ -284,10 +260,10 @@ The only exceptions are when the argument is <span style="font-family: monospace
 in which case <span style="font-family: monospace; ">troff2page</span> displays an appropriate informative
 text and exits.  For example,
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;%&#xa0;troff2page&#xa0;--help<Br>
@@ -295,11 +271,10 @@ text and exits.  For example,
 &#xa0;&#xa0;&#xa0;&#xa0;Copyright&#xa0;(C)&#xa0;2003-2016&#xa0;Dorai&#xa0;Sitaram<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;For&#xa0;full&#xa0;details,&#xa0;please&#xa0;see&#xa0;http://ds26gte.github.io/troff2page/index.html<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 While this is intentionally similar to groff’s
 <span style="font-family: monospace; ">--help</span> and <span style="font-family: monospace; ">--version</span> options, <span style="font-family: monospace; ">troff2page</span> cannot process true options as <span style="font-family: monospace; ">groff</span>
@@ -307,7 +282,7 @@ can.  Indeed, if <span style="font-family: monospace; ">--help</span> and <span 
 process them as
 such.
 
-</p>
+</P>
 <p class=indent>
 In contrast, <span style="font-family: monospace; ">groff</span> options allow you to specify on the command-line not just the input file but also
 additional information, e.g., <span style="font-family: monospace; ">-m</span> to load macro files;
@@ -318,7 +293,7 @@ for details on all the provided options.)
 The options can be usefully varied
 with each call to <span style="font-family: monospace; ">groff</span>.
 
-</p>
+</P>
 <p class=indent>
 For options that do not make sense for HTML — e.g., the setting of
 <span style="font-family: monospace; ">PO</span> (adjusting the left margin to suit a particular printer) —, it is fine
@@ -330,7 +305,7 @@ may need to add this information explicitly within the input document.
 Thus, a <span style="font-family: monospace; ">-m</span> command-line option would be replaced by an explicit call
 to <span style="font-family: monospace; ">.mso</span> within the document.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:troff2pagerc"></a>
 <a name="TAG:__troff2page_index_23"></a>
@@ -341,7 +316,7 @@ be varied for the same document, when processed by different users or
 in different environments, or if you simply do not want to
 clutter your document source.
 
-</p>
+</P>
 <p class=indent>
 For such cases, you may place the information in a file named
 <span style="font-family: monospace; ">troff2pagerc.tmac</span> in one of your macro directories
@@ -352,12 +327,12 @@ plausible if your changes are valid for all your documents. A
 more system-level <span style="font-family: monospace; ">GROFF_TMAC_PATH</span> placement is typically
 unadvised for such an ad hoc file.
 
-</p>
+</P>
 <p class=indent>
 <span style="font-family: monospace; ">troff2page</span> loads the first <span style="font-family: monospace; ">troff2pagerc.tmac</span> it
 finds, if it exists, before processing its main argument file.
 
-</p>
+</P>
 <p class=indent>
 (Note that groff itself will not load <span style="font-family: monospace; ">.troff2pagerc.tmac</span>
 automatically.  But that is presumably OK, since you are using
@@ -365,25 +340,22 @@ groff command-line options to specify the same information
 anyway.  If you do want groff to pick up this file, you can use
 the option <span style="font-family: monospace; ">-m.troff2pagerc</span>.)
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_25"></a>
 If the input file is recognizably a man page (i.e., it has the
 command <span style="font-family: monospace; ">.TH</span>), both troff2page and groff will load, if it
 exists, the init file <span style="font-family: monospace; ">man.local</span> in the home directory.
-</p>
-<p>
-<div class=footnote><hr align=left width="40%"></p>
-<p>
+</P>
+<div class=footnote><hr align=left width="40%"><p>
 <a name="TAG:__troff2page_footnote_1"></a><a class=hrefinternal href="#TAG:__troff2page_call_footnote_1"><span class=hreftext><sup><small>1</small></sup></span></a>
 <a name="TAG:__troff2page_index_26"></a>
 E.g., ms’s footnotes (<span style="font-family: monospace; ">\**</span> and <span style="font-family: monospace; ">.FS</span>/<span style="font-family: monospace; ">.FE</span>) have a
 straightforward translation in the HTML, with the footnote text set at the
 bottom of the HTML page, and with the footnote markers in the body and the
 footnote hyperlinking to each other.
+</P>
 </div>
-<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-1.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-3.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></p>
-
-</div>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-1.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-3.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></div>
 </body>
 </html>

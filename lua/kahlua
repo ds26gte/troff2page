@@ -1,4 +1,4 @@
-# last modified 2017-08-14
+# last modified 2017-08-20
 
 rm -f ../troff2page.lua *-Z-*.lua
 
@@ -7,6 +7,8 @@ for f in *.lua; do
   echo >> ../troff2page.lua
 done
 
-echo 'troff2page(Troff2page_file_arg)' >> ../troff2page.lua 
+DEBUG=false
+
+echo "troff2page(Troff2page_file_arg, $DEBUG)" >> ../troff2page.lua 
 
 chmod +x ../troff2page.lua

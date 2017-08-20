@@ -16,30 +16,22 @@ troff2page
 <meta name=robots content="index,follow">
 </head>
 <body>
-<p>
 <div>
 <div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-2.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
-
-</p>
 <p class=indent>
-</p>
-<p>
+</P>
 <h1 style="font-size: 160%"><a name="TAG:__pca_sec_6"></a>
 3. Page layout</h1>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 <a name="TAG:__troff2page_index_27"></a>
 <a name="TAG:__troff2page_index_28"></a>
 The page-break command <span style="font-family: monospace; ">.bp</span> ends the current HTML page and start a new
 one.  <span style="font-family: monospace; ">.bp</span> causes a page-break in both the HTML and the print outputs.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:cond-bp"></a>
 <a name="TAG:__troff2page_index_29"></a>
@@ -47,71 +39,68 @@ one.  <span style="font-family: monospace; ">.bp</span> causes a page-break in b
 Generally, page-breaks require a different aesthetic in HTML than in
 print.  You can use troff conditionals to express this difference:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.if&#xa0;\n[.troff2page]&#xa0;.bp<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 causes a page-break only in the HTML, whereas
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.if&#xa0;!\n[.troff2page]&#xa0;.bp<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 causes a page-break only in print.
 
-</p>
+</P>
 <p class=indent>
 As can be seen, the number register <span style="font-family: monospace; ">\n[.troff2page]</span> has a <span style="font-style: italic; ">true</span>
 value, i.e., a number greater than zero, only when troff2page processes the
 document.<a name="TAG:__troff2page_call_footnote_2"></a><a class=hrefinternal href="#TAG:__troff2page_footnote_2"><span class=hreftext><sup><small>2</small></sup></span></a>
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_31"></a>
 If may be convenient to define a <span style="font-family: monospace; ">.HBP</span> macro that causes a page-break
 only for HTML:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.de&#xa0;HBP<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;.if&#xa0;\n[.troff2page]&#xa0;.bp<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;..<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 Note that troff2page, like troff, does not automatically cause a page break
 at the sectioning commands.  Use <span style="font-family: monospace; ">.bp</span> or a macro like <span style="font-family: monospace; ">.HBP</span> to
 explicitly to insert breaks as needed.
 
-</p>
+</P>
 <p class=indent>
 <a name="TAG:__troff2page_index_32"></a>
 Each page in a multiple-page HTML output has a navigation bar at its
@@ -120,23 +109,17 @@ page, and the table-of-contents and index pages.  If any of these pages
 doesn’t exist, or if it is the same as the page containing the
 navigation bar, then the link for it is disabled.
 
-</p>
+</P>
 <p class=indent>
 
-
-</p>
+</P>
 <p class=indent>
-</p>
-<p>
+</P>
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_7"></a>
 HTML-style paragraphs</h2>
-</p>
 <p>
 
-</p>
-<p class=indent>
-
-</p>
+</P>
 <p>
 By default, troff2page sets paragraphs exactly as groff does: the first
 lines of paragraphs are indented (unless explicitly disabled via an
@@ -146,7 +129,7 @@ amount that groff employs.  These two values are given by the number
 registers <span style="font-family: monospace; ">PI</span> and <span style="font-family: monospace; ">PD</span>, which (for the ms format) are 0.3n and 0.3v
 respectively.
 
-</p>
+</P>
 <p class=indent>
 If you wish to have the kind of block paragraphs customary in HTML, it
 is not enough to set <span style="font-family: monospace; ">PI</span> to 0, for the prevailing value of <span style="font-family: monospace; ">PD</span> is too
@@ -157,10 +140,10 @@ separation that HTML uses.  Note that setting <span style="font-family: monospac
 should be done only for HTML, as groff will happily overstrike
 text in order to respect a negative <span style="font-family: monospace; ">PD</span>:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.if&#xa0;\n[.troff2page]&#xa0;\{\<Br>
@@ -168,11 +151,10 @@ text in order to respect a negative <span style="font-family: monospace; ">PD</s
 &#xa0;&#xa0;&#xa0;&#xa0;.nr&#xa0;PD&#xa0;0-1p<Br>
 &#xa0;&#xa0;&#xa0;&#xa0;.\}<Br>
 <p>
-</p>
+</P>
 </span><p>
 
-
-</p>
+</P>
 <p>
 Unlike groff ms, which uses the line length given by the register
 <span style="font-family: monospace; ">LL</span>,
@@ -184,26 +166,24 @@ browser window to a width less than <span style="font-family: monospace; ">LL</s
 shrink too to fit the window.  This is to avoid the need for horizontal
 scrolling.
 
-</p>
+</P>
 <p class=indent>
 A good <span style="font-family: monospace; ">LL</span> value for troff2page should be a bit larger than
 ms’s 6 inches, which is too narrow for a browser.  The following sets it
 to 18 cm, making sure it takes effect only for HTML:
 
-</p>
+</P>
 <p class=indent>
 
-</p>
+</P>
 <p>
 <p >
 <p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.if&#xa0;\n[.troff2page]&#xa0;.nr&#xa0;LL&#xa0;18c<Br>
 <p>
-</p>
+</P>
 </span><p>
-</p>
-<p>
-<div class=footnote><hr align=left width="40%"></p>
-<p>
+</P>
+<div class=footnote><hr align=left width="40%"><p>
 <a name="TAG:__troff2page_footnote_2"></a><a class=hrefinternal href="#TAG:__troff2page_call_footnote_2"><span class=hreftext><sup><small>2</small></sup></span></a>
 The greater-than-zero number held in the register
 <span style="font-family: monospace; ">\n[.troff2page]</span>
@@ -214,9 +194,8 @@ released on 2015 March 20.  <span style="font-family: monospace; ">\n[.troff2pag
 to distinguish not just troff2page from troff, but also between various versions
 of troff2page.  Thus, one could, if the need were dire, write a document
 that translates differently with different versions of troff2page.
+</P>
 </div>
-<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-2.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></p>
-
-</div>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-2.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></div>
 </body>
 </html>

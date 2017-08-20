@@ -1,4 +1,4 @@
--- last modified 2017-08-15
+-- last modified 2017-08-20
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -13,7 +13,7 @@ function initialize_numregs()
   defnumreg('.c', {thunk = function() return Input_line_no; end})
   defnumreg('c.', {thunk = function() return Input_line_no; end})
   defnumreg('.i', {thunk = function() return Margin_left; end})
-  defnumreg('.u', {thunk = function() return bool_to_num(Ev_stack[1].fill); end})
+  defnumreg('.u', {thunk = function() return bool_to_num(not Ev_stack[1].hardlines); end})
   defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
   defnumreg('lss', {thunk = function() return Leading_spaces_number * point_equivalent_of('n'); end})

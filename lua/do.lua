@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2017-08-20
 
 function do_afterpar()
   local it = Afterpar
@@ -16,16 +16,18 @@ function do_eject()
   end
   if Slides_p then
     --print('eject for slides')
-    emit_para{last_p = true}
+    --print('eject/slides calling eep')
+    emit_end_para()
     emit_verbatim '</div>\n'
     emit_verbatim '<div class=slide>\n'
-    emit_para{first_p = true}
+    emit_para()
     --print('done ejecting for slides')
   elseif page_break_p then
     emit_end_page(); emit_start()
   else
+    emit_end_para()
     emit_verbatim '<div class=pagebreak></div>'
-    emit_newline()
+    emit_para()
   end
 end
 

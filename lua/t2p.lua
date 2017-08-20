@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2017-08-20
 
 function find_macro_file(f)
   --print('doing find_macro_file', f)
@@ -139,6 +139,7 @@ function troff2page_1pass(input_doc)
        Html_head = {},
        Html_page = false,
        Image_file_count = 0,
+       In_para_p = false,
        Input_line_no = 0,
        Inside_table_text_block_p = false,
        Just_after_par_start_p = false,
@@ -190,8 +191,10 @@ function troff2page_1pass(input_doc)
      }, function() 
        --print('mp =', Macro_package)
      begin_html_document()
+     --print('bhd done, Out=', Out)
        --print('mp1 =', Macro_package)
      troff2page_file(input_doc)
+     --print('t2pf done, Out=', Out)
        --print('mp2 =', Macro_package)
      do_bye()
        --print('mp3 =', Macro_package)

@@ -1,4 +1,4 @@
--- last modified 2017-08-18
+-- last modified 2017-08-20
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
@@ -94,7 +94,8 @@ function emit_navigation_bar(headerp)
 end
 
 function emit_colophon()
-  emit_para()
+  --print('colophon calling eep')
+  emit_end_para()
   emit_verbatim '<div align=right class=colophon>'
   emit_newline()
   local it = String_table.DY
