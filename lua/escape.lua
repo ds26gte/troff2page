@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2017-08-20
 
 Escape_table = {}
 
@@ -76,14 +76,15 @@ defescape('\\', function()
 end)
 
 defescape('{', function()
-  --print('doing \\{')
+  --dprint('doing \\{')
   table.insert(Cascaded_if_stack, 1, Cascaded_if_p)
   Cascaded_if_p = false
+  Keep_newline_p=false
   return ''
 end)
 
 defescape('}', function()
-  --print('doing \\}')
+  --dprint('doing \\}')
   read_troff_line()
   Cascaded_if_p = table.remove(Cascaded_if_stack, 1)
   return ''
@@ -167,6 +168,8 @@ defescape('v', function()
 end)
 
 defescape('\n', function()
+  --dprint('doing \\n')
+  Keep_newline_p=false
   return ''
 end)
 
