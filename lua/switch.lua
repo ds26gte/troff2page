@@ -1,4 +1,4 @@
--- last modified 2017-08-16
+-- last modified 2017-08-20
 
 function switch_style(opts)
   opts = opts or {}
@@ -111,6 +111,13 @@ function make_span_open(opts)
   verbatim '">'
   --print('mkspano retng', res)
   return res
+end
+
+function switch_font_family(f)
+  if f=='C' then f = 'font-family: monospace'
+  else f=false
+  end
+  return switch_style{font = f}
 end
 
 function switch_glyph_color(c)

@@ -4619,6 +4619,13 @@ function make_span_open(opts)
   return res
 end
 
+function switch_font_family(f)
+  if f=='C' then f = 'font-family: monospace'
+  else f=false
+  end
+  return switch_style{font = f}
+end
+
 function switch_glyph_color(c)
   if not c then ;
   elseif c == '' then c='previous'
