@@ -1,4 +1,8 @@
--- last modified 2017-08-20
+-- last modified 2017-08-22
+
+if not table.unpack then
+  table.unpack = unpack
+end
 
 function dprint(...)
   if Debug_p then
