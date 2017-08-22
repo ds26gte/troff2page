@@ -1,4 +1,4 @@
--- last modified 2017-08-20
+-- last modified 2017-08-22
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -392,7 +392,7 @@ function initialize_macros()
   end)
 
   defrequest('par@reset', function()
-    ;
+    do end
   end)
 
   defrequest('LP', function()

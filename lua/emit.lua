@@ -1,4 +1,4 @@
--- last modified 2017-08-20
+-- last modified 2017-08-22
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -67,9 +67,9 @@ function emit(s)
         elseif e == '[htmlnbsp]' then Out:write('&#xa0;')
         elseif e == '[htmleightnbsp]' then
           for j=1,8 do Out:write('&#xa0;') end
-        elseif e == '[htmlempty]' then ;
+        elseif e == '[htmlempty]' then do end
         else Out:write(c, e) end
-      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then ;
+      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then do end
       elseif c == '<' then Out:write('&#x3c;')
       elseif c == '>' then Out:write('&#x3e;')
       elseif c == '&' then Out:write('&#x26;')

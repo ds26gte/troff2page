@@ -1,3 +1,5 @@
+-- last modified 2017-08-22
+
 function write_aux(...)
   Aux_stream:write(...)
   Aux_stream:write('\n')
@@ -41,4 +43,4 @@ function begin_html_document()
     it = Jobname .. '.t2p'
     if probe_file(it) then troff2page_file(it) end
   end
-end 
+end

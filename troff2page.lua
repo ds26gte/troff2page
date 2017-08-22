@@ -12,6 +12,10 @@ string.format('Copyright (C) 2017 Dorai Sitaram'
 Troff2page_file_arg = ...
 
 
+if not table.unpack then
+  table.unpack = unpack
+end
+
 function dprint(...)
   if Debug_p then
     io.write(...); io.write('\n')
@@ -1175,9 +1179,9 @@ function emit(s)
         elseif e == '[htmlnbsp]' then Out:write('&#xa0;')
         elseif e == '[htmleightnbsp]' then
           for j=1,8 do Out:write('&#xa0;') end
-        elseif e == '[htmlempty]' then ;
+        elseif e == '[htmlempty]' then do end
         else Out:write(c, e) end
-      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then ;
+      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then do end
       elseif c == '<' then Out:write('&#x3c;')
       elseif c == '>' then Out:write('&#x3e;')
       elseif c == '&' then Out:write('&#x26;')
@@ -1920,8 +1924,9 @@ function troff2page_help(f)
   return true
 end
 
+
 function html2info()
-  ;
+  do end
 end
 
 
@@ -2006,6 +2011,7 @@ end
 
 
 
+
 function write_aux(...)
   Aux_stream:write(...)
   Aux_stream:write('\n')
@@ -2049,7 +2055,7 @@ function begin_html_document()
     it = Jobname .. '.t2p'
     if probe_file(it) then troff2page_file(it) end
   end
-end 
+end
 
 
 --refer groff_char(7)
@@ -2804,7 +2810,7 @@ function initialize_macros()
   end)
 
   defrequest('par@reset', function()
-    ;
+    do end
   end)
 
   defrequest('LP', function()
@@ -3951,7 +3957,7 @@ function read_quoted_phrase()
       if read_escape_p then
         read_escape_p = false
         get_char()
-        if c == '\n' then ;
+        if c == '\n' then do end
         else r = r .. Escape_char .. c
         end
       elseif escape_char_p(c) then
@@ -4639,7 +4645,7 @@ function switch_font_family(f)
 end
 
 function switch_glyph_color(c)
-  if not c then ;
+  if not c then do end
   elseif c == '' then c='previous'
   else
     local it = Color_table[c]
@@ -5025,7 +5031,7 @@ function table_do_rows()
         local continue
         if c == Control_char then get_char()
           local w = read_word()
-          if not w then ;
+          if not w then do end
           elseif w=='TE' then break
           elseif w=='TH' then Reading_table_header_p=false; continue=true
           else toss_back_string(w)
