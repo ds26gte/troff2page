@@ -1,4 +1,4 @@
--- last modified 2017-08-20
+-- last modified 2017-08-22
 
 Escape_table = {}
 
@@ -159,6 +159,17 @@ defescape('h', function()
     terror('\\h bad delims %s %s', delim, delim2) 
   end
   return verbatim_nbsp(x / 5)
+end)
+
+defescape('l', function()
+  local delim = get_char()
+  read_opt_pipe()
+  local x = read_length_in_pixels()
+  local delim2 = get_char()
+  if delim ~= delim2 then
+    terror('\\l bad delims %s %s', delim, delim2)
+  end
+  return verbatim('<hr style="width: ' .. x .. 'px">')
 end)
 
 defescape('v', function()
