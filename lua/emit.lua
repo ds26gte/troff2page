@@ -1,4 +1,4 @@
--- last modified 2017-08-22
+-- last modified 2017-08-26
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -156,7 +156,7 @@ function emit_expanded_line()
   local num_leading_spaces = 0
   local blank_line_p = true
   local count_leading_spaces_p = fillp() and not Reading_table_p and
-    not Macro_copy_mode_p and Output_streams ~= 'troff'
+    not Macro_copy_mode_p and Outputting_to ~= 'troff'
   local insert_line_break_p = not Macro_copy_mode_p and Outputting_to == 'html' and
     not Just_after_par_start_p
   local c

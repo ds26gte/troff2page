@@ -1,3 +1,4 @@
+.\" last modified 2017-08-23
 .SH 1
 1. Introduction
 
@@ -27,7 +28,7 @@ HTML consists of a series of interlinked files: The first file is named
 the rest are
 \fCjobname-Z-H-1.html\fP,
 \fCjobname-Z-H-2.html\fP,
-&c.
+etc.
 
 The script \fCtroff2page\fP runs on the Unix command-line on Cygwin,
 Linux, Mac
@@ -38,7 +39,7 @@ Copy the script \fCtroff2page\fP to your \fCPATH\fP.
 
 For more information,
 please see the file \*[url \
-https://github.com/ds26gte/troff2page/blob/master/INSTALL]INSTALL\&
+https://github.com/ds26gte/troff2page/blob/master/INSTALL.adoc]INSTALL.adoc\&
 in the distribution.
 
 .SH 2

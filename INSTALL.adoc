@@ -46,7 +46,8 @@ to get started with using troff2page.
 
 == System requirements
 
-The script `troff2page` works on Lua 5.3.
+The script `troff2page` has been tested on Lua 5.2.4 and 5.3.3,
+and LuaJIT 2.0.4.
 
 The branch `lisp` in the troff2page git repository contains an
 implementation in Common Lisp.
@@ -63,5 +64,5 @@ have installed troff2page, including the macro files that come
 with this distribution, as described above.
 
 If calling groff on `index.ms`, you will need to run groff twice
-in order to pick up all the auxiliar file info. (There will be a
+in order to pick up all the auxiliary file info. (There will be a
 message reminding you to do so.)

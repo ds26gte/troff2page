@@ -1,4 +1,4 @@
--- last modified 2017-08-22
+-- last modified 2017-08-23
 
 function make_bstream(opts)
   return {
@@ -48,6 +48,9 @@ function snoop_char()
 end
 
 function read_till_chars(delims, eat_delim_p)
+  -- read until one of the delims is found.
+  -- if eat_delim_p, eat the delim.
+  -- the delim will not be part of the returned string
   local newline_is_delim_p = table_member('\n', delims)
   local r = ''
   local c

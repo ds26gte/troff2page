@@ -1,4 +1,4 @@
--- last modified 2017-08-16
+-- last modified 2017-08-26
 
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
@@ -61,8 +61,11 @@ function execute_macro(w)
   --
   it = Diversion_table[w]
   if it then
+    --print('execing divn')
     read_troff_line()
-    toss_back_string(retrieve_diversion(it))
+    local divvalue = retrieve_diversion(it)
+    --print('divvalue =', divvalue)
+    emit_verbatim(divvalue)
     return
   end
   --
@@ -81,7 +84,7 @@ function execute_macro(w)
   it = String_table[w]
   if it then
     read_troff_line()
-    toss_back_string(it())
+    emit_verbatim(it())
     return
   end
   --
@@ -119,7 +122,7 @@ function execute_macro_body(ss)
 end
 
 function retrieve_diversion(div)
-  local value = Diversion_table[div]
+  local value = div.value
   if not value then 
     value = (div.stream):get_output_stream_string()
     div.value = value
