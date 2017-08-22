@@ -1,6 +1,6 @@
-#! /usr/bin/env lua5.3
+#! /usr/bin/env lua
 
-Troff2page_version = 20170820 -- last modified
+Troff2page_version = 20170822 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page/index.html'
 
 Troff2page_copyright_notice = 
@@ -1016,6 +1016,7 @@ function retrieve_diversion(div)
   return value
 end
 
+
 function point_equivalent_of(indicator)
   if indicator == 'c' then return point_equivalent_of('i')/2.54
   elseif indicator == 'i' then return 72
@@ -1025,6 +1026,7 @@ function point_equivalent_of(indicator)
   elseif indicator == 'n' then return point_equivalent_of('m') * .5
   elseif indicator == 'p' then return 1
   elseif indicator == 'P' then return 12
+  elseif indicator == 'u' then return 1
   else terror('point_equivalent_of: unknown indicator %s', indicator)
   end
 end
@@ -1050,12 +1052,12 @@ function read_length_in_pixels()
   local n = read_arith_expr()
   local u = snoop_char()
   local res
-  if u == 'c' or u == 'i' or u == 'm' or u == 'n' or u == 'p' or u == 'P' then
+  if u == 'c' or u == 'i' or u == 'm' or u == 'n' or u == 'p' or u == 'P' or u == 'u' then
     get_char(); res= math_round(n*point_equivalent_of(u))
   else
     res= math_round(4.5*n)
   end
-  --print('read_length_in_pixels retng', res)
+  --print('read_length_in_pixels ->', res)
   return res
 end 
 
@@ -1655,6 +1657,17 @@ defescape('h', function()
   return verbatim_nbsp(x / 5)
 end)
 
+defescape('l', function()
+  local delim = get_char()
+  read_opt_pipe()
+  local x = read_length_in_pixels()
+  local delim2 = get_char()
+  if delim ~= delim2 then
+    terror('\\l bad delims %s %s', delim, delim2)
+  end
+  return verbatim('<hr style="width: ' .. x .. 'px">')
+end)
+
 defescape('v', function()
   local delim = get_char()
   read_till_char(delim, 'eat_delim')
@@ -1784,7 +1797,7 @@ function emit_footnotes()
   Footnote_buffer = {}
 end
 
---
+
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
   local returned_status_value
