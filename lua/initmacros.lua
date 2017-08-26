@@ -1,4 +1,4 @@
--- last modified 2017-08-22
+-- last modified 2017-08-26
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -180,7 +180,23 @@ function initialize_macros()
     No_break_control_char = get_first_non_space_char_on_curr_line() or "'"
   end)
 
+  defrequest('asciify', function()
+    local arg1 = read_args()[1]
+    local div = Diversion_table[arg1]
+    --print('doing asciify of', div)
+    local value = div.value
+    --print('value(1) =', value)
+    if not value then
+      value = (div.stream):get_output_stream_string()
+    end
+    --print('value(2) =', value)
+    value = string.gsub(value, '^(%s*)<br>', '%1\n')
+    value = string.gsub(value, '<br>(%s*)$', '\n%1')
+    div.value = value
+  end)
+
   defrequest('di', function()
+    -- ToDo: di's can be nested
     if not Current_diversion then
       local w = read_args()[1]
       if not w then terror('di: name missing') end

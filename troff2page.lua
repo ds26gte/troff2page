@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20170822 -- last modified
+Troff2page_version = 20170826 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page/index.html'
 
 Troff2page_copyright_notice = 
@@ -954,8 +954,11 @@ function execute_macro(w)
   --
   it = Diversion_table[w]
   if it then
+    --print('execing divn')
     read_troff_line()
-    toss_back_string(retrieve_diversion(it))
+    local divvalue = retrieve_diversion(it)
+    --print('divvalue =', divvalue)
+    emit_verbatim(divvalue)
     return
   end
   --
@@ -974,7 +977,7 @@ function execute_macro(w)
   it = String_table[w]
   if it then
     read_troff_line()
-    toss_back_string(it())
+    emit_verbatim(it())
     return
   end
   --
@@ -1012,7 +1015,7 @@ function execute_macro_body(ss)
 end
 
 function retrieve_diversion(div)
-  local value = Diversion_table[div]
+  local value = div.value
   if not value then 
     value = (div.stream):get_output_stream_string()
     div.value = value
@@ -1268,7 +1271,7 @@ function emit_expanded_line()
   local num_leading_spaces = 0
   local blank_line_p = true
   local count_leading_spaces_p = fillp() and not Reading_table_p and
-    not Macro_copy_mode_p and Output_streams ~= 'troff'
+    not Macro_copy_mode_p and Outputting_to ~= 'troff'
   local insert_line_break_p = not Macro_copy_mode_p and Outputting_to == 'html' and
     not Just_after_par_start_p
   local c
@@ -2598,7 +2601,23 @@ function initialize_macros()
     No_break_control_char = get_first_non_space_char_on_curr_line() or "'"
   end)
 
+  defrequest('asciify', function()
+    local arg1 = read_args()[1]
+    local div = Diversion_table[arg1]
+    --print('doing asciify of', div)
+    local value = div.value
+    --print('value(1) =', value)
+    if not value then
+      value = (div.stream):get_output_stream_string()
+    end
+    --print('value(2) =', value)
+    value = string.gsub(value, '^(%s*)<br>', '%1\n')
+    value = string.gsub(value, '<br>(%s*)$', '\n%1')
+    div.value = value
+  end)
+
   defrequest('di', function()
+    -- ToDo: di's can be nested
     if not Current_diversion then
       local w = read_args()[1]
       if not w then terror('di: name missing') end
@@ -3842,6 +3861,9 @@ function snoop_char()
 end
 
 function read_till_chars(delims, eat_delim_p)
+  -- read until one of the delims is found.
+  -- if eat_delim_p, eat the delim.
+  -- the delim will not be part of the returned string
   local newline_is_delim_p = table_member('\n', delims)
   local r = ''
   local c

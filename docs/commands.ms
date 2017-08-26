@@ -226,7 +226,7 @@ in different environments, or if you simply do not want to
 clutter your document source.
 
 For such cases, you may place the information in a file named
-\fCtroff2pagerc.tmac\fP in one of your macro directories
+\fC.troff2pagerc.tmac\fP in one of your macro directories
 (\fCGROFF_TMAC_PATH\fP, working directory, home). The working
 directory is usual if your changes are geared to your document. A
 home-directory or private \fCGROFF_TMAC_PATH\fP placement is also
@@ -234,7 +234,7 @@ plausible if your changes are valid for all your documents. A
 more system-level \fCGROFF_TMAC_PATH\fP placement is typically
 unadvised for such an ad hoc file.
 
-\fCtroff2page\fP loads the first \fCtroff2pagerc.tmac\fP it
+\fCtroff2page\fP loads the first \fC.troff2pagerc.tmac\fP it
 finds, if it exists, before processing its main argument file.
 
 (Note that groff itself will not load \fC.troff2pagerc.tmac\fP
