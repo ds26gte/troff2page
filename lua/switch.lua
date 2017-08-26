@@ -1,4 +1,4 @@
--- last modified 2017-08-22
+-- last modified 2017-08-26
 
 function switch_style(opts)
   opts = opts or {}
@@ -121,7 +121,7 @@ function switch_font_family(f)
 end
 
 function switch_glyph_color(c)
-  if not c then do end
+  if not c then no_op()
   elseif c == '' then c='previous'
   else
     local it = Color_table[c]

@@ -1,4 +1,4 @@
--- last modified 2017-08-23
+-- last modified 2017-08-26
 
 function make_bstream(opts)
   return {
@@ -166,7 +166,7 @@ function read_quoted_phrase()
       if read_escape_p then
         read_escape_p = false
         get_char()
-        if c == '\n' then do end
+        if c == '\n' then no_op()
         else r = r .. Escape_char .. c
         end
       elseif escape_char_p(c) then

@@ -67,9 +67,9 @@ function emit(s)
         elseif e == '[htmlnbsp]' then Out:write('&#xa0;')
         elseif e == '[htmleightnbsp]' then
           for j=1,8 do Out:write('&#xa0;') end
-        elseif e == '[htmlempty]' then do end
+        elseif e == '[htmlempty]' then no_op()
         else Out:write(c, e) end
-      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then do end
+      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
       elseif c == '<' then Out:write('&#x3c;')
       elseif c == '>' then Out:write('&#x3e;')
       elseif c == '&' then Out:write('&#x26;')

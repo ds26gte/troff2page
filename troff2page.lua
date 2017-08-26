@@ -4,16 +4,18 @@ Troff2page_version = 20170826 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page/index.html'
 
 Troff2page_copyright_notice = 
-string.format('Copyright (C) 2017 Dorai Sitaram'
-              -- 2017-%s after 2017
-              -- string.sub(Troff2page_version, 1, 4)
-              )
+  string.format('Copyright (C) 2003-%s Dorai Sitaram',
+                 string.sub(Troff2page_version, 1, 4))
 
 Troff2page_file_arg = ...
 
 
 if not table.unpack then
   table.unpack = unpack
+end
+
+function no_op()
+  do end
 end
 
 function dprint(...)
@@ -1182,9 +1184,9 @@ function emit(s)
         elseif e == '[htmlnbsp]' then Out:write('&#xa0;')
         elseif e == '[htmleightnbsp]' then
           for j=1,8 do Out:write('&#xa0;') end
-        elseif e == '[htmlempty]' then do end
+        elseif e == '[htmlempty]' then no_op()
         else Out:write(c, e) end
-      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then do end
+      elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
       elseif c == '<' then Out:write('&#x3c;')
       elseif c == '>' then Out:write('&#x3e;')
       elseif c == '&' then Out:write('&#x26;')
@@ -1929,7 +1931,7 @@ end
 
 
 function html2info()
-  do end
+  no_op()
 end
 
 
@@ -2617,34 +2619,33 @@ function initialize_macros()
   end)
 
   defrequest('di', function()
-    -- ToDo: di's can be nested
-    if not Current_diversion then
-      local w = read_args()[1]
-      if not w then terror('di: name missing') end
-      Current_diversion = w
+    local w = read_args()[1]
+    if w then
       local o = make_string_output_stream()
-      Diversion_table[w] = { stream = o, oldstream = Out }
+      Diversion_table[w] = {stream = o, oldstream = Out, olddiversion = Current_diversion}
       Out = o
+      Current_diversion = w
     else
-      local div = Diversion_table[Current_diversion]
-      if not div then terror(string.format("di: %s doesn't exist", Current_diversion)) end
-      Current_diversion = false
-      Out = div.oldstream
+      local curr_div = Diversion_table[Current_diversion]
+      if curr_div then
+        Out = curr_div.oldstream
+        Current_diversion = curr_div.olddiversion
+      end
     end
-      --print('.di set Out to', Out)
   end)
 
   defrequest('da', function()
     local w = read_args()[1]
     if not w then terror('da: name missing') end
-    Current_diversion = w
     local div = Diversion_table[w]
     local div_stream
     if div then div_stream = div.stream
+      -- what if existing divn has already been retrieved and its stream closed?
     else div_stream = make_string_output_stream()
-      Diversion_table[w] = {stream = div_stream, oldstream = Out}
+      Diversion_table[w] = {stream = div_stream, oldstream = Out, olddiversion = Current_diversion}
     end
     Out = div_stream
+    Current_diversion = w
       --print('.da set Out to', Out)
   end)
 
@@ -2829,7 +2830,7 @@ function initialize_macros()
   end)
 
   defrequest('par@reset', function()
-    do end
+    no_op()
   end)
 
   defrequest('LP', function()
@@ -2947,7 +2948,6 @@ function initialize_macros()
     read_troff_line()
     emit_verbatim '</blockquote>'
   end)
-
 
   defrequest('NH', function()
     Request_table['@NH']()
@@ -3979,7 +3979,7 @@ function read_quoted_phrase()
       if read_escape_p then
         read_escape_p = false
         get_char()
-        if c == '\n' then do end
+        if c == '\n' then no_op()
         else r = r .. Escape_char .. c
         end
       elseif escape_char_p(c) then
@@ -4667,7 +4667,7 @@ function switch_font_family(f)
 end
 
 function switch_glyph_color(c)
-  if not c then do end
+  if not c then no_op()
   elseif c == '' then c='previous'
   else
     local it = Color_table[c]
@@ -5053,7 +5053,7 @@ function table_do_rows()
         local continue
         if c == Control_char then get_char()
           local w = read_word()
-          if not w then do end
+          if not w then no_op()
           elseif w=='TE' then break
           elseif w=='TH' then Reading_table_header_p=false; continue=true
           else toss_back_string(w)

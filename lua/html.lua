@@ -1,5 +1,5 @@
--- last modified 2017-08-22
+-- last modified 2017-08-26
 
 function html2info()
-  do end
+  no_op()
 end

@@ -1,4 +1,4 @@
--- last modified 2017-08-22
+-- last modified 2017-08-26
 
 function table_do_global_options()
   local x
@@ -92,7 +92,7 @@ function table_do_rows()
         local continue
         if c == Control_char then get_char()
           local w = read_word()
-          if not w then do end
+          if not w then no_op()
           elseif w=='TE' then break
           elseif w=='TH' then Reading_table_header_p=false; continue=true
           else toss_back_string(w)

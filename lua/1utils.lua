@@ -1,7 +1,11 @@
--- last modified 2017-08-22
+-- last modified 2017-08-26
 
 if not table.unpack then
   table.unpack = unpack
+end
+
+function no_op()
+  do end
 end
 
 function dprint(...)
