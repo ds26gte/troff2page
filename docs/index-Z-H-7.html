@@ -4,7 +4,7 @@
 Generated from index.ms by troff2page, v. 20170827
 Copyright (C) 2003-2017 Dorai Sitaram
 (running on Lua 5.3)
-http://ds26gte.github.io/troff2page/index.html
+http://ds26gte.github.io/troff2page
 -->
 <head>
 <meta charset="utf-8">
@@ -20,10 +20,10 @@ troff2page
 <div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-8.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div><br><h1 style="font-size: 160%"><a name="TAG:__pca_sec_11"></a>
 7. Extending troff using Lua</h1>
 <p>
-<a name="TAG:__troff2page_index_48"></a>
-<a name="TAG:__troff2page_index_49"></a>
-<a name="TAG:__troff2page_index_50"></a>
-<a name="TAG:__troff2page_index_51"></a>
+<a name="TAG:__troff2page_index_56"></a>
+<a name="TAG:__troff2page_index_57"></a>
+<a name="TAG:__troff2page_index_58"></a>
+<a name="TAG:__troff2page_index_59"></a>
 To invoke Lua from troff, we use the macro <span style="font-family: monospace; ">.eval</span> with its closer
 <span style="font-family: monospace; ">.endeval</span>.   These are
 defined in the
@@ -62,9 +62,9 @@ Consider the following troff document, <span style="font-family: monospace; ">ta
 
 </p>
 <p>
-<a name="TAG:__troff2page_index_52"></a>
-<a name="TAG:__troff2page_index_53"></a>
-<a name="TAG:__troff2page_index_54"></a>
+<a name="TAG:__troff2page_index_60"></a>
+<a name="TAG:__troff2page_index_61"></a>
+<a name="TAG:__troff2page_index_62"></a>
 Run troff (actually groff, and in unsafe mode too) on <span style="font-family: monospace; ">tau.ms</span>:
 
 </p>
@@ -148,7 +148,7 @@ resulting <span style="font-family: monospace; ">tau.html</span> will show the s
 
 </p>
 <p class=indent>
-<a name="TAG:__troff2page_index_55"></a>
+<a name="TAG:__troff2page_index_63"></a>
 Furthermore, we can embed  <span style="font-family: monospace; ">.eval</span>-enclosed Lua code inside an
 <span style="font-family: monospace; ">.if</span> (or <span style="font-family: monospace; ">.ie</span> or <span style="font-family: monospace; ">.el</span>) statement so that it gets executed
 only for troff or only for troff2page.  (Recall we used the number register
@@ -174,7 +174,7 @@ not useful) to the <span style="font-family: monospace; ">.eval</span> code seen
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_12"></a>
 Defining color names using HSL</h2>
 <p>
-<a name="TAG:__troff2page_index_56"></a>
+<a name="TAG:__troff2page_index_64"></a>
 For a more substantial example of <span style="font-family: monospace; ">.eval</span>’s use, consider defining
 color names using the HSL (hue/saturation/lightness) scheme rather than the
 RGB and CMYK schemes provided by groff.  For instance, we would like to
@@ -314,8 +314,8 @@ emulate the sanguine chalk drawings of the Old Masters.
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_13"></a>
 Extending troff2page only</h2>
 <p>
-<a name="TAG:__troff2page_index_57"></a>
-<a name="TAG:__troff2page_index_58"></a>
+<a name="TAG:__troff2page_index_65"></a>
+<a name="TAG:__troff2page_index_66"></a>
 troff2page treats troff’s <span style="font-family: monospace; ">.ig</span>
 environment, whenever it uses <span style="font-family: monospace; ">##</span> as ender, as
 containing Lua code that can be used to extend
@@ -384,7 +384,7 @@ The procedures <span style="font-family: monospace; ">defstring</span>, <span st
 
 </p>
 <p class=indent>
-<a name="TAG:__troff2page_index_59"></a>
+<a name="TAG:__troff2page_index_67"></a>
 <span style="font-family: monospace; ">.ig ##</span> can be used to specify settings that are relevant only
 when troff2page is used on a document, e.g., stylesheet changes.
 troff2page uses the output-stream <span style="font-family: monospace; ">Css_stream</span> to

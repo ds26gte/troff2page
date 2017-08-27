@@ -29,11 +29,9 @@ concentrate here on those commands whose HTML counterpart is not immediately
 obvious.
 
 .IX macro files provided with troff2page
-.IX m@-m, groff option
 .IX pca-tag.tmac, macro file
 .IX pca-ix.tmac, macro file
 .IX eval4troff.tmac, macro file
-.IX mso@.mso, groff request
 The troff2page distribution includes several troff macro
 or tmac
 files (with
@@ -43,6 +41,8 @@ extensions to the \fCms\fP package, e.g., \fCpca-tag.tmac\fP for
 cross-references; \fCpca-ix.tmac\fP for index generation;
 \fCpca-eval.tmac\fP for extending troff using Lua, etc.
 
+.IX m@-m, command-line option
+.IX mso@.mso, groff request
 You should put these tmac files in one of your macro directories,
 i.e., the directories that are searched by the \fC-m\fP
 command-line option and \fC.mso\fP request.  (Both groff and troff2page search for macro files
@@ -56,15 +56,16 @@ Auxiliary files
 
 .IX unsafe mode
 .IX auxiliary files
-.IX U@-U, groff option
+.IX U@-U, command-line option
 Many of the macros defined in these \fC.tmac\fP files write
 auxiliary files that are absorbed into the document during a
-second run.  Note that in order to write these aux files,
-groff must be run with the \fC-U\fP option for “unsafe”
-mode.
+second run.  Let’s first investigate how groff deals with them,
+and then see how troff2page does the same in its own way. Note
+that in order to write these aux files, groff must be run with
+the \fC-U\fP option for “unsafe” mode.
 
-.IX t@-t, groff option
-.IX z@-z, groff option
+.IX t@-t, command-line option
+.IX z@-z, command-line option
 As an example, consider \fCindex.ms\fP (the groff source for the
 document you’re reading, which is the \fCdoc\fP subdirectory).  The following is one
 way to get the correct PostScript output:
@@ -162,56 +163,65 @@ programs’ aux files don’t clash.  The number register
 to do this.
 
 .SH 2
-troff2page commmand-line options
+Commmand-line options
 
-\fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP.
+.IX command-line options
+.IX version@--version, command-line option
+.IX help@--help, command-line option
+.IX v@-v, command-line option
+.IX h@-h, command-line option
+.IX m@-m, command-line option
+.IX r@-r, command-line option
+.IX d@-d, command-line option
+.IX -@--, command-line option
+\fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP,
+viz.,
+\fC-v\fP or \fC--version\fP to display the version;
+\fC-h\fP or \fC--help\fP to display help;
+\fC-m\fP to load macro files from \fCGROFF_TMAC_PATH\fP;
+\fC-r\fP to pre-set number registers;
+\fC-d\fP to pre-define strings; and
+\fC--\fP to signal the end of options.
 
-.IX version@--version, troff2page option
-(1) \fC--version\fP displays the troff2page version.
+The options can be varied with each call to \fCtroff2page\fP, just as
+with \fCgroff\fP. Please see the groff man page
+for details on all the provided options.
 
-.IX help@--help, troff2page option
-(2) \fC--help\fP displays a help message.
+.IX z@-z, command-line option
+.IX t@-t, command-line option
+.IX U@-U, command-line option
+\fCtroff2page\fP ignores all other \fCgroff\fP options, most with a warning.
+The options
+\fC-z\fP, \fC-t\fP, and \fC-U\fP are silently ignored, as they're always valid
+for troff2page.
 
 .EX
     % troff2page --help
 .ft CI
-    troff2page version 20160216
-    Copyright (C) 2003-2016 Dorai Sitaram
-    For full details, please see http://ds26gte.github.io/troff2page/index.html
+    troff2page version 20170827
+    Copyright (C) ...
+    For full details, please see http://ds26gte.github.io/troff2page
 .EE
 
-.IX m@-m, troff2page option
-(3) \fC-mxyz\fP or \fC-m xyz\fP looks
-for the macro file \fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is
-found in the macro directories, and loads it.
+In the unlikely event that you have a document file named
+\fC--help\fP (and wish to process it), use
+use
 
-.IX -@--, troff2page option
-(4) \fC--\fP signals that the rest of the command-line arguments
-are no longer options and should be treated as troff files.
+.EX
+    % troff2page -- --help
+.EE
 
-Thus, if \fC--help\fP occurs after \fC--\fP, it is treated as a
-filename and not as cue to display help.
+Macro file options must be given without the suffix \fC.tmac\fP or prefix
+\fCtmac.\fP. Thus, \fC-mxyz\fP or \fC-m xyz\fP looks for the macro file
+\fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is found in the macro directories,
+and loads it.
 
 If after all the option processing, no file arguments remain,
 \fCtroff2page\fP displays a “could not find” message.
 
-\fCtroff2page\fP ignores some other options that \fCgroff\fP can
-process, e.g.,
-the \fC-t\fP, \fC-U\fP, and \fC-z\fP mentioned earlier;
-\fC-r\fP to pre-set number registers;
-\fC-d\fP to pre-define strings;
-\fC-f\fP to set default font family; etc. (Please see the groff man page
-for details on all the provided options.)
-The options can be usefully varied
-with each call to \fCgroff\fP.
-
-For options that do not make sense for HTML — e.g., the setting of
-\fCPO\fP (adjusting the left margin to suit a particular printer) —, it is fine
-that you can’t feed the same option to
-\fCtroff2page\fP.  If you do need to supply such options, use a
-macro file via \fC-m\fP. (We will learn later how to
-conditionalize code within a macro file so that it is picked up
-only by \fCgroff\fP, or only by \fCtroff2page\fP.)
+If you find you need to specify an option that \fCtroff2page\fP
+doesn't accept, you can always supply it in a macro file via
+\fC-m\fP.
 
 .TAG troff2pagerc
 .IX init files for troff2page
@@ -235,7 +245,8 @@ unadvised for such an ad hoc file.
 \fCtroff2page\fP loads the first \fC.troff2pagerc.tmac\fP it
 finds, if it exists, before processing its main argument file.
 
-.IX t2p@.t2p, macro file In addition, \fCtroff2page\fP will also pick up a file
+.IX t2p@.t2p, macro file
+In addition, \fCtroff2page\fP will also pick up a file
 \fCjobname.t2p\fP, where \fCjobname\fP is the basename of the input document.
 This is useful for directives that are specific to a document. Note that the
 \fCjobname.t2p\fP, unlike \fC.troff2pagerc.tmac\fP, is looked for only in the
