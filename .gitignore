@@ -1,3 +1,4 @@
+#last modified 2017-08-27
 *.ps
 *.txt
 *temp_*
@@ -5,6 +6,8 @@
 .trofftemp*
 ?.lisp
 ?.ms
-doc/*[!ces]
-examples/*.ms
-man/man1/*[!1ce]
+docs/*[!cesl]
+examples/*[!1]
+lua/*[!a]
+man/man1/*[!1]
+troffput*

@@ -1,4 +1,4 @@
--- last modified 2017-08-26
+-- last modified 2017-08-28
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -707,9 +707,23 @@ function initialize_macros()
     if extra then emit(extra) end
     emit_newline()
   end)
-  --BX
-  --B1
-  --B2
+
+  defrequest('BX', function()
+    local txt = read_args()[1]
+    emit_verbatim '<span class=troffbox>'
+    emit(expand_args(txt))
+    emit_verbatim '</span>\n'
+  end)
+
+  defrequest('B1', function()
+    read_troff_line()
+    emit_verbatim '<div class=troffbox>\n'
+  end)
+
+  defrequest('B2', function()
+    read_troff_line()
+    emit_verbatim '</div>\n'
+  end)
 
   defrequest('ft', function()
     local f = read_args()[1]
@@ -736,7 +750,25 @@ function initialize_macros()
     emit(switch_size(false))
   end)
 
-  --URL
+  defrequest('URL', function()
+    local url, link_text, tack_on = table.unpack(read_args())
+    link_text = link_text or ''
+    if link_text == '' then
+      if string.sub(url, 0,0) == '#' then
+        local s = 'TAG:' .. string.sub(url,2)
+        local it = String_table[s]
+        link_text = it and it() or 'see below'
+      else link_text = url
+      end
+    end
+    emit_verbatim '<a href="'
+    emit(link_url(url))
+    emit_verbatim '">'
+    emit(link_text)
+    emit_verbatim '</a>'
+    if tack_on then emit(tack_on) end
+    emit_newline()
+  end)
 
   defrequest('TAG', function()
 --    print('doing TAG')
@@ -754,23 +786,117 @@ function initialize_macros()
 --    print('TAG done')
   end)
 
-  --ULS
-  --ULE
-  --OLS
-  --OLE
-  --LI
-  --HR
-  --HTML
-  --CDS
-  --CDE
-  --QP
-  --QS
-  --QE
-  --IP
-  --TP
-  --PS
-  --EQ
-  --TS
+  defrequest('ULS', function()
+    read_troff_line()
+    emit_para()
+    emit_verbatim '<ul>'
+  end)
+
+  defrequest('ULE', function()
+    read_troff_line()
+    emit_verbatim '</ul>'
+    emit_para()
+  end)
+
+  defrequest('OLS', function()
+    read_troff_line()
+    emit_para()
+    emit_verbatim '<ol>'
+  end)
+
+  defrequest('OLE', function()
+    read_troff_line()
+    emit_verbatim '</ol>'
+    emit_para()
+  end)
+
+  defrequest('LI', function()
+    read_troff_line()
+    emit_verbatim '<li>'
+  end)
+
+  defrequest('HR', function()
+    read_troff_line()
+    emit_verbatim '<hr>'
+  end)
+
+  defrequest('HTML', function()
+    emit_verbatim(expand_args(read_troff_line()))
+    emit_newline()
+  end)
+
+  defrequest('CDS', function()
+    start_display 'L'
+    emit(switch_font 'C')
+  end)
+
+  defrequest('CDE', function()
+    stop_display()
+  end)
+
+  defrequest('QP', function()
+    read_troff_line()
+    emit_para()
+    emit_verbatim '<blockquote>'
+    Afterpar = function() emit_verbatim '</blockquote>' end
+  end)
+
+  defrequest('QS', function()
+    read_troff_line()
+    emit_para()
+    emit_verbatim '<blockquote>'
+  end)
+
+  defrequest('QE', function()
+    read_troff_line()
+    emit_verbatim '</blockquote>'
+    emit_para()
+  end)
+
+  defrequest('IP', function()
+    local label = read_args()[1]
+    emit_para()
+    emit_verbatim '<dl><dt>'
+    if label then emit(expand_args(label)) end
+    emit_verbatim '</dt><dd>'
+    Afterpar = function() emit_verbatim '</dd></dl>\n' end
+  end)
+
+  defrequest('TP', function()
+    read_troff_line(); emit_para()
+    emit_verbatim '<dl'
+    process_line()
+    emit_verbatim '</dt><dd>'
+    Afterpar = function() emit_verbatim '</dd></dl>\n' end
+  end)
+
+  defrequest('PS', function()
+    read_troff_line()
+    make_image('.PS', '.PE')
+  end)
+
+  defrequest('EQ', function()
+    local args = read_args()
+    local w = args[1] or 'C'
+    local eqno = args[2]
+    emit_verbatim '<div class=display align='
+    emit_verbatim(w=='C' and 'center' or 'left')
+    emit_verbatim '>'
+    if eqno then
+      emit_verbatim '<table><tr><td width="80%" align='
+      emit_verbatim(w=='C' and 'center' or 'left')
+      emit_verbatim '>\n'
+    end
+    make_image('.EQ', '.EN')
+    if eqno then
+      emit_newline()
+      emit_verbatim '</td><td width="20%" align=right>'
+      emit_nbsp(16)
+      troff2page_string(eqno)
+      emit_verbatim '</td></tr></table>'
+    end
+    emit_verbatim '</div>\n'
+  end)
 
   defrequest('TS', function()
     local args = read_args()
@@ -923,13 +1049,19 @@ function initialize_macros()
     if f then troff2page_file(f) end
   end)
 
-  --HX
-  --DS
-  --LD
-  --ID
-  --BD
-  --CD
-  --RD
+  defrequest('HX', function()
+    get_counter_named('www:HX').value = tonumber(read_args()[1])
+  end)
+
+  defrequest('DS', function()
+    start_display(read_word())
+  end)
+
+  defrequest('LD', function() start_display 'L' end)
+  defrequest('ID', function() start_display 'I' end)
+  defrequest('BD', function() start_display 'B' end)
+  defrequest('CD', function() start_display 'C' end)
+  defrequest('RD', function() start_display 'R' end)
 
   defrequest('defcolor', function()
     local ident = read_word()
