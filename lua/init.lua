@@ -1,4 +1,4 @@
--- last modified 2017-08-22
+-- last modified 2017-08-27
 
 function write_aux(...)
   Aux_stream:write(...)
@@ -6,17 +6,13 @@ function write_aux(...)
 end
 
 function begin_html_document()
+
   initialize_glyphs()
   initialize_numregs()
   initialize_strings()
   initialize_macros()
 
   Convert_to_info_p = false
-
-  if not Jobname then
-    Jobname = file_stem_name(Main_troff_file)
-    Log_stream = io.stdout
-  end
 
   Last_page_number = -1
 

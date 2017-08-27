@@ -44,20 +44,12 @@ cross-references; \fCpca-ix.tmac\fP for index generation;
 \fCpca-eval.tmac\fP for extending troff using Lua, etc.
 
 You should put these tmac files in one of your macro directories,
-i.e., the directories that are searched by groff’s \fC-m\fP
-option and \fC.mso\fP request.  (groff searches for macro files
+i.e., the directories that are searched by the \fC-m\fP
+command-line option and \fC.mso\fP request.  (Both groff and troff2page search for macro files
 first in the directories in \fCGROFF_TMAC_PATH\fP, then in the
 working directory, and finally in your home directory. See the
 section for “Macro Directories” in the groff info file for
 details.)
-
-.IX macro files, loading of
-Note that it is best to load these \fC.tmac\fP files into
-your document with an \fC.mso\fP request rather than through
-groff’s command-line option \fC-m\fP.  This is because
-troff2page doesn’t support the same kind of command-line
-arguments that groff does. But see below for avoiding cluttering
-your source document.
 
 .SH 2
 Auxiliary files
@@ -141,11 +133,12 @@ the Lua procedure \fCtroff2page\fP within Lua, as described on
 page \*[TAG:calling_troff2page_within_lua].
 
 If you wish to have
-the Lua procedure perform just one pass on the document, give it a
-second argument that is non-false, e.g.,
+the Lua procedure perform just one pass on the document, set the
+global \fCSingle_pass_p\fP to true, i.e.,
 
 .EX
-    troff2page('index.ms', 'single-pass')
+    Single_pass_p = true
+    troff2page('index.ms')
 .EE
 
 Call it the same way a second time to run the second pass, which
@@ -169,19 +162,15 @@ programs’ aux files don’t clash.  The number register
 to do this.
 
 .SH 2
-Simulating troff options
+troff2page commmand-line options
 
-.IX troff options, translation of
-The program \fCtroff2page\fP just takes a single argument.  Typically
-this is a filename specifying
-the input document file.  If the file so named does not exist, \fCtroff2page\fP
-exits with a “could not find” message.
+\fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP.
+
+.IX version@--version, troff2page option
+(1) \fC--version\fP displays the troff2page version.
 
 .IX help@--help, troff2page option
-.IX version@--version, troff2page option
-The only exceptions are when the argument is \fC--help\fP or \fC--version\fP,
-in which case \fCtroff2page\fP displays an appropriate informative
-text and exits.  For example,
+(2) \fC--help\fP displays a help message.
 
 .EX
     % troff2page --help
@@ -191,14 +180,24 @@ text and exits.  For example,
     For full details, please see http://ds26gte.github.io/troff2page/index.html
 .EE
 
-While this is intentionally similar to groff’s
-\fC--help\fP and \fC--version\fP options, \fCtroff2page\fP cannot process true options as \fCgroff\fP
-can.  Indeed, if \fC--help\fP and \fC--version\fP happen to be the names of input documents, \fCtroff2page\fP will
-process them as
-such.
+.IX m@-m, troff2page option
+(3) \fC-mxyz\fP or \fC-m xyz\fP looks
+for the macro file \fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is
+found in the macro directories, and loads it.
 
-In contrast, \fCgroff\fP options allow you to specify on the command-line not just the input file but also
-additional information, e.g., \fC-m\fP to load macro files;
+.IX -@--, troff2page option
+(4) \fC--\fP signals that the rest of the command-line arguments
+are no longer options and should be treated as troff files.
+
+Thus, if \fC--help\fP occurs after \fC--\fP, it is treated as a
+filename and not as cue to display help.
+
+If after all the option processing, no file arguments remain,
+\fCtroff2page\fP displays a “could not find” message.
+
+\fCtroff2page\fP ignores some other options that \fCgroff\fP can
+process, e.g.,
+the \fC-t\fP, \fC-U\fP, and \fC-z\fP mentioned earlier;
 \fC-r\fP to pre-set number registers;
 \fC-d\fP to pre-define strings;
 \fC-f\fP to set default font family; etc. (Please see the groff man page
@@ -209,39 +208,44 @@ with each call to \fCgroff\fP.
 For options that do not make sense for HTML — e.g., the setting of
 \fCPO\fP (adjusting the left margin to suit a particular printer) —, it is fine
 that you can’t feed the same option to
-\fCtroff2page\fP.  For the options
-that \fIare\fP valid for both print and HTML — e.g., loading a macro
-file that works for both output formats —, you
-may need to add this information explicitly within the input document.
-Thus, a \fC-m\fP command-line option would be replaced by an explicit call
-to \fC.mso\fP within the document.
+\fCtroff2page\fP.  If you do need to supply such options, use a
+macro file via \fC-m\fP. (We will learn later how to
+conditionalize code within a macro file so that it is picked up
+only by \fCgroff\fP, or only by \fCtroff2page\fP.)
 
 .TAG troff2pagerc
-.IX init file for troff2page
+.IX init files for troff2page
 .IX troff2pagerc@.troff2pagerc.tmac, macro file
-However, this will not be a workable approach for some options that do
-not belong to the document, or that may potentially need to
-be varied for the same document, when processed by different users or
-in different environments, or if you simply do not want to
-clutter your document source.
+\fCtroff2page\fP can read directives in some autoloaded files
+without the need to explicitly use a command-line option. These
+are useful to specify information that is relevant only the HTML
+output.
 
-For such cases, you may place the information in a file named
-\fC.troff2pagerc.tmac\fP in one of your macro directories
+The first such file is named
+\fC.troff2pagerc.tmac\fP, placed in one of your macro directories
 (\fCGROFF_TMAC_PATH\fP, working directory, home). The working
-directory is usual if your changes are geared to your document. A
-home-directory or private \fCGROFF_TMAC_PATH\fP placement is also
-plausible if your changes are valid for all your documents. A
+directory is a good location if your changes are geared to only those
+documents that are in that directory.
+If your changes will be used in all your documents, place it in
+your home or a private \fCGROFF_TMAC_PATH\fP directory.
+A
 more system-level \fCGROFF_TMAC_PATH\fP placement is typically
 unadvised for such an ad hoc file.
 
 \fCtroff2page\fP loads the first \fC.troff2pagerc.tmac\fP it
 finds, if it exists, before processing its main argument file.
 
-(Note that groff itself will not load \fC.troff2pagerc.tmac\fP
-automatically.  But that is presumably OK, since you are using
-groff command-line options to specify the same information
-anyway.  If you do want groff to pick up this file, you can use
-the option \fC-m.troff2pagerc\fP.)
+.IX t2p@.t2p, macro file In addition, \fCtroff2page\fP will also pick up a file
+\fCjobname.t2p\fP, where \fCjobname\fP is the basename of the input document.
+This is useful for directives that are specific to a document. Note that the
+\fCjobname.t2p\fP, unlike \fC.troff2pagerc.tmac\fP, is looked for only in the
+working directory, and not more generally in \fCGROFF_TMAC_PATH\fP.
+
+(Note that groff itself will not load either \fC.troff2pagerc.tmac\fP or
+\fCjobname.t2p\fP automatically.  But that is presumably OK, since you are
+using groff command-line options to specify the same information anyway, or
+these files contain information that's only relevant for HTML.  If you do want
+groff to pick up this file, you can use the option \fC-m.troff2pagerc\fP.)
 
 .IX man.local, -man init file
 If the input file is recognizably a man page (i.e., it has the

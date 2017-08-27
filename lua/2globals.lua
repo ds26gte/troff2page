@@ -1,4 +1,4 @@
--- last modified 2017-08-20
+-- last modified 2017-08-26
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -43,6 +43,7 @@ Output_extension = '.html'
 Pso_file_suffix = '-Z-T.1'
 
 Nroff_image_p = nil
+Single_pass_p = nil
 
 Afterpar = nil
 Aux_stream = nil

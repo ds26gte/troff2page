@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <!--
-Generated from index.ms by troff2page, v. 20170816
-Copyright (C) 2017 Dorai Sitaram
+Generated from index.ms by troff2page, v. 20170827
+Copyright (C) 2003-2017 Dorai Sitaram
 (running on Lua 5.3)
 http://ds26gte.github.io/troff2page/index.html
 -->
@@ -17,18 +17,12 @@ troff2page
 </head>
 <body>
 <div>
-<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
-<p class=indent>
-</P>
-<h1 style="font-size: 160%"><a name="TAG:__pca_sec_9"></a>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div><br><h1 style="font-size: 160%"><a name="TAG:__pca_sec_9"></a>
 5. Making an index</h1>
 <p>
-
-</P>
-<p>
-<a name="TAG:__troff2page_index_40"></a>
 <a name="TAG:__troff2page_index_41"></a>
 <a name="TAG:__troff2page_index_42"></a>
+<a name="TAG:__troff2page_index_43"></a>
 The supplied macro file <span style="font-family: monospace; ">pca-ix.tmac</span>
 creates a sorted
 index, with the aid of the external program makeindex.
@@ -36,31 +30,31 @@ makeindex is included with TeX distributions, but you can
 also obtain <a href="http://stuff.mit.edu/afs/sipb/project/tex-dev/src/tar/makeindex.tar.gz"><span class=hreftext>just
 the makeindex distribution</span></a>.
 
-</P>
-<p class=indent>
+</p>
+<p>
 Note that the indexes created by groff and troff2page are
 necessarily different, because the respective paginations
 are different.  In addition, the index generated for
 troff2page has the additional feature of hyperlinking to the
 appropriate locations in the body text.
 
-</P>
+</p>
 <p class=indent>
-<a name="TAG:__troff2page_index_43"></a>
+<a name="TAG:__troff2page_index_44"></a>
 The call
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.IX&#xa0;item<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.IX&#xa0;item<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 marks the text “item” as an indexable item.  The metacharacters <span style="font-family: monospace; ">@</span>,
 <span style="font-family: monospace; ">!</span>, <span style="font-family: monospace; ">&#x22;</span>, and <span style="font-family: monospace; ">|</span> can be used to respectively specify (a)
@@ -72,27 +66,27 @@ index entries is the same <a href="http://tex.loria.fr/bibdex/makeindex.pdf"><sp
 “<span style="font-family: monospace; ">.IX item</span>” where in LaTeX one would use
 “<span style="font-family: monospace; ">\index{item}</span>”.
 
-</P>
+</p>
 <p class=indent>
 <span style="font-family: monospace; ">pca-ix.tmac</span> will call makeindex to create a
 sorted index in the auxiliary file <span style="font-family: monospace; ">\*[AUXF].ind</span>, which can be
 slurped back into the input document:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.so&#xa0;\*[AUXF].ind<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.so&#xa0;\*[AUXF].ind<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 Adding a section header on top is up to you.
-<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></P>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-4.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></p>
 </div>
 </body>
 </html>

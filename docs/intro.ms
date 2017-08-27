@@ -1,4 +1,4 @@
-.\" last modified 2017-08-23
+.\" last modified 2017-08-27
 .SH 1
 1. Introduction
 
@@ -35,7 +35,6 @@ Linux, Mac
 OS X, and Solaris.  
 
 Copy the script \fCtroff2page\fP to your \fCPATH\fP.
-
 
 For more information,
 please see the file \*[url \

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <!--
-Generated from index.ms by troff2page, v. 20170816
-Copyright (C) 2017 Dorai Sitaram
+Generated from index.ms by troff2page, v. 20170827
+Copyright (C) 2003-2017 Dorai Sitaram
 (running on Lua 5.3)
 http://ds26gte.github.io/troff2page/index.html
 -->
@@ -17,19 +17,13 @@ troff2page
 </head>
 <body>
 <div>
-<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-8.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
-<p class=indent>
-</P>
-<h1 style="font-size: 160%"><a name="TAG:__pca_sec_11"></a>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-8.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div><br><h1 style="font-size: 160%"><a name="TAG:__pca_sec_11"></a>
 7. Extending troff using Lua</h1>
 <p>
-
-</P>
-<p>
-<a name="TAG:__troff2page_index_47"></a>
 <a name="TAG:__troff2page_index_48"></a>
 <a name="TAG:__troff2page_index_49"></a>
 <a name="TAG:__troff2page_index_50"></a>
+<a name="TAG:__troff2page_index_51"></a>
 To invoke Lua from troff, we use the macro <span style="font-family: monospace; ">.eval</span> with its closer
 <span style="font-family: monospace; ">.endeval</span>.   These are
 defined in the
@@ -37,8 +31,8 @@ supplied
 troff macro file <span style="font-family: monospace; ">pca-eval.tmac</span>, which you should put
 in a macro directory.
 
-</P>
-<p class=indent>
+</p>
+<p>
 <span style="font-family: monospace; ">.eval</span> does only one thing: It
 allows you to place arbitrary Lua code until the following
 <span style="font-family: monospace; ">.endeval</span>, and the text written to standard output by
@@ -48,94 +42,94 @@ The usefulness of this tactic will be apparent from an
 example.
 Consider the following troff document, <span style="font-family: monospace; ">tau.ms</span>:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.mso&#xa0;pca-eval.tmac<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;The&#xa0;ratio&#xa0;of&#xa0;the&#xa0;circumference&#xa0;of&#xa0;a&#xa0;circle&#xa0;to<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;its&#xa0;radius&#xa0;is&#xa0;\(*t&#xa0;\(~=<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.eval<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;--&#xa0;following&#xa0;prints&#xa0;tau,&#xa0;because&#xa0;cos(tau/2)&#xa0;=&#xa0;-1<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;io.write(2*math.acos(-1),&#xa0;'.\n')<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.endeval<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.mso&#xa0;pca-eval.tmac<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.<br>
+&#xa0;&#xa0;&#xa0;&#xa0;The&#xa0;ratio&#xa0;of&#xa0;the&#xa0;circumference&#xa0;of&#xa0;a&#xa0;circle&#xa0;to<br>
+&#xa0;&#xa0;&#xa0;&#xa0;its&#xa0;radius&#xa0;is&#xa0;\(*t&#xa0;\(~=<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.eval<br>
+&#xa0;&#xa0;&#xa0;&#xa0;--&#xa0;following&#xa0;prints&#xa0;tau,&#xa0;because&#xa0;cos(tau/2)&#xa0;=&#xa0;-1<br>
+&#xa0;&#xa0;&#xa0;&#xa0;io.write(2*math.acos(-1),&#xa0;'.\n')<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.endeval<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
-<a name="TAG:__troff2page_index_51"></a>
 <a name="TAG:__troff2page_index_52"></a>
 <a name="TAG:__troff2page_index_53"></a>
+<a name="TAG:__troff2page_index_54"></a>
 Run troff (actually groff, and in unsafe mode too) on <span style="font-family: monospace; ">tau.ms</span>:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;groff&#xa0;-z&#xa0;-U&#xa0;-ms&#xa0;tau.ms<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;groff&#xa0;-z&#xa0;-U&#xa0;-ms&#xa0;tau.ms<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 (The <span style="font-family: monospace; ">-z</span> avoids generating output, because we are not ready for it
 yet.  The <span style="font-family: monospace; ">-U</span> runs in “unsafe” mode, i.e., it allows the writing of
 aux files.)
 You will find that the groff asks you to run it again:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;</span><span style="font-style: oblique; font-family: monospace;&#xa0;">Rerun&#xa0;groff&#xa0;with&#xa0;-U<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;</span><span style="font-style: oblique; font-family: monospace;&#xa0;">Rerun&#xa0;groff&#xa0;with&#xa0;-U<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 Call groff again as follows:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;groff&#xa0;-U&#xa0;-ms&#xa0;tau.ms&#xa0;&#x3e;&#xa0;tau.ps<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;groff&#xa0;-U&#xa0;-ms&#xa0;tau.ms&#xa0;&#x3e;&#xa0;tau.ps<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 <span style="font-family: monospace; ">tau.ps</span> will now look like:
 
-</P>
+</p>
 <p class=indent>
-</P>
+</p>
 <blockquote><p>
 The ratio of the circumference of a circle to
 its radius is &#x3c4; &#x2248;
 6.2831853071796.
 
-</P>
+</p>
 <p class=indent>
-</P>
+</p>
 </blockquote>
 <p>
 
-</P>
+</p>
 <p class=indent>
 The first groff call produces a Lua file
 <span style="font-family: monospace; ">.trofftemp.lua</span>.<a name="TAG:__troff2page_call_footnote_3"></a><a class=hrefinternal href="#TAG:__troff2page_footnote_3"><span class=hreftext><sup><small>3</small></sup></span></a>
@@ -143,7 +137,7 @@ The second groff
 call invokes Lua to create an auxiliary file for each <span style="font-family: monospace; ">.eval</span> that gets sourced
 back into the document.
 
-</P>
+</p>
 <p class=indent>
 It is clear that Lua code via <span style="font-family: monospace; ">.eval</span> can
 serve as a very powerful <span style="font-style: italic; ">second extension language</span>
@@ -152,9 +146,9 @@ is processed by troff2page:
 We could run troff2page on the same document, <span style="font-family: monospace; ">tau.ms</span>, and the
 resulting <span style="font-family: monospace; ">tau.html</span> will show the same content.
 
-</P>
+</p>
 <p class=indent>
-<a name="TAG:__troff2page_index_54"></a>
+<a name="TAG:__troff2page_index_55"></a>
 Furthermore, we can embed  <span style="font-family: monospace; ">.eval</span>-enclosed Lua code inside an
 <span style="font-family: monospace; ">.if</span> (or <span style="font-family: monospace; ">.ie</span> or <span style="font-family: monospace; ">.el</span>) statement so that it gets executed
 only for troff or only for troff2page.  (Recall we used the number register
@@ -165,7 +159,7 @@ means to extend troff2page to deal with things that the core
 program as supplied does
 not.
 
-</P>
+</p>
 <p class=indent>
 Note that when troff2page sees
 <span style="font-family: monospace; ">.eval</span>-enclosed Lua
@@ -174,19 +168,13 @@ Lua language but also includes the procedures and data structures
 defined in troff2page.  These extras are not available (and are arguably
 not useful) to the <span style="font-family: monospace; ">.eval</span> code seen by troff.
 
-</P>
+</p>
 <p class=indent>
-
-</P>
-<p class=indent>
-</P>
+<br></p>
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_12"></a>
 Defining color names using HSL</h2>
 <p>
-
-</P>
-<p>
-<a name="TAG:__troff2page_index_55"></a>
+<a name="TAG:__troff2page_index_56"></a>
 For a more substantial example of <span style="font-family: monospace; ">.eval</span>’s use, consider defining
 color names using the HSL (hue/saturation/lightness) scheme rather than the
 RGB and CMYK schemes provided by groff.  For instance, we would like to
@@ -194,154 +182,148 @@ define the color Venetian red using its HSL spec (357&#xb0;, 49%,
 24%), which to many is a more intuitive description than RGB
 (91, 31, 34).
 
-</P>
-<p class=indent>
+</p>
+<p>
 While there is an <a href="http://en.wikipedia.org/wiki/HSL_color_space"><span class=hreftext>algorithm</span></a> to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lua procedure to do the same, and put it inside an <span style="font-family: monospace; ">.eval</span>:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.mso&#xa0;pca-eval.tmac<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.eval<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;do<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;between_0_and_1(n)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;if&#xa0;n&#xa0;&#x3c;&#xa0;0&#xa0;then<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;n&#xa0;+&#xa0;1<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;elseif&#xa0;n&#xa0;&#x3e;&#xa0;1&#xa0;then<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;n&#xa0;-&#xa0;1<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;else<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;n<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.mso&#xa0;pca-eval.tmac<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.eval<br>
+&#xa0;&#xa0;&#xa0;&#xa0;do<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;between_0_and_1(n)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;if&#xa0;n&#xa0;&#x3c;&#xa0;0&#xa0;then<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;n&#xa0;+&#xa0;1<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;elseif&#xa0;n&#xa0;&#x3e;&#xa0;1&#xa0;then<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;n&#xa0;-&#xa0;1<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;else<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;n<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<br>
 <br style="margin-top: 6px; margin-bottom: 6px">
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;tc_to_c(tc,&#xa0;p,&#xa0;q)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;if&#xa0;tc&#xa0;&#x3c;&#xa0;1/6&#xa0;then<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;p&#xa0;+&#xa0;(q&#xa0;-&#xa0;p)*6*tc<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;elseif&#xa0;1/6&#xa0;&#x3c;=&#xa0;tc&#xa0;and&#xa0;tc&#xa0;&#x3c;&#xa0;1/2&#xa0;then<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;q<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;elseif&#xa0;1/2&#xa0;&#x3c;=&#xa0;tc&#xa0;and&#xa0;tc&#xa0;&#x3c;&#xa0;2/3&#xa0;then<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;p&#xa0;+&#xa0;(q&#xa0;-&#xa0;p)*6*(2/3&#xa0;-&#xa0;tc)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;else<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;p<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;tc_to_c(tc,&#xa0;p,&#xa0;q)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;if&#xa0;tc&#xa0;&#x3c;&#xa0;1/6&#xa0;then<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;p&#xa0;+&#xa0;(q&#xa0;-&#xa0;p)*6*tc<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;elseif&#xa0;1/6&#xa0;&#x3c;=&#xa0;tc&#xa0;and&#xa0;tc&#xa0;&#x3c;&#xa0;1/2&#xa0;then<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;q<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;elseif&#xa0;1/2&#xa0;&#x3c;=&#xa0;tc&#xa0;and&#xa0;tc&#xa0;&#x3c;&#xa0;2/3&#xa0;then<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;p&#xa0;+&#xa0;(q&#xa0;-&#xa0;p)*6*(2/3&#xa0;-&#xa0;tc)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;else<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;p<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<br>
 <br style="margin-top: 6px; margin-bottom: 6px">
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;hsl_to_rgb(h,&#xa0;s,&#xa0;l)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;h&#xa0;=&#xa0;(h&#xa0;%&#xa0;360)&#xa0;/&#xa0;360<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;q<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;if&#xa0;l&#xa0;&#x3c;&#xa0;1/2&#xa0;then<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;q&#xa0;=&#xa0;l&#xa0;*&#xa0;(s&#xa0;+&#xa0;1)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;else<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;q&#xa0;=&#xa0;1&#xa0;+&#xa0;s&#xa0;-&#xa0;l*s<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;p&#xa0;=&#xa0;2*l&#xa0;-&#xa0;q<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;tr&#xa0;=&#xa0;between_0_and_1(h&#xa0;+&#xa0;1/3)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;tg&#xa0;=&#xa0;between_0_and_1(h)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;tb&#xa0;=&#xa0;between_0_and_1(h&#xa0;-&#xa0;1/3)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;tc_to_c(tr,&#xa0;p,&#xa0;q),<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;tc_to_c(tg,&#xa0;p,&#xa0;q),<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;tc_to_c(tb,&#xa0;p,&#xa0;q)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;function&#xa0;hsl_to_rgb(h,&#xa0;s,&#xa0;l)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;h&#xa0;=&#xa0;(h&#xa0;%&#xa0;360)&#xa0;/&#xa0;360<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;q<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;if&#xa0;l&#xa0;&#x3c;&#xa0;1/2&#xa0;then<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;q&#xa0;=&#xa0;l&#xa0;*&#xa0;(s&#xa0;+&#xa0;1)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;else<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;q&#xa0;=&#xa0;1&#xa0;+&#xa0;s&#xa0;-&#xa0;l*s<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;p&#xa0;=&#xa0;2*l&#xa0;-&#xa0;q<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;tr&#xa0;=&#xa0;between_0_and_1(h&#xa0;+&#xa0;1/3)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;tg&#xa0;=&#xa0;between_0_and_1(h)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;tb&#xa0;=&#xa0;between_0_and_1(h&#xa0;-&#xa0;1/3)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;tc_to_c(tr,&#xa0;p,&#xa0;q),<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;tc_to_c(tg,&#xa0;p,&#xa0;q),<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;tc_to_c(tb,&#xa0;p,&#xa0;q)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<br>
 <br style="margin-top: 6px; margin-bottom: 6px">
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;function&#xa0;def_hsl_color(name,&#xa0;h,&#xa0;s,&#xa0;l)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;r,&#xa0;g,&#xa0;b&#xa0;=&#xa0;hsl_to_rgb(h,&#xa0;s,&#xa0;l)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;io.write(string.format('.defcolor&#xa0;%s&#xa0;rgb&#xa0;%s&#xa0;%s&#xa0;%s\n',&#xa0;name,&#xa0;r,&#xa0;g,&#xa0;b))<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;end<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.endeval<Br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;function&#xa0;def_hsl_color(name,&#xa0;h,&#xa0;s,&#xa0;l)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;local&#xa0;r,&#xa0;g,&#xa0;b&#xa0;=&#xa0;hsl_to_rgb(h,&#xa0;s,&#xa0;l)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;io.write(string.format('.defcolor&#xa0;%s&#xa0;rgb&#xa0;%s&#xa0;%s&#xa0;%s\n',&#xa0;name,&#xa0;r,&#xa0;g,&#xa0;b))<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;end<br>
+&#xa0;&#xa0;&#xa0;&#xa0;end<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.endeval<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 Here, the Lua procedure <span style="font-family: monospace; ">def-hsl-color</span> takes an HSL spec and
 writes out the equivalent RGB groff definition. (The troff2page
 distribution provides <span style="font-family: monospace; ">def-hsl-color</span> in the macro file
 <span style="font-family: monospace; ">defhsl.tmac</span>.)
 
-</P>
+</p>
 <p class=indent>
 We can call this Lua procedure inside another <span style="font-family: monospace; ">.eval</span> to define
 <span style="font-family: monospace; ">venetianred</span> using its HSL spec:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.eval<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;def_hsl_color('venetianred',&#xa0;357,&#xa0;.49,&#xa0;.24)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.endeval<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.eval<br>
+&#xa0;&#xa0;&#xa0;&#xa0;def_hsl_color('venetianred',&#xa0;357,&#xa0;.49,&#xa0;.24)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.endeval<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 
-</P>
+</p>
 <p class=indent>
 The color name <span style="font-family: monospace; ">venetianred</span> can now be used like any other groff color name:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;Prismacolor’s&#xa0;burnt&#xa0;ochre&#xa0;pencil&#xa0;is&#xa0;a&#xa0;close&#xa0;match&#xa0;for&#xa0;Derwent’s<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;\fB\m[venetianred]Venetian&#xa0;red\m[]\fP,&#xa0;and&#xa0;either&#xa0;can&#xa0;be&#xa0;used&#xa0;to<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;emulate&#xa0;the&#xa0;sanguine&#xa0;chalk&#xa0;drawings&#xa0;of&#xa0;the&#xa0;Old&#xa0;Masters.<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;Prismacolor’s&#xa0;burnt&#xa0;ochre&#xa0;pencil&#xa0;is&#xa0;a&#xa0;close&#xa0;match&#xa0;for&#xa0;Derwent’s<br>
+&#xa0;&#xa0;&#xa0;&#xa0;\fB\m[venetianred]Venetian&#xa0;red\m[]\fP,&#xa0;and&#xa0;either&#xa0;can&#xa0;be&#xa0;used&#xa0;to<br>
+&#xa0;&#xa0;&#xa0;&#xa0;emulate&#xa0;the&#xa0;sanguine&#xa0;chalk&#xa0;drawings&#xa0;of&#xa0;the&#xa0;Old&#xa0;Masters.<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 This produces:
 
-</P>
+</p>
 <p class=indent>
-</P>
+</p>
 <blockquote><p>
 Prismacolor’s burnt ochre pencil is a close match for Derwent’s
 <span style="font-weight: bold; "></span><span style="font-weight: bold; color: #5c1f22; ">Venetian red</span><span style="font-weight: bold; color: previous; "></span><span style="color: previous; ">, and either can be used to
 emulate the sanguine chalk drawings of the Old Masters.
-</P>
+</p>
 </span></blockquote>
 <p>
 
-</P>
+</p>
 <p class=indent>
-
-</P>
-<p class=indent>
-</P>
+<br></p>
 <h2 style="font-size: 130%"><a name="TAG:__pca_sec_13"></a>
 Extending troff2page only</h2>
 <p>
-
-</P>
-<p>
-<a name="TAG:__troff2page_index_56"></a>
 <a name="TAG:__troff2page_index_57"></a>
+<a name="TAG:__troff2page_index_58"></a>
 troff2page treats troff’s <span style="font-family: monospace; ">.ig</span>
 environment, whenever it uses <span style="font-family: monospace; ">##</span> as ender, as
 containing Lua code that can be used to extend
 troff2page.  This syntactic overloading of <span style="font-family: monospace; ">.ig ##</span> is an innovation introduced by
 Oliver Laumann’s <a href="http://www-rn.informatik.uni-bremen.de/software/unroff"><span class=hreftext>unroff</span></a>.
 
-</P>
-<p class=indent>
+</p>
+<p>
 Any Lua code enclosed within
 <span style="font-family: monospace; ">.ig ##</span> ... <span style="font-family: monospace; ">.##</span> will be processed by
 troff2page but not by
@@ -354,24 +336,24 @@ comment.  However, you can add Lua code within <span style="font-family: monospa
 to influence how troff2page — but not troff! — processes the rest of the
 document.
 
-</P>
+</p>
 <p class=indent>
 For example, let’s define a
 <span style="font-family: monospace; ">\*[url ...]</span> string register that simply typesets its URL
 argument within angle brackets.
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ds&#xa0;url&#xa0;\(la\fC\\$1\fP\(ra<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ds&#xa0;url&#xa0;\(la\fC\\$1\fP\(ra<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 This is adequate for the print output.
 For troff2page though, we’d like to
@@ -380,69 +362,69 @@ We enclose this re-definition in a <span style="font-family: monospace; ">.ig ##
 only allows it to be in Lua, but also makes it apply only
 when troff2page reads it:
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ig&#xa0;##<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;defstring('url',&#xa0;function(url)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;link_start(url)&#xa0;..&#xa0;url&#xa0;..&#xa0;link_stop()<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;end)<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.##<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ig&#xa0;##<br>
+&#xa0;&#xa0;&#xa0;&#xa0;defstring('url',&#xa0;function(url)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;return&#xa0;link_start(url)&#xa0;..&#xa0;url&#xa0;..&#xa0;link_stop()<br>
+&#xa0;&#xa0;&#xa0;&#xa0;end)<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.##<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 The procedures <span style="font-family: monospace; ">defstring</span>, <span style="font-family: monospace; ">link_start</span>, and
 <span style="font-family: monospace; ">link_stop</span> are defined in the troff2page code.
 
-</P>
+</p>
 <p class=indent>
-<a name="TAG:__troff2page_index_58"></a>
+<a name="TAG:__troff2page_index_59"></a>
 <span style="font-family: monospace; ">.ig ##</span> can be used to specify settings that are relevant only
 when troff2page is used on a document, e.g., stylesheet changes.
 troff2page uses the output-stream <span style="font-family: monospace; ">Css_stream</span> to
 write out style information.  The user can also write to this stream, e.g.,
 
-</P>
+</p>
 <p class=indent>
 
-</P>
+</p>
 <p>
 <p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ig&#xa0;##<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;Css_stream:write([[<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;h1,h2,h3,h4,h5,h6&#xa0;{<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;color:&#xa0;rgb(61,35,39);&#xa0;/*&#xa0;chocolate&#xa0;*/<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;}<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;]])<Br>
-&#xa0;&#xa0;&#xa0;&#xa0;.##<Br>
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;.ig&#xa0;##<br>
+&#xa0;&#xa0;&#xa0;&#xa0;Css_stream:write([[<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;h1,h2,h3,h4,h5,h6&#xa0;{<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;color:&#xa0;rgb(61,35,39);&#xa0;/*&#xa0;chocolate&#xa0;*/<br>
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;}<br>
+&#xa0;&#xa0;&#xa0;&#xa0;]])<br>
+&#xa0;&#xa0;&#xa0;&#xa0;.##<br>
 <p>
-</P>
+</p>
 </span><p>
 
-</P>
+</p>
 <p>
 This sets the HTML headers
 with a foreground color
 of chocolate.<a name="TAG:__troff2page_call_footnote_4"></a><a class=hrefinternal href="#TAG:__troff2page_footnote_4"><span class=hreftext><sup><small>4</small></sup></span></a>
-</P>
+</p>
 <div class=footnote><hr align=left width="40%"><p>
 <a name="TAG:__troff2page_footnote_3"></a><a class=hrefinternal href="#TAG:__troff2page_call_footnote_3"><span class=hreftext><sup><small>3</small></sup></span></a>
 This name may be different based on
 your setting of <span style="font-family: monospace; ">\*[AUXF]</span> — see page <a class=hrefinternal href="index-Z-H-2.html#TAG:auxf"><span class=hreftext>2</span></a>.
-</P>
+</p>
 <p>
 <a name="TAG:__troff2page_footnote_4"></a><a class=hrefinternal href="#TAG:__troff2page_call_footnote_4"><span class=hreftext><sup><small>4</small></sup></span></a>
 The RGB values used in this manual for
 the colors chocolate,
 terracotta pink,
 and Venetian red are all courtesy <a href="http://www.resene.co.nz/swatches"><span class=hreftext>Resene Paints</span></a>.
-</P>
+</p>
 </div>
 <div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-6.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-8.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div></div>
 </body>
