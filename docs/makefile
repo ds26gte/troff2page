@@ -11,6 +11,6 @@ index.info: $(troff-files)
 	troff2page index.ms
 
 clean:
-	rm -f *-Z-* *.html *.info
+	rm -f .troff2page_temp* *-Z-* *.html *.info
 
 .PHONY: all clean

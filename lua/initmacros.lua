@@ -272,27 +272,22 @@ function initialize_macros()
   end)
 
   defrequest('PSPIC', function()
-    local align
+    local align=read_word()
+    if not align then terror('pspic') end
     local ps_file
-    local width
-    local height
-    local args = read_args()
-    local w = args[1]
-    if not w then terror('pspic')
-    elseif w == '-L' then align = 'left'
-    elseif w == '-I' then read_word(); align='left'
-    elseif w == '-R' then align='right'
+    if align=='-L' or align=='-C' or align=='-R' then ps_file=read_word()
+    elseif align=='-I' then read_word(); align='-C'; ps_file=read_word()
+    else ps_file=align; align='-C'
     end
-    if align then ps_file = read_word()
-    else align='center'; ps_file = w
+    local width=read_word(); local height=read_word()
+    read_troff_line()
+    if align == '-L' then align = 'left'
+    elseif align == '-C' then align='center'
+    elseif align == '-R' then align='right'
     end
-    width=args[2]; height=args[3]
-    emit_verbatim '<div align='
-    emit_verbatim(align)
-    emit_verbatim '>'
-    flet({
-      Groff_image_options=false
-    }, function()
+    emit_verbatim '<div align='; emit_verbatim(align); emit_verbatim '>'
+    flet({Groff_image_options=''},
+    function()
       call_with_image_stream(function(o)
         o:write('.mso pspic.tmac\n')
         o:write('.PSPIC ', ps_file)

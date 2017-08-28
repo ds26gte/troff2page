@@ -1,4 +1,4 @@
-#last modified 2017-08-27
+#last modified 2017-08-28
 *.ps
 *.txt
 *temp_*
@@ -6,6 +6,8 @@
 .trofftemp*
 ?.lisp
 ?.ms
+[!i]*.html
+[!i]*-Z-*
 docs/*[!cesl]
 examples/*[!1]
 lua/*[!a]
