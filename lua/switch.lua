@@ -1,4 +1,4 @@
--- last modified 2017-08-26
+-- last modified 2017-08-28
 
 function switch_style(opts)
   opts = opts or {}
@@ -159,8 +159,7 @@ function man_font_macro(f)
 end
 
 function ms_font_macro(f)
-  local args = read_args()
-  local w, post, pre = args[1], args[2], args[3]
+  local w, post, pre = read_args()
   if pre then emit(pre) end
   emit(switch_font(f))
   if w then

@@ -1,4 +1,4 @@
--- last modified 2017-08-27
+-- last modified 2017-08-28
 
 function find_macro_file(f)
   --print('doing find_macro_file', f)
@@ -88,23 +88,4 @@ function troff2page_file(f)
     end)
   end
 --  print('done troff2page_file', f)
-end
-
-function read_args()
-  --print('doing read_args')
-  local ln = expand_args(read_troff_line())
-  local r = {}
-  --print('line read=', ln)
-  toss_back_line(ln)
-  while true do
-    ignore_spaces()
-    local c = snoop_char()
-    if not c or c == '\n' then
-      get_char()
-      break
-    end
-    table.insert(r, read_word())
-  end
-  --print('read_args returning' , table_to_string(r))
-  return r
 end 

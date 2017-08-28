@@ -1166,7 +1166,7 @@ function execute_macro(w)
   --
   it = Macro_table[w]
   if it then
-    local args = read_args()
+    local args = {read_args()}
     flet({
       Macro_args = args
     }, function()
@@ -1903,19 +1903,6 @@ end)
 
 defescape('E', Escape_table.e) 
 
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
-end
-
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -1975,6 +1962,19 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
+end
+
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
 end
 
 
@@ -2192,6 +2192,48 @@ function make_image(env, endenv)
 end
 
 
+
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
+end
 
 
 --refer groff_char(7)
@@ -2554,48 +2596,6 @@ function initialize_glyphs()
 end 
 
 
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
-end
-
-function begin_html_document()
-
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
-  end
-
-  start_css_file()
-
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
-  end
-end
-
-
 function defrequest(w, th)
   if Macro_table[w] then
     Macro_table[w] = nil
@@ -2634,52 +2634,46 @@ function initialize_macros()
   end)
 
   defrequest('rm', function()
-    local w = read_args()[1]
+    local w = read_args()
     Request_table[w] = nil
     Macro_table[w] = nil
     String_table[w] = nil
   end)
 
   defrequest('blm', function()
-    local w = read_args()[1]
+    local w = read_args() or false
     --print('doing blm', w)
     --print('its a mac=', Macro_table[w])
-    Blank_line_macro = w or false
+    Blank_line_macro = w
   end)
 
   defrequest('lsm', function()
-    Leading_spaces_macro = read_args()[1]
+    local w = read_args() or false
+    Leading_spaces_macro = w
   end)
 
   defrequest('em', function()
-    End_macro = read_args()[1]
+    End_macro = read_args()
   end)
 
   defrequest('de', function()
-    local args = read_args()
-    local w = args[1]
-    --print('doing de', w)
-    local ender = args[2] or '.'
+    local w, ender = read_args()
+    ender = ender or '.'
     deftmacro(w, collect_macro_body(w, ender))
     call_ender(ender)
   end)
 
   defrequest('shift', function()
-    local args = read_args()
-    local n = 1
-    if #args > 0 then
-      n = tonumber(args[1])
-    end
+    local n = tonumber(read_args() or 1)
     for i = 1,n do
       table.remove(Macro_args, 2)
     end
   end)
 
   defrequest('ig', function()
-    local ender = read_args()[1] or '.'
-    flet({
-      Turn_off_escape_char_p = true
-    }, function()
+    local ender = read_args() or '.'
+    flet({Turn_off_escape_char_p = true},
+    function()
       local contents = collect_macro_body('collecting_ig', ender)
       if ender == '##' then
         eval_in_lua(contents)
@@ -2688,8 +2682,7 @@ function initialize_macros()
   end)
 
   defrequest('als', function()
-    local args = read_args()
-    local new, old = args[1], args[2]
+    local new, old = read_args()
     --print('doing als', old, new)
     local it
     it = Macro_table[old]
@@ -2704,8 +2697,7 @@ function initialize_macros()
   end)
 
   defrequest('rn', function()
-    local args = read_args()
-    local old, new = args[1], args[2]
+    local old, new = read_args()
     --print('doing rn', old, new)
     local it
     it = Macro_table[old]
@@ -2722,9 +2714,8 @@ function initialize_macros()
   end)
 
   defrequest('am', function()
-    local args = read_args()
-    local w = args[1]
-    local ender = args[2] or '.'
+    local w, ender = read_args()
+    ender = ender or '.'
     local extra_macro_body = collect_macro_body(w, ender)
     local it
     it = Macro_table[w]
@@ -2777,7 +2768,7 @@ function initialize_macros()
   end)
 
   defrequest('asciify', function()
-    local arg1 = read_args()[1]
+    local arg1 = read_args()
     local div = Diversion_table[arg1]
     --print('doing asciify of', div)
     local value = div.value
@@ -2792,7 +2783,7 @@ function initialize_macros()
   end)
 
   defrequest('di', function()
-    local w = read_args()[1]
+    local w = read_args()
     if w then
       local o = make_string_output_stream()
       Diversion_table[w] = {stream = o, oldstream = Out, olddiversion = Current_diversion}
@@ -2808,7 +2799,7 @@ function initialize_macros()
   end)
 
   defrequest('da', function()
-    local w = read_args()[1]
+    local w = read_args()
     if not w then terror('da: name missing') end
     local div = Diversion_table[w]
     local div_stream
@@ -2846,25 +2837,21 @@ function initialize_macros()
   end)
 
   defrequest('substring', function()
-    local args = read_args()
-    local s = args[1]
+    local s, n1, n2 = read_args()
     local str = String_table[s]()
-    local str_new
     local n = #str
-    local n1 = tonumber(args[2])
-    local n2 = args[3]
-    if n2 then n2 = tonumber(n2) end
-    ;
-    if not n2 then n2 = n-1 end
+    n1 = tonumber(n1)
+    n2 = n2 and tonumber(n2) or n-1
     ;
     if n1 < 0 then n1 = n + n1 end
     if n2 < 0 then n2 = n + n2 end
-    str_new = string.sub(str, n1, n2 + 1)
+    local str_new = string.sub(str, n1 + 1, n2 + 1)
+    defstring(s, function() return str_new end)
   end)
 
   defrequest('length', function()
-    local args = read_args()
-    get_counter_named(args[1]).value = #(args[2])
+    local c, s = read_args()
+    get_counter_named(c).value = #s
   end)
 
   defrequest('PSPIC', function()
@@ -2957,7 +2944,7 @@ function initialize_macros()
   end)
 
   defrequest('FS', function()
-    local fnmark = read_args()[1]
+    local fnmark = read_args()
     local fno
     local fntag
     if fnmark then
@@ -3102,7 +3089,7 @@ function initialize_macros()
   defrequest('AI', author_info)
 
   defrequest('AB', function()
-    local w = read_args()[1]
+    local w = read_args()
     --print('AB calling eep')
     emit_end_para()
     if w ~= 'no' then
@@ -3126,14 +3113,14 @@ function initialize_macros()
   end)
 
   defrequest('@NH', function()
-    local lvl = read_args()[1]
+    local lvl = read_args()
     local num = tonumber(lvl) or 1
     emit_section_header(num, {numbered_p = true})
   end)
 
   defrequest('@SH', function()
     --print('doing @SH')
-    local lvl = read_args()[1]
+    local lvl = read_args()
     local num = tonumber(lvl) or 1
     emit_section_header(num)
     --print('@SH done')
@@ -3152,26 +3139,25 @@ function initialize_macros()
     it = find_macro_file('pca-t2p-man.tmac')
     if it then troff2page_file(it) end
     if (function() it = Macro_table.TH; return it end)''
-    then defrequest('TH', disabled_TH)
-      args = read_args()
-      flet({
-        Macro_args = table.insert(args, 1, 'TH')
-      }, function() execute_macro_body(it) end)
+    then
+      defrequest('TH', disabled_TH)
+      args = {read_args()}
+      table.insert(args, 1, 'TH')
+      flet({Macro_args = args},
+      function() execute_macro_body(it) end)
     elseif (function() it = Request_table.TH; return it end)''
     then it()
-    else twarning("Couldn't find pca-t2p-man.tmac is any macro directory")
+    else twarning("Couldn't find pca-t2p-man.tmac in any macro directory")
       defrequest('TH', disabled_TH)
       defrequest('SH', function() emit_section_header(1, {man_header_p = true}) end)
       defrequest('SS', function() emit_section_header(2, {man_header_p = true}) end)
-      args = read_args()
-      it = args[1]
-      if it then
-        it = string_trim_blanks(it)
-        if it ~= '' then store_title(it, {emit_p = true}) end
-        it = args[3]
-        if it then
-          it = string_trim_blanks(it)
-          if it ~= '' then defstring('DY', function() return it end) end
+      local titl, _, dat = read_args()
+      if titl then
+        titl = string_trim_blanks(titl)
+        if titl ~= '' then store_title(titl, {emit_p = true}) end
+        if dat then
+          dat = string_trim_blanks(dat)
+          if dat ~= '' then defstring('DY', function() return dat end) end
         end
       end
     end
@@ -3215,7 +3201,7 @@ function initialize_macros()
   end)
 
   defrequest('CSS', function()
-    local f = read_args()[1]
+    local f = read_args()
     if not table_member(f, Stylesheets) then
       flag_missing_piece 'stylesheet'
     end
@@ -3224,7 +3210,7 @@ function initialize_macros()
 
   defrequest('REDIRECT', function()
     if not Redirected_p then flag_missing_piece 'redirect' end
-    local f = read_args()[1]
+    local f = read_args()
     write_aux('nb_redirect("', f, '")')
   end)
 
@@ -3234,12 +3220,12 @@ function initialize_macros()
   end)
 
   defrequest('gcolor', function()
-    local c = read_args()[1]
+    local c = read_args()
     switch_glyph_color(c)
   end)
 
   defrequest('fcolor', function()
-    local c = read_args()[1]
+    local c = read_args()
     switch_fill_color(c)
   end)
 
@@ -3286,10 +3272,7 @@ function initialize_macros()
   end)
 
   defrequest('DC', function()
-    local args = read_args()
-    local big_letter = args[1]
-    local extra = args[2]
-    local color = args[3]
+    local big_letter, extra, color = read_args()
     emit(switch_glyph_color(color))
     emit_verbatim '<span class=dropcap>'
     emit(big_letter)
@@ -3300,7 +3283,7 @@ function initialize_macros()
   end)
 
   defrequest('BX', function()
-    local txt = read_args()[1]
+    local txt = read_args()
     emit_verbatim '<span class=troffbox>'
     emit(expand_args(txt))
     emit_verbatim '</span>\n'
@@ -3317,12 +3300,12 @@ function initialize_macros()
   end)
 
   defrequest('ft', function()
-    local f = read_args()[1]
+    local f = read_args()
     emit(switch_font(f))
   end)
 
   defrequest('fam', function()
-    local f = read_args()[1]
+    local f = read_args()
     emit(switch_font_family(f))
   end)
 
@@ -3342,7 +3325,7 @@ function initialize_macros()
   end)
 
   defrequest('URL', function()
-    local url, link_text, tack_on = table.unpack(read_args())
+    local url, link_text, tack_on = read_args()
     link_text = link_text or ''
     if link_text == '' then
       if string.sub(url, 0,0) == '#' then
@@ -3362,19 +3345,19 @@ function initialize_macros()
   end)
 
   defrequest('TAG', function()
---    print('doing TAG')
-    local args = read_args()
---    print('args=', table_to_string(args))
-    local node = 'TAG:' .. args[1]
+    --    print('doing TAG')
+    local node, tag_value = read_args()
+    --    print('args=', table_to_string(args))
+    node = 'TAG:' .. node
     local pageno = Current_pageno
---    print('pageno=', pageno)
-    local tag_value = args[2] or pageno
---    print('tag_value=', tag_value)
+    --    print('pageno=', pageno)
+    tag_value = tag_value or pageno
+    --    print('tag_value=', tag_value)
     emit(anchor(node))
     emit_newline()
     nb_node(node, pageno, tag_value)
     write_aux('nb_node("', node, '",', pageno, ',', tag_value, ')')
---    print('TAG done')
+    --    print('TAG done')
   end)
 
   defrequest('ULS', function()
@@ -3445,7 +3428,7 @@ function initialize_macros()
   end)
 
   defrequest('IP', function()
-    local label = read_args()[1]
+    local label = read_args()
     emit_para()
     emit_verbatim '<dl><dt>'
     if label then emit(expand_args(label)) end
@@ -3467,9 +3450,8 @@ function initialize_macros()
   end)
 
   defrequest('EQ', function()
-    local args = read_args()
-    local w = args[1] or 'C'
-    local eqno = args[2]
+    local w, eqno = read_args()
+    w = w or 'C'
     emit_verbatim '<div class=display align='
     emit_verbatim(w=='C' and 'center' or 'left')
     emit_verbatim '>'
@@ -3490,9 +3472,9 @@ function initialize_macros()
   end)
 
   defrequest('TS', function()
-    local args = read_args()
+    local arg1 = read_args()
     flet({
-      Reading_table_header_p = (args[1] == 'H'),
+      Reading_table_header_p = (args1 == 'H'),
       Reading_table_p = true,
       Table_format_table = {},
       Table_default_format_line = 0,
@@ -3577,8 +3559,8 @@ function initialize_macros()
   end)
 
   defrequest('nx', function()
-    local args = read_args()
-    if #args > 0 then troff2page_file(args[1]) end
+    local next_file = read_args()
+    if next_file then troff2page_file(next_file) end
     Exit_status = 'nx'
   end)
 
@@ -3624,7 +3606,7 @@ function initialize_macros()
   end)
 
   defrequest('so', function()
-    local f = read_args()[1]
+    local f = read_args()
     if Macro_package == 'man' then
       local g = '../' .. f
       if probe_file(g) then f = g end
@@ -3633,7 +3615,7 @@ function initialize_macros()
   end)
 
   defrequest('mso', function()
-    local f = read_args()[1]
+    local f = read_args()
     --print('MSO ', f)
     if f then f = find_macro_file(f) end
     --print('MSO2 ', f)
@@ -3641,7 +3623,7 @@ function initialize_macros()
   end)
 
   defrequest('HX', function()
-    get_counter_named('www:HX').value = tonumber(read_args()[1])
+    get_counter_named('www:HX').value = tonumber(read_args())
   end)
 
   defrequest('DS', function()
@@ -3662,8 +3644,8 @@ function initialize_macros()
   end)
 
   defrequest('ce', function()
-    local arg1 = read_args()[1]
-    local n = (arg1 and tonumber(arg1) or 1)
+    local arg1 = read_args() or 1
+    local n = tonumber(arg1)
     if n<=0 then
       if Lines_to_be_centered>0 then Lines_to_be_centered=0; emit_verbatim '</div>' end
     else Lines_to_be_centered=n; emit_verbatim '<div align=center>'
@@ -3687,9 +3669,8 @@ function initialize_macros()
   end)
 
   defrequest('af', function()
-    local args = read_args()
-    local c = get_counter_named(args[1])
-    local f = args[2]
+    local c, f = read_args()
+    c = get_counter_named(c)
     read_troff_line()
     c.format = f
   end)
@@ -3702,20 +3683,18 @@ function initialize_macros()
   end)
 
   defrequest('evc', function()
-    local ev_rhs_name = read_args()[1]
+    local ev_rhs_name = read_args()
     local ev_rhs = ev_named(ev_rhs_name)
     ev_copy(Ev_stack[1], ev_rhs)
   end)
 
   defrequest('open', function()
-    local args = read_args()
-    local stream_name = args[1]
-    local file_name = args[2]
+    local stream_name, file_name = read_args()
     troff_open(stream_name, file_name)
   end)
 
   defrequest('close', function()
-    local stream_name = read_args()[1]
+    local stream_name = read_args()
     troff_close(stream_name)
   end)
 
@@ -3745,7 +3724,7 @@ function initialize_macros()
   end)
 
   defrequest('DEBUG', function()
-    local w = read_args()[1] or ''
+    local w = read_args() or ''
     local it = tonumber(w)
     if it then Debug_p = (it>0)
     else it = string.lower(w)
@@ -4634,6 +4613,25 @@ function read_macro_name()
   return res
 end
 
+function read_args()
+  --print('doing read_args')
+  local ln = expand_args(read_troff_line())
+  local r = {}
+  --print('line read=', ln)
+  toss_back_line(ln)
+  while true do
+    ignore_spaces()
+    local c = snoop_char()
+    if not c or c == '\n' then
+      get_char()
+      break
+    end
+    table.insert(r, read_word())
+  end
+  --print('read_args returning' , table_to_string(r))
+  return table.unpack(r)
+end 
+
 do 
   local roman_quanta = { 1000, 500, 100, 50, 10, 5, 1 }
 
@@ -5005,8 +5003,7 @@ function man_font_macro(f)
 end
 
 function ms_font_macro(f)
-  local args = read_args()
-  local w, post, pre = args[1], args[2], args[3]
+  local w, post, pre = read_args()
   if pre then emit(pre) end
   emit(switch_font(f))
   if w then
@@ -5112,25 +5109,6 @@ function troff2page_file(f)
     end)
   end
 --  print('done troff2page_file', f)
-end
-
-function read_args()
-  --print('doing read_args')
-  local ln = expand_args(read_troff_line())
-  local r = {}
-  --print('line read=', ln)
-  toss_back_line(ln)
-  while true do
-    ignore_spaces()
-    local c = snoop_char()
-    if not c or c == '\n' then
-      get_char()
-      break
-    end
-    table.insert(r, read_word())
-  end
-  --print('read_args returning' , table_to_string(r))
-  return r
 end 
 
 

@@ -1,4 +1,4 @@
--- last modified 2017-08-26
+-- last modified 2017-08-28
 
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
@@ -71,7 +71,7 @@ function execute_macro(w)
   --
   it = Macro_table[w]
   if it then
-    local args = read_args()
+    local args = {read_args()}
     flet({
       Macro_args = args
     }, function()
