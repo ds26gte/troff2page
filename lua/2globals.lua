@@ -1,4 +1,4 @@
--- last modified 2017-08-26
+-- last modified 2017-08-28
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -41,9 +41,6 @@ Navigation_sentence_begin = 'Go to '
 Navigation_sentence_end = ''
 Output_extension = '.html'
 Pso_file_suffix = '-Z-T.1'
-
-Nroff_image_p = nil
-Single_pass_p = nil
 
 Afterpar = nil
 Aux_stream = nil
@@ -130,4 +127,6 @@ Title = nil
 Turn_off_escape_char_p = nil
 Verbatim_apostrophe_p = nil
 
+Single_pass_p = nil
 Debug_p = nil
+Image_format = 'png'
