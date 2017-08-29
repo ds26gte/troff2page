@@ -1,4 +1,4 @@
--- last modified 2017-08-28
+-- last modified 2017-08-29
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -531,40 +531,7 @@ function initialize_macros()
   end)
 
   defrequest('TH', function()
-    defrequest('TH', nil)
-    nb_macro_package('man')
-    local function disabled_TH()
-      read_troff_line()
-      twarning('Calling .TH twice in man page')
-    end
-    local it; local args
-    it = find_macro_file('man.local')
-    if it then troff2page_file(it) end
-    it = find_macro_file('pca-t2p-man.tmac')
-    if it then troff2page_file(it) end
-    if (function() it = Macro_table.TH; return it end)''
-    then
-      defrequest('TH', disabled_TH)
-      args = {read_args()}
-      table.insert(args, 1, 'TH')
-      flet({Macro_args = args},
-      function() execute_macro_body(it) end)
-    elseif (function() it = Request_table.TH; return it end)''
-    then it()
-    else twarning("Couldn't find pca-t2p-man.tmac in any macro directory")
-      defrequest('TH', disabled_TH)
-      defrequest('SH', function() emit_section_header(1, {man_header_p = true}) end)
-      defrequest('SS', function() emit_section_header(2, {man_header_p = true}) end)
-      local titl, _, dat = read_args()
-      if titl then
-        titl = string_trim_blanks(titl)
-        if titl ~= '' then store_title(titl, {emit_p = true}) end
-        if dat then
-          dat = string_trim_blanks(dat)
-          if dat ~= '' then defstring('DY', function() return dat end) end
-        end
-      end
-    end
+    TH_request()
   end)
 
   defrequest('SC', function()
