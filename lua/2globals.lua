@@ -1,4 +1,4 @@
--- last modified 2017-08-28
+-- last modified 2017-08-29
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -63,7 +63,6 @@ Escape_char = nil
 Ev_stack = nil
 Ev_table = nil
 Exit_status = nil
-File_copy_buffer = nil
 File_postlude = nil
 Footnote_buffer = nil
 Footnote_count = nil

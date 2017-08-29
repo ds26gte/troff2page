@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20170829 -- last modified
+Troff2page_version = 20170830 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -221,6 +221,26 @@ function math_round(n)
   return math.floor(n+.5)
 end
 
+function copy_file_to_stream(fi, o)
+  --print('doing copy_file_to_stream', fi, o)
+  with_open_input_file(fi, function(i)
+    local it
+    while true do
+      it = i:read '*line'
+      --print('read <-', it)
+      if not it then break end
+      o:write(it, '\n')
+    end
+  end)
+end
+
+function copy_file_to_file(fi, fo)
+  --print('doing copy_file_to_file', fi, fo)
+  with_open_output_file(fo, function(o)
+    copy_file_to_stream(fi, o)
+  end)
+end
+
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -285,7 +305,6 @@ Escape_char = nil
 Ev_stack = nil
 Ev_table = nil
 Exit_status = nil
-File_copy_buffer = nil
 File_postlude = nil
 Footnote_buffer = nil
 Footnote_count = nil
@@ -1903,6 +1922,19 @@ end)
 
 defescape('E', Escape_table.e) 
 
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
+end
+
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -1962,19 +1994,6 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
-end
-
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
 end
 
 
@@ -2097,11 +2116,6 @@ function expand_escape(c)
 end 
 
 
-function html2info()
-  no_op()
-end
-
-
 function next_html_image_file_stem()
   Image_file_count = Image_file_count + 1
   return Jobname .. Image_file_suffix .. Image_file_count
@@ -2194,45 +2208,113 @@ end
 
 
 
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
+function html2info()
+  if Rerun_needed_p then
+    tlog 'Unable to create Info doc because aux files unresolved.\n'
+    return
+  end
+  local tmp_html_file = Jobname .. '-Z-T.html'
+  local tmp_info_file = Jobname .. '-Z-T.info'
+  local info_file = Jobname .. '.info'
+  local i = 0
+
+  --print('Last_page_number=', Last_page_number)
+
+  with_open_output_file(info_file, function(o)
+    while true do
+      if i>Last_page_number then break end
+      copy_file_to_file(Jobname .. (i==0 and '' or ('-Z-H-' .. i)) .. '.html', tmp_html_file)
+      o:write(string.char(0x1f), '\nFile: ', info_file)
+      --
+      if i==0 then o:write ', Node: Top' end
+      if i>0 then o:write(', Node: ', i) end
+      --
+      if i==1 then o:write ', Prev: Top' end
+      if i>1 then o:write(', Prev: ', i-1) end
+      --
+      if i ~= Last_page_number then o:write(', Next: ', i+1) end
+
+      o:write ', Up: Top\n'
+
+      html2info_tweak_html_file(tmp_html_file, i)
+
+      os.execute('lynx -dump -nolist ' .. tmp_html_file .. ' > ' .. tmp_info_file)
+      --os.remove(tmp_html_file)
+
+      copy_file_to_stream(tmp_info_file, o)
+      --os.remove(tmp_info_file)
+
+      i=i+1
+    end
+  end)
+  --print('created infofile i')
+  html2info_tweak_info_file(info_file)
+  --print('tweaked infofile ii')
 end
 
-function begin_html_document()
-
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
+function sed(f, ...)
+  local cmd = 'sed -i'
+  local argv = {...}
+  local argc = #argv
+  for i=1,argc do
+    cmd = cmd .. " -e '" .. argv[i] .. "'"
   end
+  cmd = cmd .. ' ' .. f
+  --print('osexecuting cmd=', cmd)
+  os.execute(cmd)
+end
 
-  start_css_file()
+function html2info_tweak_html_file(f, i)
+  --print('doing html2info_tweak_html_file', f)
+  sed(f,
+  "s/Þ/&!/g",
+  -- delete navigation lines
+  "/^<div\\s\\+\\S\\+\\s\\+class=navigation.\\+<\\/div>/d",
+  -- mark beginning and end of ToC
+  "s/^<a\\s\\+name=\"TAG:__troff2page_toc\">/<!-- ÞINFO_MENU_BEGIN! -->ÞINFO_MENU_BEGIN!* Menu:<br>/",
+  --
+  "s/^<a\\s\\+name=\"TAG:__troff2page_toc_end\">/<!-- ÞINFO_MENU_END! -->ÞINFO_MENU_END!/",
+  -- create Info menu entry for all doc-internal links within ToC
+  string.format("/^<!--\\s\\+ÞINFO_MENU_BEGIN!\\s\\+-->/,/^<!--\\s\\+ÞINFO_MENU_END!\\s\\+-->/ s/<a\\s\\+class=hrefinternal\\s\\+href=\"%s\\.html#[^\"]*\">/* 0:: /g", Jobname),
+  --
+  string.format("/^<!--\\s\\+ÞINFO_MENU_BEGIN!\\s\\+-->/,/^<!--\\s\\+ÞINFO_MENU_END!\\s\\+-->/ s/<a\\s\\+class=hrefinternal\\s\\+href=\"%s-Z-H-\\([0-9]\\+\\)\\.html#[^\"]*\">/* \\1:: /g",
+  Jobname),
+  --
+  string.format("/^<!--\\s\\+ÞINFO_MENU_BEGIN!\\s\\+-->/,/^<!--\\s\\+ÞINFO_MENU_END!\\s\\+-->/ s/<a\\s\\+class=hrefinternal\\s\\+href=\"#[^\"]*>\"/* %s:: /g", i),
+  -- disable all other page-internal links
+  "s/<a\\s\\+class=hrefinternal\\s\\+href=\"#[^\"]\\+\">//g",
+  -- mark all doc-internal links in the index (if any
+  string.format("s/<a\\s\\+class=hrefinternal\\s\\+href=\"%s\\.html#TAG:__troff2page_index_[^\"]\\+\">/ÞI!0::/g", Jobname),
+  --
+  string.format("s/<a\\s\\+class=hrefinternal\\s\\+href=\"%s-Z-H-\\([0-9]\\+\\)\\.html#TAG:__troff2page_index_[^\"]\\+\">/ÞI!\\1::/g", Jobname),
+  --
+  string.format("s/<a\\s\\+class=hrefinternal\\s\\+href=\"#TAG:__troff2page_index_[^\"]\\+\">/ÞI!%s::/g", i),
+  -- all other doc-internal links become Info *note's
+  string.format("s/<a\\s\\+class=hrefinternal\\s\\+href=\"%s\\.html.[^\"]*\">/ÞN!0::/g", Jobname),
+  --
+  string.format("s/<a\\s\\+class=hrefinternal\\s\\+href=\"%s-Z-H-\\([0-9]\\+\\)\\.html.[^\"]*\">/ÞN!\\1::/g", Jobname),
+  -- disable all doc-external links
+  "s/<a\\s\\+href=\"[^=]\\+\">//g",
+  -- delete all anchors
+  "s/<a\\s\\+name=\"[^\"]\\+\">//g",
+  -- </a> are all orphans now -- delete
+  "s/<\\/a>//g")
+end
 
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
-  end
+function html2info_tweak_info_file(f)
+  --print('doing html2info_tweak_info_file', f)
+  sed(f,
+  -- flushleft menu entries
+  --"/^\\s*ÞINFO_MENU_BEGIN!/,/^\\s*ÞINFO_MENU_END!/ s/^\\(\\s*\\)\\(\\*\\s\\+[^:]\\+::\\)/\\2\\1/",
+  -- delete menu markers
+  "s/^\\s*ÞINFO_MENU_\\(BEGIN\\|END\\)!//",
+  -- expand doc-internal notes (not index)
+  --"s/ÞN!\\([0-9]\\+::\\)/*note \\1/g",
+  -- expand doc-internal notes in index
+  --"s/ÞI!\\([0-9]\\+\\)::\\1/*note \\1::/g",
+  -- restore Þ
+  "s/Þ!/Þ/g"
+  )
 end
 
 
@@ -2594,6 +2676,48 @@ function initialize_glyphs()
     defglyph(k, verbatim(string.format('&#x%x;', v)))
   end
 end 
+
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
+end
 
 
 function defrequest(w, th)
@@ -3033,7 +3157,7 @@ function initialize_macros()
 
   defrequest('br', function()
     read_troff_line()
-    emit_verbatim '<br>'
+    emit_verbatim '<br>\n'
   end)
 
   defrequest('ti', function()

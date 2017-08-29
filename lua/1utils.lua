@@ -1,4 +1,4 @@
--- last modified 2017-08-26
+-- last modified 2017-08-30
 
 if not table.unpack then
   table.unpack = unpack
@@ -211,4 +211,24 @@ end
 
 function math_round(n)
   return math.floor(n+.5)
+end
+
+function copy_file_to_stream(fi, o)
+  --print('doing copy_file_to_stream', fi, o)
+  with_open_input_file(fi, function(i)
+    local it
+    while true do
+      it = i:read '*line'
+      --print('read <-', it)
+      if not it then break end
+      o:write(it, '\n')
+    end
+  end)
+end
+
+function copy_file_to_file(fi, fo)
+  --print('doing copy_file_to_file', fi, fo)
+  with_open_output_file(fo, function(o)
+    copy_file_to_stream(fi, o)
+  end)
 end

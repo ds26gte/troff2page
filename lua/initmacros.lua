@@ -437,7 +437,7 @@ function initialize_macros()
 
   defrequest('br', function()
     read_troff_line()
-    emit_verbatim '<br>'
+    emit_verbatim '<br>\n'
   end)
 
   defrequest('ti', function()
