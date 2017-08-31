@@ -1,4 +1,4 @@
--- last modified 2017-08-27
+-- last modified 2017-09-03
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -110,14 +110,15 @@ function troff2page_1pass(argc, argv)
     with_open_output_file(Jobname..Log_file_suffix, function(o)
       Log_stream = make_broadcast_stream(o, io.stdout)
       begin_html_document()
-      local i=1; local document_found_p = false
+      local i=1; local document_found_p = false; local call_for_help_p = false;
       while i<=argc do
         local arg = argv[i]
         if not document_found_p then
           if arg=='--help' or arg=='-h' or arg=='--version' or arg=='-v' then
+            call_for_help_p = true
             tlog('troff2page version %s\n', Troff2page_version)
             tlog ('%s\n', Troff2page_copyright_notice)
-            if arg=='--help' then
+            if arg=='--help' or arg=='-h' then
               tlog('For full details, please see %s\n', Troff2page_website)
             end
             --
@@ -164,7 +165,9 @@ function troff2page_1pass(argc, argv)
         end
         i=i+1
       end -- while
-      if not document_found_p then tlog('troff2page called with no document files.\n') end
+      if not document_found_p and not call_for_help_p then
+        tlog('troff2page called with no document files.\n')
+      end
       do_bye()
     end) -- with_open_output_file
   end) -- flet

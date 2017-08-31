@@ -18,8 +18,6 @@ If the basename of the input troff document is \fCjobname\fP, the
 Info file is created in \fCjobname.info\fP, which may be
 displayed on any Info viewer.
 
-Since \fCtroff2page\fP doesn’t
-accept options, a good place to set \fC.troff2info\fP external to
-the input troff document is in the
-\fC.troff2pagerc.tmac\fP file, described on page
-\*[TAG:troff2pagerc].
+A good place to set \fC.troff2info\fP external to the input troff
+document is in \fC.troff2pagerc.tmac\fP or \fCjobname.t2p\fP,
+described on page \*[TAG:troff2pagerc].

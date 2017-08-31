@@ -1,4 +1,4 @@
--- last modified 2017-08-30
+-- last modified 2017-08-31
 
 function html2info()
   if Rerun_needed_p then
@@ -31,10 +31,10 @@ function html2info()
       html2info_tweak_html_file(tmp_html_file, i)
 
       os.execute('lynx -dump -nolist ' .. tmp_html_file .. ' > ' .. tmp_info_file)
-      --os.remove(tmp_html_file)
+      os.remove(tmp_html_file)
 
       copy_file_to_stream(tmp_info_file, o)
-      --os.remove(tmp_info_file)
+      os.remove(tmp_info_file)
 
       i=i+1
     end
