@@ -1,4 +1,4 @@
--- last modified 2017-09-03
+-- last modified 2017-09-06
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -27,6 +27,26 @@ function set_register(regset, type)
   end
 end
 
+function troff2page_help()
+  tlog('Usage: troff2page OPTION ... FILE\n')
+  tlog('Available options:\n')
+  tlog(' -h              print this message\n')
+  tlog(' --help          print this message\n')
+  tlog(' -v              print version number\n')
+  tlog(' -version        print version number\n')
+  tlog(' -m name         read macros name.tmac or tmac.name\n')
+  tlog(' -mname          read macros name.tmac or tmac.name\n')
+  tlog(' -rcn            define number register r as n\n')
+  tlog(' -r reg=num      define number register reg as num\n')
+  tlog(' -dxs            define string x as s\n')
+  tlog(' -d xxx str      define string xxx as str\n')
+  tlog(' -U              enable unsafe mode [not needed]\n')
+  tlog(' -z              suppress formatted output to stdout [not needed]\n')
+  tlog(' -t              preprocess with tbl [not needed]\n')
+  tlog(' --              stop processing options\n')
+  tlog('For full details, please see %s\n', Troff2page_website)
+end
+
 function troff2page_1pass(argc, argv)
   --print('doing troff2page_1pass', argc, table_to_string(argv))
   flet({
@@ -40,7 +60,7 @@ function troff2page_1pass(argc, argv)
     Css_stream = false,
     Current_diversion = false,
     Current_pageno = -1,
-    Current_source_file = input_doc,
+    Current_source_file = Main_troff_file,
     Current_troff_input = false,
     Diversion_table = {},
     --End_hooks = {},
@@ -65,7 +85,6 @@ function troff2page_1pass(argc, argv)
     Leading_spaces_macro = false,
     Leading_spaces_number = 0,
     Lines_to_be_centered = 0,
-    Log_stream = false,
     Macro_args = { true },
     Macro_copy_mode_p = false,
     Macro_package = 'ms',
@@ -107,76 +126,79 @@ function troff2page_1pass(argc, argv)
     Turn_off_escape_char_p = false,
     Verbatim_apostrophe_p = false
   }, function()
-    with_open_output_file(Jobname..Log_file_suffix, function(o)
-      Log_stream = make_broadcast_stream(o, io.stdout)
-      begin_html_document()
-      local i=1; local document_found_p = false; local call_for_help_p = false;
-      while i<=argc do
-        local arg = argv[i]
-        if not document_found_p then
-          if arg=='--help' or arg=='-h' or arg=='--version' or arg=='-v' then
-            call_for_help_p = true
-            tlog('troff2page version %s\n', Troff2page_version)
-            tlog ('%s\n', Troff2page_copyright_notice)
-            if arg=='--help' or arg=='-h' then
-              tlog('For full details, please see %s\n', Troff2page_website)
-            end
-            --
-          elseif string.match(arg, '^-m$') then
-            i=i+1; local tmacf = argv[i]
-            if tmacf then load_tmac(tmacf)
-            else tlog('option requires an argument -- m')
-            end
-          elseif string.match(arg, '^-m') then
-            local tmacf = string.gsub(arg, '^-m(.*)', '%1')
-            load_tmac(tmacf)
-            --
-          elseif string.match(arg, '^-d$') then
-            i=i+1; local regset = argv[i]
-            if regset then set_register(regset, 'string')
-            else tlog('option requires an argument -- d')
-            end
-          elseif string.match(arg, '^-d') then
-            local regset = string.gsub(arg, '^-d(.*)', '%1')
-            set_register(regset, 'string')
-            --
-          elseif string.match(arg, '^-r$') then
-            i=i+1; local regset = argv[i]
-            if regset then set_register(regset, 'number')
-            else tlog('option requires an argument -- r')
-            end
-          elseif string.match(arg, '^-r') then
-            --print('doing clo -r')
-            local regset = string.gsub(arg, '^-r(.*)', '%1')
-            set_register(regset, 'number')
-            --
-          elseif arg=='--' then
-            if i<argc then document_found_p=true end
-          elseif string.match(arg, '^-') then
-            if not(arg=='-t' or arg=='-U' or arg=='-z') then
-              tlog('ignoring option %s\n', arg)
-            end
-          else
-            document_found_p=true; i=i-1
+    begin_html_document()
+    local i=1; local document_found_p = false; local call_for_help_p = false;
+    while i<=argc do
+      local arg = argv[i]
+      if not document_found_p then
+        if arg=='--help' or arg=='-h' or arg=='--version' or arg=='-v' then
+          call_for_help_p = true
+          tlog('troff2page version %s\n', Troff2page_version)
+          tlog ('%s\n', Troff2page_copyright_notice)
+          if arg=='--help' or arg=='-h' then
+            troff2page_help()
+          end
+          --
+        elseif string.match(arg, '^-m$') then
+          i=i+1; local tmacf = argv[i]
+          if tmacf then load_tmac(tmacf)
+          else tlog('option requires an argument -- m')
+          end
+        elseif string.match(arg, '^-m') then
+          local tmacf = string.gsub(arg, '^-m(.*)', '%1')
+          load_tmac(tmacf)
+          --
+        elseif string.match(arg, '^-d$') then
+          i=i+1; local regset = argv[i]
+          if regset then set_register(regset, 'string')
+          else tlog('option requires an argument -- d')
+          end
+        elseif string.match(arg, '^-d') then
+          local regset = string.gsub(arg, '^-d(.*)', '%1')
+          set_register(regset, 'string')
+          --
+        elseif string.match(arg, '^-r$') then
+          i=i+1; local regset = argv[i]
+          if regset then set_register(regset, 'number')
+          else tlog('option requires an argument -- r')
+          end
+        elseif string.match(arg, '^-r') then
+          --print('doing clo -r')
+          local regset = string.gsub(arg, '^-r(.*)', '%1')
+          set_register(regset, 'number')
+          --
+        elseif arg=='--' then
+          if i<argc then document_found_p=true end
+        elseif string.match(arg, '^-') then
+          if not(arg=='-t' or arg=='-U' or arg=='-z') then
+            tlog('ignoring option %s\n', arg)
           end
         else
-          for j=i,argc do troff2page_file(argv[j]) end
-          break
+          document_found_p=true; i=i-1
         end
-        i=i+1
-      end -- while
-      if not document_found_p and not call_for_help_p then
-        tlog('troff2page called with no document files.\n')
+      else
+        for j=i,argc do
+          local f = argv[j]
+          if not probe_file(f) then
+            twarning('cannot open %s: No such file or directory', f)
+          else
+            troff2page_file(argv[j])
+          end
+        end
+        break
       end
-      do_bye()
-    end) -- with_open_output_file
+      i=i+1
+    end -- while
+    if not document_found_p and not call_for_help_p then
+      tlog('troff2page called with no document files.\n')
+    end
+    do_bye()
   end) -- flet
 end
 
 function troff2page(...)
   local argv = {...}
   local argc = #argv
-  if argc==0 then tlog('troff2page called with no arguments.\n'); return end
   --
   flet({
     --End_hooks = {},
@@ -187,19 +209,23 @@ function troff2page(...)
     Main_troff_file = argv[argc],
     Rerun_needed_p = false
   }, function()
+    if argc==0 then tlog('troff2page called with no arguments.\n'); return end
     if not(string.match(Main_troff_file, '^-')) then
       Jobname = file_stem_name(Main_troff_file)
     else Jobname = 'troffput'
     end
-    troff2page_1pass(argc, argv)
-    if Rerun_needed_p then
-      if Single_pass_p then
-        tlog(string.format('Rerun: troff2page %s\n', table_to_string(argv)))
-      else
-        tlog(string.format('Rerunning: troff2page %s\n', table_to_string(argv)))
-        troff2page_1pass(argc, argv)
+    with_open_output_file(Jobname..Log_file_suffix, function(o)
+      Log_stream = make_broadcast_stream(o, io.stdout)
+      troff2page_1pass(argc, argv)
+      if Rerun_needed_p then
+        if Single_pass_p then
+          tlog(string.format('Rerun: troff2page %s\n', table_to_string(argv)))
+        else
+          tlog(string.format('Rerunning: troff2page %s\n', table_to_string(argv)))
+          troff2page_1pass(argc, argv)
+        end
       end
-    end
-    if Convert_to_info_p then html2info() end
+      if Convert_to_info_p then html2info() end
+    end)
   end)
 end
