@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20170906 -- last modified
+Troff2page_version = 20171112 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1319,6 +1319,50 @@ function read_length_in_pixels()
 end 
 
 
+function troff_align_to_html(i)
+  if not i then
+    i = 'I'
+  end
+  if i == 'C' then return 'center'
+  elseif i == 'B' then return 'block'
+  elseif i == 'R' then return 'right'
+  elseif i == 'L' then return 'left'
+  else return 'indent'
+  end
+end
+
+function start_display(w)
+  local w = troff_align_to_html(w)
+  read_troff_line()
+  emit_para()
+  emit_verbatim '<div class=display align='
+  if w == 'block' then
+    emit_verbatim 'center'
+  elseif w == 'indent' then
+    emit_verbatim 'left'
+  else emit_verbatim(w)
+  end
+  if w == 'indent' then
+    emit_verbatim ' style="margin-left: '
+    emit_verbatim(raw_counter_value 'DI')
+    emit_verbatim 'ps;"'
+  end
+  emit_verbatim '>'
+  emit_newline()
+  ev_push 'display_environment'
+  unfill_mode()
+end
+
+function stop_display()
+  emit(switch_style())
+  ev_pop()
+  emit_newline()
+  emit_verbatim '</div>'
+  emit_newline()
+  emit_para()
+end
+
+
 function do_afterpar()
   local it = Afterpar
   if it then
@@ -1951,19 +1995,6 @@ end)
 
 defescape('E', Escape_table.e) 
 
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
-end
-
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -2023,6 +2054,19 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
+end
+
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
 end
 
 
@@ -2344,6 +2388,48 @@ function html2info_tweak_info_file(f)
   -- restore Þ
   "s/Þ!/Þ/g"
   )
+end
+
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
 end
 
 
@@ -2705,48 +2791,6 @@ function initialize_glyphs()
     defglyph(k, verbatim(string.format('&#x%x;', v)))
   end
 end 
-
-
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
-end
-
-function begin_html_document()
-
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
-  end
-
-  start_css_file()
-
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
-  end
-end
 
 
 function defrequest(w, th)
