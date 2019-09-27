@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20180511 -- last modified
+Troff2page_version = 20190926 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1195,7 +1195,7 @@ function expand_args(s)
   return res
 end 
 
-function execute_macro(w)
+function execute_macro(w, noarg)
   --print('doing execute_macro', w)
   local it
   if not w then 
@@ -1205,7 +1205,7 @@ function execute_macro(w)
   it = Diversion_table[w]
   if it then
     --print('execing divn')
-    read_troff_line()
+    if not noarg then read_troff_line() end
     local divvalue = retrieve_diversion(it)
     --print('divvalue =', divvalue)
     emit_verbatim(divvalue)
@@ -1214,7 +1214,7 @@ function execute_macro(w)
   --
   it = Macro_table[w]
   if it then
-    local args = {read_args()}
+    local args = noarg and {} or {read_args()}
     flet({
       Macro_args = args
     }, function()
@@ -1226,7 +1226,7 @@ function execute_macro(w)
   --
   it = String_table[w]
   if it then
-    read_troff_line()
+    if not noarg then read_troff_line() end
     emit_verbatim(it())
     return
   end
@@ -1238,7 +1238,7 @@ function execute_macro(w)
     return
   end
   --
-  read_troff_line()
+  if not noarg then read_troff_line() end
 end
 
 function execute_macro_body(ss)
@@ -1995,6 +1995,19 @@ end)
 
 defescape('E', Escape_table.e) 
 
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
+end
+
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -2054,19 +2067,6 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
-end
-
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
 end
 
 
@@ -2388,48 +2388,6 @@ function html2info_tweak_info_file(f)
   -- restore Þ
   "s/Þ!/Þ/g"
   )
-end
-
-
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
-end
-
-function begin_html_document()
-
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
-  end
-
-  start_css_file()
-
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
-  end
 end
 
 
@@ -2791,6 +2749,48 @@ function initialize_glyphs()
     defglyph(k, verbatim(string.format('&#x%x;', v)))
   end
 end 
+
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
+end
 
 
 function defrequest(w, th)
@@ -3186,6 +3186,7 @@ function initialize_macros()
   end)
 
   defrequest('LP', function()
+    execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
     emit_newline()
     --print('LP calling emit_para')
@@ -3200,6 +3201,7 @@ function initialize_macros()
   defrequest('lp', Request_table.LP)
 
   defrequest('PP', function()
+    execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
     emit_newline()
     emit_para{par_start_p = true, indent_p = true}
@@ -5223,7 +5225,7 @@ function man_alternating_font_macro(f1, f2)
     arg = read_word()
     if not arg then break end
     emit(switch_font(first_font_p and f1 or f2))
-    emit(expand_args(arg))
+    emit(expand-args(arg))
     emit(switch_font())
     first_font_p = not first_font_p
   end
@@ -5236,7 +5238,7 @@ function man_font_macro(f)
   local e = read_troff_line()
   if e=='' then e = read_troff_line() end
   emit(switch_font(f))
-  emit(expand_args(e))
+  emit(expand-args(e))
   emit(switch_font())
   emit_newline()
 end

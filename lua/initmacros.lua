@@ -1,4 +1,4 @@
--- last modified 2017-08-29
+-- last modified 2019-09-26
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -393,6 +393,7 @@ function initialize_macros()
   end)
 
   defrequest('LP', function()
+    execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
     emit_newline()
     --print('LP calling emit_para')
@@ -407,6 +408,7 @@ function initialize_macros()
   defrequest('lp', Request_table.LP)
 
   defrequest('PP', function()
+    execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
     emit_newline()
     emit_para{par_start_p = true, indent_p = true}

@@ -1,4 +1,4 @@
--- last modified 2017-08-28
+-- last modified 2019-09-26
 
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
@@ -52,7 +52,7 @@ function expand_args(s)
   return res
 end 
 
-function execute_macro(w)
+function execute_macro(w, noarg)
   --print('doing execute_macro', w)
   local it
   if not w then 
@@ -62,7 +62,7 @@ function execute_macro(w)
   it = Diversion_table[w]
   if it then
     --print('execing divn')
-    read_troff_line()
+    if not noarg then read_troff_line() end
     local divvalue = retrieve_diversion(it)
     --print('divvalue =', divvalue)
     emit_verbatim(divvalue)
@@ -71,7 +71,7 @@ function execute_macro(w)
   --
   it = Macro_table[w]
   if it then
-    local args = {read_args()}
+    local args = noarg and {} or {read_args()}
     flet({
       Macro_args = args
     }, function()
@@ -83,7 +83,7 @@ function execute_macro(w)
   --
   it = String_table[w]
   if it then
-    read_troff_line()
+    if not noarg then read_troff_line() end
     emit_verbatim(it())
     return
   end
@@ -95,7 +95,7 @@ function execute_macro(w)
     return
   end
   --
-  read_troff_line()
+  if not noarg then read_troff_line() end
 end
 
 function execute_macro_body(ss)
