@@ -111,12 +111,12 @@
     }
     */
 
-  } /* media screen */
+  }
 
   @media screen and (orientation: portrait) and (max-width: 480px),
          screen and (orientation: landscape) and (max-width: 640px) {
     body {
-      margin: 0;
+      margin: 5px;
     }
   }
 
@@ -150,7 +150,7 @@
       display: none;
     }
 
-  } /* media print */
+  }
   
 body { max-width: 576px; }
 

@@ -1,4 +1,4 @@
-/* last modified 2015-03-19 */
+/* last modified 2019-09-30 */
 
 body {
     max-width: 40em;
@@ -6,6 +6,14 @@ body {
     margin-bottom: 2em;
     margin-left: 4em;
     margin-right: 2em;
+}
+
+@media screen and (orientation: portrait) and (max-width: 480px),
+       screen and (orientation: landscape) and (max-width: 640px) {
+  body {
+    max-width: none;
+    margin: 5px;
+  }
 }
 
 @media print {

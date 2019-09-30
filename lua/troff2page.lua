@@ -1062,12 +1062,12 @@ function start_css_file()
     }
     */
 
-  } /* media screen */
+  }
 
   @media screen and (orientation: portrait) and (max-width: 480px),
          screen and (orientation: landscape) and (max-width: 640px) {
     body {
-      margin: 0;
+      margin: 5px;
     }
   }
 
@@ -1101,7 +1101,7 @@ function start_css_file()
       display: none;
     }
 
-  } /* media print */
+  }
   ]])
 end
 
@@ -1139,7 +1139,7 @@ function collect_css_info_from_preamble()
     Css_stream:write '\na.hrefinternal .hreftext { display: none; }\n'
     Css_stream:write '\n}\n'
   end
-end 
+end
 
 function specify_margin_left_style()
   if Margin_left ~= 0 then
