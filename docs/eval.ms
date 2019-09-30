@@ -1,6 +1,7 @@
+.\" last modified 2019-09-29
 .SH 1
 7. Extending troff using Lua
-
+.LP
 .IX extending troff and troff2page with Lua
 .IX eval@.eval, macro
 .IX endeval@.endeval, macro
@@ -11,7 +12,7 @@ defined in the
 supplied
 troff macro file \fCpca-eval.tmac\fP, which you should put
 in a macro directory.
-
+.PP
 \&\fC.eval\fP does only one thing: It
 allows you to place arbitrary Lua code until the following
 \fC.endeval\fP, and the text written to standard output by
@@ -20,7 +21,7 @@ is substituted for the \fC.eval\fP ... \fC.endeval\fP.
 The usefulness of this tactic will be apparent from an
 example.
 Consider the following troff document, \fCtau.ms\fP:
-
+.PP
 .EX
     .mso pca-eval.tmac
     .
@@ -31,34 +32,34 @@ Consider the following troff document, \fCtau.ms\fP:
     io.write(2*math.acos(-1), '.\n')
     .endeval
 .EE
-
+.PP
 .IX unsafe mode
 .IX z@-z, groff option
 .IX U@-U, groff option
 Run troff (actually groff, and in unsafe mode too) on \fCtau.ms\fP:
-
+.PP
 .EX
     groff -z -U -ms tau.ms
 .EE
-
+.PP
 (The \fC-z\fP avoids generating output, because we are not ready for it
 yet.  The \fC-U\fP runs in “unsafe” mode, i.e., it allows the writing of
 aux files.)
 You will find that the groff asks you to run it again:
-
+.PP
 .EX
 .ec
     \f(CIRerun groff with -U
 .EE
-
+.PP
 Call groff again as follows:
-
+.PP
 .EX
     groff -U -ms tau.ms > tau.ps
 .EE
-
+.PP
 \fCtau.ps\fP will now look like:
-
+.PP
 .B1
 .RS
 The ratio of the circumference of a circle to
@@ -69,7 +70,7 @@ io.write(2*math.acos(-1), '.\n')
 .endeval
 .RE
 .B2
-
+.PP
 The first groff call produces a Lua file
 \fC.trofftemp.lua\fP.\**
 .FS
@@ -79,14 +80,14 @@ your setting of \fC\e*[AUXF]\fP — see page \*[TAG:auxf].
 The second groff
 call invokes Lua to create an auxiliary file for each \fC.eval\fP that gets sourced
 back into the document.
-
+.PP
 It is clear that Lua code via \fC.eval\fP can
 serve as a very powerful \fIsecond extension language\fP
 for troff.  This benefit is available even when the document
 is processed by troff2page:
 We could run troff2page on the same document, \fCtau.ms\fP, and the
 resulting \fCtau.html\fP will show the same content.
-
+.PP
 .IX extending troff and troff2page differently with Lua
 Furthermore, we can embed  \fC.eval\fP-enclosed Lua code inside an
 \fC.if\fP (or \fC.ie\fP or \fC.el\fP) statement so that it gets executed
@@ -97,17 +98,17 @@ user has the
 means to extend troff2page to deal with things that the core
 program as supplied does
 not.
-
+.PP
 Note that when troff2page sees
 \fC.eval\fP-enclosed Lua
 code, it runs it in a Lua environment that has not only the basic
 Lua language but also includes the procedures and data structures
 defined in troff2page.  These extras are not available (and are arguably
 not useful) to the \fC.eval\fP code seen by troff.
-
+.PP
 .SH 2
 Defining color names using HSL
-
+.LP
 .IX color names, defining
 For a more substantial example of \fC.eval\fP’s use, consider defining
 color names using the HSL (hue/saturation/lightness) scheme rather than the
@@ -115,13 +116,13 @@ RGB and CMYK schemes provided by groff.  For instance, we would like to
 define the color Venetian red using its HSL spec (357\(de, 49%,
 24%), which to many is a more intuitive description than RGB
 (91, 31, 34).
-
+.PP
 While there is an \*[url \
 http://en.wikipedia.org/wiki/HSL_color_space]algorithm\& to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
-
+.PP
 .EX
     .mso pca-eval.tmac
     .
@@ -173,35 +174,35 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
     end
     .endeval
 .EE
-
+.PP
 Here, the Lua procedure \fCdef-hsl-color\fP takes an HSL spec and
 writes out the equivalent RGB groff definition. (The troff2page
 distribution provides \fCdef-hsl-color\fP in the macro file
 \fCdefhsl.tmac\fP.)
-
+.PP
 We can call this Lua procedure inside another \fC.eval\fP to define
 \fCvenetianred\fP using its HSL spec:
-
+.PP
 .EX
     .eval
     def_hsl_color('venetianred', 357, .49, .24)
     .endeval
 .EE
-
+.PP
 .eval
     def_hsl_color('venetianred', 357, .49, .24)
 .endeval
 The color name \fCvenetianred\fP can now be used like any other groff color name:
-
+.PP
 .EX
 .ec
     Prismacolor’s burnt ochre pencil is a close match for Derwent’s
     \\fB\\m[venetianred]Venetian red\\m[]\\fP, and either can be used to
     emulate the sanguine chalk drawings of the Old Masters.
 .EE
-
+.PP
 This produces:
-
+.PP
 .B1
 .RS
 Prismacolor’s burnt ochre pencil is a close match for Derwent’s
@@ -209,10 +210,10 @@ Prismacolor’s burnt ochre pencil is a close match for Derwent’s
 emulate the sanguine chalk drawings of the Old Masters.
 .RE
 .B2
-
+.PP
 .SH 2
 Extending troff2page only
-
+.LP
 .IX extending troff2page with Lua without producing output
 .IX ig@.ig ##, as troff2page extender
 troff2page treats troff’s \fC.ig\fP
@@ -221,7 +222,7 @@ containing Lua code that can be used to extend
 troff2page.  This syntactic overloading of \fC.ig ##\fP is an innovation introduced by
 Oliver Laumann’s \*[url \
 http://www-rn.informatik.uni-bremen.de/software/unroff]unroff\&.
-
+.PP
 Any Lua code enclosed within
 \&\fC.ig ##\fP ... \fC.##\fP will be processed by
 troff2page but not by
@@ -233,22 +234,22 @@ concerned, \fC.ig ##\fP, like other \fC.ig\fPs, is \fIalways\fP a
 comment.  However, you can add Lua code within \fC.ig ##\fP
 to influence how troff2page — but not troff! — processes the rest of the
 document.
-
+.PP
 For example, let’s define a
 \fC\e*[url ...]\fP string register that simply typesets its URL
 argument within angle brackets.
-
+.PP
 .EX
     .ds url \(la\fC\\$1\fP\(ra
 .EE
-
+.PP
 This is adequate for the print output.
 For troff2page though, we’d like to
 re-define this macro, in Lua, to create a hyperlink.
 We enclose this re-definition in a \fC.ig ##\fP, which not
 only allows it to be in Lua, but also makes it apply only
 when troff2page reads it:
-
+.PP
 .EX
     .ig ##
     defstring('url', function(url)
@@ -256,16 +257,16 @@ when troff2page reads it:
     end)
     .##
 .EE
-
+.PP
 The procedures \fCdefstring\fP, \fClink_start\fP, and
 \fClink_stop\fP are defined in the troff2page code.
-
+.PP
 .IX stylesheet, modifying
 \fC.ig ##\fP can be used to specify settings that are relevant only
 when troff2page is used on a document, e.g., stylesheet changes.
 troff2page uses the output-stream \fCCss_stream\fP to
 write out style information.  The user can also write to this stream, e.g.,
-
+.PP
 .EX
     .ig ##
     Css_stream:write([[
@@ -275,7 +276,7 @@ write out style information.  The user can also write to this stream, e.g.,
     ]])
     .##
 .EE
-
+.PP
 .ig ##
     Css_stream:write([[
         h1,h2,h3,h4,h5,h6 {

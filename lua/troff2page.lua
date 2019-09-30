@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20190926 -- last modified
+Troff2page_version = 20170827 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -4248,11 +4248,11 @@ function emit_navigation_bar(headerp)
       if not index_page_p then emit(link_stop()) end
       emit_verbatim '</span>'
     end
-    ---
+    --
   end
   emit(Navigation_sentence_end)
   emit_verbatim ']'
-  emit_verbatim '</i></div>'
+  emit_verbatim '</i></div>\n'
   --
 end
 
@@ -5509,6 +5509,17 @@ function table_do_cell()
   if font then emit(switch_font()) end
   emit_verbatim '</td>'
 end 
+
+
+local running_in_neovim = (vim and type(vim) == 'table' and
+vim.api and type(vim.api) == 'table' and
+vim.api.nvim_eval and type(vim.api.nvim_eval) == 'function')
+
+if running_in_neovim then
+  local retobj = {}
+  retobj.troff2page = troff2page
+  return retobj
+end
 
 Single_pass_p = false
 troff2page(...)

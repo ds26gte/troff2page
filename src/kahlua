@@ -1,0 +1,20 @@
+# last modified 2019-09-29
+
+DEST=../lua/troff2page.lua
+
+rm -f $DEST
+rm -f *-Z-*.lua
+
+for f in *.lua; do
+  cat $f | grep -v '^-- last modified' >> $DEST
+  echo >> $DEST
+done
+
+DEBUG=false
+
+echo "Single_pass_p = $DEBUG" >> $DEST
+
+echo "troff2page(...)" >> $DEST
+
+chmod +x $DEST
+

@@ -1,6 +1,6 @@
 .so style.tmac
 .
-.ND 2017-08-16  \"last modified
+.ND 2019-09-29  \"last modified
 .
 .TL
 troff2page
@@ -16,7 +16,7 @@ troff2page
 .RT
 .
 .TOC
-
+.
 .so intro.ms
 .so commands.ms
 .so layout.ms
@@ -26,11 +26,11 @@ troff2page
 .so eval.ms
 .so error.ms
 .so infodoc.ms
-
+.PP
 .if t \{\
 .SH 1
 Index
-
+.LP
 .\"rs
 .\"if \n(.H .sp .8v
 .2C

@@ -1,6 +1,7 @@
+.\" last modified 2019-09-29
 .SH 1
 2. troff and troff2page commands
-
+.LP
 .IX drop caps in color
 .defcolor terracottapink rgb #9b3d3d
 .DC T ROFF2PAGE terracottapink
@@ -27,7 +28,7 @@ footnote hyperlinking to each other.
 Please consult troff and groff documentation for these commands.  We will
 concentrate here on those commands whose HTML counterpart is not immediately
 obvious.
-
+.PP
 .IX macro files provided with troff2page
 .IX pca-tag.tmac, macro file
 .IX pca-ix.tmac, macro file
@@ -40,7 +41,7 @@ sudirectory for the submodule \fCmpca\fP. They include general-purpose
 extensions to the \fCms\fP package, e.g., \fCpca-tag.tmac\fP for
 cross-references; \fCpca-ix.tmac\fP for index generation;
 \fCpca-eval.tmac\fP for extending troff using Lua, etc.
-
+.PP
 .IX m@-m, command-line option
 .IX mso@.mso, groff request
 You should put these tmac files in one of your macro directories,
@@ -50,10 +51,10 @@ first in the directories in \fCGROFF_TMAC_PATH\fP, then in the
 working directory, and finally in your home directory. See the
 section for “Macro Directories” in the groff info file for
 details.)
-
+.PP
 .SH 2
 Auxiliary files
-
+.LP
 .IX unsafe mode
 .IX auxiliary files
 .IX U@-U, command-line option
@@ -63,13 +64,13 @@ second run.  Let’s first investigate how groff deals with them,
 and then see how troff2page does the same in its own way. Note
 that in order to write these aux files, groff must be run with
 the \fC-U\fP option for “unsafe” mode.
-
+.PP
 .IX t@-t, command-line option
 .IX z@-z, command-line option
 As an example, consider \fCindex.ms\fP (the groff source for the
 document you’re reading, which is the \fCdoc\fP subdirectory).  The following is one
 way to get the correct PostScript output:
-
+.PP
 .EX
     % groff -t -U -z index.ms
 .ft CI
@@ -88,14 +89,14 @@ way to get the correct PostScript output:
     Output written in z.trofftemp.ind.
     Transcript written in z.trofftemp.ilg.
 .EE
-
+.PP
 The \fC-t\fP option (which calls the tbl
 preprocessor) is needed because the
 document \fCindex.ms\fP
 uses a table.  The first run uses the \fC-z\fP option to disable
 writing an output file, which we don’t need until the second
 run.
-
+.PP
 In both runs, we use the \fC-U\fP option: The first run
 needs unsafe mode to write the aux files, and the second run
 needs it to process some of them with external programs to
@@ -103,16 +104,16 @@ create additional aux files.  Subsequent runs may dispense
 with the \fC-U\fP, as all the required aux files are made.
 (You will need the option again, if the aux files’ content
 changes.)
-
+.PP
 troff2page also needs to process the document twice in order to absorb
 information from the aux files. However:
-
+.PP
 (1) troff2page will automatically do the second processing
 without needing the user to explicitly call it a second time; and
-
+.PP
 (2) troff2page doesn’t need any special option to run in “unsafe”
 mode or to process tables.
-
+.PP
 .EX
     % troff2page index.ms
 .ft CI
@@ -128,24 +129,24 @@ mode or to process tables.
     Output written in z.troff2page_temp_index.ind.
     Transcript written in z.troff2page_temp_index.ilg.
 .EE
-
+.PP
 The same holds if you run troff2page by calling
 the Lua procedure \fCtroff2page\fP within Lua, as described on
 page \*[TAG:calling_troff2page_within_lua].
-
+.PP
 If you wish to have
 the Lua procedure perform just one pass on the document, set the
 global \fCSingle_pass_p\fP to true, i.e.,
-
+.PP
 .EX
     Single_pass_p = true
     troff2page('index.ms')
 .EE
-
+.PP
 Call it the same way a second time to run the second pass, which
 resolve the aux files. This is exactly analogous to calling
 \fCgroff\fP twice on the same document to resolve aux files.
-
+.PP
 .TAG auxf
 .IX auxiliary files, naming of
 .IX troff2page@.troff2page, number register
@@ -161,10 +162,10 @@ different for groff and troff2page, so that the two
 programs’ aux files don’t clash.  The number register
 \fC\en[.troff2page]\fP (page \*[TAG:cond-bp]) suggests a way
 to do this.
-
+.PP
 .SH 2
 Commmand-line options
-
+.LP
 .IX command-line options
 .IX version@--version, command-line option
 .IX help@--help, command-line option
@@ -182,11 +183,11 @@ viz.,
 \fC-r\fP to pre-set number registers;
 \fC-d\fP to pre-define strings; and
 \fC--\fP to signal the end of options.
-
+.PP
 The options can be varied with each call to \fCtroff2page\fP, just as
 with \fCgroff\fP. Please see the groff man page
 for details on all the provided options.
-
+.PP
 .IX z@-z, command-line option
 .IX t@-t, command-line option
 .IX U@-U, command-line option
@@ -194,7 +195,7 @@ for details on all the provided options.
 The options
 \fC-z\fP, \fC-t\fP, and \fC-U\fP are silently ignored, as they're always valid
 for troff2page.
-
+.PP
 .EX
     % troff2page --help
 .ft CI
@@ -202,27 +203,27 @@ for troff2page.
     Copyright (C) ...
     For full details, please see http://ds26gte.github.io/troff2page
 .EE
-
+.PP
 In the unlikely event that you have a document file named
 \fC--help\fP (and wish to process it), use
 use
-
+.PP
 .EX
     % troff2page -- --help
 .EE
-
+.PP
 Macro file options must be given without the suffix \fC.tmac\fP or prefix
 \fCtmac.\fP. Thus, \fC-mxyz\fP or \fC-m xyz\fP looks for the macro file
 \fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is found in the macro directories,
 and loads it.
-
+.PP
 If after all the option processing, no file arguments remain,
 \fCtroff2page\fP displays a “could not find” message.
-
+.PP
 If you find you need to specify an option that \fCtroff2page\fP
 doesn't accept, you can always supply it in a macro file via
 \fC-m\fP.
-
+.PP
 .TAG troff2pagerc
 .IX init files for troff2page
 .IX troff2pagerc@.troff2pagerc.tmac, macro file
@@ -230,7 +231,7 @@ doesn't accept, you can always supply it in a macro file via
 without the need to explicitly use a command-line option. These
 are useful to specify information that is relevant only the HTML
 output.
-
+.PP
 The first such file is named
 \fC.troff2pagerc.tmac\fP, placed in one of your macro directories
 (\fCGROFF_TMAC_PATH\fP, working directory, home). The working
@@ -241,23 +242,23 @@ your home or a private \fCGROFF_TMAC_PATH\fP directory.
 A
 more system-level \fCGROFF_TMAC_PATH\fP placement is typically
 unadvised for such an ad hoc file.
-
+.PP
 \fCtroff2page\fP loads the first \fC.troff2pagerc.tmac\fP it
 finds, if it exists, before processing its main argument file.
-
+.PP
 .IX t2p@.t2p, macro file
 In addition, \fCtroff2page\fP will also pick up a file
 \fCjobname.t2p\fP, where \fCjobname\fP is the basename of the input document.
 This is useful for directives that are specific to a document. Note that the
 \fCjobname.t2p\fP, unlike \fC.troff2pagerc.tmac\fP, is looked for only in the
 working directory, and not more generally in \fCGROFF_TMAC_PATH\fP.
-
+.PP
 (Note that groff itself will not load either \fC.troff2pagerc.tmac\fP or
 \fCjobname.t2p\fP automatically.  But that is presumably OK, since you are
 using groff command-line options to specify the same information anyway, or
 these files contain information that's only relevant for HTML.  If you do want
 groff to pick up this file, you can use the option \fC-m.troff2pagerc\fP.)
-
+.PP
 .IX man.local, -man init file
 If the input file is recognizably a man page (i.e., it has the
 command \fC.TH\fP), both troff2page and groff will load, if it

@@ -1,4 +1,4 @@
--- last modified 2017-08-20
+-- last modified 2019-09-29
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
@@ -85,11 +85,11 @@ function emit_navigation_bar(headerp)
       if not index_page_p then emit(link_stop()) end
       emit_verbatim '</span>'
     end
-    ---
+    --
   end
   emit(Navigation_sentence_end)
   emit_verbatim ']'
-  emit_verbatim '</i></div>'
+  emit_verbatim '</i></div>\n'
   --
 end
 
