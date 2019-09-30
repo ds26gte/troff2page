@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2019-09-30
 
 function link_stylesheets()
   emit_verbatim '<link rel="stylesheet" href="'
@@ -141,6 +141,13 @@ function start_css_file()
     */
 
   } /* media screen */
+
+  @media screen and (orientation: portrait) and (max-width: 480px),
+         screen and (orientation: landscape) and (max-width: 640px) {
+    body {
+      margin: 0;
+    }
+  }
 
   @media print {
 

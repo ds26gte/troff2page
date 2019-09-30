@@ -1064,6 +1064,13 @@ function start_css_file()
 
   } /* media screen */
 
+  @media screen and (orientation: portrait) and (max-width: 480px),
+         screen and (orientation: landscape) and (max-width: 640px) {
+    body {
+      margin: 0;
+    }
+  }
+
   @media print {
 
     body {
@@ -1639,6 +1646,7 @@ function emit_html_preamble()
   emit_verbatim '-->\n'
   emit_verbatim '<head>\n'
   emit_verbatim '<meta charset="utf-8">\n'
+  emit_verbatim '<meta name="viewport" content="width=device-width">\n'
   emit_external_title()
   link_stylesheets()
   link_scripts()
