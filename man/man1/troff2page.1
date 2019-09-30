@@ -1,4 +1,4 @@
-.TH TROFF2PAGE 1 "2017-08-19" \" last modified
+.TH TROFF2PAGE 1 "2019-09-30" \" last modified
 .nh
 .ad l
 .SH NAME
@@ -7,9 +7,7 @@ troff2page \- makes Web pages from troff documents
 
 .SH SYNOPSIS
 
-    troff2page <pathname>
-    troff2page --help
-    troff2page --version
+    troff2page [options] [pathnames]
 
 .SH DESCRIPTION
 
@@ -23,6 +21,10 @@ and possibly other files \fIjobname-Z-H-1.html\fP,
 \fIjobname-Z-H-2.html\fP, etc., which are linked by navigation to
 \fIjobname.html\fP.
 
+.SH OPTIONS
+
+troff2page accepts many groff options. For example,
+
     troff2page --version
 
 displays the troff2page version.
@@ -33,15 +35,28 @@ displays the version and a pointer to the comprehensive online
 manual, http://ds26gte.github.io/troff2page/index.html, whose troff
 source is included in the troff2page distribution.
 
-troff2page called with no argument exits with a “called with no
-argument” message.
+The \fI-v\fP and \fI-h\fP options are short for \fI--help\fP and
+\fI--version\fP respectively.
 
-.SH OPTIONS
+The options \fI-m\fP, \fI-r\fP, and \fI-d\fP respectively load macro files, set
+registers, and define strings, just as in groff. troff2page also accepts groff
+options that are not relevant to it, if only to ignore them. Please see the
+groff man page for further information on options.
 
-troff2page does not support options as groff can. Indeed,
-\fI--help\fP and \fI--version\fP are not really options: if they happen
-to name actual files, troff2page will happily attempt to process
-them as input documents.
+Arguments that don't look like options are treated as pathnames. The option
+\fI--\fP marks the end of options, implying that the remaining arguments are to
+be treated as pathnames (even if they look like options).
+
+If there is only one pathname argument \fIjobname.ext\fP, it is converted to
+\fIjobname.html\fP (and possibly other aux HTML files) as described above.
+
+If there is more than one pathname argument, their content is concatenated to
+produce the output HTML file(s), whose name is fashioned from the final
+pathname argument.
+
+If there are no pathname arguments, and the \fI--help\fP or \fI--version\fP
+options were not used, troff2page exits with a “called with no argument”
+message.
 
 However, additional information may be fed to troff2page via the
 specially named macro file \fI.troff2pagerc.tmac\fP. Thus, a \fI-mpca\fP
@@ -84,6 +99,16 @@ that contains several useful macro files. Both groff and
 troff2page can process these macro files, and give compatible
 results. Please see the troff2page manual for further details.
 
+.SH NEOVIM
+
+If the files \fIlua/troff2page.lua\fP and \fIplugin/troff2page.vim\fP are
+installed in your Neovim path, you can use the command \fI:Troff2page\fP to
+convert files directly from Neovim.
+
+The \fI:Troff2page\fP accepts the same style of arguments as the \fItroff2page\fP
+script. In addition, if called with no arguments, \fI:Troff2page\fP will convert the
+file in the current window.
+
 .SH INFO DOCS
 
 You can call the macro
@@ -99,7 +124,7 @@ and not to groff.
 
 .SH SYSTEM REQUIREMENTS
 
-\fItroff2page\fP requires Lua. For more information, please see the 
+\fItroff2page\fP requires Lua. For more information, please see the
 file \fIINSTALL.adoc\fP in the
 distribution.
 
@@ -109,4 +134,4 @@ troff2page is downloadable from http://github.com/ds26gte/troff2page.
 
 .SH SEE ALSO
 
-groff(1), groff_tmac(5), groff_man(7), groff_ms(7)
+groff(1), groff_tmac(5), groff_man(7), groff_ms(7), nvim(1)

@@ -1,0 +1,13 @@
+# last modified 2019-09-30
+# Dorai Sitaram
+
+# Use this if you have Neovim but not standalone Lua.
+
+# Assumes lua/troff2page.lua and plugin/troff2page.vim
+# have been installed in the appropriate Neovim directories.
+
+if test $# -eq 0; then
+  echo troff2page needs at least one argument; exit
+fi
+
+echo Troff2page "$@" | nvim -es

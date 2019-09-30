@@ -1,9 +1,12 @@
-.\" last modified 2019-09-29
+.\" last modified 2019-09-30
 .SH 1
 1. Introduction
 .LP
 .IX troff2page, script
-troff2page is a \*[url https://www.lua.org]Lua\& script that converts troff (man and ms) documents into HTML web pages.
+\fCtroff2page\fP is a \*[url https://www.lua.org]Lua\& script that
+converts troff (man and ms) documents into HTML web pages. First,
+ensure that the script \fCtroff2page\fP is in a directory in your
+\fCPATH\fP.
 .PP
 .TAG html-output
 .IX calling troff2page from the command-line
@@ -30,16 +33,119 @@ the rest are
 \fCjobname-Z-H-2.html\fP,
 etc.
 .PP
-The script \fCtroff2page\fP runs on the Unix command-line on Cygwin,
-Linux, Mac
-OS X, and Solaris.
+.SH 2
+Commmand-line options
+.LP
+.IX command-line options
+.IX version@--version, command-line option
+.IX help@--help, command-line option
+.IX v@-v, command-line option
+.IX h@-h, command-line option
+.IX m@-m, command-line option
+.IX r@-r, command-line option
+.IX d@-d, command-line option
+.IX -@--, command-line option
+\fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP,
+viz.,
+\fC-v\fP or \fC--version\fP to display the version;
+\fC-h\fP or \fC--help\fP to display help;
+\fC-m\fP to load macro files from \fCGROFF_TMAC_PATH\fP;
+\fC-r\fP to pre-set number registers;
+\fC-d\fP to pre-define strings; and
+\fC--\fP to signal the end of options.
 .PP
-Copy the script \fCtroff2page\fP to your \fCPATH\fP.
+.EX
+    % troff2page --help
+.ft CI
+    troff2page version 20190929
+    Copyright (C) ...
+    Usage: troff2page OPTION ... FILE
+    Available options: ...
+    ...
+    For full details, please see http://ds26gte.github.io/troff2page
+.EE
 .PP
-For more information,
-please see the file \*[url \
-https://github.com/ds26gte/troff2page/blob/master/INSTALL.adoc]INSTALL.adoc\&
-in the distribution.
+In the unlikely event that you have a document file named
+\fC--help\fP (and wish to process it), use
+.PP
+.EX
+    % troff2page -- --help
+.EE
+.PP
+.IX z@-z, command-line option
+.IX t@-t, command-line option
+.IX U@-U, command-line option
+\fCtroff2page\fP ignores all other \fCgroff\fP options, most with a warning.
+The options
+\fC-z\fP, \fC-t\fP, and \fC-U\fP are silently ignored, as they're always valid
+for troff2page.
+.PP
+Macro file options must be given without the suffix \fC.tmac\fP or prefix
+\fCtmac.\fP. Thus, \fC-mxyz\fP or \fC-m xyz\fP looks for the macro file
+\fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is found in the macro directories,
+and loads it.
+.PP
+If after all the option processing, no file arguments remain, and
+the options for help or version were not used,
+\fCtroff2page\fP displays a “could not find” message.
+.PP
+If there is \fIone\fP file argument, say \fCfilename.ext\fP,
+\fCtroff2page\fP converts it to \fCfilename.html\fP (and possibly
+some auxiliary HTML files whose names are of form
+\fCfilename-Z-H-number.html\fP).
+.PP
+If there is \fImore than one\fP file argument, say \fCf1.e1, f2.e2, ...
+flast.elast\fP, \fCtroff2page\fP concatenates their content to create a
+corresponding HTML version in \fCflast.html\fP (and possibly some
+aux HTML files \fCflast-Z-H-number.html\fP).
+.PP
+If you find you need to specify an option that \fCtroff2page\fP
+doesn't accept, you can always supply it in a macro file via
+\fC-m\fP.
+.PP
+The options can be varied with each call to \fCtroff2page\fP, just as
+with \fCgroff\fP. Please see the groff man page
+for details on all the provided options.
+.PP
+.TAG troff2pagerc
+.IX init files for troff2page
+.IX troff2pagerc@.troff2pagerc.tmac, macro file
+\fCtroff2page\fP can read directives in some autoloaded files
+without the need to explicitly use a command-line option. These
+are useful to specify information that is relevant only the HTML
+output.
+.PP
+The first such file is named
+\fC.troff2pagerc.tmac\fP, placed in one of your macro directories
+(\fCGROFF_TMAC_PATH\fP, working directory, home). The working
+directory is a good location if your changes are geared to only those
+documents that are in that directory.
+If your changes will be used in all your documents, place it in
+your home or a private \fCGROFF_TMAC_PATH\fP directory.
+A
+more system-level \fCGROFF_TMAC_PATH\fP placement is typically
+unadvised for such an ad hoc file.
+.PP
+\fCtroff2page\fP loads the first \fC.troff2pagerc.tmac\fP it
+finds, if it exists, before processing its main argument file.
+.PP
+.IX t2p@.t2p, macro file
+In addition, \fCtroff2page\fP will also pick up a file
+\fCjobname.t2p\fP, where \fCjobname\fP is the basename of the input document.
+This is useful for directives that are specific to a document. Note that the
+\fCjobname.t2p\fP, unlike \fC.troff2pagerc.tmac\fP, is looked for only in the
+working directory, and not more generally in \fCGROFF_TMAC_PATH\fP.
+.PP
+(Note that groff itself will not load either \fC.troff2pagerc.tmac\fP or
+\fCjobname.t2p\fP automatically.  But that is presumably OK, since you are
+using groff command-line options to specify the same information anyway, or
+these files contain information that's only relevant for HTML.  If you do want
+groff to pick up this file, you can use the option \fC-m.troff2pagerc\fP.)
+.PP
+.IX man.local, -man init file
+If the input file is recognizably a man page (i.e., it has the
+command \fC.TH\fP), both troff2page and groff will load, if it
+exists, the init file \fCman.local\fP in the home directory.
 .PP
 .SH 2
 Calling troff2page from within Lua
@@ -47,7 +153,15 @@ Calling troff2page from within Lua
 .TAG calling_troff2page_within_lua
 .IX calling troff2page from Lua
 .
-It is not necessary to run the file \fCtroff2page\fP as a
+The script \fCtroff2page\fP runs on the Unix command-line on Cygwin,
+Linux, Mac
+OS X, and Solaris.
+For more installation information,
+please see the file \*[url \
+https://github.com/ds26gte/troff2page/blob/master/INSTALL.adoc]INSTALL.adoc\&
+in the distribution.
+.PP
+However, it is not necessary to run the file \fCtroff2page\fP as a
 Unix script.  You can simply load \fCtroff2page.lua\fP (\fCtroff2page\fP is a soft link
 to the Lua file \fCtroff2page.lua\fP) into Lua, and then call the
 Lua procedure \fCtroff2page\fP on your source document.  E.g.,
@@ -58,7 +172,8 @@ Lua procedure \fCtroff2page\fP on your source document.  E.g.,
 .EE
 .PP
 The procedure \fCtroff2page\fP can be called
-several times, on the same or different documents, from
+several times, on the same or different documents, with all the
+same options as the script, from
 within the same Lua session.
 .PP
 .SH 2
@@ -80,15 +195,8 @@ To set up, first copy the files \fClua/troff2page.lua\fP and
 \fCtroff2page\fP repo in a \fCpack\fP subdirectory, somewhere in
 your \fC'runtimepath'\fP or \fC'packpath'\fP.
 .PP
-You now have the command \fCTroff2page\fP that you can call with
-no argument or with a single filename argument (completion is
-provided).
-.PP
-.EX
-    :Troff2page
-    :Troff2page filename
-.EE
-.PP
-Without an argument, \fCTroff2page\fP runs \fCtroff2page\fP on
-the file in the current window.  With a filename argument, it
-runs \fCtroff2page\fP on that file.
+You now have the Neovim command \fCTroff2page\fP (not
+capitalization!) which is called with the same style of arguments
+as \fCtroff2page\fP, with one special case: If called with no
+argument, the argument is assumed to be the name of the file in
+the current window.

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20190929 -- last modified
+Troff2page_version = 20190930 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -566,7 +566,7 @@ function set_register(regset, type)
 end
 
 function troff2page_help()
-  tlog('Usage: troff2page OPTION ... FILE\n')
+  tlog('Usage: troff2page OPTION ... FILE ...\n')
   tlog('Available options:\n')
   tlog(' -h              print this message\n')
   tlog(' --help          print this message\n')

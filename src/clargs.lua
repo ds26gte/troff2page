@@ -1,4 +1,4 @@
--- last modified 2017-09-06
+-- last modified 2019-09-30
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -28,7 +28,7 @@ function set_register(regset, type)
 end
 
 function troff2page_help()
-  tlog('Usage: troff2page OPTION ... FILE\n')
+  tlog('Usage: troff2page OPTION ... FILE ...\n')
   tlog('Available options:\n')
   tlog(' -h              print this message\n')
   tlog(' --help          print this message\n')

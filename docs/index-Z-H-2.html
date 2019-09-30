@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <!--
-Generated from index.ms by troff2page, v. 20190929
+Generated from index.ms by troff2page, v. 20190930
 Copyright (C) 2003-2019 Dorai Sitaram
 (running on Lua 5.3)
 http://ds26gte.github.io/troff2page
@@ -18,10 +18,10 @@ troff2page
 <body>
 <div>
 <div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-1.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-3.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
-<h1 style="font-size: 160%"><a name="TAG:__pca_sec_4"></a>
+<h1 style="font-size: 160%"><a name="TAG:__pca_sec_5"></a>
 2. troff and troff2page commands</h1>
 <p>
-<a name="TAG:__troff2page_index_6"></a>
+<a name="TAG:__troff2page_index_22"></a>
 <span style="color: #9b3d3d; "><span class=dropcap>T</span></span><span style="color: previous; ">ROFF2PAGE
 recognizes most of the commands (requests, macros,
 diversions, strings, escapes, glyphs) of raw troff and its
@@ -39,10 +39,10 @@ obvious.
 
 </p>
 </span><p class=indent>
-<a name="TAG:__troff2page_index_7"></a>
-<a name="TAG:__troff2page_index_8"></a>
-<a name="TAG:__troff2page_index_9"></a>
-<a name="TAG:__troff2page_index_10"></a>
+<a name="TAG:__troff2page_index_23"></a>
+<a name="TAG:__troff2page_index_24"></a>
+<a name="TAG:__troff2page_index_25"></a>
+<a name="TAG:__troff2page_index_26"></a>
 The troff2page distribution includes several troff macro
 or tmac
 files (with
@@ -54,8 +54,8 @@ cross-references; <span style="font-family: monospace; ">pca-ix.tmac</span> for 
 
 </p>
 <p class=indent>
-<a name="TAG:__troff2page_index_11"></a>
-<a name="TAG:__troff2page_index_12"></a>
+<a name="TAG:__troff2page_index_27"></a>
+<a name="TAG:__troff2page_index_28"></a>
 You should put these tmac files in one of your macro directories,
 i.e., the directories that are searched by the <span style="font-family: monospace; ">-m</span>
 command-line option and <span style="font-family: monospace; ">.mso</span> request.  (Both groff and troff2page search for macro files
@@ -67,12 +67,12 @@ details.)
 </p>
 <p class=indent>
 </p>
-<h2 style="font-size: 130%"><a name="TAG:__pca_sec_5"></a>
+<h2 style="font-size: 130%"><a name="TAG:__pca_sec_6"></a>
 Auxiliary files</h2>
 <p>
-<a name="TAG:__troff2page_index_13"></a>
-<a name="TAG:__troff2page_index_14"></a>
-<a name="TAG:__troff2page_index_15"></a>
+<a name="TAG:__troff2page_index_29"></a>
+<a name="TAG:__troff2page_index_30"></a>
+<a name="TAG:__troff2page_index_31"></a>
 Many of the macros defined in these <span style="font-family: monospace; ">.tmac</span> files write
 auxiliary files that are absorbed into the document during a
 second run.  Let’s first investigate how groff deals with them,
@@ -82,8 +82,8 @@ the <span style="font-family: monospace; ">-U</span> option for “unsafe” mod
 
 </p>
 <p class=indent>
-<a name="TAG:__troff2page_index_16"></a>
-<a name="TAG:__troff2page_index_17"></a>
+<a name="TAG:__troff2page_index_32"></a>
+<a name="TAG:__troff2page_index_33"></a>
 As an example, consider <span style="font-family: monospace; ">index.ms</span> (the groff source for the
 document you’re reading, which is the <span style="font-family: monospace; ">doc</span> subdirectory).  The following is one
 way to get the correct PostScript output:
@@ -200,8 +200,8 @@ resolve the aux files. This is exactly analogous to calling
 </p>
 <p class=indent>
 <a name="TAG:auxf"></a>
-<a name="TAG:__troff2page_index_18"></a>
-<a name="TAG:__troff2page_index_19"></a>
+<a name="TAG:__troff2page_index_34"></a>
+<a name="TAG:__troff2page_index_35"></a>
 The groff string <span style="font-family: monospace; ">\*[AUXF]</span> is used to construct the
 names of the
 auxiliary files.  By default it
@@ -217,144 +217,6 @@ to do this.
 
 </p>
 <p class=indent>
-</p>
-<h2 style="font-size: 130%"><a name="TAG:__pca_sec_6"></a>
-Commmand-line options</h2>
-<p>
-<a name="TAG:__troff2page_index_20"></a>
-<a name="TAG:__troff2page_index_21"></a>
-<a name="TAG:__troff2page_index_22"></a>
-<a name="TAG:__troff2page_index_23"></a>
-<a name="TAG:__troff2page_index_24"></a>
-<a name="TAG:__troff2page_index_25"></a>
-<a name="TAG:__troff2page_index_26"></a>
-<a name="TAG:__troff2page_index_27"></a>
-<a name="TAG:__troff2page_index_28"></a>
-<span style="font-family: monospace; ">troff2page</span> takes some, but not all, of the same options as <span style="font-family: monospace; ">groff</span>,
-viz.,
-<span style="font-family: monospace; ">-v</span> or <span style="font-family: monospace; ">--version</span> to display the version;
-<span style="font-family: monospace; ">-h</span> or <span style="font-family: monospace; ">--help</span> to display help;
-<span style="font-family: monospace; ">-m</span> to load macro files from <span style="font-family: monospace; ">GROFF_TMAC_PATH</span>;
-<span style="font-family: monospace; ">-r</span> to pre-set number registers;
-<span style="font-family: monospace; ">-d</span> to pre-define strings; and
-<span style="font-family: monospace; ">--</span> to signal the end of options.
-
-</p>
-<p class=indent>
-The options can be varied with each call to <span style="font-family: monospace; ">troff2page</span>, just as
-with <span style="font-family: monospace; ">groff</span>. Please see the groff man page
-for details on all the provided options.
-
-</p>
-<p class=indent>
-<a name="TAG:__troff2page_index_29"></a>
-<a name="TAG:__troff2page_index_30"></a>
-<a name="TAG:__troff2page_index_31"></a>
-<span style="font-family: monospace; ">troff2page</span> ignores all other <span style="font-family: monospace; ">groff</span> options, most with a warning.
-The options
-<span style="font-family: monospace; ">-z</span>, <span style="font-family: monospace; ">-t</span>, and <span style="font-family: monospace; ">-U</span> are silently ignored, as they're always valid
-for troff2page.
-
-</p>
-<p class=indent>
-
-</p>
-<p>
-<p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;%&#xa0;troff2page&#xa0;--help<br>
-</span><span style="font-style: oblique; font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;troff2page&#xa0;version&#xa0;20170827<br>
-&#xa0;&#xa0;&#xa0;&#xa0;Copyright&#xa0;(C)&#xa0;...<br>
-&#xa0;&#xa0;&#xa0;&#xa0;For&#xa0;full&#xa0;details,&#xa0;please&#xa0;see&#xa0;http://ds26gte.github.io/troff2page<br>
-<p>
-</p>
-</span><p>
-
-</p>
-<p class=indent>
-In the unlikely event that you have a document file named
-<span style="font-family: monospace; ">--help</span> (and wish to process it), use
-use
-
-</p>
-<p class=indent>
-
-</p>
-<p>
-<p >
-<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;&#xa0;&#xa0;%&#xa0;troff2page&#xa0;--&#xa0;--help<br>
-<p>
-</p>
-</span><p>
-
-</p>
-<p class=indent>
-Macro file options must be given without the suffix <span style="font-family: monospace; ">.tmac</span> or prefix
-<span style="font-family: monospace; ">tmac.</span>. Thus, <span style="font-family: monospace; ">-mxyz</span> or <span style="font-family: monospace; ">-m xyz</span> looks for the macro file
-<span style="font-family: monospace; ">xyz.tmac</span> or <span style="font-family: monospace; ">tmac.xyz</span>, whichever is found in the macro directories,
-and loads it.
-
-</p>
-<p class=indent>
-If after all the option processing, no file arguments remain,
-<span style="font-family: monospace; ">troff2page</span> displays a “could not find” message.
-
-</p>
-<p class=indent>
-If you find you need to specify an option that <span style="font-family: monospace; ">troff2page</span>
-doesn't accept, you can always supply it in a macro file via
-<span style="font-family: monospace; ">-m</span>.
-
-</p>
-<p class=indent>
-<a name="TAG:troff2pagerc"></a>
-<a name="TAG:__troff2page_index_32"></a>
-<a name="TAG:__troff2page_index_33"></a>
-<span style="font-family: monospace; ">troff2page</span> can read directives in some autoloaded files
-without the need to explicitly use a command-line option. These
-are useful to specify information that is relevant only the HTML
-output.
-
-</p>
-<p class=indent>
-The first such file is named
-<span style="font-family: monospace; ">.troff2pagerc.tmac</span>, placed in one of your macro directories
-(<span style="font-family: monospace; ">GROFF_TMAC_PATH</span>, working directory, home). The working
-directory is a good location if your changes are geared to only those
-documents that are in that directory.
-If your changes will be used in all your documents, place it in
-your home or a private <span style="font-family: monospace; ">GROFF_TMAC_PATH</span> directory.
-A
-more system-level <span style="font-family: monospace; ">GROFF_TMAC_PATH</span> placement is typically
-unadvised for such an ad hoc file.
-
-</p>
-<p class=indent>
-<span style="font-family: monospace; ">troff2page</span> loads the first <span style="font-family: monospace; ">.troff2pagerc.tmac</span> it
-finds, if it exists, before processing its main argument file.
-
-</p>
-<p class=indent>
-<a name="TAG:__troff2page_index_34"></a>
-In addition, <span style="font-family: monospace; ">troff2page</span> will also pick up a file
-<span style="font-family: monospace; ">jobname.t2p</span>, where <span style="font-family: monospace; ">jobname</span> is the basename of the input document.
-This is useful for directives that are specific to a document. Note that the
-<span style="font-family: monospace; ">jobname.t2p</span>, unlike <span style="font-family: monospace; ">.troff2pagerc.tmac</span>, is looked for only in the
-working directory, and not more generally in <span style="font-family: monospace; ">GROFF_TMAC_PATH</span>.
-
-</p>
-<p class=indent>
-(Note that groff itself will not load either <span style="font-family: monospace; ">.troff2pagerc.tmac</span> or
-<span style="font-family: monospace; ">jobname.t2p</span> automatically.  But that is presumably OK, since you are
-using groff command-line options to specify the same information anyway, or
-these files contain information that's only relevant for HTML.  If you do want
-groff to pick up this file, you can use the option <span style="font-family: monospace; ">-m.troff2pagerc</span>.)
-
-</p>
-<p class=indent>
-<a name="TAG:__troff2page_index_35"></a>
-If the input file is recognizably a man page (i.e., it has the
-command <span style="font-family: monospace; ">.TH</span>), both troff2page and groff will load, if it
-exists, the init file <span style="font-family: monospace; ">man.local</span> in the home directory.
 </p>
 <div class=footnote><hr align=left width="40%"><p>
 <a name="TAG:__troff2page_footnote_1"></a><a class=hrefinternal href="#TAG:__troff2page_call_footnote_1"><span class=hreftext><sup><small>1</small></sup></span></a>
