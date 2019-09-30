@@ -12,7 +12,7 @@ into it (somewhere) the macro call
 .EE
 .PP
 This causes troff2page to use the style sheet \fCslide.css\fP and JavaScript file
-\fCslidy.js\fP from \*[url http://www.w3.org/Talks/Tools/#slidy]Slidy\& to convert
+\fCslidy.js\fP from \*[url https://www.w3.org/Talks/Tools/#slidy]Slidy\& to convert
 your document into a single
 HTML page that can be browsed as a slideshow. troff2page looks for these files in
 the working directory, and if they’re not found there, it links

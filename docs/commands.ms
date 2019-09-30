@@ -11,7 +11,7 @@ ms and man macro packages, including such rather
 recherché macros as \fC.DC\fP, here used to produce a drop cap
 colored terracotta pink.
 The syntax recognized is the improved kind
-supported by \*[url http://groff.ffii.org]groff\& and \*[url \
+supported by \*[url https://www.gnu.org/software/groff]groff\& and \*[url \
 http://heirloom.sf.net/doctools.html]Heirloom troff\&, i.e., macro, string,
 and glyph names can be arbitrarily long, and strings can
 have arguments.  Most of the commands are converted to their

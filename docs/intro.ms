@@ -3,7 +3,7 @@
 1. Introduction
 .LP
 .IX troff2page, script
-troff2page is a \*[url http://www.lua.org]Lua\& script that converts troff (man and ms) documents into HTML web pages.
+troff2page is a \*[url https://www.lua.org]Lua\& script that converts troff (man and ms) documents into HTML web pages.
 .PP
 .TAG html-output
 .IX calling troff2page from the command-line
@@ -67,7 +67,7 @@ Calling troff2page from Neovim
 .TAG calling_troff2page_from_neovim
 .IX calling troff2page from Neovim
 .
-The text editor Neovim embeds Lua, so you can
+The text editor \*[url https://neovim.io]Neovim\& embeds Lua, so you can
 run \fCtroff2page\fP directly during an editor session.
 This can be a convenient way to convert your troff source while
 you're editing it, or even to automate the process using
@@ -90,5 +90,5 @@ provided).
 .EE
 .PP
 Without an argument, \fCTroff2page\fP runs \fCtroff2page\fP on
-the file in the current window.  With an filename argument, it
+the file in the current window.  With a filename argument, it
 runs \fCtroff2page\fP on that file.

@@ -118,7 +118,7 @@ define the color Venetian red using its HSL spec (357\(de, 49%,
 (91, 31, 34).
 .PP
 While there is an \*[url \
-http://en.wikipedia.org/wiki/HSL_color_space]algorithm\& to convert HSL to RGB,
+https://en.wikipedia.org/wiki/HSL_and_HSV]algorithm\& to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
@@ -292,5 +292,5 @@ The RGB values used in this manual for
 the colors chocolate,
 terracotta pink,
 and Venetian red are all courtesy \*[url \
-http://www.resene.co.nz/swatches]Resene Paints\&.
+https://www.resene.co.nz/swatches]Resene Paints\&.
 .FE
