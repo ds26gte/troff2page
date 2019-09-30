@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<!--
+Generated from index.ms by troff2page, v. 20170827
+Copyright (C) 2003-2017 Dorai Sitaram
+(running on Lua 5.3)
+http://ds26gte.github.io/troff2page
+-->
+<head>
+<meta charset="utf-8">
+<title>
+troff2page
+</title>
+<link rel="stylesheet" href="index-Z-S.css" title=default>
+<link rel="stylesheet" href="default.css" title=default>
+<meta name=robots content="index,follow">
+</head>
+<body>
+<div>
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-5.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-7.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
+<h1 style="font-size: 160%"><a name="TAG:__pca_sec_11"></a>
+6. Slideshows</h1>
+<p>
+<a name="TAG:__troff2page_index_54"></a>
+<a name="TAG:__troff2page_index_55"></a>
+To have your troff source to be converted into slideshow-ready HTML, insert
+into it (somewhere) the macro call
+
+</p>
+<p class=indent>
+
+</p>
+<p>
+<p >
+<p ><span style="font-family: monospace;&#xa0;">&#xa0;&#xa0;.SLIDES<br>
+<p>
+</p>
+</span><p>
+
+</p>
+<p class=indent>
+This causes troff2page to use the style sheet <span style="font-family: monospace; ">slide.css</span> and JavaScript file
+<span style="font-family: monospace; ">slidy.js</span> from <a href="http://www.w3.org/Talks/Tools/#slidy"><span class=hreftext>Slidy</span></a> to convert
+your document into a single
+HTML page that can be browsed as a slideshow. troff2page looks for these files in
+the working directory, and if they’re not found there, it links
+them from the W3C website. It may be prudent to get these files
+beforehand and place them in your working directory, so the
+presentation doesn’t rely on WiFi.
+
+</p>
+<p class=indent>
+A new slide is started for each
+level-1 section, i.e., <span style="font-family: monospace; ">.SH 1</span> and <span style="font-family: monospace; ">.NH 1</span>.
+(Note of course
+that it doesn’t make sense to convert generic troff documents
+into presentations. The sections have got to be pretty short!)
+
+</p>
+<p class=indent>
+An HTML page meant for presentation uses larger, bolder fonts by
+default (but you can add your own CSS). There are no navigation
+bars between slides.
+
+</p>
+<p class=indent>
+<a name="TAG:__troff2page_index_56"></a>
+Use the <span style="font-family: monospace; ">.pause</span> macro to
+interrupt display of the rest of the current slide.
+
+</p>
+<p class=indent>
+Consult the <a href="https://www.w3.org/Talks/Tools/Slidy2/Overview.html"><span class=hreftext>Slidy documentation</span></a> for the keypresses and clicks you can use
+to progress through or dynamically alter the look of your
+presentation.
+<div align=right class=navigation><i>[Go to <span><a class=hrefinternal href="index.html"><span class=hreftext>first</span></a>, <a class=hrefinternal href="index-Z-H-5.html"><span class=hreftext>previous</span></a></span><span>, <a class=hrefinternal href="index-Z-H-7.html"><span class=hreftext>next</span></a></span> page<span>; &#xa0;&#xa0;</span><span><a class=hrefinternal href="index.html#TAG:__troff2page_toc"><span class=hreftext>contents</span></a></span><span><span>; &#xa0;&#xa0;</span><a class=hrefinternal href="index-Z-H-10.html#TAG:__troff2page_index"><span class=hreftext>index</span></a></span>]</i></div>
+</p>
+</div>
+</body>
+</html>
