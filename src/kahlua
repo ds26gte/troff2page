@@ -1,9 +1,8 @@
-# last modified 2019-09-29
+# last modified 2020-11-07
 
 DEST=../lua/troff2page.lua
 
 rm -f $DEST
-rm -f *-Z-*.lua
 
 for f in *.lua; do
   cat $f | grep -v '^-- last modified' >> $DEST

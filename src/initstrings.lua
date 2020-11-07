@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2020-11-07
 
 function defstring(w, th)
   String_table[w] = th
@@ -23,6 +23,14 @@ function initialize_strings()
 
   defstring('}', function()
     return verbatim '</sup>'
+  end)
+
+  defstring('<', function()
+    return verbatim '<sub>'
+  end)
+
+  defstring('>', function()
+    return verbatim '</sub>'
   end)
 
   defstring('AUXF', function()

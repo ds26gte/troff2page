@@ -3980,6 +3980,14 @@ function initialize_strings()
     return verbatim '</sup>'
   end)
 
+  defstring('<', function()
+    return verbatim '<sub>'
+  end)
+
+  defstring('>', function()
+    return verbatim '</sub>'
+  end)
+
   defstring('AUXF', function()
     return verbatim('.troff2page_temp_' .. Jobname)
   end)

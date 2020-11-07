@@ -1,22 +1,41 @@
-.\" last modified 2019-09-30
+.\" last modified 2019-10-07
 .SH 1
 1. Introduction
 .LP
 .IX troff2page, script
 \fCtroff2page\fP is a \*[url https://www.lua.org]Lua\& script that
-converts troff (man and ms) documents into HTML web pages. First,
+makes Web pages from troff manuscripts. It reads an input
+document that is marked up in troff (man or ms) and produces an
+output document with the functionally equivalent HTML markup.
+.PP
+Troff is a venerable typesetting program that produces
+high-quality print output from plain text source.
+It doesn’t require
+special-purpose software to create content; any text
+editor will do. Troff macros and standard Unix external tools can
+be used to arbitrarily enhance troff’s print output.
+Troff is very compact (unlike its great rival TeX) and is
+practically ubiquitous, being available by default on
+all Unixish machines. These are significant benefits: so even
+though
+troff is a toolchain of some vintage, there continues to be a
+devoted band of troffglodytes preserving the tradition.
+troff2page lets you put your troff documents on the Web without
+your having to learn a new system or to maintain separate documents.
+.PP
+First,
 ensure that the script \fCtroff2page\fP is in a directory in your
 \fCPATH\fP.
 .PP
 .TAG html-output
 .IX calling troff2page from the command-line
-To convert an input troff document named \fCjobname.ms\fP, use
-the script \fCtroff2page\fP on the operating-system command line.
+To convert an input troff document named \fCjobname.ms\fP, type
+the following on the operating-system command line.
 .PP
 .EX
     troff2page jobname.ms
 .EE
-.PP
+.LP
 at your operating-system prompt.  This creates an output HTML file
 \fCjobname.html\fP in the current directory.  (This HTML file has the same basename as the
 input troff file (i.e., \fCjobname\fP), but its extension is
@@ -77,7 +96,7 @@ In the unlikely event that you have a document file named
 .IX U@-U, command-line option
 \fCtroff2page\fP ignores all other \fCgroff\fP options, most with a warning.
 The options
-\fC-z\fP, \fC-t\fP, and \fC-U\fP are silently ignored, as they're always valid
+\fC-z\fP, \fC-t\fP, and \fC-U\fP are silently ignored, as they’re always valid
 for troff2page.
 .PP
 Macro file options must be given without the suffix \fC.tmac\fP or prefix
@@ -100,7 +119,7 @@ corresponding HTML version in \fCflast.html\fP (and possibly some
 aux HTML files \fCflast-Z-H-number.html\fP).
 .PP
 If you find you need to specify an option that \fCtroff2page\fP
-doesn't accept, you can always supply it in a macro file via
+doesn’t accept, you can always supply it in a macro file via
 \fC-m\fP.
 .PP
 The options can be varied with each call to \fCtroff2page\fP, just as
@@ -139,7 +158,7 @@ working directory, and not more generally in \fCGROFF_TMAC_PATH\fP.
 (Note that groff itself will not load either \fC.troff2pagerc.tmac\fP or
 \fCjobname.t2p\fP automatically.  But that is presumably OK, since you are
 using groff command-line options to specify the same information anyway, or
-these files contain information that's only relevant for HTML.  If you do want
+these files contain information that’s only relevant for HTML.  If you do want
 groff to pick up this file, you can use the option \fC-m.troff2pagerc\fP.)
 .PP
 .IX man.local, -man init file
@@ -185,7 +204,7 @@ Calling troff2page from Neovim
 The text editor \*[url https://neovim.io]Neovim\& embeds Lua, so you can
 run \fCtroff2page\fP directly during an editor session.
 This can be a convenient way to convert your troff source while
-you're editing it, or even to automate the process using
+you’re editing it, or even to automate the process using
 appropriate autocommands.
 .PP
 To set up, first copy the files \fClua/troff2page.lua\fP and
