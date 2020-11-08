@@ -1,4 +1,4 @@
-.\" last modified 2019-09-29
+.\" last modified 2020-11-07
 .SH 1
 7. Extending troff using Lua
 .LP
@@ -175,9 +175,9 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
     .endeval
 .EE
 .PP
-Here, the Lua procedure \fCdef-hsl-color\fP takes an HSL spec and
+Here, the Lua procedure \fCdef_hsl_color\fP takes an HSL spec and
 writes out the equivalent RGB groff definition. (The troff2page
-distribution provides \fCdef-hsl-color\fP in the macro file
+distribution provides \fCdef_hsl_color\fP in the macro file
 \fCdefhsl.tmac\fP.)
 .PP
 We can call this Lua procedure inside another \fC.eval\fP to define

@@ -1,4 +1,4 @@
-.\" last modified 2019-09-30
+.\" last modified 2020-11-07
 .SH 1
 2. troff and troff2page commands
 .LP
@@ -29,28 +29,46 @@ Please consult troff and groff documentation for these commands.  We will
 concentrate here on those commands whose HTML counterpart is not immediately
 obvious.
 .PP
+.SH 2
+mpca macro files
 .IX macro files provided with troff2page
+.IX mpca macros
 .IX pca-tag.tmac, macro file
 .IX pca-ix.tmac, macro file
-.IX eval4troff.tmac, macro file
-The troff2page distribution includes several troff macro
-or tmac
-files (with
-extension \fCtmac\fP), both in the main directory and in the
-sudirectory for the submodule \fCmpca\fP. They include general-purpose
-extensions to the \fCms\fP package, e.g., \fCpca-tag.tmac\fP for
-cross-references; \fCpca-ix.tmac\fP for index generation;
-\fCpca-eval.tmac\fP for extending troff using Lua, etc.
+.IX pca-eval.tmac, macro file
+.IX pca.tmac, macro file
+.LP
+troff2page can process documents that use the \fCms\fP extension macros
+provided in \*[url http://github.com/ds26gte/mpca]mpca\&. For
+convenience, this repo is included as a submodule \fCmpca\fP.
+It includes general-purpose extensions to the \fCms\fP package,
+e.g., \fCpca-tag.tmac\fP for cross-references; \fCpca-ix.tmac\fP
+for index generation; \fCpca-eval.tmac\fP for extending troff
+using Lua, etc. These extensions may loaded severally or as the
+single comprehensive macro file \fCpca.tmac\fP. Please consult
+this submodule’s documentation for more information.
+.PP
+.IX GROFF_TMAC_PATH, environment variable
+In order to take advantage of the \fCmpca\fP tmac files, you
+should place them in one of your troff macro directories. (Both
+groff and troff2page search for macro files first in the
+directories in \fCGROFF_TMAC_PATH\fP, then in the working
+directory, and finally in your home directory. See the section
+for “Macro Directories” in the groff info file for details.)
 .PP
 .IX m@-m, command-line option
 .IX mso@.mso, groff request
-You should put these tmac files in one of your macro directories,
-i.e., the directories that are searched by the \fC-m\fP
-command-line option and \fC.mso\fP request.  (Both groff and troff2page search for macro files
-first in the directories in \fCGROFF_TMAC_PATH\fP, then in the
-working directory, and finally in your home directory. See the
-section for “Macro Directories” in the groff info file for
-details.)
+Your input document sources the \fCmpca\fP macro files using
+either the \fC-m\fP command-line option or the \fC.mso\fP request.
+While this is enough for groff, in order for
+troff2page to provide a truly effective HTML translation of
+\fCmpca\fP’s features, it is also necessary to install the
+additional tmac files provided in the subdirectory \fCmpca-t2p\fP.
+Once again, these should go in one of your troff macro
+directories. Note that the \fCmpca-t2p\fP macro files do not need not be
+specially sourced by the document. The \fCmpca\fP macros will
+take care to consult them whenever the document processor is
+recognized as troff2page (i.e., rather than groff).
 .PP
 .SH 2
 Auxiliary files
@@ -77,7 +95,7 @@ way to get the correct PostScript output:
     Rerun groff with -U
     index.ms:18: can't open `.trofftemp.toc': No such file or directory
     index.ms:38: can't open `.trofftemp.ind': No such file or directory
-
+.br
 .ft C
     % groff -t -U index.ms > index.ps
 .ft CI
