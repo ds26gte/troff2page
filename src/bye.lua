@@ -1,4 +1,4 @@
--- last modified 2017-08-17
+-- last modified 2020-11-08
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -12,12 +12,13 @@ function clear_per_doc_tables()
 end
 
 function close_all_open_streams()
+  --print('doing close_all_open_streams')
   -- End_hooks?
   if Aux_stream then Aux_stream:flush(); Aux_stream:close() end
   if Css_stream then Css_stream:flush(); Css_stream:close() end
   for _,c in pairs(Output_streams) do
     --print('strm=', c)
-   -- c:flush(); 
+   -- c:flush();
     c:close()
   end
 end
@@ -30,9 +31,10 @@ function do_end_macro()
 end
 
 function do_bye()
+  --print('doing do_bye')
   flet({
        Blank_line_macro = false
-     }, function() 
+     }, function()
      emit_blank_line()
    end)
   do_end_macro()
@@ -46,7 +48,13 @@ function do_bye()
   end
   --print('nb_macro_package=>', Macro_package, '<=')
   write_aux('nb_macro_package("', Macro_package, '")')
-  if Title then write_aux('nb_title("', Title, '")') end
+  if Title then
+    --print('nb_titling', Title)
+    local escaped_Title = string.gsub(Title, '\n', '\\n')
+    escaped_Title = string.gsub(escaped_Title, '"', '\\"')
+    --print('nb_titling I', escaped_Title)
+    write_aux('nb_title("', escaped_Title, '")')
+  end
   if Last_page_number == 0 then
     Css_stream:write('.navigation { display: none; }\n')
   end

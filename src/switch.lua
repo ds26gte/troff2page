@@ -1,4 +1,4 @@
--- last modified 2017-08-28
+-- last modified 2020-11-08
 
 function switch_style(opts)
   opts = opts or {}
@@ -33,7 +33,7 @@ function switch_style(opts)
     ev_curr.prevfont = false
   elseif not new_font then
     if open_new_span_p then new_font = curr_font end
-  else ev_curr.prevfont = curr_font 
+  else ev_curr.prevfont = curr_font
   end
   --
   if new_color == 'previous' then
@@ -41,7 +41,7 @@ function switch_style(opts)
     ev_curr.prevcolor = false
   elseif not new_color then
     if open_new_span_p then new_color = curr_color end
-  else ev_curr.prevcolor = curr_color 
+  else ev_curr.prevcolor = curr_color
   end
   --
   if new_bgcolor == 'previous' then
@@ -49,7 +49,7 @@ function switch_style(opts)
     ev_curr.prevbgcolor = false
   elseif not new_bgcolor then
     if open_new_span_p then new_bgcolor = curr_bgcolor end
-  else ev_curr.prevbgcolor = curr_bgcolor 
+  else ev_curr.prevbgcolor = curr_bgcolor
   end
   --
   if new_size == 'previous' then
@@ -57,7 +57,7 @@ function switch_style(opts)
     ev_curr.prevsize = false
   elseif not new_size then
     if open_new_span_p then new_size = curr_size end
-  else ev_curr.prevsize = curr_size 
+  else ev_curr.prevsize = curr_size
   end
   --
   ev_curr.font = new_font
@@ -97,7 +97,7 @@ function switch_font(f)
   end
   --print('f=', f)
   return switch_style{font = f}
-end 
+end
 
 function make_span_open(opts)
   --print('doing make_span_open')
@@ -127,10 +127,47 @@ function switch_glyph_color(c)
     local it = Color_table[c]
     if it then c=it end
   end
-  if c then 
+  if c then
     c = 'color: ' ..c
   end
   return switch_style{color = c}
+end
+
+function switch_fill_color(c)
+  if not c then no_op()
+  elseif c == '' then c='previous'
+  else
+    local it = Color_table[c]
+    if it then c=it end
+  end
+  if c then
+    c = 'background-color: ' ..c
+  end
+  return switch_style{bgcolor = c}
+end
+
+function switch_size(n)
+  if not n then no_op()
+  elseif n == '0' then n='previous'
+  else
+    local c0 = string.sub(n,1,1)
+    if c0 == '+' then
+      local m = tonumber(string.sub(n,2))
+      n = 100 * (1 + (m/10))
+    elseif c0 == '-' then
+      local m = tonumber(string.sub(n,2))
+      n = 100 * (1 - (m/10))
+    else
+      local m = tonumber(n)
+      n = 10*m
+    end
+    n = math.floor(n + 1/2)
+    if n == 100 then n = false end
+    if n then
+      n = 'font-size' .. n .. '%'
+    end
+  end
+    return switch_style{size = n}
 end
 
 function man_alternating_font_macro(f1, f2)

@@ -1,4 +1,4 @@
--- last modified 2017-08-20
+-- last modified 2020-11-08
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -16,27 +16,37 @@ function store_title(title, opts)
     --print('storetitle calling eep')
     emit_end_para()
     emit_verbatim '<h1 align=center class=title>'
-    emit(title)
+    --title = string.gsub(title, '\n', '\\n')
+    --title = string.gsub(title, '"', '\\"')
+    local unescaped_title = string.gsub(title, '\\\\', '\\')
+    --print('DOING emit title', title)
+    flet({Outputting_to = 'html'}, function()
+      emit(unescaped_title)
+    end)
     emit_verbatim '</h1>\n'
   end
 end
 
 function emit_external_title()
-  --print('doing emit_external_title')
+  --print('DOING emit_external_title', Title, '=or=', Jobname)
   emit_verbatim '<title>'
   emit_newline()
-  flet({
-       Outputting_to = 'title'
-     }, function() 
-     emit_verbatim(Title or Jobname)
-   end)
+  if Title then
+    flet({Outputting_to = 'html'}, function()
+      emit(Title)
+    end)
+  else
+    flet({Outputting_to = 'title'}, function()
+      emit_verbatim(Jobname)
+    end)
+  end
   emit_newline()
   emit_verbatim '</title>\n'
 end
 
 function get_header(k, opts)
   opts = opts or {}
-  --print('doing get_header with Out=', Out)
+  --print('DOING get_header with Out=', Out)
   if not opts.man_header_p then
     --print('not manheaderp')
     local old_Out = Out
@@ -54,6 +64,9 @@ function get_header(k, opts)
       --io.write('orig res= ->', res, '<-')
       res = string.gsub(res, '^%s*<[pP]>%s*', '')
       res = string.gsub(res, '%s*</[pP]>%s*$', '')
+      res = string.gsub(res, '"', '\\\\[htmlquot]')
+      res = string.gsub(res, '<', '\\\\[htmllt]')
+      res = string.gsub(res, '>', '\\\\[htmlgt]')
       --io.write('res= ->', res, '<-')
       k(res)
       --k(string_trim_blanks(res))
@@ -69,7 +82,7 @@ function get_header(k, opts)
         while true do
           w = read_word()
           if not w then read_troff_line(); break
-          else 
+          else
             if first_p then first_p =false else emit ' ' end
             emit(expand_args(w))
           end
@@ -126,7 +139,9 @@ function emit_section_header(level, opts)
       emit_verbatim '.'
       emit_nbsp(2)
     end
-    emit_verbatim(header)
+    local unescaped_header = string.gsub(header, '\\\\', '\\')
+    emit(unescaped_header)
+    --emit_verbatim(header)
     emit_verbatim '</h'
     emit(hnum)
     emit_verbatim '>'

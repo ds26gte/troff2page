@@ -1,27 +1,24 @@
-.mso eval4troff.tmac
-.
-pi = 
+pi =
 .eval
-;following prints pi, because cos(pi) = -1
-(princ (acos -1))
-(terpri)
+-- following prints pi, because cos(pi) = -1
+io.write(math.acos(-1))
+io.write('\n')
 .endeval
-
+.PP
 e =
 .eval
-(princ (exp 1))
-(terpri)
+io.write(math.exp(1))
+io.write('\n')
 .endeval
-
-lb/kg = 
+.PP
+kg/lb =
 .eval
-(princ (/ .45359237))
-(terpri)
+io.write(1/.45359237)
+io.write('\n')
 .endeval
-
-L/gal = 
+.PP
+gal/L =
 .eval
-(princ (* 231 (expt 2.54 3) .001))
-(terpri)
+io.write(231 * math.pow(2.54, 3) * .001)
+io.write('\n')
 .endeval
-

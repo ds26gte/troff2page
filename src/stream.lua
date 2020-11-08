@@ -1,4 +1,4 @@
--- last modified 2017-08-15
+-- last modified 2020-11-08
 
 function troff_open(stream_name, f)
   ensure_file_deleted(f)
@@ -7,6 +7,7 @@ function troff_open(stream_name, f)
 end
 
 function troff_close(stream_name)
+  --print('doing troff_close')
   local h = Output_streams[stream_name]
   io.close(h) -- check h is truthy?
   Output_streams[stream_name] = nil

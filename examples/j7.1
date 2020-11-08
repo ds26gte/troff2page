@@ -1,17 +1,15 @@
-.mso eval4troff.tmac
-.
 .eval
-(princ "one")
-(terpri)
+io.write('one')
+io.write('\n')
 .endeval
 .if \n[.troff2page] \{\
 .eval
-(princ "eins")
-(terpri)
+io.write('eins')
+io.write('\n')
 .endeval
 .\}
 .eval
-(princ "two")
-(terpri)
+io.write('two')
+io.write('\n')
 .endeval
 .nx

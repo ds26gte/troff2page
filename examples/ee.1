@@ -1,10 +1,6 @@
-.mso eval4troff.tmac
-.
 The ratio of the circumference of a circle to its diameter is
 .eval
-;following prints pi, because cos(pi) = -1
-(princ (acos -1))
-(princ ".")
-(terpri)
+-- following prints pi, because cos(pi) = -1
+io.write(math.acos(-1))
+io.write('.\n')
 .endeval
-

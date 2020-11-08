@@ -476,12 +476,13 @@ function clear_per_doc_tables()
 end
 
 function close_all_open_streams()
+  --print('doing close_all_open_streams')
   -- End_hooks?
   if Aux_stream then Aux_stream:flush(); Aux_stream:close() end
   if Css_stream then Css_stream:flush(); Css_stream:close() end
   for _,c in pairs(Output_streams) do
     --print('strm=', c)
-   -- c:flush(); 
+   -- c:flush();
     c:close()
   end
 end
@@ -494,9 +495,10 @@ function do_end_macro()
 end
 
 function do_bye()
+  --print('doing do_bye')
   flet({
        Blank_line_macro = false
-     }, function() 
+     }, function()
      emit_blank_line()
    end)
   do_end_macro()
@@ -510,7 +512,13 @@ function do_bye()
   end
   --print('nb_macro_package=>', Macro_package, '<=')
   write_aux('nb_macro_package("', Macro_package, '")')
-  if Title then write_aux('nb_title("', Title, '")') end
+  if Title then
+    --print('nb_titling', Title)
+    local escaped_Title = string.gsub(Title, '\n', '\\n')
+    escaped_Title = string.gsub(escaped_Title, '"', '\\"')
+    --print('nb_titling I', escaped_Title)
+    write_aux('nb_title("', escaped_Title, '")')
+  end
   if Last_page_number == 0 then
     Css_stream:write('.navigation { display: none; }\n')
   end
@@ -2003,19 +2011,6 @@ end)
 
 defescape('E', Escape_table.e) 
 
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
-end
-
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -2075,6 +2070,19 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
+end
+
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
 end
 
 
@@ -2396,6 +2404,48 @@ function html2info_tweak_info_file(f)
   -- restore Þ
   "s/Þ!/Þ/g"
   )
+end
+
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
 end
 
 
@@ -2759,48 +2809,6 @@ function initialize_glyphs()
 end 
 
 
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
-end
-
-function begin_html_document()
-
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
-  end
-
-  start_css_file()
-
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
-  end
-end
-
-
 function defrequest(w, th)
   if Macro_table[w] then
     Macro_table[w] = nil
@@ -2896,7 +2904,8 @@ function initialize_macros()
       it = Request_table[old]
       if it then defrequest(new, it)
       else
-        terror('als: unknown rhs %s', old)
+        no_op()
+        --terror('als: unknown rhs %s', old)
       end
     end
   end)
@@ -2988,6 +2997,7 @@ function initialize_macros()
   end)
 
   defrequest('di', function()
+    --print('doing di')
     local w = read_args()
     if w then
       local o = make_string_output_stream()
@@ -3004,6 +3014,7 @@ function initialize_macros()
   end)
 
   defrequest('da', function()
+    --print('doing da')
     local w = read_args()
     if not w then terror('da: name missing') end
     local div = Diversion_table[w]
@@ -3334,6 +3345,7 @@ function initialize_macros()
   end)
 
   defrequest('TH', function()
+    --print('doing TH')
     TH_request()
   end)
 
@@ -3358,13 +3370,13 @@ function initialize_macros()
   end)
 
   defrequest('EX', function()
---    print('doing EX')
+    --print('doing EX')
     start_display('L')
     emit(switch_font 'C')
   end)
 
   defrequest('EE', function()
---    print('doing EE')
+    --print('doing EE')
     read_troff_line()
     stop_display()
   end)
@@ -3646,6 +3658,7 @@ function initialize_macros()
   end)
 
   defrequest('TS', function()
+    --print('doing TS')
     local arg1 = read_args()
     flet({
       Reading_table_header_p = (args1 == 'H'),
@@ -4958,27 +4971,37 @@ function store_title(title, opts)
     --print('storetitle calling eep')
     emit_end_para()
     emit_verbatim '<h1 align=center class=title>'
-    emit(title)
+    --title = string.gsub(title, '\n', '\\n')
+    --title = string.gsub(title, '"', '\\"')
+    local unescaped_title = string.gsub(title, '\\\\', '\\')
+    --print('DOING emit title', title)
+    flet({Outputting_to = 'html'}, function()
+      emit(unescaped_title)
+    end)
     emit_verbatim '</h1>\n'
   end
 end
 
 function emit_external_title()
-  --print('doing emit_external_title')
+  --print('DOING emit_external_title', Title, '=or=', Jobname)
   emit_verbatim '<title>'
   emit_newline()
-  flet({
-       Outputting_to = 'title'
-     }, function() 
-     emit_verbatim(Title or Jobname)
-   end)
+  if Title then
+    flet({Outputting_to = 'html'}, function()
+      emit(Title)
+    end)
+  else
+    flet({Outputting_to = 'title'}, function()
+      emit_verbatim(Jobname)
+    end)
+  end
   emit_newline()
   emit_verbatim '</title>\n'
 end
 
 function get_header(k, opts)
   opts = opts or {}
-  --print('doing get_header with Out=', Out)
+  --print('DOING get_header with Out=', Out)
   if not opts.man_header_p then
     --print('not manheaderp')
     local old_Out = Out
@@ -4996,6 +5019,9 @@ function get_header(k, opts)
       --io.write('orig res= ->', res, '<-')
       res = string.gsub(res, '^%s*<[pP]>%s*', '')
       res = string.gsub(res, '%s*</[pP]>%s*$', '')
+      res = string.gsub(res, '"', '\\\\[htmlquot]')
+      res = string.gsub(res, '<', '\\\\[htmllt]')
+      res = string.gsub(res, '>', '\\\\[htmlgt]')
       --io.write('res= ->', res, '<-')
       k(res)
       --k(string_trim_blanks(res))
@@ -5011,7 +5037,7 @@ function get_header(k, opts)
         while true do
           w = read_word()
           if not w then read_troff_line(); break
-          else 
+          else
             if first_p then first_p =false else emit ' ' end
             emit(expand_args(w))
           end
@@ -5068,7 +5094,9 @@ function emit_section_header(level, opts)
       emit_verbatim '.'
       emit_nbsp(2)
     end
-    emit_verbatim(header)
+    local unescaped_header = string.gsub(header, '\\\\', '\\')
+    emit(unescaped_header)
+    --emit_verbatim(header)
     emit_verbatim '</h'
     emit(hnum)
     emit_verbatim '>'
@@ -5085,6 +5113,7 @@ function troff_open(stream_name, f)
 end
 
 function troff_close(stream_name)
+  --print('doing troff_close')
   local h = Output_streams[stream_name]
   io.close(h) -- check h is truthy?
   Output_streams[stream_name] = nil
@@ -5134,7 +5163,7 @@ function switch_style(opts)
     ev_curr.prevfont = false
   elseif not new_font then
     if open_new_span_p then new_font = curr_font end
-  else ev_curr.prevfont = curr_font 
+  else ev_curr.prevfont = curr_font
   end
   --
   if new_color == 'previous' then
@@ -5142,7 +5171,7 @@ function switch_style(opts)
     ev_curr.prevcolor = false
   elseif not new_color then
     if open_new_span_p then new_color = curr_color end
-  else ev_curr.prevcolor = curr_color 
+  else ev_curr.prevcolor = curr_color
   end
   --
   if new_bgcolor == 'previous' then
@@ -5150,7 +5179,7 @@ function switch_style(opts)
     ev_curr.prevbgcolor = false
   elseif not new_bgcolor then
     if open_new_span_p then new_bgcolor = curr_bgcolor end
-  else ev_curr.prevbgcolor = curr_bgcolor 
+  else ev_curr.prevbgcolor = curr_bgcolor
   end
   --
   if new_size == 'previous' then
@@ -5158,7 +5187,7 @@ function switch_style(opts)
     ev_curr.prevsize = false
   elseif not new_size then
     if open_new_span_p then new_size = curr_size end
-  else ev_curr.prevsize = curr_size 
+  else ev_curr.prevsize = curr_size
   end
   --
   ev_curr.font = new_font
@@ -5198,7 +5227,7 @@ function switch_font(f)
   end
   --print('f=', f)
   return switch_style{font = f}
-end 
+end
 
 function make_span_open(opts)
   --print('doing make_span_open')
@@ -5228,10 +5257,47 @@ function switch_glyph_color(c)
     local it = Color_table[c]
     if it then c=it end
   end
-  if c then 
+  if c then
     c = 'color: ' ..c
   end
   return switch_style{color = c}
+end
+
+function switch_fill_color(c)
+  if not c then no_op()
+  elseif c == '' then c='previous'
+  else
+    local it = Color_table[c]
+    if it then c=it end
+  end
+  if c then
+    c = 'background-color: ' ..c
+  end
+  return switch_style{bgcolor = c}
+end
+
+function switch_size(n)
+  if not n then no_op()
+  elseif n == '0' then n='previous'
+  else
+    local c0 = string.sub(n,1,1)
+    if c0 == '+' then
+      local m = tonumber(string.sub(n,2))
+      n = 100 * (1 + (m/10))
+    elseif c0 == '-' then
+      local m = tonumber(string.sub(n,2))
+      n = 100 * (1 - (m/10))
+    else
+      local m = tonumber(n)
+      n = 10*m
+    end
+    n = math.floor(n + 1/2)
+    if n == 100 then n = false end
+    if n then
+      n = 'font-size' .. n .. '%'
+    end
+  end
+    return switch_style{size = n}
 end
 
 function man_alternating_font_macro(f1, f2)

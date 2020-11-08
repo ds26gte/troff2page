@@ -1,4 +1,4 @@
--- last modified 2019-09-26
+-- last modified 2020-11-08
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -95,7 +95,8 @@ function initialize_macros()
       it = Request_table[old]
       if it then defrequest(new, it)
       else
-        terror('als: unknown rhs %s', old)
+        no_op()
+        --terror('als: unknown rhs %s', old)
       end
     end
   end)
@@ -187,6 +188,7 @@ function initialize_macros()
   end)
 
   defrequest('di', function()
+    --print('doing di')
     local w = read_args()
     if w then
       local o = make_string_output_stream()
@@ -203,6 +205,7 @@ function initialize_macros()
   end)
 
   defrequest('da', function()
+    --print('doing da')
     local w = read_args()
     if not w then terror('da: name missing') end
     local div = Diversion_table[w]
@@ -533,6 +536,7 @@ function initialize_macros()
   end)
 
   defrequest('TH', function()
+    --print('doing TH')
     TH_request()
   end)
 
@@ -557,13 +561,13 @@ function initialize_macros()
   end)
 
   defrequest('EX', function()
---    print('doing EX')
+    --print('doing EX')
     start_display('L')
     emit(switch_font 'C')
   end)
 
   defrequest('EE', function()
---    print('doing EE')
+    --print('doing EE')
     read_troff_line()
     stop_display()
   end)
@@ -845,6 +849,7 @@ function initialize_macros()
   end)
 
   defrequest('TS', function()
+    --print('doing TS')
     local arg1 = read_args()
     flet({
       Reading_table_header_p = (args1 == 'H'),
