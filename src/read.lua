@@ -1,4 +1,4 @@
--- last modified 2017-08-28
+-- last modified 2020-11-09
 
 function make_bstream(opts)
   return {
@@ -525,17 +525,20 @@ function read_args()
   --print('doing read_args')
   local ln = expand_args(read_troff_line())
   local r = {}
+  local c, w
   --print('line read=', ln)
   toss_back_line(ln)
   while true do
     ignore_spaces()
-    local c = snoop_char()
+    c = snoop_char()
     if not c or c == '\n' then
       get_char()
       break
     end
-    table.insert(r, read_word())
+    w = read_word()
+    --print('read_args found word a', w, 'a')
+    table.insert(r, w)
   end
-  --print('read_args returning' , table_to_string(r))
+  --print('read_args returning a' , table_to_string(r), 'a')
   return table.unpack(r)
 end 

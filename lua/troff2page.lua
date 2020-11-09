@@ -2011,6 +2011,19 @@ end)
 
 defescape('E', Escape_table.e) 
 
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
+end
+
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -2070,19 +2083,6 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
-end
-
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
 end
 
 
@@ -2404,48 +2404,6 @@ function html2info_tweak_info_file(f)
   -- restore Þ
   "s/Þ!/Þ/g"
   )
-end
-
-
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
-end
-
-function begin_html_document()
-
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
-  end
-
-  start_css_file()
-
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
-  end
 end
 
 
@@ -2807,6 +2765,48 @@ function initialize_glyphs()
     defglyph(k, verbatim(string.format('&#x%x;', v)))
   end
 end 
+
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
+end
 
 
 function defrequest(w, th)
@@ -3660,8 +3660,9 @@ function initialize_macros()
   defrequest('TS', function()
     --print('doing TS')
     local arg1 = read_args()
+    --print('TS arg1 is a', arg1, 'a')
     flet({
-      Reading_table_header_p = (args1 == 'H'),
+      Reading_table_header_p = (arg1 == 'H'),
       Reading_table_p = true,
       Table_format_table = {},
       Table_default_format_line = 0,
@@ -4887,18 +4888,21 @@ function read_args()
   --print('doing read_args')
   local ln = expand_args(read_troff_line())
   local r = {}
+  local c, w
   --print('line read=', ln)
   toss_back_line(ln)
   while true do
     ignore_spaces()
-    local c = snoop_char()
+    c = snoop_char()
     if not c or c == '\n' then
       get_char()
       break
     end
-    table.insert(r, read_word())
+    w = read_word()
+    --print('read_args found word a', w, 'a')
+    table.insert(r, w)
   end
-  --print('read_args returning' , table_to_string(r))
+  --print('read_args returning a' , table_to_string(r), 'a')
   return table.unpack(r)
 end 
 
@@ -5436,6 +5440,7 @@ end
 
 
 function table_do_global_options()
+  --print('doing table_do_global_options')
   local x
   while true do
     x = string.match(read_one_line(), '^ *(.-) *$')
@@ -5447,6 +5452,7 @@ function table_do_global_options()
 end
 
 function table_do_global_option_1(x)
+  --print('doing table_do_global_option_1')
   flet({
        Current_troff_input = { buffer = string_to_table(x) }
      }, function()
@@ -5474,6 +5480,7 @@ function table_do_global_option_1(x)
 end
 
 function table_do_format_section()
+  --print('doing table_do_format_section')
   Table_default_format_line = 0
   local x; local xn
   while true do
@@ -5515,6 +5522,7 @@ function table_do_format_1(x)
 end
 
 function table_do_rows()
+  --print('doing table_do_rows')
   flet({
     Inside_table_text_block_p = false,
     Table_row_number = 1,
@@ -5523,13 +5531,15 @@ function table_do_rows()
     local c
     while true do
       c = snoop_char()
+      if not c then break end
+      --print('while loop saw', c)
       if Table_cell_number==0 then
-        local continue
         if c == Control_char then get_char()
           local w = read_word()
+          --print('found cmd inside table', w)
           if not w then no_op()
           elseif w=='TE' then break
-          elseif w=='TH' then Reading_table_header_p=false; continue=true
+          elseif w=='TH' then Reading_table_header_p=false
           else toss_back_string(w)
           end
           toss_back_char(Control_char)
@@ -5537,9 +5547,8 @@ function table_do_rows()
           emit_verbatim '<tr><td valign=top colspan='
           emit_verbatim(Table_number_of_columns)
           emit_verbatim '><hr></td></tr>\n'
-          continue=true
         end
-        if continue then break else table_do_cell() end
+        table_do_cell()
       elseif not Inside_table_text_block_p and c=='T' then
         get_char(); c = snoop_char()
         if c=='{' then get_char()
@@ -5560,7 +5569,9 @@ function table_do_rows()
 end
 
 function table_do_cell()
+  --print('doing table_do_cell')
   if Table_cell_number==0 then
+    --print('starting cell', Reading_table_header_p)
     emit_verbatim '<tr'
     if Reading_table_header_p then emit_verbatim ' class=tableheader' end
     emit_verbatim '>'

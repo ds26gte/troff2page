@@ -1,4 +1,4 @@
--- last modified 2020-11-08
+-- last modified 2020-11-09
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -851,8 +851,9 @@ function initialize_macros()
   defrequest('TS', function()
     --print('doing TS')
     local arg1 = read_args()
+    --print('TS arg1 is a', arg1, 'a')
     flet({
-      Reading_table_header_p = (args1 == 'H'),
+      Reading_table_header_p = (arg1 == 'H'),
       Reading_table_p = true,
       Table_format_table = {},
       Table_default_format_line = 0,

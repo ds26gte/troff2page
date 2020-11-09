@@ -1,6 +1,7 @@
--- last modified 2017-08-26
+-- last modified 2020-11-09
 
 function table_do_global_options()
+  --print('doing table_do_global_options')
   local x
   while true do
     x = string.match(read_one_line(), '^ *(.-) *$')
@@ -12,6 +13,7 @@ function table_do_global_options()
 end
 
 function table_do_global_option_1(x)
+  --print('doing table_do_global_option_1')
   flet({
        Current_troff_input = { buffer = string_to_table(x) }
      }, function()
@@ -39,6 +41,7 @@ function table_do_global_option_1(x)
 end
 
 function table_do_format_section()
+  --print('doing table_do_format_section')
   Table_default_format_line = 0
   local x; local xn
   while true do
@@ -80,6 +83,7 @@ function table_do_format_1(x)
 end
 
 function table_do_rows()
+  --print('doing table_do_rows')
   flet({
     Inside_table_text_block_p = false,
     Table_row_number = 1,
@@ -88,13 +92,15 @@ function table_do_rows()
     local c
     while true do
       c = snoop_char()
+      if not c then break end
+      --print('while loop saw', c)
       if Table_cell_number==0 then
-        local continue
         if c == Control_char then get_char()
           local w = read_word()
+          --print('found cmd inside table', w)
           if not w then no_op()
           elseif w=='TE' then break
-          elseif w=='TH' then Reading_table_header_p=false; continue=true
+          elseif w=='TH' then Reading_table_header_p=false
           else toss_back_string(w)
           end
           toss_back_char(Control_char)
@@ -102,9 +108,8 @@ function table_do_rows()
           emit_verbatim '<tr><td valign=top colspan='
           emit_verbatim(Table_number_of_columns)
           emit_verbatim '><hr></td></tr>\n'
-          continue=true
         end
-        if continue then break else table_do_cell() end
+        table_do_cell()
       elseif not Inside_table_text_block_p and c=='T' then
         get_char(); c = snoop_char()
         if c=='{' then get_char()
@@ -125,7 +130,9 @@ function table_do_rows()
 end
 
 function table_do_cell()
+  --print('doing table_do_cell')
   if Table_cell_number==0 then
+    --print('starting cell', Reading_table_header_p)
     emit_verbatim '<tr'
     if Reading_table_header_p then emit_verbatim ' class=tableheader' end
     emit_verbatim '>'
