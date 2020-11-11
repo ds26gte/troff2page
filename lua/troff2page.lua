@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201107 -- last modified
+Troff2page_version = 20201111 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -2011,19 +2011,6 @@ end)
 
 defescape('E', Escape_table.e) 
 
-
-function eval_in_lua(tbl)
---  print('doing eval_in_lua')
-  local tmpf = os.tmpname()
-  local o = io.open(tmpf, 'w')
-  for i=1,#tbl do
-    o:write(tbl[i], '\n')
-  end
-  o:close()
-  dofile(tmpf)
-  --os.remove(tmpf)
-end
-
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
   lhs.font = rhs.font
@@ -2083,6 +2070,19 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
+end
+
+
+function eval_in_lua(tbl)
+--  print('doing eval_in_lua')
+  local tmpf = os.tmpname()
+  local o = io.open(tmpf, 'w')
+  for i=1,#tbl do
+    o:write(tbl[i], '\n')
+  end
+  o:close()
+  dofile(tmpf)
+  --os.remove(tmpf)
 end
 
 
@@ -2404,6 +2404,48 @@ function html2info_tweak_info_file(f)
   -- restore Þ
   "s/Þ!/Þ/g"
   )
+end
+
+
+function write_aux(...)
+  Aux_stream:write(...)
+  Aux_stream:write('\n')
+end
+
+function begin_html_document()
+
+  initialize_glyphs()
+  initialize_numregs()
+  initialize_strings()
+  initialize_macros()
+
+  Convert_to_info_p = false
+
+  Last_page_number = -1
+
+  Pso_temp_file = Jobname .. Pso_file_suffix
+
+  Rerun_needed_p = false
+
+  do
+    local f = Jobname .. Aux_file_suffix
+    if probe_file(f) then
+      dofile(f)
+      ensure_file_deleted(f)
+    end
+    Aux_stream = io.open(f, 'w')
+  end
+
+  start_css_file()
+
+  emit_start()
+
+  do
+    local it = find_macro_file('.troff2pagerc.tmac')
+    if it then troff2page_file(it) end
+    it = Jobname .. '.t2p'
+    if probe_file(it) then troff2page_file(it) end
+  end
 end
 
 
@@ -2767,48 +2809,6 @@ function initialize_glyphs()
 end 
 
 
-function write_aux(...)
-  Aux_stream:write(...)
-  Aux_stream:write('\n')
-end
-
-function begin_html_document()
-
-  initialize_glyphs()
-  initialize_numregs()
-  initialize_strings()
-  initialize_macros()
-
-  Convert_to_info_p = false
-
-  Last_page_number = -1
-
-  Pso_temp_file = Jobname .. Pso_file_suffix
-
-  Rerun_needed_p = false
-
-  do
-    local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
-      ensure_file_deleted(f)
-    end
-    Aux_stream = io.open(f, 'w')
-  end
-
-  start_css_file()
-
-  emit_start()
-
-  do
-    local it = find_macro_file('.troff2pagerc.tmac')
-    if it then troff2page_file(it) end
-    it = Jobname .. '.t2p'
-    if probe_file(it) then troff2page_file(it) end
-  end
-end
-
-
 function defrequest(w, th)
   if Macro_table[w] then
     Macro_table[w] = nil
@@ -2993,6 +2993,17 @@ function initialize_macros()
     --print('value(2) =', value)
     value = string.gsub(value, '^(%s*)<br>', '%1\n')
     value = string.gsub(value, '<br>(%s*)$', '\n%1')
+    div.value = value
+  end)
+
+  defrequest('chop', function()
+    local arg1 = read_args()
+    local div = Diversion_table[arg1]
+    local value = div.value
+    if not value then
+      value = (div.stream):get_output_stream_string()
+    end
+    value = string.gsub(value, '\n$', '')
     div.value = value
   end)
 
@@ -5235,11 +5246,12 @@ function make_span_open(opts)
   --print('doing make_span_open')
   --for k,v in pairs(opts) do print(k,v) end
   if not (opts.font or opts.color or opts.bgcolor or opts.size) then return '' end
+  local semic = verbatim('; ')
   local res= verbatim '<span style="' ..
-  (opts.font and (verbatim(opts.font) .. '; ') or '') ..
-  (opts.color and (verbatim(opts.color) .. '; ') or '') ..
-  (opts.bgcolor and (verbatim(opts.bgcolor) .. '; ') or '') ..
-  (opts.size and (verbatim(opts.size) .. '; ') or '') ..
+  (opts.font and (verbatim(opts.font) .. semic) or '') ..
+  (opts.color and (verbatim(opts.color) .. semic) or '') ..
+  (opts.bgcolor and (verbatim(opts.bgcolor) .. semic) or '') ..
+  (opts.size and (verbatim(opts.size) .. semic) or '') ..
   verbatim '">'
   --print('mkspano retng', res)
   return res

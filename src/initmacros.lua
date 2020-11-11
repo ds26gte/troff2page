@@ -1,4 +1,4 @@
--- last modified 2020-11-10
+-- last modified 2020-11-11
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -184,6 +184,17 @@ function initialize_macros()
     --print('value(2) =', value)
     value = string.gsub(value, '^(%s*)<br>', '%1\n')
     value = string.gsub(value, '<br>(%s*)$', '\n%1')
+    div.value = value
+  end)
+
+  defrequest('chop', function()
+    local arg1 = read_args()
+    local div = Diversion_table[arg1]
+    local value = div.value
+    if not value then
+      value = (div.stream):get_output_stream_string()
+    end
+    value = string.gsub(value, '\n$', '')
     div.value = value
   end)
 

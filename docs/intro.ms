@@ -1,4 +1,4 @@
-.\" last modified 2019-10-07
+.\" last modified 2020-11-11
 .SH 1
 1. Introduction
 .LP
@@ -214,7 +214,7 @@ To set up, first copy the files \fClua/troff2page.lua\fP and
 \fCtroff2page\fP repo in a \fCpack\fP subdirectory, somewhere in
 your \fC'runtimepath'\fP or \fC'packpath'\fP.
 .PP
-You now have the Neovim command \fCTroff2page\fP (not
+You now have the Neovim command \fCTroff2page\fP (note
 capitalization!) which is called with the same style of arguments
 as \fCtroff2page\fP, with one special case: If called with no
 argument, the argument is assumed to be the name of the file in

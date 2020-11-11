@@ -1,5 +1,5 @@
-tmac-files = defhsl.tmac style.tmac
-ms-files = commands.ms error.ms eval.ms genindex.ms index.ms infodoc.ms intro.ms layout.ms slideshow.ms xrefs.ms
+tmac-files = *.tmac
+ms-files = *.ms
 troff-files = $(tmac-files) $(ms-files)
 
 all: index.html
