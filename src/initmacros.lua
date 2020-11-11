@@ -1,4 +1,4 @@
--- last modified 2020-11-09
+-- last modified 2020-11-10
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -315,8 +315,6 @@ function initialize_macros()
     emit_verbatim '>\n'
     emit_verbatim '</div>\n'
   end)
-
-  defrequest('IMG', Request_table.PIMG)
 
   defrequest('tmc', do_tmc)
 

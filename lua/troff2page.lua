@@ -3125,8 +3125,6 @@ function initialize_macros()
     emit_verbatim '</div>\n'
   end)
 
-  defrequest('IMG', Request_table.PIMG)
-
   defrequest('tmc', do_tmc)
 
   defrequest('tm', function()
