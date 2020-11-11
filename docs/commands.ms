@@ -31,13 +31,13 @@ obvious.
 .PP
 .SH 2
 mpca macro files
+.LP
 .IX macro files provided with troff2page
 .IX mpca macros
 .IX pca-tag.tmac, macro file
 .IX pca-ix.tmac, macro file
 .IX pca-eval.tmac, macro file
 .IX pca.tmac, macro file
-.LP
 troff2page can process documents that use the \fCms\fP extension macros
 provided in \*[url http://github.com/ds26gte/mpca]mpca\&. For
 convenience, this repo is included as a submodule \fCmpca\fP.
