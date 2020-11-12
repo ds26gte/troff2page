@@ -1,4 +1,4 @@
--- last modified 2020-11-11
+-- last modified 2020-11-12
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -602,6 +602,8 @@ function initialize_macros()
     local w = expand_args(read_troff_line())
     defstring('DY', function() return w end)
   end)
+
+  defrequest('DA', Request_table.ND)
 
   defrequest('CSS', function()
     local f = read_args()

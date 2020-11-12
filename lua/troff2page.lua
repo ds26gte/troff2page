@@ -3412,6 +3412,8 @@ function initialize_macros()
     defstring('DY', function() return w end)
   end)
 
+  defrequest('DA', Request_table.ND)
+
   defrequest('CSS', function()
     local f = read_args()
     if not table_member(f, Stylesheets) then
@@ -4093,6 +4095,19 @@ function initialize_strings()
 
   defstring('MONTH12', function()
     return 'December'
+  end)
+
+-- .ds MO \E*[MONTH\n[mo]]
+-- .ds DY \n[dy] \*[MO] \n[year]
+
+  defstring('MO', function()
+    return String_table['MONTH'..get_counter_named('mo').value]()
+  end)
+
+  defstring('DY', function()
+    return verbatim(get_counter_named('dy').value .. ' ' ..
+    String_table['MO']() .. ' ' ..
+    get_counter_named('year').value)
   end)
 
   defstring('Q', function()
@@ -5710,5 +5725,4 @@ if running_in_neovim then
   return retobj
 end
 
-Single_pass_p = false
 troff2page(...)

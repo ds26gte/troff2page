@@ -174,4 +174,3 @@ different for groff and troff2page, so that the two
 programs’ aux files don’t clash.  The number register
 \fC\en[.troff2page]\fP (page \*[TAG:cond-bp]) suggests a way
 to do this.
-.PP
