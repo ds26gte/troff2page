@@ -1,0 +1,30 @@
+.\" last modified 2017-08-13
+.\" Dorai Sitaram
+.
+.if !\n[.troff2page] .nx
+.
+.de pca:toc-hook
+.ig ##
+(let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) ".toc")))
+  (unless (probe-file f)
+    (flag-missing-piece :toc)))
+(when (and (> *last-page-number* 0) nil ;needed?
+           (not (gethash "TAG:__troff2page_toc" *node-table*)))
+  (flag-missing-piece :toc-in-nav-bar))
+.##
+.TAG __troff2page_toc
+..
+.
+.ig ##
+(defstring  "pca-toc:create-link"
+  (lambda (n)
+    (let ((f (concatenate 'string (funcall (gethash "AUXF" *string-table*)) "-snippet-" n ".tmp")))
+      (let ((o (make-string-output-stream)))
+        (with-open-file (i f :direction :input)
+          (loop
+            (let ((x (read-line i nil)))
+              (unless x (return))
+              (princ x o) (terpri o))))
+        (url-to-html (concatenate 'string "#TAG:__pca_sec_" n)
+          (get-output-stream-string o))))))
+.##

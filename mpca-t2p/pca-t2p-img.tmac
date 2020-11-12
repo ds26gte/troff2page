@@ -1,0 +1,26 @@
+.\" last change 2020-11-10
+.
+.if !\n[.troff2page] .nx
+.
+.ig ##
+defrequest('IMG', function()
+  local align, img_file, width = read_args()
+  if not (align=='-L' or align=='-C' or align=='-R') then
+    width=img_file; img_file=align; align='-C'
+  end
+  if align=='-L' then align='left'
+  elseif align=='-C' then align='center'
+  elseif align=='-R' then align='right'
+  end
+  emit_verbatim '<div align='
+  emit_verbatim(align)
+  emit_verbatim '>\n'
+  emit_verbatim '<img src="'
+  emit_verbatim(img_file)
+  emit_verbatim '"'
+  if not width then width=80 end
+  emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim('%"') 
+  emit_verbatim '>\n'
+  emit_verbatim '</div>\n'
+end)
+.##

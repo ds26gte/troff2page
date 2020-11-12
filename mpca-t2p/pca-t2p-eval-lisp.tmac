@@ -1,0 +1,18 @@
+.\" last change 2016-02-18
+.
+.if !\n[.troff2page] .nx
+.
+.ig ##
+(defrequest "pca-eval:process-snippets"
+  (lambda ()
+    (read-troff-line)
+    (let ((f (funcall (gethash "pca-eval:file" *string-table*))))
+      (when (probe-file f) (load f)))))
+
+(defrequest "pca-eval:load-snippet-if-poss"
+  (lambda ()
+    (read-troff-line)
+    (let ((f (funcall (gethash "pca-eval:snippet-file" *string-table*))))
+      (if (probe-file f) (troff2page-file f)
+        (flag-missing-piece :eval)))))
+.##
