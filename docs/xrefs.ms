@@ -1,4 +1,4 @@
-.\" last modified 2019-09-29
+.\" last modified 2020-11-12
 .SH 1
 4. Cross-references
 .LP
@@ -39,16 +39,16 @@ of the current page number.
 .IX pca-toc.tmac, macro file
 .IX table of contents
 The
-macro file \fCpca-toc.tmac\fP supplies a \fC.TOC\fP macro
+macro file \fCpca-toc.tmac\fP supplies a \fC.ToC\fP macro
 for automatic generation of a table of contents. This can be used
 by both groff and troff2page.
 .PP
 .IX GROWPS, number register
 The troff2page aspect of \fCpca-toc.tmac\fP
-uses \fC.TAG\fP. For both outputs, TOC entries are created for
+uses \fC.TAG\fP. For both outputs, ToC entries are created for
 headers of level \fC\\n[GROWPS]\fP or lower. By default,
 \fCGROWPS\fP is set to 0, so you should set it to at least 1 to see
-a TOC.
+a ToC.
 .PP
 \fCpca-toc.tmac\fP doesn’t require you to modify how you use your header
 macros (\fC.SH\fP or \fC.NH\fP). It is a solution to the
@@ -61,5 +61,5 @@ in the long run if you use ‘ms’ regularly.”
 .IX pca-t2p-man.tmac, macro file
 troff2page uses the macro file \fCpca-t2p-man.tmac\fP (if it can
 find it in \fCGROFF_TMAC_PATH\fP)
-to automatically generate a TOC for man pages,
-with a TOC entry for each \fC.SH\fP in the input.
+to automatically generate a ToC for man pages,
+with a ToC entry for each \fC.SH\fP in the input.

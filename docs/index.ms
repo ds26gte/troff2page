@@ -1,6 +1,6 @@
 .so style.tmac
 .
-.ND 2019-09-29  \"last modified
+.ND 2020-11-12  \"last modified
 .
 .TL
 troff2page
@@ -15,7 +15,7 @@ troff2page
 .\}
 .RT
 .
-.TOC
+.ToC
 .
 .so intro.ms
 .so commands.ms

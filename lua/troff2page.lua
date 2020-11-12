@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201111 -- last modified
+Troff2page_version = 20201112 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -4000,13 +4000,6 @@ function defstring(w, th)
 end
 
 function initialize_strings()
-  defstring('pca-eval-lang', function()
-    return 'lua'
-  end)
-
-  defstring('.T', function()
-    return 'webpage'
-  end)
 
   defstring('-', function()
     return verbatim '&#x2014;'
@@ -4028,10 +4021,6 @@ function initialize_strings()
     return verbatim '</sub>'
   end)
 
-  defstring('AUXF', function()
-    return verbatim('.troff2page_temp_' .. Jobname)
-  end)
-
   defstring('*', function()
     This_footnote_is_numbered_p = true
     Footnote_count = Footnote_count +1
@@ -4046,11 +4035,91 @@ function initialize_strings()
     end
   end)
 
+  defstring('REFERENCES', function()
+    return 'References'
+  end)
+
+  defstring('ABSTRACT', function()
+    return 'ABSTRACT'
+  end)
+
+  defstring('TOC', function()
+    return verbatim('Table of contents')
+  end)
+
+  defstring('MONTH1', function()
+    return 'January'
+  end)
+
+  defstring('MONTH2', function()
+    return 'February'
+  end)
+
+  defstring('MONTH3', function()
+    return 'March'
+  end)
+
+  defstring('MONTH4', function()
+    return 'April'
+  end)
+
+  defstring('MONTH5', function()
+    return 'May'
+  end)
+
+  defstring('MONTH6', function()
+    return 'June'
+  end)
+
+  defstring('MONTH7', function()
+    return 'July'
+  end)
+
+  defstring('MONTH8', function()
+    return 'August'
+  end)
+
+  defstring('MONTH9', function()
+    return 'September'
+  end)
+
+  defstring('MONTH10', function()
+    return 'October'
+  end)
+
+  defstring('MONTH11', function()
+    return 'November'
+  end)
+
+  defstring('MONTH12', function()
+    return 'December'
+  end)
+
+  defstring('Q', function()
+    return verbatim('&#x201c')
+  end)
+
+  defstring('U', function()
+    return verbatim('&#x201d')
+  end)
+
+  defstring('.T', function()
+    return 'webpage'
+  end)
+
+  defstring('AUXF', function()
+    return verbatim('.troff2page_temp_' .. Jobname)
+  end)
+
+  defstring('pca-eval-lang', function()
+    return 'lua'
+  end)
+
   defstring(':', urlh_string_value)
   defstring('url', urlh_string_value)
   defstring('urlh', urlh_string_value)
 
-end 
+end
 
 
 function anchor(lbl)
