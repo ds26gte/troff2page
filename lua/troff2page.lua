@@ -3054,6 +3054,23 @@ function initialize_macros()
     end)
   end)
 
+  defrequest('as', function()
+    local w = expand_args(read_word())
+    local s = expand_args(read_troff_string_line())
+    local orig_th = String_table[w]
+    defstring(w, function(...)
+      local args = {...}
+      table.insert(args, 1, w)
+      local first_half = ''
+      if orig_th then first_half = orig_th(args) end
+      local second_half
+      return flet({Macro_args = args}, function()
+        second_half = expand_args(s)
+        return first_half..second_half
+      end)
+    end)
+  end)
+
   defrequest('char', function()
     ignore_spaces()
     if get_char() ~= Escape_char then terror('char') end
