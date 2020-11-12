@@ -1,4 +1,4 @@
-.\" last modified 2019-09-29
+.\" last modified 2020-11-12
 .SH 1
 8. Recovery from errors
 .LP
@@ -6,14 +6,12 @@
 If troff2page fails on your document, it will display a message giving its
 best guess on what the problem is and where it occurred in the source
 document, and will offer to take you there so you can fix it immediately.
-.PP
 .EX
 .ec
     \&\f(CIfilename:lineno: error description\fP
     Type e to edit file filename at line lineno; x to quit
     ?
 .EE
-.PP
 In the first line, or the error diagnostic line,
 \f(CIfilename\fP is the particular source file (which need not be the
 main document file) and \f(CIlineno\fP is the estimated number of the line in

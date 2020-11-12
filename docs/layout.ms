@@ -1,4 +1,4 @@
-.\" last modified 2019-09-29
+.\" last modified 2020-11-12
 .SH 1
 3. Page layout
 .LP
@@ -12,17 +12,13 @@ one.  \fC.bp\fP causes a page-break in both the HTML and the print outputs.
 .IX troff2page@.troff2page, number register
 Generally, page-breaks require a different aesthetic in HTML than in
 print.  You can use troff conditionals to express this difference:
-.PP
 .EX
     .if \n[.troff2page] .bp
 .EE
-.PP
 causes a page-break only in the HTML, whereas
-.PP
 .EX
     .if !\n[.troff2page] .bp
 .EE
-.PP
 causes a page-break only in print.
 .PP
 As can be seen, the number register \fC\en[.troff2page]\fP has a \fItrue\fP
@@ -44,13 +40,11 @@ that translates differently with different versions of troff2page.
 .IX page breaks for HTML only
 If may be convenient to define a \fC.HBP\fP macro that causes a page-break
 only for HTML:
-.PP
 .EX
     .de HBP
     .if \n[.troff2page] .bp
     ..
 .EE
-.PP
 Note that troff2page, like troff, does not automatically cause a page break
 at the sectioning commands.  Use \fC.bp\fP or a macro like \fC.HBP\fP to
 explicitly to insert breaks as needed.
@@ -81,14 +75,12 @@ to a \fInegative\fP value, which leads to whatever default paragraph
 separation that HTML uses.  Note that setting \fCPD\fP to a negative value
 should be done only for HTML, as groff will happily overstrike
 text in order to respect a negative \fCPD\fP:
-.PP
 .EX
     .if \n[.troff2page] \{\
     .nr PI 0n
     .nr PD 0-1p
     .\}
 .EE
-.PP
 Unlike groff ms, which uses the line length given by the register
 \fCLL\fP,
 troff2page by default does not restrict the width of its HTML pages.
@@ -102,7 +94,6 @@ scrolling.
 A good \fCLL\fP value for troff2page should be a bit larger than
 ms’s 6 inches, which is too narrow for a browser.  The following sets it
 to 18 cm, making sure it takes effect only for HTML:
-.PP
 .EX
     .if \n[.troff2page] .nr LL 18c
 .EE

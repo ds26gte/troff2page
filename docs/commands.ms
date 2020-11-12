@@ -1,4 +1,4 @@
-.\" last modified 2020-11-07
+.\" last modified 2020-11-12
 .SH 1
 2. troff and troff2page commands
 .LP
@@ -88,7 +88,6 @@ the \fC-U\fP option for “unsafe” mode.
 As an example, consider \fCindex.ms\fP (the groff source for the
 document you’re reading, which is the \fCdoc\fP subdirectory).  The following is one
 way to get the correct PostScript output:
-.PP
 .EX
     % groff -t -U -z index.ms
 .ft CI
@@ -107,7 +106,6 @@ way to get the correct PostScript output:
     Output written in z.trofftemp.ind.
     Transcript written in z.trofftemp.ilg.
 .EE
-.PP
 The \fC-t\fP option (which calls the tbl
 preprocessor) is needed because the
 document \fCindex.ms\fP
@@ -131,7 +129,6 @@ without needing the user to explicitly call it a second time; and
 .PP
 (2) troff2page doesn’t need any special option to run in “unsafe”
 mode or to process tables.
-.PP
 .EX
     % troff2page index.ms
 .ft CI
@@ -147,7 +144,6 @@ mode or to process tables.
     Output written in z.troff2page_temp_index.ind.
     Transcript written in z.troff2page_temp_index.ilg.
 .EE
-.PP
 The same holds if you run troff2page by calling
 the Lua procedure \fCtroff2page\fP within Lua, as described on
 page \*[TAG:calling_troff2page_within_lua].
@@ -155,12 +151,10 @@ page \*[TAG:calling_troff2page_within_lua].
 If you wish to have
 the Lua procedure perform just one pass on the document, set the
 global \fCSingle_pass_p\fP to true, i.e.,
-.PP
 .EX
     Single_pass_p = true
     troff2page('index.ms')
 .EE
-.PP
 Call it the same way a second time to run the second pass, which
 resolve the aux files. This is exactly analogous to calling
 \fCgroff\fP twice on the same document to resolve aux files.

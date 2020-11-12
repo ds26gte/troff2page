@@ -10,21 +10,17 @@ cross-references. A compatible groff definition is provided in
 the supplied macro file \fCpca-tag.tmac\fP. (This overrides the
 similarly named macro in groff’s \fCwww.tmac\fP, in order to allow
 forward references.)
-.PP
 .EX
     .TAG sec_trofflua
 .EE
-.PP
 associates the \fItag\fP \fCsec_trofflua\fP with the number of
 the current page.  The \fIstring\fP \fC\e*[TAG:sec_trofflua]\fP
 is defined to typeset as that page number.
 Thus, in a hand-crafted table of contents, you could
 use
-.PP
 .EX
     Extending troff using Lua, \*[TAG:sec_trofflua]
 .EE
-.PP
 In the HTML output, the string \fC\e*[TAG:sec_trofflua]\fP
 furthermore is a link to where \fC.TAG sec_trofflua\fP was
 called.

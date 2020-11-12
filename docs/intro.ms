@@ -1,4 +1,4 @@
-.\" last modified 2020-11-11
+.\" last modified 2020-11-12
 .SH 1
 1. Introduction
 .LP
@@ -31,11 +31,9 @@ ensure that the script \fCtroff2page\fP is in a directory in your
 .IX calling troff2page from the command-line
 To convert an input troff document named \fCjobname.ms\fP, type
 the following on the operating-system command line.
-.PP
 .EX
     troff2page jobname.ms
 .EE
-.LP
 at your operating-system prompt.  This creates an output HTML file
 \fCjobname.html\fP in the current directory.  (This HTML file has the same basename as the
 input troff file (i.e., \fCjobname\fP), but its extension is
@@ -72,7 +70,6 @@ viz.,
 \fC-r\fP to pre-set number registers;
 \fC-d\fP to pre-define strings; and
 \fC--\fP to signal the end of options.
-.PP
 .EX
     % troff2page --help
 .ft CI
@@ -83,14 +80,11 @@ viz.,
     ...
     For full details, please see http://ds26gte.github.io/troff2page
 .EE
-.PP
 In the unlikely event that you have a document file named
 \fC--help\fP (and wish to process it), use
-.PP
 .EX
     % troff2page -- --help
 .EE
-.PP
 .IX z@-z, command-line option
 .IX t@-t, command-line option
 .IX U@-U, command-line option
@@ -184,12 +178,10 @@ However, it is not necessary to run the file \fCtroff2page\fP as a
 Unix script.  You can simply load \fCtroff2page.lua\fP (\fCtroff2page\fP is a soft link
 to the Lua file \fCtroff2page.lua\fP) into Lua, and then call the
 Lua procedure \fCtroff2page\fP on your source document.  E.g.,
-.PP
 .EX
     dofile('troff2page.lua')
     troff2page('my-troff-document.ms')
 .EE
-.PP
 The procedure \fCtroff2page\fP can be called
 several times, on the same or different documents, with all the
 same options as the script, from

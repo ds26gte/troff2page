@@ -1,4 +1,4 @@
-.\" last modified 2020-11-11
+.\" last modified 2020-11-12
 .SH 1
 5. Making an index
 .LP
@@ -21,56 +21,44 @@ appropriate locations in the body text.
 .PP
 .IX IX@.IX, macro
 The call
-.PP
 .EX
     .IX item
 .EE
-.LP
 marks the text “item” as an indexable item.  The metacharacters \fC@\fP,
 \fC!\fP, \fC"\fP, and \fC|\fP can be used to respectively specify (a)
 alternate alphabetization, (b) subitems, (c) literal metacharacters, and
 (d) encapsulation of the page number.
 .PP
 E.g.,
-.PP
 .EX
     .IX m@-m, groff option
 .EE
-.LP
 identifies an index entry for “-m, groff option” but alphabetizes
 it as though it were “m” rather than something that starts with a
 hyphen.
-.PP
 .EX
     .IX groff!macro packages
 .EE
-.LP
 makes “macro packages” an indented index subentry under “groff”.
 .PP
 Up to two \fC!\fPs may be used.
-.PP
 .EX
     .IX groff!macro packages!ms
 .EE
-.LP
 produces “ms” as a subsubentry under “macro packages” under
 “groff”.
-.PP
 .EX
     .IX troff|see groff
 .EE
-.LP
 has the index entry for “troff” point to
 “groff” rather than have a page number of its own.
 .PP
 If any of the metacharacters need to
 appear in the index entry as themselves, precede them with
 \fC"\fP.
-.PP
 .EX
     .IX set"!car
 .EE
-.LP
 creates an index entry for “set!car” rather than creating a
 subentry “car” under “set"”.
 .PP
@@ -85,9 +73,7 @@ http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in troff we
 \fCpca-ix.tmac\fP will call makeindex to create a
 sorted index in the auxiliary file \fC\e*[AUXF].ind\fP, which can be
 slurped back into the input document:
-.PP
 .EX
     .so \*[AUXF].ind
 .EE
-.LP
 Adding a section header on top is up to you.

@@ -1,4 +1,4 @@
-.\" last modified 2019-09-29
+.\" last modified 2020-11-12
 .SH 1
 6. Slideshows
 .LP
@@ -6,11 +6,9 @@
 .IX Slidy
 To have your troff source to be converted into slideshow-ready HTML, insert
 into it (somewhere) the macro call
-.PP
 .EX
   .SLIDES
 .EE
-.PP
 This causes troff2page to use the style sheet \fCslide.css\fP and JavaScript file
 \fCslidy.js\fP from \*[url https://www.w3.org/Talks/Tools/#slidy]Slidy\& to convert
 your document into a single

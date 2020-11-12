@@ -1,4 +1,4 @@
-.\" last modified 2020-11-07
+.\" last modified 2020-11-12
 .SH 1
 7. Extending troff using Lua
 .LP
@@ -21,7 +21,6 @@ is substituted for the \fC.eval\fP ... \fC.endeval\fP.
 The usefulness of this tactic will be apparent from an
 example.
 Consider the following troff document, \fCtau.ms\fP:
-.PP
 .EX
     .mso pca-eval.tmac
     .
@@ -32,32 +31,25 @@ Consider the following troff document, \fCtau.ms\fP:
     io.write(2*math.acos(-1), '.\n')
     .endeval
 .EE
-.PP
 .IX unsafe mode
 .IX z@-z, groff option
 .IX U@-U, groff option
 Run troff (actually groff, and in unsafe mode too) on \fCtau.ms\fP:
-.PP
 .EX
     groff -z -U -ms tau.ms
 .EE
-.PP
 (The \fC-z\fP avoids generating output, because we are not ready for it
 yet.  The \fC-U\fP runs in “unsafe” mode, i.e., it allows the writing of
 aux files.)
 You will find that the groff asks you to run it again:
-.PP
 .EX
 .ec
     \f(CIRerun groff with -U
 .EE
-.PP
 Call groff again as follows:
-.PP
 .EX
     groff -U -ms tau.ms > tau.ps
 .EE
-.PP
 \fCtau.ps\fP will now look like:
 .PP
 .B1
@@ -111,7 +103,7 @@ Defining color names using HSL
 .LP
 .IX color names, defining
 For a more substantial example of \fC.eval\fP’s use, consider defining
-color names using the HSL (hue/saturation/lightness) scheme rather than the
+color names using the HSL (Hue/Saturation/Lightness) scheme rather than the
 RGB and CMYK schemes provided by groff.  For instance, we would like to
 define the color Venetian red using its HSL spec (357\(de, 49%,
 24%), which to many is a more intuitive description than RGB
@@ -122,7 +114,6 @@ https://en.wikipedia.org/wiki/HSL_and_HSV]algorithm\& to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
-.PP
 .EX
     .mso pca-eval.tmac
     .
@@ -137,7 +128,7 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
           return n
         end
       end
-
+.sp
       local function tc_to_c(tc, p, q)
         if tc < 1/6 then
           return p + (q - p)*6*tc
@@ -149,7 +140,7 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
           return p
         end
       end
-
+.sp
       local function hsl_to_rgb(h, s, l)
         h = (h % 360) / 360
         local q
@@ -166,7 +157,7 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
           tc_to_c(tg, p, q),
           tc_to_c(tb, p, q)
       end
-
+.sp
       function def_hsl_color(name, h, s, l)
         local r, g, b = hsl_to_rgb(h, s, l)
         io.write(string.format('.defcolor %s rgb %s %s %s\n', name, r, g, b))
@@ -174,7 +165,6 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
     end
     .endeval
 .EE
-.PP
 Here, the Lua procedure \fCdef_hsl_color\fP takes an HSL spec and
 writes out the equivalent RGB groff definition. (The troff2page
 distribution provides \fCdef_hsl_color\fP in the macro file
@@ -182,25 +172,21 @@ distribution provides \fCdef_hsl_color\fP in the macro file
 .PP
 We can call this Lua procedure inside another \fC.eval\fP to define
 \fCvenetianred\fP using its HSL spec:
-.PP
 .EX
     .eval
     def_hsl_color('venetianred', 357, .49, .24)
     .endeval
 .EE
-.PP
 .eval
     def_hsl_color('venetianred', 357, .49, .24)
 .endeval
 The color name \fCvenetianred\fP can now be used like any other groff color name:
-.PP
 .EX
 .ec
     Prismacolor’s burnt ochre pencil is a close match for Derwent’s
     \\fB\\m[venetianred]Venetian red\\m[]\\fP, and either can be used to
     emulate the sanguine chalk drawings of the Old Masters.
 .EE
-.PP
 This produces:
 .PP
 .B1
@@ -238,18 +224,15 @@ document.
 For example, let’s define a
 \fC\e*[url ...]\fP string register that simply typesets its URL
 argument within angle brackets.
-.PP
 .EX
     .ds url \(la\fC\\$1\fP\(ra
 .EE
-.PP
 This is adequate for the print output.
 For troff2page though, we’d like to
 re-define this macro, in Lua, to create a hyperlink.
 We enclose this re-definition in a \fC.ig ##\fP, which not
 only allows it to be in Lua, but also makes it apply only
 when troff2page reads it:
-.PP
 .EX
     .ig ##
     defstring('url', function(url)
@@ -257,7 +240,6 @@ when troff2page reads it:
     end)
     .##
 .EE
-.PP
 The procedures \fCdefstring\fP, \fClink_start\fP, and
 \fClink_stop\fP are defined in the troff2page code.
 .PP
@@ -266,7 +248,6 @@ The procedures \fCdefstring\fP, \fClink_start\fP, and
 when troff2page is used on a document, e.g., stylesheet changes.
 troff2page uses the output-stream \fCCss_stream\fP to
 write out style information.  The user can also write to this stream, e.g.,
-.PP
 .EX
     .ig ##
     Css_stream:write([[
@@ -276,7 +257,6 @@ write out style information.  The user can also write to this stream, e.g.,
     ]])
     .##
 .EE
-.PP
 .ig ##
     Css_stream:write([[
         h1,h2,h3,h4,h5,h6 {
