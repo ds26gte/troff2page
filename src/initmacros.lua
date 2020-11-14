@@ -498,7 +498,10 @@ function initialize_macros()
       else Margin_left=num
       end
     end
-    emit_verbatim '<p '
+    if In_para_p then emit_verbatim '</p>\n'
+    else In_para_p = true
+    end
+    emit_verbatim '<p'
     specify_margin_left_style()
     emit_verbatim '>'
   end)
@@ -1006,7 +1009,10 @@ function initialize_macros()
   defrequest('nf', function()
     read_troff_line()
     if not Previous_line_exec_p then
-      emit_verbatim '<p '
+      if In_para_p then emit_verbatim '</p>\n'
+      else In_para_p = true
+      end
+      emit_verbatim '<p'
       specify_margin_left_style()
       emit_verbatim '>\n'
     end
@@ -1016,6 +1022,9 @@ function initialize_macros()
   defrequest('fi', function()
     read_troff_line()
     fill_mode()
+    if In_para_p then emit_verbatim '</p>\n'
+    else In_para_p = true
+    end
     emit_verbatim '<p>'
   end)
 
