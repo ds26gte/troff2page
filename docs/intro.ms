@@ -207,7 +207,11 @@ To set up, first copy the files \fClua/troff2page.lua\fP and
 your \fC'runtimepath'\fP or \fC'packpath'\fP.
 .PP
 You now have the Neovim command \fCTroff2page\fP (note
-capitalization!) which is called with the same style of arguments
-as \fCtroff2page\fP, with one special case: If called with no
-argument, the argument is assumed to be the name of the file in
+capital T!) which is called with the same style of arguments
+as \fCtroff2page\fP, with the following special cases:
+.PP
+1. The argument \fC%\fP is replaced with the name of the file in
 the current window.
+.PP
+2. If called with no argument, the name of the file in the
+current window is assumed to be the argument.

@@ -1,4 +1,4 @@
--- last modified 2020-11-12
+-- last modified 2020-11-14
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -455,15 +455,22 @@ function initialize_macros()
 
   defrequest('sp', function()
     local num = read_number_or_length('v')
-    if num == 0 then
-      num = point_equivalent_of('v')
-    end
+    --if num == 0 then num = point_equivalent_of('v') end
+    --print('sp arg is', num)
     read_troff_line()
-    emit_verbatim '<br style="margin-top: '
-    emit_verbatim(num)
-    emit_verbatim 'px; margin-bottom: '
-    emit_verbatim(num)
-    emit_verbatim 'px">\n'
+    if num == 0 then
+      emit_verbatim '<br>'
+    else
+      if In_para_p then emit_verbatim '</p>\n' end
+      emit_verbatim '<br>'
+      emit_verbatim '<p style="margin-top: '
+      emit_verbatim(num)
+      emit_verbatim 'px; margin-bottom: '
+      emit_verbatim(num)
+      emit_verbatim 'px"></p>'
+      if In_para_p then emit_verbatim '\n<p>' end
+    end
+    emit_verbatim '\n'
   end)
 
   defrequest('br', function()

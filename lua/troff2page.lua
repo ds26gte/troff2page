@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201112 -- last modified
+Troff2page_version = 20201114 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -3264,15 +3264,22 @@ function initialize_macros()
 
   defrequest('sp', function()
     local num = read_number_or_length('v')
-    if num == 0 then
-      num = point_equivalent_of('v')
-    end
+    --if num == 0 then num = point_equivalent_of('v') end
+    --print('sp arg is', num)
     read_troff_line()
-    emit_verbatim '<br style="margin-top: '
-    emit_verbatim(num)
-    emit_verbatim 'px; margin-bottom: '
-    emit_verbatim(num)
-    emit_verbatim 'px">\n'
+    if num == 0 then
+      emit_verbatim '<br>'
+    else
+      if In_para_p then emit_verbatim '</p>\n' end
+      emit_verbatim '<br>'
+      emit_verbatim '<p style="margin-top: '
+      emit_verbatim(num)
+      emit_verbatim 'px; margin-bottom: '
+      emit_verbatim(num)
+      emit_verbatim 'px"></p>'
+      if In_para_p then emit_verbatim '\n<p>' end
+    end
+    emit_verbatim '\n'
   end)
 
   defrequest('br', function()
@@ -4096,9 +4103,6 @@ function initialize_strings()
   defstring('MONTH12', function()
     return 'December'
   end)
-
--- .ds MO \E*[MONTH\n[mo]]
--- .ds DY \n[dy] \*[MO] \n[year]
 
   defstring('MO', function()
     return String_table['MONTH'..get_counter_named('mo').value]()
