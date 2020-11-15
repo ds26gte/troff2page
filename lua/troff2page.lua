@@ -3842,13 +3842,13 @@ function initialize_macros()
   end)
 
   defrequest('troff2info', function()
-    print('doing troff2info')
+    --print('doing troff2info')
     read_troff_line()
     if not Convert_to_info_p then
       if not html2info then
         local f = find_macro_file('pca-t2p-info-lua.tmac')
         if f then
-          print('loading', f)
+          --print('loading', f)
           troff2page_file(f)
         end
       end
