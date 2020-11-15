@@ -1,4 +1,4 @@
--- last modified 2020-11-14
+-- last modified 2020-11-15
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -1137,9 +1137,24 @@ function initialize_macros()
     write_troff_macro_to_stream(macro_name, out)
   end)
 
-  defrequest('troff2info', function()
+  defrequest('troff2info_obsolete', function()
     read_troff_line()
     Convert_to_info_p = true
+  end)
+
+  defrequest('troff2info', function()
+    print('doing troff2info')
+    read_troff_line()
+    if not Convert_to_info_p then
+      if not html2info then
+        local f = find_macro_file('pca-t2p-info-lua.tmac')
+        if f then
+          print('loading', f)
+          troff2page_file(f)
+        end
+      end
+      if html2info then Convert_to_info_p = true end
+    end
   end)
 
   defrequest('AM', function()

@@ -1,4 +1,4 @@
-.\" last modified 2020-11-12
+.\" last modified 2020-11-14
 .SH 1
 9. GNU Info docs
 .LP
@@ -13,12 +13,6 @@ You can call the macro
 within your document to signal to \fCtroff2page\fP that it should
 also create an Info document.
 .PP
-\fCtroff2page\fP includes a (do-nothing) definition for \fC.troff2info\fP. To
-ensure that regular groff can process your document,
-it’s best to use
-.EX
-    .if d troff2info .troff2info
-.EE
 If the basename of the input troff document is \fCjobname\fP, the
 Info file is created in \fCjobname.info\fP, which may be
 displayed on any Info viewer.
