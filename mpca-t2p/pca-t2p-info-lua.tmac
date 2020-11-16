@@ -41,7 +41,7 @@ function html2info()
     end
   end)
   --print('created infofile i')
-  copy_file_to_file(info_file, "junk.info")
+  --copy_file_to_file(info_file, "junk.info")
   html2info_tweak_info_file(info_file)
   --print('tweaked infofile ii')
 end
@@ -59,7 +59,7 @@ function sed(f, ...)
 end
 
 function html2info_tweak_html_file(f, i)
-  print('doing html2info_tweak_html_file', f)
+  --print('doing html2info_tweak_html_file', f)
   sed(f,
 
   -- mark any verbatim Þ's
@@ -114,7 +114,7 @@ function html2info_tweak_html_file(f, i)
 end
 
 function html2info_tweak_info_file(f)
-  print('doing html2info_tweak_info_file', f)
+  --print('doing html2info_tweak_info_file', f)
   sed(f,
   -- flushleft menu entries
 
