@@ -1137,11 +1137,6 @@ function initialize_macros()
     write_troff_macro_to_stream(macro_name, out)
   end)
 
-  defrequest('troff2info_obsolete', function()
-    read_troff_line()
-    Convert_to_info_p = true
-  end)
-
   defrequest('troff2info', function()
     --print('doing troff2info')
     read_troff_line()
