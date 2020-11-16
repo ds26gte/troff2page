@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201115 -- last modified
+Troff2page_version = 20201116 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1689,7 +1689,7 @@ function emit_blank_line()
     it = Request_table[Blank_line_macro]
     if it then --print('BLM req found');
       toss_back_char('\n'); it(); return end
-  else emit_verbatim '<br>&#xa0;<br>'
+  else emit_verbatim '<br>&#xa0;<br>'; emit_newline()
   end
 end
 
@@ -3834,11 +3834,6 @@ function initialize_macros()
     local out = Output_streams[stream_name]
     --print('doing writem', macro_name)
     write_troff_macro_to_stream(macro_name, out)
-  end)
-
-  defrequest('troff2info_obsolete', function()
-    read_troff_line()
-    Convert_to_info_p = true
   end)
 
   defrequest('troff2info', function()

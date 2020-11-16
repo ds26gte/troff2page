@@ -1,4 +1,4 @@
--- last modified 2019-09-30
+-- last modified 2020-11-16
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -265,7 +265,7 @@ function emit_blank_line()
     it = Request_table[Blank_line_macro]
     if it then --print('BLM req found');
       toss_back_char('\n'); it(); return end
-  else emit_verbatim '<br>&#xa0;<br>'
+  else emit_verbatim '<br>&#xa0;<br>'; emit_newline()
   end
 end
 
