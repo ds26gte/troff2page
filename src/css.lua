@@ -1,4 +1,4 @@
--- last modified 2019-09-30
+-- last modified 2020-11-17
 
 function link_stylesheets()
   emit_verbatim '<link rel="stylesheet" href="'
@@ -221,8 +221,8 @@ end
 
 function specify_margin_left_style()
   if Margin_left ~= 0 then
-    emit_verbatim ' style="margin-left: '
-    emit_verbatim(Margin_left)
-    emit_verbatim 'pt;"'
+    return 'margin-left: ' .. Margin_left .. 'pt'
+  else
+    return false
   end
 end

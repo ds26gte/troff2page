@@ -1,4 +1,4 @@
-# last modified 2020-11-15
+# last modified 2020-11-17
 
 src_files = [!i]*.css *.ms *.tmac
 
@@ -18,5 +18,13 @@ index.ms: $(src_dir)/index.ms
 	cp -p $$(dirname $<)/*.ms .; \
 	cp -p $$(dirname $<)/*.tmac .
 
+index.ps: index.ms $(src_files) .trofftemp.ind
+	mpca index.ms
+
+.trofftemp.ind: index.ms $(src_files)
+	mpca index.ms
+
+ps: index.ps
+
 clean:
-	rm -f .troff2page_temp* *-Z-* *.html *.info
+	rm -f .troff2page_temp* *-Z-* *.html *.info .trofftemp.ind

@@ -1,6 +1,6 @@
 .so style.tmac
 .
-.ND 2020-11-12  \"last modified
+.ND 2020-11-16  \"last modified
 .
 .TL
 troff2page
@@ -26,6 +26,7 @@ troff2page
 .so eval.ms
 .so error.ms
 .so infodoc.ms
+.so nvimtex.ms
 .PP
 .if t \{\
 .SH 1

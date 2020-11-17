@@ -1,4 +1,4 @@
-.TH TROFF2PAGE 1 "2019-09-30" \" last modified
+.TH TROFF2PAGE 1 "2020-11-16" \" last modified
 .nh
 .ad l
 .SH NAME
@@ -43,7 +43,7 @@ registers, and define strings, just as in groff. troff2page also accepts groff
 options that are not relevant to it, if only to ignore them. Please see the
 groff man page for further information on options.
 
-Arguments that don't look like options are treated as pathnames. The option
+Arguments that don’t look like options are treated as pathnames. The option
 \fI--\fP marks the end of options, implying that the remaining arguments are to
 be treated as pathnames (even if they look like options).
 
@@ -113,14 +113,20 @@ file in the current window.
 
 You can call the macro
 
-  .troff2info
+  .troff2page2info
 
 within your document to signal to troff2page that it should also
 create an Info document.
 
-A good place to place the \fI.troff2info\fP call is in your
+A good place to place the \fI.troff2page2info\fP call is in your
 \fI.troff2pagerc.tmac\fP file, as it is relevant only to troff2page
 and not to groff.
+
+If you’re sure you always want an Info file for whatever document
+you give to \fCtroff2page\fP, set the environment variable
+\fCTROFF2PAGE2INFO\fP (the value doesn’t matter):
+
+  export TROFF2PAGE2INFO=always
 
 .SH SYSTEM REQUIREMENTS
 
@@ -134,4 +140,4 @@ troff2page is downloadable from http://github.com/ds26gte/troff2page.
 
 .SH SEE ALSO
 
-groff(1), groff_tmac(5), groff_man(7), groff_ms(7), nvim(1)
+groff(1), groff_tmac(5), groff_man(7), groff_ms(7), lua(1), nvim(1)

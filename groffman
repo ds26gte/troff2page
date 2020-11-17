@@ -1,7 +1,0 @@
-# last change 2009-02-08
-
-c=$(expr $(tput cols) - 10)
-
-export GROFF_ENCODING=utf8
-
-$(echo nroff -man -c -t -rLL=${c}n $@)

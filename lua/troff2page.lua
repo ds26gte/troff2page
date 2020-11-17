@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201116 -- last modified
+Troff2page_version = 20201117 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -494,6 +494,24 @@ function do_end_macro()
   end
 end
 
+function load_info_converter()
+  --print('doing load_info_converter')
+  if html2info then return end
+  --print('loading info converter')
+  local f = find_macro_file('pca-t2p-info-lua.tmac')
+  if not f then
+    tlog('File pca-t2p-info-lua.tmac not found.\n')
+    Convert_to_info_p = false
+    return
+  end
+  troff2page_file(f)
+  --print('html2info found?', html2info)
+  if not html2info then
+    Convert_to_info_p = false
+    tlog('File pca-t2p-info-lua.tmac corrupted?\n')
+  end
+end
+
 function do_bye()
   --print('doing do_bye')
   flet({
@@ -537,10 +555,19 @@ function do_bye()
     write_aux('nb_script("', slidy_js_file, '")')
     --print('done slide setup')
   end
+  --print('checking Convert_to_info_p', Convert_to_info_p)
+  if not Convert_to_info_p and os.getenv 'TROFF2PAGE2INFO' then
+    Convert_to_info_p = true
+  end
+  if Convert_to_info_p then
+    --print('calling load_info_converter')
+    load_info_converter()
+    --print('done load_info_converter')
+  end
   clear_per_doc_tables()
   if #Missing_pieces > 0 then
     Rerun_needed_p = true
-    tlog(string.format('Missing: %s\n', table_to_string(Missing_pieces)))
+    tlog('Missing: %s\n', table_to_string(Missing_pieces))
   end
   close_all_open_streams()
 end
@@ -550,7 +577,7 @@ function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
   local f = find_macro_file(tmacf .. '.tmac') or find_macro_file('tmac.' .. tmacf)
   if not f then
-    tlog('can\'t open %s: No such file or directory', tmacf)
+    tlog('can\'t open %s: No such file or directory\n', tmacf)
   else
     troff2page_file(f)
   end
@@ -563,7 +590,7 @@ function set_register(regset, type)
     lhs, rhs = string.match(regset, '^([^=])(.+)')
   end
   --print('lhs=', lhs, 'rhs=', rhs)
-  if not lhs then tlog('expression expected') end
+  if not lhs then tlog('expression expected\n') end
   if type=='string' then
     --print('calling defstring', lhs, rhs)
     defstring(lhs, function() return verbatim(rhs) end)
@@ -688,7 +715,7 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-m$') then
           i=i+1; local tmacf = argv[i]
           if tmacf then load_tmac(tmacf)
-          else tlog('option requires an argument -- m')
+          else tlog('option requires an argument -- m\n')
           end
         elseif string.match(arg, '^-m') then
           local tmacf = string.gsub(arg, '^-m(.*)', '%1')
@@ -697,7 +724,7 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-d$') then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'string')
-          else tlog('option requires an argument -- d')
+          else tlog('option requires an argument -- d\n')
           end
         elseif string.match(arg, '^-d') then
           local regset = string.gsub(arg, '^-d(.*)', '%1')
@@ -706,7 +733,7 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-r$') then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'number')
-          else tlog('option requires an argument -- r')
+          else tlog('option requires an argument -- r\n')
           end
         elseif string.match(arg, '^-r') then
           --print('doing clo -r')
@@ -765,12 +792,13 @@ function troff2page(...)
       troff2page_1pass(argc, argv)
       if Rerun_needed_p then
         if Single_pass_p then
-          tlog(string.format('Rerun: troff2page %s\n', table_to_string(argv)))
+          tlog('Rerun: troff2page %s\n', table_to_string(argv))
         else
-          tlog(string.format('Rerunning: troff2page %s\n', table_to_string(argv)))
+          tlog('Rerunning: troff2page %s\n', table_to_string(argv))
           troff2page_1pass(argc, argv)
         end
       end
+      --print('info convert if approp')
       if Convert_to_info_p then html2info() end
     end)
   end)
@@ -1151,9 +1179,9 @@ end
 
 function specify_margin_left_style()
   if Margin_left ~= 0 then
-    emit_verbatim ' style="margin-left: '
-    emit_verbatim(Margin_left)
-    emit_verbatim 'pt;"'
+    return 'margin-left: ' .. Margin_left .. 'pt'
+  else
+    return false
   end
 end
 
@@ -1715,33 +1743,51 @@ function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
 end
 
 function emit_end_para()
+  --print('doing emit_end_para')
   --print('In_para_p =', In_para_p)
-  if In_para_p then
-    --print('doing eep')
-    In_para_p=false
-    --print('doing emit_end_para')
-    emit_verbatim '</p>\n'
-    Margin_left = 0
-    local it = Request_table['par@reset']
-    if it then it() end
-    --print('eep switch style to default')
-    emit(switch_style())
-    fill_mode()
-    do_afterpar()
-    --print('eep/ipp should be true', In_para_p)
-    --print('eep setting ipp=false')
-  end
+  if not In_para_p then return end
+  --print('doing eep')
+  In_para_p=false
+  --print('doing emit_end_para')
+  emit(switch_style())
+  emit_verbatim '</p>\n'
+  Margin_left = 0
+  local it = Request_table['par@reset']
+  if it then it() end
+  --print('eep switch style to default')
+  --emit(switch_style())
+  fill_mode()
+  do_afterpar()
+  --print('eep/ipp should be true', In_para_p)
+  --print('eep setting ipp=false')
 end
 
 function emit_para(opts)
-  --print('doing emit_para')
+  --print('doing emit_para', opts)
   opts = opts or {}
+  local para_style = opts.style
+  if opts.no_margins_p then
+    local zero_margins = 'margin-top: 0; margin-bottom: 0'
+    if para_style then
+      para_style = para_style .. '; ' .. zero_margins
+    else
+      para_style = zero_margins
+    end
+  end
+  local continue_unfill_p = false
+  if opts.continue_unfill_p and not fillp() then
+    --print('continuing unfill')
+    continue_unfill_p = true
+  end
   --print('emit_para calling eep')
   emit_end_para()
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end
+  if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'
+  if opts.interspersed_br then emit_verbatim '<br>' end
+  if continue_unfill_p then unfill_mode() end
   In_para_p=true
   Just_after_par_start_p = opts.par_start_p
   emit_newline()
@@ -2061,10 +2107,12 @@ function ev_named(s)
 end 
 
 function fill_mode()
+  --print('turn fill on')
   Ev_stack[1].hardlines = false
 end
 
 function unfill_mode()
+  --print('turn fill off')
   Ev_stack[1].hardlines = true
 end 
 
@@ -3153,21 +3201,22 @@ function initialize_macros()
   end)
 
   defrequest('sp', function()
+    --print('doing sp')
     local num = read_number_or_length('v')
     --if num == 0 then num = point_equivalent_of('v') end
     --print('sp arg is', num)
     read_troff_line()
     if num == 0 then
-      emit_verbatim '<br>'
+      if raw_counter_value 'PD' == 0 then
+        emit_verbatim '<br>'
+      else
+        emit_para{continue_unfill_p = true,
+        style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
+      end
     else
-      if In_para_p then emit_verbatim '</p>\n' end
-      emit_verbatim '<br>'
-      emit_verbatim '<p style="margin-top: '
-      emit_verbatim(num)
-      emit_verbatim 'px; margin-bottom: '
-      emit_verbatim(num)
-      emit_verbatim 'px"></p>'
-      if In_para_p then emit_verbatim '\n<p>' end
+      emit_para{interspersed_br = true,
+      continue_unfill_p = true,
+      style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
     end
     emit_verbatim '\n'
   end)
@@ -3188,6 +3237,7 @@ function initialize_macros()
   end)
 
   defrequest('in', function()
+    --print('doing in')
     local sign = read_opt_sign()
     local num = read_number_or_length('m')
     read_troff_line()
@@ -3197,12 +3247,11 @@ function initialize_macros()
       else Margin_left=num
       end
     end
-    if In_para_p then emit_verbatim '</p>\n'
-    else In_para_p = true
+    if Margin_left ~= 0 then
+      emit_para{continue_unfill_p = true,
+      style = specify_margin_left_style()}
+    else emit_para{continue_unfill_p = true}
     end
-    emit_verbatim '<p'
-    specify_margin_left_style()
-    emit_verbatim '>'
   end)
 
   defrequest('TL', function()
@@ -3272,7 +3321,15 @@ function initialize_macros()
 
   defrequest('TH', function()
     --print('doing TH')
-    TH_request()
+    local args = {read_args()}
+    --print('TH args=', table.unpack(args))
+    local f = find_macro_file('pca-t2p-man.tmac')
+    if f then
+      troff2page_file(f)
+      call_redefined_TH(args)
+    else
+      twarning('TH called outside table')
+    end
   end)
 
   defrequest('SC', function()
@@ -3706,25 +3763,25 @@ function initialize_macros()
   end)
 
   defrequest('nf', function()
+    --print('doing nf')
     read_troff_line()
     if not Previous_line_exec_p then
-      if In_para_p then emit_verbatim '</p>\n'
-      else In_para_p = true
+      if Margin_left ~= 0 then
+        --print('doing nf with margin-left= ', Margin_left)
+        emit_para{no_margins_p = true,
+        style = specify_margin_left_style()}
+      else emit_para{no_margins_p = true}
       end
-      emit_verbatim '<p'
-      specify_margin_left_style()
-      emit_verbatim '>\n'
     end
     unfill_mode()
+    --print('done nf')
   end)
 
   defrequest('fi', function()
+    --print('doing fi')
     read_troff_line()
     fill_mode()
-    if In_para_p then emit_verbatim '</p>\n'
-    else In_para_p = true
-    end
-    emit_verbatim '<p>'
+    emit_para{no_margins_p = true}
   end)
 
   defrequest('so', function()
@@ -3836,20 +3893,16 @@ function initialize_macros()
     write_troff_macro_to_stream(macro_name, out)
   end)
 
-  defrequest('troff2info', function()
-    --print('doing troff2info')
+  defrequest('troff2page2info', function()
+    --print('doing troff2page2info')
     read_troff_line()
     if not Convert_to_info_p then
-      if not html2info then
-        local f = find_macro_file('pca-t2p-info-lua.tmac')
-        if f then
-          --print('loading', f)
-          troff2page_file(f)
-        end
-      end
-      if html2info then Convert_to_info_p = true end
+      Convert_to_info_p = true
     end
+    --print('Convert_to_info_p set')
   end)
+
+  defrequest('troff2info', Request_table.troff2page2info) -- obsolescent
 
   defrequest('AM', function()
     accent_marks()
@@ -4139,81 +4192,6 @@ function urlh_string_value(url, link_text)
   end
   return url_to_html(url, link_text)
 end 
-
-
-function TH_request()
-  defrequest('TH', nil)
-  nb_macro_package('man')
-  local it
-  it = find_macro_file('man.local')
-  if it then troff2page_file(it) end
-  troff2page_string[[
-.de TH
-.de TH disabled
-.tm Calling .TH twice in man page
-.disabled
-.TL
-\\$1
-.RT
-.ds DY \\$3
-.ig ##
-if Last_page_number>0 and not Node_table['TAG:__troff2page_toc']
-then flag_missing_piece('toc')
-end
-.##
-.TAG __troff2page_toc
-.so \\*[AUXF].toc
-.nr pca:next-graf-without-indent 1
-.nr pca-t2p-man:enable-toc-entries 1
-..
-.
-.de TOCLINE-PLAIN
-.nr pca-t2p-man:sec-count \\$1
-.shift
-.nr pca-t2p-man:toc-item-indent \\$1
-.shift
-\h'\\n[pca-t2p-man:toc-item-indent]m'
-\\*[url #TAG:__pca_sec_\\n[pca-t2p-man:sec-count] "\\$*"]
-.br
-..
-.
-.de pca-t2p-man:write-toc-line
-.if !\\n[pca-t2p-man:enable-toc-entries] .return
-.if !\\n[pca-t2p-man:toc-opened-p] \{\
-.nr pca-t2p-man:toc-opened-p 1
-.open pca:toc-stream \\*[AUXF].toc
-.\}
-.nr pca-toc:count +1
-.TAG __pca_sec_\\n[pca-toc:count]
-.write pca:toc-stream .TOCLINE-PLAIN \\n[pca-toc:count] \\$*
-..
-.
-.ig ##
-defrequest('pca-t2p-man:orig-SH', function()
-  emit_section_header(1, {man_header_p=true})
-end)
-
-defrequest('pca-t2p-man:orig-SS', function()
-  emit_section_header(2, {man_header_p=true})
-end)
-.##
-.
-.de SH
-.pca-t2p-man:write-toc-line 0 \\$*
-.pca-t2p-man:orig-SH \\$*
-..
-.
-.de SS
-.pca-t2p-man:write-toc-line 1 \\$*
-.pca-t2p-man:orig-SS \\$*
-..
-  ]]
-  it = Macro_table.TH
-  local args = {read_args()}
-  table.insert(args, 1, 'TH')
-  flet({Macro_args = args},
-  function() execute_macro_body(it) end)
-end
 
 
 function emit_navigation_bar(headerp)
@@ -5626,6 +5604,21 @@ function table_do_cell()
   if font then emit(switch_font()) end
   emit_verbatim '</td>'
 end 
+
+
+local running_in_luatex = (tex and tex.print)
+
+if running_in_luatex then
+  function luatex_troff2page(s)
+    s = string.gsub(s, '^%s*(.-)%s*$', '%1')
+    s = string.gsub(s, '%s%s+', ' ')
+    return troff2page(table.unpack(split_string(s, ' ')))
+  end
+
+  local retobj = {}
+  retobj.troff2page = luatex_troff2page
+  return retobj
+end
 
 
 local running_in_neovim = (vim and type(vim) == 'table' and

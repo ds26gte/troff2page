@@ -5,6 +5,8 @@ function html2info()
   if Rerun_needed_p then
     tlog 'Unable to create Info doc because aux files unresolved.\n'
     return
+  else
+    tlog('Converting %s.html to %s.info\n', Jobname, Jobname)
   end
   local tmp_html_file = Jobname .. '-Z-T.html'
   local tmp_info_file = Jobname .. '-Z-T.info'

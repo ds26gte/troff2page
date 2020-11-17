@@ -1,0 +1,31 @@
+.\" last modified 2020-11-16
+.
+.ig ##
+defrequest('pca-t2p-man:orig-SH', function()
+  emit_section_header(1, {man_header_p=true})
+end)
+
+defrequest('pca-t2p-man:orig-SS', function()
+  emit_section_header(2, {man_header_p=true})
+end)
+
+nb_macro_package('man')
+
+if Last_page_number>0 and not Node_table['TAG:__troff2page_toc'] then
+  flag_missing_piece('toc')
+end
+
+local it = find_macro_file('man.local')
+if it then troff2page_file(it) end
+
+function call_redefined_TH(args)
+  local it = Macro_table.TH
+  defrequest('TH', nil)
+  table.insert(args, 1, 'TH')
+  if not it then print('Couldnt find TH!!!', table.unpack(args)) end
+  flet({Macro_args = args}, function()
+    execute_macro_body(it)
+  end)
+end
+
+.##

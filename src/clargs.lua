@@ -1,10 +1,10 @@
--- last modified 2019-09-30
+-- last modified 2020-11-17
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
   local f = find_macro_file(tmacf .. '.tmac') or find_macro_file('tmac.' .. tmacf)
   if not f then
-    tlog('can\'t open %s: No such file or directory', tmacf)
+    tlog('can\'t open %s: No such file or directory\n', tmacf)
   else
     troff2page_file(f)
   end
@@ -17,7 +17,7 @@ function set_register(regset, type)
     lhs, rhs = string.match(regset, '^([^=])(.+)')
   end
   --print('lhs=', lhs, 'rhs=', rhs)
-  if not lhs then tlog('expression expected') end
+  if not lhs then tlog('expression expected\n') end
   if type=='string' then
     --print('calling defstring', lhs, rhs)
     defstring(lhs, function() return verbatim(rhs) end)
@@ -142,7 +142,7 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-m$') then
           i=i+1; local tmacf = argv[i]
           if tmacf then load_tmac(tmacf)
-          else tlog('option requires an argument -- m')
+          else tlog('option requires an argument -- m\n')
           end
         elseif string.match(arg, '^-m') then
           local tmacf = string.gsub(arg, '^-m(.*)', '%1')
@@ -151,7 +151,7 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-d$') then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'string')
-          else tlog('option requires an argument -- d')
+          else tlog('option requires an argument -- d\n')
           end
         elseif string.match(arg, '^-d') then
           local regset = string.gsub(arg, '^-d(.*)', '%1')
@@ -160,7 +160,7 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-r$') then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'number')
-          else tlog('option requires an argument -- r')
+          else tlog('option requires an argument -- r\n')
           end
         elseif string.match(arg, '^-r') then
           --print('doing clo -r')
@@ -219,12 +219,13 @@ function troff2page(...)
       troff2page_1pass(argc, argv)
       if Rerun_needed_p then
         if Single_pass_p then
-          tlog(string.format('Rerun: troff2page %s\n', table_to_string(argv)))
+          tlog('Rerun: troff2page %s\n', table_to_string(argv))
         else
-          tlog(string.format('Rerunning: troff2page %s\n', table_to_string(argv)))
+          tlog('Rerunning: troff2page %s\n', table_to_string(argv))
           troff2page_1pass(argc, argv)
         end
       end
+      --print('info convert if approp')
       if Convert_to_info_p then html2info() end
     end)
   end)

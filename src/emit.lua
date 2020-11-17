@@ -1,4 +1,4 @@
--- last modified 2020-11-16
+-- last modified 2020-11-17
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -291,33 +291,51 @@ function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
 end
 
 function emit_end_para()
+  --print('doing emit_end_para')
   --print('In_para_p =', In_para_p)
-  if In_para_p then
-    --print('doing eep')
-    In_para_p=false
-    --print('doing emit_end_para')
-    emit_verbatim '</p>\n'
-    Margin_left = 0
-    local it = Request_table['par@reset']
-    if it then it() end
-    --print('eep switch style to default')
-    emit(switch_style())
-    fill_mode()
-    do_afterpar()
-    --print('eep/ipp should be true', In_para_p)
-    --print('eep setting ipp=false')
-  end
+  if not In_para_p then return end
+  --print('doing eep')
+  In_para_p=false
+  --print('doing emit_end_para')
+  emit(switch_style())
+  emit_verbatim '</p>\n'
+  Margin_left = 0
+  local it = Request_table['par@reset']
+  if it then it() end
+  --print('eep switch style to default')
+  --emit(switch_style())
+  fill_mode()
+  do_afterpar()
+  --print('eep/ipp should be true', In_para_p)
+  --print('eep setting ipp=false')
 end
 
 function emit_para(opts)
-  --print('doing emit_para')
+  --print('doing emit_para', opts)
   opts = opts or {}
+  local para_style = opts.style
+  if opts.no_margins_p then
+    local zero_margins = 'margin-top: 0; margin-bottom: 0'
+    if para_style then
+      para_style = para_style .. '; ' .. zero_margins
+    else
+      para_style = zero_margins
+    end
+  end
+  local continue_unfill_p = false
+  if opts.continue_unfill_p and not fillp() then
+    --print('continuing unfill')
+    continue_unfill_p = true
+  end
   --print('emit_para calling eep')
   emit_end_para()
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end
+  if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'
+  if opts.interspersed_br then emit_verbatim '<br>' end
+  if continue_unfill_p then unfill_mode() end
   In_para_p=true
   Just_after_par_start_p = opts.par_start_p
   emit_newline()

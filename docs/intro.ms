@@ -1,4 +1,4 @@
-.\" last modified 2020-11-12
+.\" last modified 2020-11-16
 .SH 1
 1. Introduction
 .LP
@@ -22,13 +22,16 @@ troff is a toolchain of some vintage, there continues to be a
 devoted band of troffglodytes preserving the tradition.
 troff2page lets you put your troff documents on the Web without
 your having to learn a new system or to maintain separate documents.
+With a flag, troff2page can also produce an Info version of your
+document that’s suitable for browing on a text terminal (chapter
+\*[TAG:gnuinfo]).
 .PP
 First,
 ensure that the script \fCtroff2page\fP is in a directory in your
 \fCPATH\fP.
 .PP
 .TAG html-output
-.IX calling troff2page from the command-line
+.IX calling troff2page from!the command-line
 To convert an input troff document named \fCjobname.ms\fP, type
 the following on the operating-system command line.
 .EX
@@ -164,7 +167,7 @@ exists, the init file \fCman.local\fP in the home directory.
 Calling troff2page from within Lua
 .LP
 .TAG calling_troff2page_within_lua
-.IX calling troff2page from Lua
+.IX calling troff2page from!Lua
 .
 The script \fCtroff2page\fP runs on the Unix command-line on Cygwin,
 Linux, Mac
@@ -183,35 +186,9 @@ Lua procedure \fCtroff2page\fP on your source document.  E.g.,
     troff2page('my-troff-document.ms')
 .EE
 The procedure \fCtroff2page\fP can be called
-several times, on the same or different documents, with all the
-same options as the script, from
-within the same Lua session.
+several times, on the same or different documents, from within
+the same Lua session. It takes the same options as the script,
+supplied as multiple string arguments.
 .PP
-.SH 2
-Calling troff2page from Neovim
-.LP
-.TAG calling_troff2page_from_neovim
-.IX calling troff2page from Neovim
-.
-The text editor \*[url https://neovim.io]Neovim\& embeds Lua, so you can
-run \fCtroff2page\fP directly during an editor session.
-This can be a convenient way to convert your troff source while
-you’re editing it, or even to automate the process using
-appropriate autocommands.
-.PP
-To set up, first copy the files \fClua/troff2page.lua\fP and
-\fCplugin/troff2page.vim\fP to subdirectories \fClua\fP and
-\fCplugin\fP respectively, somewhere in your Neovim
-\fC'runtimepath'\fP.  Alternatively, simple place a clone of the
-\fCtroff2page\fP repo in a \fCpack\fP subdirectory, somewhere in
-your \fC'runtimepath'\fP or \fC'packpath'\fP.
-.PP
-You now have the Neovim command \fCTroff2page\fP (note
-capital T!) which is called with the same style of arguments
-as \fCtroff2page\fP, with the following special cases:
-.PP
-1. The argument \fC%\fP is replaced with the name of the file in
-the current window.
-.PP
-2. If called with no argument, the name of the file in the
-current window is assumed to be the argument.
+For some more exotic ways of invoking \fCtroff2page\fP, see
+section \*[TAG:nvimtex].

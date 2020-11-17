@@ -1,4 +1,4 @@
--- last modified 2020-11-15
+-- last modified 2020-11-17
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -454,21 +454,22 @@ function initialize_macros()
   end)
 
   defrequest('sp', function()
+    --print('doing sp')
     local num = read_number_or_length('v')
     --if num == 0 then num = point_equivalent_of('v') end
     --print('sp arg is', num)
     read_troff_line()
     if num == 0 then
-      emit_verbatim '<br>'
+      if raw_counter_value 'PD' == 0 then
+        emit_verbatim '<br>'
+      else
+        emit_para{continue_unfill_p = true,
+        style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
+      end
     else
-      if In_para_p then emit_verbatim '</p>\n' end
-      emit_verbatim '<br>'
-      emit_verbatim '<p style="margin-top: '
-      emit_verbatim(num)
-      emit_verbatim 'px; margin-bottom: '
-      emit_verbatim(num)
-      emit_verbatim 'px"></p>'
-      if In_para_p then emit_verbatim '\n<p>' end
+      emit_para{interspersed_br = true,
+      continue_unfill_p = true,
+      style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
     end
     emit_verbatim '\n'
   end)
@@ -489,6 +490,7 @@ function initialize_macros()
   end)
 
   defrequest('in', function()
+    --print('doing in')
     local sign = read_opt_sign()
     local num = read_number_or_length('m')
     read_troff_line()
@@ -498,12 +500,11 @@ function initialize_macros()
       else Margin_left=num
       end
     end
-    if In_para_p then emit_verbatim '</p>\n'
-    else In_para_p = true
+    if Margin_left ~= 0 then
+      emit_para{continue_unfill_p = true,
+      style = specify_margin_left_style()}
+    else emit_para{continue_unfill_p = true}
     end
-    emit_verbatim '<p'
-    specify_margin_left_style()
-    emit_verbatim '>'
   end)
 
   defrequest('TL', function()
@@ -573,7 +574,15 @@ function initialize_macros()
 
   defrequest('TH', function()
     --print('doing TH')
-    TH_request()
+    local args = {read_args()}
+    --print('TH args=', table.unpack(args))
+    local f = find_macro_file('pca-t2p-man.tmac')
+    if f then
+      troff2page_file(f)
+      call_redefined_TH(args)
+    else
+      twarning('TH called outside table')
+    end
   end)
 
   defrequest('SC', function()
@@ -1007,25 +1016,25 @@ function initialize_macros()
   end)
 
   defrequest('nf', function()
+    --print('doing nf')
     read_troff_line()
     if not Previous_line_exec_p then
-      if In_para_p then emit_verbatim '</p>\n'
-      else In_para_p = true
+      if Margin_left ~= 0 then
+        --print('doing nf with margin-left= ', Margin_left)
+        emit_para{no_margins_p = true,
+        style = specify_margin_left_style()}
+      else emit_para{no_margins_p = true}
       end
-      emit_verbatim '<p'
-      specify_margin_left_style()
-      emit_verbatim '>\n'
     end
     unfill_mode()
+    --print('done nf')
   end)
 
   defrequest('fi', function()
+    --print('doing fi')
     read_troff_line()
     fill_mode()
-    if In_para_p then emit_verbatim '</p>\n'
-    else In_para_p = true
-    end
-    emit_verbatim '<p>'
+    emit_para{no_margins_p = true}
   end)
 
   defrequest('so', function()
@@ -1137,20 +1146,16 @@ function initialize_macros()
     write_troff_macro_to_stream(macro_name, out)
   end)
 
-  defrequest('troff2info', function()
-    --print('doing troff2info')
+  defrequest('troff2page2info', function()
+    --print('doing troff2page2info')
     read_troff_line()
     if not Convert_to_info_p then
-      if not html2info then
-        local f = find_macro_file('pca-t2p-info-lua.tmac')
-        if f then
-          --print('loading', f)
-          troff2page_file(f)
-        end
-      end
-      if html2info then Convert_to_info_p = true end
+      Convert_to_info_p = true
     end
+    --print('Convert_to_info_p set')
   end)
+
+  defrequest('troff2info', Request_table.troff2page2info) -- obsolescent
 
   defrequest('AM', function()
     accent_marks()

@@ -1,4 +1,4 @@
--- last modified 2020-11-08
+-- last modified 2020-11-17
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -27,6 +27,24 @@ function do_end_macro()
   if End_macro then
     local it = Macro_table[End_macro]
     if it then troff2page_lines(it) end
+  end
+end
+
+function load_info_converter()
+  --print('doing load_info_converter')
+  if html2info then return end
+  --print('loading info converter')
+  local f = find_macro_file('pca-t2p-info-lua.tmac')
+  if not f then
+    tlog('File pca-t2p-info-lua.tmac not found.\n')
+    Convert_to_info_p = false
+    return
+  end
+  troff2page_file(f)
+  --print('html2info found?', html2info)
+  if not html2info then
+    Convert_to_info_p = false
+    tlog('File pca-t2p-info-lua.tmac corrupted?\n')
   end
 end
 
@@ -73,10 +91,19 @@ function do_bye()
     write_aux('nb_script("', slidy_js_file, '")')
     --print('done slide setup')
   end
+  --print('checking Convert_to_info_p', Convert_to_info_p)
+  if not Convert_to_info_p and os.getenv 'TROFF2PAGE2INFO' then
+    Convert_to_info_p = true
+  end
+  if Convert_to_info_p then
+    --print('calling load_info_converter')
+    load_info_converter()
+    --print('done load_info_converter')
+  end
   clear_per_doc_tables()
   if #Missing_pieces > 0 then
     Rerun_needed_p = true
-    tlog(string.format('Missing: %s\n', table_to_string(Missing_pieces)))
+    tlog('Missing: %s\n', table_to_string(Missing_pieces))
   end
   close_all_open_streams()
 end

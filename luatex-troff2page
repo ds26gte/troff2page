@@ -1,0 +1,23 @@
+# last modified 2020-11-16
+# Dorai Sitaram
+
+# Use this if you have LuaTeX but not standalone Lua.
+
+# Assumes lua/troff2page.lua has been copied to a
+# directory in your TEXINPUTS.
+
+if test $# -eq 0; then
+  echo troff2page needs at least one argument; exit
+fi
+
+cat > texput.tex <<EOF
+\directlua{
+  troff2page = require('troff2page.lua')
+  troff2page.troff2page(table.unpack(troff2page.split_at_space('$@')))
+}
+\bye
+EOF
+
+luatex texput
+
+echo Troff2page "$@" | nvim -es

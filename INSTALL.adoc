@@ -11,31 +11,37 @@ Copy the script `troff2page` to a directory in your PATH.
 Copy the file `man/man1/troff2page.1` to the `man1` subdirectory of a
 directory in your `MANPATH`.
 
-The troff2page documentation (see below) uses the
-`pca*.tmac` files from the `mpca` submodule
-(available on its own at https://github.com/ds26gte/mpca). To
-include `mpca`, do
+troff2page can also use the `*.tmac` files from the `mpca` repo.
+To include `mpca` as a submodule, do
 
   git submodule init
   git submodule update
 
-This will create an `mpca` subdirectory.
-
-Copy these `pca*.tmac` files from `mpca`
-to somewhere in your
-`GROFF_TMAC_PATH` (or include these directories or copies thereof
-in `GROFF_TMAC_PATH`). In a pinch, if you don’t want to mess with
+This will create an `mpca` subdirectory. Either include this
+directory or a copy of it in your `GROFF_TMAC_PATH`; or add the
+`pca*.tmac` files in it to some directory already in your
+`GROFF_TMAC_PATH`. In a pinch, if you don’t want to mess with
 `GROFF_TMAC_PATH` just yet, you may simply copy these `*.tmac`
 files to your home directory.
 
-These `*.tmac` files, while generally useful, are specifically
-needed to typeset the supplied documentation, which is provided
-in `docs/index.ms`. If you don’t need these macros for anything
-other than processing `index.ms`, you may make do by copying
-these files to the directory containing `index.ms`.
+NOTE: `mpca` is available on its own from
+      https://github.com/ds26gte/mpca.
 
-The `pca-t2p-*.tmac` are only used by `troff2page`, never by
-`groff`.
+troff2page also includes the `mpca-t2p` directory which contains
+modifications of the `mpca` macro files that are appropriate for
+HTML conversion. While you don't need to load them explicitly,
+you need them available in your `GROFF_TMAC_PATH`. Do the same
+with this directory as you did with the `mpca` directory.
+
+These `*.tmac` files from `mpca` and `mpca-t2p`, while generally
+useful, are specifically needed to typeset the troff2page
+documentation, which is provided in `docs/index.ms`. If you don’t
+need these macros for anything other than processing `index.ms`,
+you may make do by copying these files to the directory
+containing `index.ms`.
+
+The `pca-t2p-*.tmac` are used only by `troff2page`, never by
+`groff`. The other `pca*.tmac` are used by both.
 
 == Man page
 
@@ -49,19 +55,19 @@ to get started with using troff2page.
 `troff2page.lua` has been tested on Lua 5.1.5, 5.2.4 and
 5.3.3; LuaJIT 2.0.4; RaptorJIT 1.0.0; and Neovim 0.5.0-dev.
 
-The branch `lisp` in the troff2page git repository contains an
-implementation in Common Lisp.
+NOTE: The branch `lisp` in the troff2page git repository contains
+      an implementation in Common Lisp.
 
 == Documentation
 
 Documentation for troff2page is available online at
 http://ds26gte.github.io/troff2page/index.html.
 
-The troff source for this document, `index.ms`, is available in
-the `docs` subdirectory of the distribution. It can be processed
-with either groff or troff2page.  You must
-have installed troff2page, including the macro files that come
-with this distribution, as described above.
+The troff sources for this document, `index.ms` and subfiles, are
+available in the `docs` subdirectory of the distribution. It can
+be processed with either groff or troff2page.  To convert it into
+HTML, you must have installed troff2page, including the macro
+files that come with this distribution, as described above.
 
 If calling groff on `index.ms`, you will need to run groff twice
 in order to pick up all the auxiliary file info. (There will be a

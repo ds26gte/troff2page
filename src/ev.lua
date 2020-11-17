@@ -48,10 +48,12 @@ function ev_named(s)
 end 
 
 function fill_mode()
+  --print('turn fill on')
   Ev_stack[1].hardlines = false
 end
 
 function unfill_mode()
+  --print('turn fill off')
   Ev_stack[1].hardlines = true
 end 
 
