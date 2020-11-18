@@ -424,7 +424,7 @@ function initialize_macros()
   defrequest('LP', function()
     execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
-    emit_newline()
+    --emit_newline()
     --print('LP calling emit_para')
     emit_para{par_start_p = true}
   end)
@@ -439,7 +439,7 @@ function initialize_macros()
   defrequest('PP', function()
     execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
-    emit_newline()
+    --emit_newline()
     emit_para{par_start_p = true, indent_p = true}
   end)
 
@@ -456,25 +456,12 @@ function initialize_macros()
   defrequest('sp', function()
     --print('doing sp')
     local num = read_number_or_length('v')
-    --if num == 0 then num = point_equivalent_of('v') end
-    --print('sp arg is', num)
     read_troff_line()
-    if num == 0 then
-      --print('sp 0')
-      if raw_counter_value 'PD' == 0 then
-        --print('sp 0 PD = 0')
-        emit_verbatim '<br>'
-      else
-        --print('sp 0 PD ~= 0')
-        emit_para{continue_top_ev_p = true,
-        style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
-      end
-    else
-      --print('sp ~0')
-      emit_para{interspersed_br = true,
+    if num == 0 then num = point_equivalent_of('v') end
+    --print('sp arg is', num)
+    emit_para{interleaved_p = true,
       continue_top_ev_p = true,
       style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
-    end
     emit_verbatim '\n'
   end)
 

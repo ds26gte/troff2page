@@ -311,8 +311,8 @@ function emit_end_para()
 end
 
 function emit_para(opts)
-  --print('doing emit_para', opts)
   opts = opts or {}
+  --print('doing emit_para', opts.style, opts.no_margins_p, opts.continue_top_ev_p)
   local para_style = opts.style
   if opts.no_margins_p then
     local zero_margins = 'margin-top: 0; margin-bottom: 0'
@@ -330,12 +330,12 @@ function emit_para(opts)
   end
   --print('emit_para calling emit_end_para')
   emit_end_para()
+  if opts.interleaved_p then emit_verbatim '<p class=interleaved></p>\n' end
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end
   if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'
-  if opts.interspersed_br then emit_verbatim '<br>' end
   if saved_ev then
     --print('restoring saved_ev')
     if saved_ev.hardlines then unfill_mode() end
@@ -349,7 +349,7 @@ function emit_para(opts)
   end
   In_para_p=true
   Just_after_par_start_p = opts.par_start_p
-  emit_newline()
+  --emit_newline()
   --print('emit_para winding down')
 end
 
