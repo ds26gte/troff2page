@@ -3398,6 +3398,24 @@ function initialize_macros()
     write_aux('nb_stylesheet("', f, '")')
   end)
 
+  defrequest('CSSS', function()
+    --print('doing CSSS')
+    local c, w
+    while true do
+      c = snoop_char()
+      if not c then break end
+      if c == Control_char then get_char()
+        w = read_word()
+        if w=='CSSE' then break
+        else toss_back_string(w)
+          toss_back_char(Control_char)
+        end
+      end
+      w = read_one_line()
+      Css_stream:write(w, '\n')
+    end
+  end)
+
   defrequest('REDIRECT', function()
     if not Redirected_p then flag_missing_piece 'redirect' end
     local f = read_args()
