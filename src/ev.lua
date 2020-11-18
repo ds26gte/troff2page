@@ -60,3 +60,13 @@ end
 function fillp()
   return not Ev_stack[1].hardlines
 end
+
+function ev_top()
+  local top = Ev_stack[1]
+    return {
+      hardlines = top.hardlines,
+      font = top.font,
+      color = top.color,
+      bgcolor = top.bgcolor,
+    }
+end

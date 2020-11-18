@@ -322,12 +322,13 @@ function emit_para(opts)
       para_style = zero_margins
     end
   end
-  local continue_unfill_p = false
-  if opts.continue_unfill_p and not fillp() then
-    --print('continuing unfill')
-    continue_unfill_p = true
+  local saved_ev
+  if opts.continue_top_ev_p then
+    --print('saving current ev')
+    saved_ev = ev_top()
+    --print('curr ev=', saved_ev)
   end
-  --print('emit_para calling eep')
+  --print('emit_para calling emit_end_para')
   emit_end_para()
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
@@ -335,10 +336,21 @@ function emit_para(opts)
   if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'
   if opts.interspersed_br then emit_verbatim '<br>' end
-  if continue_unfill_p then unfill_mode() end
+  if saved_ev then
+    --print('restoring saved_ev')
+    if saved_ev.hardlines then unfill_mode() end
+    local new_style = {}
+    --print('sf=', saved_ev.font)
+    if saved_ev.font then new_style.font = saved_ev.font end
+    if saved_ev.color then new_style.color = saved_ev.color end
+    if saved_ev.bgcolor then new_style.bgcolor = saved_ev.bgcolor end
+    --print('calling switch_style with new_style')
+    emit(switch_style(new_style))
+  end
   In_para_p=true
   Just_after_par_start_p = opts.par_start_p
   emit_newline()
+  --print('emit_para winding down')
 end
 
 function emit_start()

@@ -1774,12 +1774,13 @@ function emit_para(opts)
       para_style = zero_margins
     end
   end
-  local continue_unfill_p = false
-  if opts.continue_unfill_p and not fillp() then
-    --print('continuing unfill')
-    continue_unfill_p = true
+  local saved_ev
+  if opts.continue_top_ev_p then
+    --print('saving current ev')
+    saved_ev = ev_top()
+    --print('curr ev=', saved_ev)
   end
-  --print('emit_para calling eep')
+  --print('emit_para calling emit_end_para')
   emit_end_para()
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
@@ -1787,10 +1788,21 @@ function emit_para(opts)
   if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'
   if opts.interspersed_br then emit_verbatim '<br>' end
-  if continue_unfill_p then unfill_mode() end
+  if saved_ev then
+    --print('restoring saved_ev')
+    if saved_ev.hardlines then unfill_mode() end
+    local new_style = {}
+    --print('sf=', saved_ev.font)
+    if saved_ev.font then new_style.font = saved_ev.font end
+    if saved_ev.color then new_style.color = saved_ev.color end
+    if saved_ev.bgcolor then new_style.bgcolor = saved_ev.bgcolor end
+    --print('calling switch_style with new_style')
+    emit(switch_style(new_style))
+  end
   In_para_p=true
   Just_after_par_start_p = opts.par_start_p
   emit_newline()
+  --print('emit_para winding down')
 end
 
 function emit_start()
@@ -2118,6 +2130,16 @@ end
 
 function fillp()
   return not Ev_stack[1].hardlines
+end
+
+function ev_top()
+  local top = Ev_stack[1]
+    return {
+      hardlines = top.hardlines,
+      font = top.font,
+      color = top.color,
+      bgcolor = top.bgcolor,
+    }
 end
 
 
@@ -3210,15 +3232,19 @@ function initialize_macros()
     --print('sp arg is', num)
     read_troff_line()
     if num == 0 then
+      --print('sp 0')
       if raw_counter_value 'PD' == 0 then
+        --print('sp 0 PD = 0')
         emit_verbatim '<br>'
       else
-        emit_para{continue_unfill_p = true,
+        --print('sp 0 PD ~= 0')
+        emit_para{continue_top_ev_p = true,
         style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
       end
     else
+      --print('sp ~0')
       emit_para{interspersed_br = true,
-      continue_unfill_p = true,
+      continue_top_ev_p = true,
       style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
     end
     emit_verbatim '\n'
@@ -3251,9 +3277,9 @@ function initialize_macros()
       end
     end
     if Margin_left ~= 0 then
-      emit_para{continue_unfill_p = true,
+      emit_para{continue_top_ev_p = true,
       style = specify_margin_left_style()}
-    else emit_para{continue_unfill_p = true}
+    else emit_para{continue_top_ev_p = true}
     end
   end)
 
@@ -3475,6 +3501,7 @@ function initialize_macros()
 
   defrequest('ft', function()
     local f = read_args()
+    --print('doing ft', f)
     emit(switch_font(f))
   end)
 
@@ -5140,6 +5167,7 @@ end
 
 function switch_style(opts)
   opts = opts or {}
+  --print('doing switch_style', opts)
   --print('doing switch_style')
   --for k,v in pairs(opts) do print(k, v) end
   local ev_curr = Ev_stack[1]
@@ -5219,6 +5247,7 @@ function switch_style(opts)
     }
   end
   --
+  --print('switch_style winding down')
   return r
 end
 
@@ -5234,7 +5263,8 @@ function switch_font(f)
   else f = false
   end
   --print('f=', f)
-  return switch_style{font = f}
+  --print('switch_font calling switch_style', f)
+  return switch_style({font = f})
 end
 
 function make_span_open(opts)

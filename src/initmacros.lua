@@ -460,15 +460,19 @@ function initialize_macros()
     --print('sp arg is', num)
     read_troff_line()
     if num == 0 then
+      --print('sp 0')
       if raw_counter_value 'PD' == 0 then
+        --print('sp 0 PD = 0')
         emit_verbatim '<br>'
       else
-        emit_para{continue_unfill_p = true,
+        --print('sp 0 PD ~= 0')
+        emit_para{continue_top_ev_p = true,
         style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
       end
     else
+      --print('sp ~0')
       emit_para{interspersed_br = true,
-      continue_unfill_p = true,
+      continue_top_ev_p = true,
       style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
     end
     emit_verbatim '\n'
@@ -501,9 +505,9 @@ function initialize_macros()
       end
     end
     if Margin_left ~= 0 then
-      emit_para{continue_unfill_p = true,
+      emit_para{continue_top_ev_p = true,
       style = specify_margin_left_style()}
-    else emit_para{continue_unfill_p = true}
+    else emit_para{continue_top_ev_p = true}
     end
   end)
 
@@ -725,6 +729,7 @@ function initialize_macros()
 
   defrequest('ft', function()
     local f = read_args()
+    --print('doing ft', f)
     emit(switch_font(f))
   end)
 

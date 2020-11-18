@@ -1,7 +1,8 @@
--- last modified 2020-11-11
+-- last modified 2020-11-17
 
 function switch_style(opts)
   opts = opts or {}
+  --print('doing switch_style', opts)
   --print('doing switch_style')
   --for k,v in pairs(opts) do print(k, v) end
   local ev_curr = Ev_stack[1]
@@ -81,6 +82,7 @@ function switch_style(opts)
     }
   end
   --
+  --print('switch_style winding down')
   return r
 end
 
@@ -96,7 +98,8 @@ function switch_font(f)
   else f = false
   end
   --print('f=', f)
-  return switch_style{font = f}
+  --print('switch_font calling switch_style', f)
+  return switch_style({font = f})
 end
 
 function make_span_open(opts)
