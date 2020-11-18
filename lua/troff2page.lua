@@ -1763,8 +1763,8 @@ function emit_end_para()
 end
 
 function emit_para(opts)
-  --print('doing emit_para', opts)
   opts = opts or {}
+  --print('doing emit_para', opts.style, opts.no_margins_p, opts.continue_top_ev_p)
   local para_style = opts.style
   if opts.no_margins_p then
     local zero_margins = 'margin-top: 0; margin-bottom: 0'
@@ -1782,12 +1782,12 @@ function emit_para(opts)
   end
   --print('emit_para calling emit_end_para')
   emit_end_para()
+  if opts.interleaved_p then emit_verbatim '<p class=interleaved></p>\n' end
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end
   if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'
-  if opts.interspersed_br then emit_verbatim '<br>' end
   if saved_ev then
     --print('restoring saved_ev')
     if saved_ev.hardlines then unfill_mode() end
@@ -1801,7 +1801,7 @@ function emit_para(opts)
   end
   In_para_p=true
   Just_after_par_start_p = opts.par_start_p
-  emit_newline()
+  --emit_newline()
   --print('emit_para winding down')
 end
 
@@ -3196,7 +3196,7 @@ function initialize_macros()
   defrequest('LP', function()
     execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
-    emit_newline()
+    --emit_newline()
     --print('LP calling emit_para')
     emit_para{par_start_p = true}
   end)
@@ -3211,7 +3211,7 @@ function initialize_macros()
   defrequest('PP', function()
     execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
-    emit_newline()
+    --emit_newline()
     emit_para{par_start_p = true, indent_p = true}
   end)
 
@@ -3228,25 +3228,12 @@ function initialize_macros()
   defrequest('sp', function()
     --print('doing sp')
     local num = read_number_or_length('v')
-    --if num == 0 then num = point_equivalent_of('v') end
-    --print('sp arg is', num)
     read_troff_line()
-    if num == 0 then
-      --print('sp 0')
-      if raw_counter_value 'PD' == 0 then
-        --print('sp 0 PD = 0')
-        emit_verbatim '<br>'
-      else
-        --print('sp 0 PD ~= 0')
-        emit_para{continue_top_ev_p = true,
-        style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
-      end
-    else
-      --print('sp ~0')
-      emit_para{interspersed_br = true,
+    if num == 0 then num = point_equivalent_of('v') end
+    --print('sp arg is', num)
+    emit_para{interleaved_p = true,
       continue_top_ev_p = true,
       style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
-    end
     emit_verbatim '\n'
   end)
 
