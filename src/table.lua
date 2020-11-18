@@ -1,4 +1,4 @@
--- last modified 2020-11-09
+-- last modified 2020-11-18
 
 function table_do_global_options()
   --print('doing table_do_global_options')
@@ -28,9 +28,9 @@ function table_do_global_option_1(x)
          Table_colsep_char = get_char()
          ignore_char ')'
        elseif w == 'box' or w == 'frame' or w == 'doublebox' or w == 'doubleframe' then
-         Table_options = Table_options .. ' border=1'
+         Table_style.border = true
        elseif w == 'allbox' then
-         Table_options = Table_options .. ' border=1'
+         Table_style.border = true; Table_cell_style.border = true
        elseif w == 'expand' then
          Table_options = Table_options .. ' width="100%"'
        elseif w == 'center' then
@@ -95,30 +95,30 @@ function table_do_rows()
       if not c then break end
       --print('while loop saw', c)
       if Table_cell_number==0 then
-        if c == Control_char then get_char()
+        if c == Control_char then
+          get_char()
           local w = read_word()
           --print('found cmd inside table', w)
           if not w then no_op()
-          elseif w=='TE' then break
-          elseif w=='TH' then Reading_table_header_p=false
-          else toss_back_string(w)
+          elseif w=='TE' then
+            read_troff_line(); break
+          elseif w=='TH' then
+            Reading_table_header_p=false
+          else
+            toss_back_string(w)
+            toss_back_char(Control_char)
+            process_line()
           end
-          toss_back_char(Control_char)
         elseif c=='_' or c=='-' or c=='=' then read_troff_line()
           emit_verbatim '<tr><td valign=top colspan='
           emit_verbatim(Table_number_of_columns)
           emit_verbatim '><hr></td></tr>\n'
+        else
+          emit_verbatim '<tr'
+          if Reading_table_header_p then emit_verbatim ' class=tableheader' end
+          emit_verbatim '>'
+          table_do_cell()
         end
-        table_do_cell()
-      elseif not Inside_table_text_block_p and c=='T' then
-        get_char(); c = snoop_char()
-        if c=='{' then get_char()
-          Inside_table_text_block_p=true
-          ignore_char '\n'
-        else toss_back_char('T')
-        end
-        table_do_cell()
-      elseif c == Table_colsep_char then get_char()
       elseif c=='\n' then get_char()
         emit_verbatim '\n</tr>\n'
         Table_row_number=Table_row_number+1
@@ -131,12 +131,6 @@ end
 
 function table_do_cell()
   --print('doing table_do_cell')
-  if Table_cell_number==0 then
-    --print('starting cell', Reading_table_header_p)
-    emit_verbatim '<tr'
-    if Reading_table_header_p then emit_verbatim ' class=tableheader' end
-    emit_verbatim '>'
-  end
   Table_cell_number=Table_cell_number+1
   local cell_format_info =
   Table_format_table[math.min(Table_row_number, Table_default_format_line)][Table_cell_number]
@@ -144,22 +138,47 @@ function table_do_cell()
   local c; local it
   emit_verbatim '\n<td valign=top'
   if align then emit_verbatim ' align='; emit_verbatim(align) end
+  if Table_cell_style.border then emit_verbatim ' style="border: 1px solid black"' end
   emit_verbatim '>'
   if font then emit(switch_font(font)) end
+  local cell_contents = ''
+  local more
   while true do
     c=snoop_char()
-    if Inside_table_text_block_p and c=='T' then get_char()
-      c=snoop_char()
-      if c=='}' then get_char()
-        Inside_table_text_block_p=false
-      else toss_back_char('T')
-        troff2page_line(read_one_line())
+    if Inside_table_text_block_p then
+      if c=='T' then
+        get_char()
+        c=snoop_char()
+        if c=='}' then
+          get_char()
+          Inside_table_text_block_p=false
+        else
+          toss_back_char('T')
+          more = read_one_line()
+          cell_contents = cell_contents .. more .. '\n'
+        end
+      else
+        more = read_one_line()
+        cell_contents = cell_contents .. more .. '\n'
       end
-    elseif Inside_table_text_block_p then troff2page_line(read_one_line())
-    elseif (function() it = read_till_chars{Table_colsep_char, '\n'}; return it end)''
-    then troff2page_string(it); break
+    else
+      more = read_till_chars({Table_colsep_char, 'T', '\n'})
+      cell_contents = cell_contents .. more
+      if c==Table_colsep_char then get_char(); break end
+      if c=='\n' then break end
+      if c=='T' then
+        get_char()
+        c=snoop_char()
+        if c=='{' then
+          read_troff_line()
+          Inside_table_text_block_p=true
+        else
+          cell_contents = cell_contents .. 'T'
+        end
+      end
     end
   end
+  troff2page_string(cell_contents)
   if font then emit(switch_font()) end
   emit_verbatim '</td>'
-end 
+end

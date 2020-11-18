@@ -1,4 +1,4 @@
-# last modified 2020-11-17
+# last modified 2020-11-18
 #
 src_files = $(wildcard ?.1 ??.1)
 
@@ -10,4 +10,4 @@ all: $(html_files)
 	troff2page -mpca $<
 
 clean:
-	rm $(html_files)
+	rm -f $(html_files)

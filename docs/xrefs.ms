@@ -1,4 +1,4 @@
-.\" last modified 2020-11-12
+.\" last modified 2020-11-18
 .SH 1
 4. Cross-references
 .LP
@@ -49,11 +49,11 @@ a ToC.
 \fCpca-toc.tmac\fP doesn’t require you to modify how you use your header
 macros (\fC.SH\fP or \fC.NH\fP). It is a solution to the
 following statement from the groff manual:
-.PP
+.QS
 “Altering the ‘NH’ macro to automatically build the table of contents
 is perhaps initially more difficult, but would save a great deal of time
 in the long run if you use ‘ms’ regularly.”
-.PP
+.QE
 .IX pca-t2p-man.tmac, macro file
 troff2page uses the macro file \fCpca-t2p-man.tmac\fP (if it can
 find it in \fCGROFF_TMAC_PATH\fP)

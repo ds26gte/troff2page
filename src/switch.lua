@@ -171,7 +171,7 @@ function switch_size(n)
     n = math.floor(n + 1/2)
     if n == 100 then n = false end
     if n then
-      n = 'font-size' .. n .. '%'
+      n = 'font-size: ' .. n .. '%'
     end
   end
     return switch_style{size = n}
@@ -184,7 +184,7 @@ function man_alternating_font_macro(f1, f2)
     arg = read_word()
     if not arg then break end
     emit(switch_font(first_font_p and f1 or f2))
-    emit(expand-args(arg))
+    emit(expand_args(arg))
     emit(switch_font())
     first_font_p = not first_font_p
   end
@@ -197,7 +197,7 @@ function man_font_macro(f)
   local e = read_troff_line()
   if e=='' then e = read_troff_line() end
   emit(switch_font(f))
-  emit(expand-args(e))
+  emit(expand_args(e))
   emit(switch_font())
   emit_newline()
 end

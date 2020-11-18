@@ -919,7 +919,9 @@ function initialize_macros()
       Table_colsep_char = '\t',
       Table_options = ' cellpadding=2',
       Table_number_of_columns = 0,
-      Table_align = false
+      Table_align = false,
+      Table_style = {},
+      Table_cell_style = {},
     }, function()
       table_do_global_options()
       table_do_format_section()
@@ -928,6 +930,7 @@ function initialize_macros()
       emit_verbatim '>\n'
       emit_verbatim '<table'
       Out:write(Table_options)
+      if Table_style.border then Out:write ' style="border: 1px solid black"' end
       emit_verbatim '>\n'
       table_do_rows()
       emit_verbatim '</table>\n'
