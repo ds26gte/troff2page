@@ -1,7 +1,7 @@
--- last modified 2017-08-16
+-- last modified 2020-11-18
 
 function anchor(lbl)
---  print('doing anchor', lbl)
+  --print('doing anchor', lbl)
   return verbatim '<a name="' ..
   verbatim(lbl) ..
   verbatim '"></a>'
@@ -56,12 +56,14 @@ function link_url(url)
 end
 
 function url_to_html(url, link_text)
---  print('doing url_to_html', url, link_text)
+  --print('doing url_to_html', url, link_text)
   local internal_node_p
   url, internal_node_p = link_url(url)
-  return link_start(url, internal_node_p) ..
-    expand_args(link_text) ..
+  local lk = link_start(url, internal_node_p) ..
+    link_text ..
     link_stop()
+  --print('url_to_html returning', lk)
+  return lk
 end 
 
 function urlh_string_value(url, link_text)
@@ -87,5 +89,5 @@ function urlh_string_value(url, link_text)
   if link_text == '' then
     link_text = url
   end
-  return url_to_html(url, link_text)
+  return url_to_html(url, expand_args(link_text))
 end 

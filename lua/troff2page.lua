@@ -532,10 +532,13 @@ function do_bye()
   write_aux('nb_macro_package("', Macro_package, '")')
   if Title then
     --print('nb_titling', Title)
-    local escaped_Title = string.gsub(Title, '\n', '\\n')
-    escaped_Title = string.gsub(escaped_Title, '"', '\\"')
-    --print('nb_titling I', escaped_Title)
-    write_aux('nb_title("', escaped_Title, '")')
+    local escaped_Title = Title
+    escaped_Title = string.gsub(escaped_Title, '\\', '\\\\')
+    escaped_Title = string.gsub(escaped_Title, '\n', '\\n')
+    escaped_Title = string.gsub(escaped_Title, "'", "\\'")
+    --escaped_Title = string.gsub(escaped_Title, '"', '\\"')
+    --print('nb_titling ->', escaped_Title)
+    write_aux('nb_title(\'', escaped_Title, '\')')
   end
   if Last_page_number == 0 then
     Css_stream:write('.navigation { display: none; }\n')
@@ -2958,6 +2961,7 @@ function initialize_macros()
     end
     --print('value(2) =', value)
     value = string.gsub(value, '^(%s*)<br>', '%1\n')
+    value = string.gsub(value, '&', '\\[htmlamp]')
     value = string.gsub(value, '<br>(%s*)$', '\n%1')
     div.value = value
   end)
@@ -4157,7 +4161,7 @@ end
 
 
 function anchor(lbl)
---  print('doing anchor', lbl)
+  --print('doing anchor', lbl)
   return verbatim '<a name="' ..
   verbatim(lbl) ..
   verbatim '"></a>'
@@ -4212,12 +4216,14 @@ function link_url(url)
 end
 
 function url_to_html(url, link_text)
---  print('doing url_to_html', url, link_text)
+  --print('doing url_to_html', url, link_text)
   local internal_node_p
   url, internal_node_p = link_url(url)
-  return link_start(url, internal_node_p) ..
-    expand_args(link_text) ..
+  local lk = link_start(url, internal_node_p) ..
+    link_text ..
     link_stop()
+  --print('url_to_html returning', lk)
+  return lk
 end 
 
 function urlh_string_value(url, link_text)
@@ -4243,7 +4249,7 @@ function urlh_string_value(url, link_text)
   if link_text == '' then
     link_text = url
   end
-  return url_to_html(url, link_text)
+  return url_to_html(url, expand_args(link_text))
 end 
 
 
@@ -5058,33 +5064,39 @@ function emit_external_title()
 end
 
 function get_header(k, opts)
+  --print('doing get_header')
   opts = opts or {}
-  --print('DOING get_header with Out=', Out)
+  --print('DOING get_header with Outputting_to=', Outputting_to)
   if not opts.man_header_p then
     --print('not manheaderp')
     local old_Out = Out
+    local old_Outputting_to = Outputting_to
     local o = make_string_output_stream()
     --print('get_header setting Out to (string stream)', o)
     Out = o
+    Outputting_to = 'troff'
     --print('get_header starts a new para')
     emit_para()
     Afterpar = function()
-      --print('calling get_headers afterpar')
+      --io.write('calling get_headers afterpar\n')
       Out = old_Out
+      Outputting_to = old_Outputting_to
       --print('doing afterpar in getheader')
       --print('gh/apar ipp=', In_para_p)
       local res = o:get_output_stream_string()
-      --io.write('orig res= ->', res, '<-')
+      --io.write('orig res= ->', res, '<-\n')
       res = string.gsub(res, '^%s*<[pP]>%s*', '')
       res = string.gsub(res, '%s*</[pP]>%s*$', '')
       res = string.gsub(res, '"', '\\\\[htmlquot]')
+      res = string.gsub(res, '&', '\\[htmlamp]')
       res = string.gsub(res, '<', '\\\\[htmllt]')
       res = string.gsub(res, '>', '\\\\[htmlgt]')
-      --io.write('res= ->', res, '<-')
+      --io.write('res= ->', res, '<-\n')
       k(res)
       --k(string_trim_blanks(res))
     end
   else
+    --io.write('get_header calling its k')
     k(with_output_to_string(function(o)
       flet({
         Out = o,
@@ -5097,7 +5109,9 @@ function get_header(k, opts)
           if not w then read_troff_line(); break
           else
             if first_p then first_p =false else emit ' ' end
-            emit(expand_args(w))
+            local hdr_frag = expand_args(w)
+            --io.write('hdr_frag = ', hdr_frag)
+            emit(hdr_frag)
           end
         end
       end)
@@ -5106,6 +5120,7 @@ function get_header(k, opts)
 end
 
 function emit_section_header(level, opts)
+  --print('doing emit_section_header', level)
   opts = opts or {}
   --
   if Slides_p and level==1 then do_eject() end
@@ -5128,6 +5143,7 @@ function emit_section_header(level, opts)
     defstring('SN-STYLE', this_section_num_dot_thunk)
   end
   ignore_spaces()
+  --print('emit_section_header calling get_header')
   get_header(function(header)
     --print('get_header arg header=', header)
     local hnum = math.max(1, math.min(6, level))
@@ -5152,9 +5168,9 @@ function emit_section_header(level, opts)
       emit_verbatim '.'
       emit_nbsp(2)
     end
-    local unescaped_header = string.gsub(header, '\\\\', '\\')
-    emit(unescaped_header)
-    --emit_verbatim(header)
+    --local unescaped_header = string.gsub(header, '\\\\', '\\')
+    --emit_verbatim(unescaped_header)
+    emit(header)
     emit_verbatim '</h'
     emit(hnum)
     emit_verbatim '>'

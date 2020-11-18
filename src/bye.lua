@@ -1,4 +1,4 @@
--- last modified 2020-11-17
+-- last modified 2020-11-18
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -68,10 +68,13 @@ function do_bye()
   write_aux('nb_macro_package("', Macro_package, '")')
   if Title then
     --print('nb_titling', Title)
-    local escaped_Title = string.gsub(Title, '\n', '\\n')
-    escaped_Title = string.gsub(escaped_Title, '"', '\\"')
-    --print('nb_titling I', escaped_Title)
-    write_aux('nb_title("', escaped_Title, '")')
+    local escaped_Title = Title
+    escaped_Title = string.gsub(escaped_Title, '\\', '\\\\')
+    escaped_Title = string.gsub(escaped_Title, '\n', '\\n')
+    escaped_Title = string.gsub(escaped_Title, "'", "\\'")
+    --escaped_Title = string.gsub(escaped_Title, '"', '\\"')
+    --print('nb_titling ->', escaped_Title)
+    write_aux('nb_title(\'', escaped_Title, '\')')
   end
   if Last_page_number == 0 then
     Css_stream:write('.navigation { display: none; }\n')

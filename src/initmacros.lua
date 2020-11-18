@@ -183,6 +183,7 @@ function initialize_macros()
     end
     --print('value(2) =', value)
     value = string.gsub(value, '^(%s*)<br>', '%1\n')
+    value = string.gsub(value, '&', '\\[htmlamp]')
     value = string.gsub(value, '<br>(%s*)$', '\n%1')
     div.value = value
   end)
