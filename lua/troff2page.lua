@@ -5247,6 +5247,15 @@ function switch_style(opts)
   elseif not new_size then
     if open_new_span_p then new_size = curr_size end
   else ev_curr.prevsize = curr_size
+    if curr_size then
+      --print('curr_size =', curr_size, 'new_size =', new_size)
+      new_size = curr_size*new_size/100
+      --print('corrected new_size =', new_size)
+    end
+  end
+  local new_size_for_span = false
+  if new_size then
+    new_size_for_span = 'font-size: ' .. new_size .. '%'
   end
   --
   ev_curr.font = new_font
@@ -5266,7 +5275,7 @@ function switch_style(opts)
       font = new_font,
       color = new_color,
       bgcolor = new_bgcolor,
-      size = new_size
+      size = new_size_for_span
     }
   end
   --
@@ -5342,6 +5351,7 @@ function switch_fill_color(c)
 end
 
 function switch_size(n)
+  --print('doing switch_style', n)
   if not n then no_op()
   elseif n == '0' then n='previous'
   else
@@ -5351,18 +5361,17 @@ function switch_size(n)
       n = 100 * (1 + (m/10))
     elseif c0 == '-' then
       local m = tonumber(string.sub(n,2))
-      n = 100 * (1 - (m/10))
+      n = 100 / (1 + (m/10))
+      --n = 100 * (1 - (m/10))
     else
       local m = tonumber(n)
       n = 10*m
     end
     n = math.floor(n + 1/2)
     if n == 100 then n = false end
-    if n then
-      n = 'font-size: ' .. n .. '%'
-    end
   end
-    return switch_style{size = n}
+  --print('calling switch_style w size=', n)
+  return switch_style{size = n}
 end
 
 function man_alternating_font_macro(f1, f2)
