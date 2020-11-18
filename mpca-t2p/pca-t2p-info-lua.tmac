@@ -1,4 +1,4 @@
-.\" last modified 2020-11-16
+.\" last modified 2020-11-17
 .ig ##
 
 function html2info()
@@ -34,10 +34,10 @@ function html2info()
       html2info_tweak_html_file(tmp_html_file, i)
 
       os.execute('lynx -dump -nolist ' .. tmp_html_file .. ' > ' .. tmp_info_file)
-      --os.remove(tmp_html_file)
+      os.remove(tmp_html_file)
 
       copy_file_to_stream(tmp_info_file, o)
-      --os.remove(tmp_info_file)
+      os.remove(tmp_info_file)
 
       i=i+1
     end

@@ -1,4 +1,4 @@
-#last modified 2017-08-30
+# last modified 2020-11-17
 *.ps
 *.txt
 *temp_*
@@ -9,7 +9,7 @@
 [^i]*-Z-*
 [^i]*.html
 docs/*[^cels]
-examples/*[^1]
+examples/*[^1e]
 examples/???*.1
 lua/*[^a]
 man/man1/*[^1]

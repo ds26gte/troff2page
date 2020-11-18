@@ -1,4 +1,4 @@
-.\" last modified 2020-11-16
+.\" last modified 2020-11-17
 .
 .ig ##
 defrequest('pca-t2p-man:orig-SH', function()
@@ -21,8 +21,11 @@ if it then troff2page_file(it) end
 function call_redefined_TH(args)
   local it = Macro_table.TH
   defrequest('TH', nil)
+  if not it then
+    print('Couldn\'t find .TH', table.unpack(args))
+    return
+  end
   table.insert(args, 1, 'TH')
-  if not it then print('Couldnt find TH!!!', table.unpack(args)) end
   flet({Macro_args = args}, function()
     execute_macro_body(it)
   end)

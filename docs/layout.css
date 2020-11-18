@@ -1,4 +1,4 @@
-/* last modified 2019-09-30 */
+/* last modified 2020-11-17 */
 
 body {
     max-width: 40em;
@@ -8,12 +8,31 @@ body {
     margin-right: 2em;
 }
 
+@media screen {
+    h1.title {
+        color: #333333;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dddddf;
+    }
+
+    h1,h2,h3,h4,h5 {
+        /* color: #ba3925; /* asciidoctor red */
+        /* color: #a14743; /* roof terracotta */
+        /* color: #333333; /* ubuntu cool gray */
+        color: #9b3d3d; /* terracotta pink */
+        font-family: sans-serif;
+        font-weight: normal;
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+    }
+}
+
 @media screen and (orientation: portrait) and (max-width: 480px),
        screen and (orientation: landscape) and (max-width: 640px) {
-  body {
-    max-width: none;
-    margin: 5px;
-  }
+    body {
+       max-width: none;
+       margin: 5px;
+    }
 }
 
 @media print {
@@ -29,7 +48,7 @@ a {
 }
 
 a:hover {
-    /* color: #333333; /* ubuntu cool gray */
+    /* color: #333333; */
     background-color: #fdca01; /* ubuntu yellow */
 }
 
@@ -40,9 +59,11 @@ a:hover {
     font-size: 161.8%;
 }
 
+/*
 h1,h2 {
     margin-top: 1.5em;
 }
+*/
 
 .footnotes {
     margin-top: 2.5em;
@@ -53,20 +74,15 @@ h1 {
     font-size: 127.2%;
 }
 
-h1,h2,h3 {
-    /* color: #a14743; /* roof terracotta */
-    color: #333333; /* ubuntu cool gray */
-}
-
 .figure {
     margin-top: 1em;
     margin-bottom: 1em;
 }
 
 .dropcap {
-     line-height: 80%;
+    line-height: 80%;
     /* font-size: 410%; */
-     font-size: 500%;
+    font-size: 500%;
     float: left;
     padding-right: 5px;
 }

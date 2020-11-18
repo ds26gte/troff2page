@@ -1,4 +1,4 @@
--- last modified 2017-08-19
+-- last modified 2020-11-17
 
 --refer groff_char(7)
 Standard_glyphs = {
@@ -230,8 +230,10 @@ Standard_glyphs = {
   ['fl'] = 0xfb02,
   ['fm'] = 0x2032,
   ['fo'] = 0x2039,
+  ['ga'] = 0x60,
   ['gr'] = 0x2207,
   ['hA'] = 0x21d4,
+  ['ha'] = 0x5e,
   ['hbar'] = 0x210f,
   ['hy'] = 0x2010,
   ['ib'] = 0x2286,
@@ -313,6 +315,7 @@ Standard_glyphs = {
   ['tdi'] = 0xf7,
   ['te'] = 0x2203,
   ['tf'] = 0x2234,
+  ['ti'] = 0x7e,
   ['tm'] = 0x2122,
   ['tmu'] = 0xd7,
   ['tno'] = 0xac,
