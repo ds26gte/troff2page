@@ -1,4 +1,4 @@
--- last modified 2020-11-17
+-- last modified 2020-11-18
 
 function switch_style(opts)
   opts = opts or {}
@@ -125,6 +125,8 @@ function switch_font_family(f)
 end
 
 function switch_glyph_color(c)
+  --print('doing switch_glyph_color', c)
+  if raw_counter_value '.color' == 0 then return '' end
   if not c then no_op()
   elseif c == '' then c='previous'
   else
@@ -138,6 +140,7 @@ function switch_glyph_color(c)
 end
 
 function switch_fill_color(c)
+  if raw_counter_value '.color' == 0 then return '' end
   if not c then no_op()
   elseif c == '' then c='previous'
   else

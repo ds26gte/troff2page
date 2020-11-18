@@ -1,4 +1,4 @@
-.\" last modified 2020-11-12
+.\" last modified 2020-11-18
 .SH 1
 3. Page layout
 .LP
@@ -65,7 +65,15 @@ lines of paragraphs are indented (unless explicitly disabled via an
 the vertical distance between adjacent paragraphs is the same smallish
 amount that groff employs.  These two values are given by the number
 registers \fCPI\fP and \fCPD\fP, which (for the ms format) are 0.3n and 0.3v
-respectively.
+respectively.\**
+.FS
+The length unit \fCn\fP (en) is half the width of the letter ‘\fCm\fP’ in
+the current font. \fCv\fP is the distance between two consecutive
+baselines. Other groff length units that troff2page recognizes
+are: \fCi\fP (inch = 1/12 foot), \fCc\fP (cm =
+50/127 inch), \fCp\fP (point = 1/72 inch), \fCP\fP (pica = 12
+points), \fCm\fP (em = 2 ens), and \fCM\fP (1/100 em).
+.FE
 .PP
 If you wish to have the kind of block paragraphs customary in HTML, it
 is not enough to set \fCPI\fP to 0, for the prevailing value of \fCPD\fP is too
@@ -83,17 +91,20 @@ text in order to respect a negative \fCPD\fP:
 .EE
 Unlike groff ms, which uses the line length given by the register
 \fCLL\fP,
-troff2page by default does not restrict the width of its HTML pages.
+troff2page by default does not restrict the text width on its HTML pages.
 Text will narrow or widen to fit the current browser window width.  However, if
 you explicitly set \fCLL\fP (instead of relying on ms’s default), troff2page
-will respect that line length.  Nevertheless, if the user shrinks the
-browser window to a width less than \fCLL\fP, the text will correspondingly
-shrink too to fit the window.  This is to avoid the need for horizontal
-scrolling.
+will respect that line length, regardless of how wide your
+browser gets.
+.PP
+It is always OK to have the browser window less
+wide than \fCLL\fP (as is certainly unavoidable on cell
+phones): the text will correspondingly shrink to
+fit the window, avoiding the need for horizontal scrolling.
 .PP
 A good \fCLL\fP value for troff2page should be a bit larger than
 ms’s 6 inches, which is too narrow for a browser.  The following sets it
-to 18 cm, making sure it takes effect only for HTML:
+to 1 millifurlong, but it takes effect only for HTML:
 .EX
-    .if \n[.troff2page] .nr LL 18c
+    .if \n[.troff2page] .nr LL 7.92i
 .EE

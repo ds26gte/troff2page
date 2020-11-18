@@ -1,4 +1,4 @@
--- last modified 2020-11-17
+-- last modified 2020-11-18
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -1065,6 +1065,17 @@ function initialize_macros()
     local rgb_color = read_rgb_color()
     read_troff_line()
     Color_table[ident] = rgb_color
+  end)
+
+  defrequest('color', function()
+    --print('doing .color')
+    local num = read_args() or 1
+    --print('.color arg =', num)
+    read_troff_line()
+    if num==0 then Numreg_table['.color'].value = 0
+    else Numreg_table['.color'].value = 1
+    end
+    --print('done .color')
   end)
 
   defrequest('ce', function()

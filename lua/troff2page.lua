@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201117 -- last modified
+Troff2page_version = 20201118 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -712,15 +712,9 @@ function troff2page_1pass(argc, argv)
             troff2page_help()
           end
           --
-        elseif string.match(arg, '^-m$') then
-          i=i+1; local tmacf = argv[i]
-          if tmacf then load_tmac(tmacf)
-          else tlog('option requires an argument -- m\n')
-          end
-        elseif string.match(arg, '^-m') then
-          local tmacf = string.gsub(arg, '^-m(.*)', '%1')
-          load_tmac(tmacf)
-          --
+        elseif string.match(arg, '^-c$') then
+          --print('turning color off')
+          Numreg_table['.color'].value = 0
         elseif string.match(arg, '^-d$') then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'string')
@@ -729,6 +723,15 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-d') then
           local regset = string.gsub(arg, '^-d(.*)', '%1')
           set_register(regset, 'string')
+          --
+        elseif string.match(arg, '^-m$') then
+          i=i+1; local tmacf = argv[i]
+          if tmacf then load_tmac(tmacf)
+          else tlog('option requires an argument -- m\n')
+          end
+        elseif string.match(arg, '^-m') then
+          local tmacf = string.gsub(arg, '^-m(.*)', '%1')
+          load_tmac(tmacf)
           --
         elseif string.match(arg, '^-r$') then
           i=i+1; local regset = argv[i]
@@ -3839,6 +3842,17 @@ function initialize_macros()
     Color_table[ident] = rgb_color
   end)
 
+  defrequest('color', function()
+    --print('doing .color')
+    local num = read_args() or 1
+    --print('.color arg =', num)
+    read_troff_line()
+    if num==0 then Numreg_table['.color'].value = 0
+    else Numreg_table['.color'].value = 1
+    end
+    --print('done .color')
+  end)
+
   defrequest('ce', function()
     local arg1 = read_args() or 1
     local n = tonumber(arg1)
@@ -3958,6 +3972,7 @@ function initialize_numregs()
   defnumreg('$$', {value = 0xbadc0de})
   defnumreg('.g', {value = 1})
   defnumreg('.U', {value = 1})
+  defnumreg('.color', {value = 1})
   defnumreg('.troff2page', {value = Troff2page_version})
   defnumreg('systat', {value = 0})
   defnumreg('www:HX', {value = -1})
@@ -5277,6 +5292,8 @@ function switch_font_family(f)
 end
 
 function switch_glyph_color(c)
+  --print('doing switch_glyph_color', c)
+  if raw_counter_value '.color' == 0 then return '' end
   if not c then no_op()
   elseif c == '' then c='previous'
   else
@@ -5290,6 +5307,7 @@ function switch_glyph_color(c)
 end
 
 function switch_fill_color(c)
+  if raw_counter_value '.color' == 0 then return '' end
   if not c then no_op()
   elseif c == '' then c='previous'
   else

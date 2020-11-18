@@ -1,4 +1,4 @@
-.\" last modified 2020-11-16
+.\" last modified 2020-11-18
 .SH 1
 1. Introduction
 .LP
@@ -64,6 +64,7 @@ Commmand-line options
 .IX m@-m, command-line option
 .IX r@-r, command-line option
 .IX d@-d, command-line option
+.IX c@-c, command-line option
 .IX -@--, command-line option
 \fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP,
 viz.,
@@ -71,7 +72,8 @@ viz.,
 \fC-h\fP or \fC--help\fP to display help;
 \fC-m\fP to load macro files from \fCGROFF_TMAC_PATH\fP;
 \fC-r\fP to pre-set number registers;
-\fC-d\fP to pre-define strings; and
+\fC-d\fP to pre-define strings;
+\fC-c\fP to turn off color; and
 \fC--\fP to signal the end of options.
 .EX
     % troff2page --help
@@ -123,12 +125,15 @@ The options can be varied with each call to \fCtroff2page\fP, just as
 with \fCgroff\fP. Please see the groff man page
 for details on all the provided options.
 .PP
+.SH 2
+Autoloaded files
+.LP
 .TAG troff2pagerc
 .IX init files for troff2page
 .IX troff2pagerc@.troff2pagerc.tmac, macro file
 \fCtroff2page\fP can read directives in some autoloaded files
 without the need to explicitly use a command-line option. These
-are useful to specify information that is relevant only the HTML
+are useful to specify information that is relevant only for the HTML
 output.
 .PP
 The first such file is named

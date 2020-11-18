@@ -1,4 +1,4 @@
--- last modified 2020-11-17
+-- last modified 2020-11-18
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -139,15 +139,9 @@ function troff2page_1pass(argc, argv)
             troff2page_help()
           end
           --
-        elseif string.match(arg, '^-m$') then
-          i=i+1; local tmacf = argv[i]
-          if tmacf then load_tmac(tmacf)
-          else tlog('option requires an argument -- m\n')
-          end
-        elseif string.match(arg, '^-m') then
-          local tmacf = string.gsub(arg, '^-m(.*)', '%1')
-          load_tmac(tmacf)
-          --
+        elseif string.match(arg, '^-c$') then
+          --print('turning color off')
+          Numreg_table['.color'].value = 0
         elseif string.match(arg, '^-d$') then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'string')
@@ -156,6 +150,15 @@ function troff2page_1pass(argc, argv)
         elseif string.match(arg, '^-d') then
           local regset = string.gsub(arg, '^-d(.*)', '%1')
           set_register(regset, 'string')
+          --
+        elseif string.match(arg, '^-m$') then
+          i=i+1; local tmacf = argv[i]
+          if tmacf then load_tmac(tmacf)
+          else tlog('option requires an argument -- m\n')
+          end
+        elseif string.match(arg, '^-m') then
+          local tmacf = string.gsub(arg, '^-m(.*)', '%1')
+          load_tmac(tmacf)
           --
         elseif string.match(arg, '^-r$') then
           i=i+1; local regset = argv[i]

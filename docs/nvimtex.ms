@@ -1,4 +1,4 @@
-.\" last modified 2020-11-16
+.\" last modified 2020-11-17
 .SH 1
 10. Some unusual ways to call troff2page
 .LP
@@ -30,7 +30,7 @@ your \fC'runtimepath'\fP or \fC'packpath'\fP.
 .PP
 You now have the Neovim command \fCTroff2page\fP\**
 .FS
-Note the capital \fCT\fP! This is only because Vim doesn’t allow
+Note capital \fCT\fP! Vim won’t allow
 non-primitive commands to start with a lowercase letter.
 .FE
 which is called with the same style of arguments 
