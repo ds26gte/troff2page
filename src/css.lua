@@ -1,4 +1,4 @@
--- last modified 2020-11-17
+-- last modified 2020-11-20
 
 function link_stylesheets()
   emit_verbatim '<link rel="stylesheet" href="'
@@ -45,6 +45,10 @@ function start_css_file()
     /* font-weight: normal; */
     margin-top: 2.8em;
     text-align: center;
+  }
+
+  .abstract {
+    margin-top: 2em;
   }
 
   .dropcap {

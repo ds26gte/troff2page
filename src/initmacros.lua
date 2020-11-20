@@ -1,4 +1,4 @@
--- last modified 2020-11-18
+-- last modified 2020-11-20
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -531,7 +531,9 @@ function initialize_macros()
     --print('AB calling eep')
     emit_end_para()
     if w ~= 'no' then
-      emit_verbatim '<div align=center class=abstract><i>ABSTRACT</i></div>'
+      emit_verbatim '<div align=center class=abstract><i>'
+      emit_verbatim(String_table.ABSTRACT())
+      emit_verbatim '</i></div>'
       emit_para()
     end
     emit_verbatim '<blockquote>'

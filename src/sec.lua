@@ -1,4 +1,4 @@
--- last modified 2020-11-18
+-- last modified 2020-11-20
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -66,15 +66,10 @@ function get_header(k, opts)
       --print('gh/apar ipp=', In_para_p)
       local res = o:get_output_stream_string()
       --io.write('orig res= ->', res, '<-\n')
-      res = string.gsub(res, '^%s*<[pP]>%s*', '')
-      res = string.gsub(res, '%s*</[pP]>%s*$', '')
-      res = string.gsub(res, '"', '\\\\[htmlquot]')
-      res = string.gsub(res, '&', '\\[htmlamp]')
-      res = string.gsub(res, '<', '\\\\[htmllt]')
-      res = string.gsub(res, '>', '\\\\[htmlgt]')
+      res = string.gsub(res, '\\%[htmllt%]/?p\\%[htmlgt%]', '')
+      res = string_trim_blanks(res)
       --io.write('res= ->', res, '<-\n')
       k(res)
-      --k(string_trim_blanks(res))
     end
   else
     --io.write('get_header calling its k')

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201119 -- last modified
+Troff2page_version = 20201120 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1009,6 +1009,10 @@ function start_css_file()
     /* font-weight: normal; */
     margin-top: 2.8em;
     text-align: center;
+  }
+
+  .abstract {
+    margin-top: 2em;
   }
 
   .dropcap {
@@ -3309,7 +3313,9 @@ function initialize_macros()
     --print('AB calling eep')
     emit_end_para()
     if w ~= 'no' then
-      emit_verbatim '<div align=center class=abstract><i>ABSTRACT</i></div>'
+      emit_verbatim '<div align=center class=abstract><i>'
+      emit_verbatim(String_table.ABSTRACT())
+      emit_verbatim '</i></div>'
       emit_para()
     end
     emit_verbatim '<blockquote>'
@@ -4129,7 +4135,7 @@ function initialize_strings()
 
   defstring('DY', function()
     return verbatim(get_counter_named('dy').value .. ' ' ..
-    String_table['MO']() .. ' ' ..
+    String_table.MO() .. ' ' ..
     get_counter_named('year').value)
   end)
 
@@ -5085,15 +5091,10 @@ function get_header(k, opts)
       --print('gh/apar ipp=', In_para_p)
       local res = o:get_output_stream_string()
       --io.write('orig res= ->', res, '<-\n')
-      res = string.gsub(res, '^%s*<[pP]>%s*', '')
-      res = string.gsub(res, '%s*</[pP]>%s*$', '')
-      res = string.gsub(res, '"', '\\\\[htmlquot]')
-      res = string.gsub(res, '&', '\\[htmlamp]')
-      res = string.gsub(res, '<', '\\\\[htmllt]')
-      res = string.gsub(res, '>', '\\\\[htmlgt]')
+      res = string.gsub(res, '\\%[htmllt%]/?p\\%[htmlgt%]', '')
+      res = string_trim_blanks(res)
       --io.write('res= ->', res, '<-\n')
       k(res)
-      --k(string_trim_blanks(res))
     end
   else
     --io.write('get_header calling its k')
