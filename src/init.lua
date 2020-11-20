@@ -1,4 +1,4 @@
--- last modified 2017-08-27
+-- last modified 2020-11-19
 
 function write_aux(...)
   Aux_stream:write(...)
@@ -34,7 +34,7 @@ function begin_html_document()
   emit_start()
 
   do
-    local it = find_macro_file('.troff2pagerc.tmac')
+    local it = find_macro_file('.troff2pagerc')
     if it then troff2page_file(it) end
     it = Jobname .. '.t2p'
     if probe_file(it) then troff2page_file(it) end

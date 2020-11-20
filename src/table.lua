@@ -1,4 +1,4 @@
--- last modified 2020-11-18
+-- last modified 2020-11-19
 
 function table_do_global_options()
   --print('doing table_do_global_options')
@@ -63,7 +63,7 @@ function table_do_format_1(x)
     local cell_number = 0
     local w; local align; local font
     while true do
-      w = read_word()
+      w = read_till_chars({' ',',','\n'},true)
       if w then w=string_to_table(w) else w={} end
       align=false; font=false
       if #w == 0 then break end

@@ -1,4 +1,4 @@
-.\" last modified 2020-11-18
+.\" last modified 2020-11-19
 .SH 1
 3. Page layout
 .LP
@@ -95,7 +95,14 @@ troff2page by default does not restrict the text width on its HTML pages.
 Text will narrow or widen to fit the current browser window width.  However, if
 you explicitly set \fCLL\fP (instead of relying on ms’s default), troff2page
 will respect that line length, regardless of how wide your
-browser gets.
+browser gets.\**
+.FS
+If you prefer troff2page’s default fit-to-width text-width, but
+one of the macro files you loaded sets \fCLL\fP, simply reset
+\fCLL\fP to 0 inside an \fC.if \n[.troff2page]\fP conditional.
+Use the same ploy to set your HTML \fCLL\fP to whatever you want,
+without affecting the print output.
+.FE
 .PP
 It is always OK to have the browser window less
 wide than \fCLL\fP (as is certainly unavoidable on cell

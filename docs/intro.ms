@@ -1,4 +1,4 @@
-.\" last modified 2020-11-18
+.\" last modified 2020-11-19
 .SH 1
 1. Introduction
 .LP
@@ -68,13 +68,17 @@ Commmand-line options
 .IX -@--, command-line option
 \fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP,
 viz.,
-\fC-v\fP or \fC--version\fP to display the version;
-\fC-h\fP or \fC--help\fP to display help;
-\fC-m\fP to load macro files from \fCGROFF_TMAC_PATH\fP;
-\fC-r\fP to pre-set number registers;
-\fC-d\fP to pre-define strings;
-\fC-c\fP to turn off color; and
-\fC--\fP to signal the end of options.
+.TS
+tab(@) center box;
+l l.
+\fC-v\fP or \fC--version\fP @ display the version
+\fC-h\fP or \fC--help\fP @ display help
+\fC-m\fP @ load macro files from \fCGROFF_TMAC_PATH\fP
+\fC-r\fP @ pre-set number registers
+\fC-d\fP @ pre-define strings
+\fC-c\fP @ turn off color
+\fC--\fP @ signal the end of options
+.TE
 .EX
     % troff2page --help
 .ft CI
@@ -126,42 +130,54 @@ with \fCgroff\fP. Please see the groff man page
 for details on all the provided options.
 .PP
 .SH 2
-Autoloaded files
+Autoloaded init files
 .LP
 .TAG troff2pagerc
 .IX init files for troff2page
-.IX troff2pagerc@.troff2pagerc.tmac, macro file
+.IX troff2pagerc@.troff2pagerc, macro file
 \fCtroff2page\fP can read directives in some autoloaded files
 without the need to explicitly use a command-line option. These
 are useful to specify information that is relevant only for the HTML
-output.
+output, and they’re loaded before the input document is
+processed.
 .PP
 The first such file is named
-\fC.troff2pagerc.tmac\fP, placed in one of your macro directories
-(\fCGROFF_TMAC_PATH\fP, working directory, home). The working
-directory is a good location if your changes are geared to only those
+\fC.troff2pagerc\fP: troff2page looks for it in your macro
+directories: \fCGROFF_TMAC_PATH\fP, working directory, home — in
+that order. The working directory is a good location if your
+changes are meant only for those
 documents that are in that directory.
 If your changes will be used in all your documents, place it in
-your home or a private \fCGROFF_TMAC_PATH\fP directory.
+your home or a private \fCGROFF_TMAC_PATH\fP directory.\**
+.FS
+That your home directory is the last place troff2page looks in
+for \fC.troff2pagerc\fP has a nice benefit: Use
+\fC~/.troff2pagerc\fP for standard boilerplate customization that
+you want unthinkingly autoloaded for \fImost\fP of your
+documents, but easily disable it for the documents that need
+special TLC by simply placing an empty or different
+\fC.troff2pagerc\fP in the local directory.
+.FE
 A
 more system-level \fCGROFF_TMAC_PATH\fP placement is typically
 unadvised for such an ad hoc file.
 .PP
-\fCtroff2page\fP loads the first \fC.troff2pagerc.tmac\fP it
-finds, if it exists, before processing its main argument file.
+\fCtroff2page\fP loads only the first \fC.troff2pagerc\fP it
+finds.
 .PP
 .IX t2p@.t2p, macro file
 In addition, \fCtroff2page\fP will also pick up a file
 \fCjobname.t2p\fP, where \fCjobname\fP is the basename of the input document.
-This is useful for directives that are specific to a document. Note that the
-\fCjobname.t2p\fP, unlike \fC.troff2pagerc.tmac\fP, is looked for only in the
-working directory, and not more generally in \fCGROFF_TMAC_PATH\fP.
+This is useful for directives that are specific to this document.
+\fCjobname.t2p\fP, unlike \fC.troff2pagerc\fP, is looked for only in the
+working directory, and not more generally in
+\fCGROFF_TMAC_PATH\fP.  \fCjobname.t2p\fP \fIdoes
+not\fP disable the autoloading of \fC.troff2pagerc\fP.
 .PP
-(Note that groff itself will not load either \fC.troff2pagerc.tmac\fP or
-\fCjobname.t2p\fP automatically.  But that is presumably OK, since you are
-using groff command-line options to specify the same information anyway, or
-these files contain information that’s only relevant for HTML.  If you do want
-groff to pick up this file, you can use the option \fC-m.troff2pagerc\fP.)
+(Note that groff itself will \fInot\fP load either \fC.troff2pagerc\fP or
+\fCjobname.t2p\fP automatically.  But that is presumably OK, since
+these files presumably contain information that’s relevant
+for HTML only.)
 .PP
 .IX man.local, -man init file
 If the input file is recognizably a man page (i.e., it has the

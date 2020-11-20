@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201118 -- last modified
+Troff2page_version = 20201119 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -609,13 +609,13 @@ function troff2page_help()
   tlog(' -h              print this message\n')
   tlog(' --help          print this message\n')
   tlog(' -v              print version number\n')
-  tlog(' -version        print version number\n')
+  tlog(' --version       print version number\n')
   tlog(' -m name         read macros name.tmac or tmac.name\n')
   tlog(' -mname          read macros name.tmac or tmac.name\n')
-  tlog(' -rcn            define number register r as n\n')
-  tlog(' -r reg=num      define number register reg as num\n')
-  tlog(' -dxs            define string x as s\n')
-  tlog(' -d xxx str      define string xxx as str\n')
+  tlog(' -rcn            define a number register r as n\n')
+  tlog(' -r reg=num      define a number register reg as num\n')
+  tlog(' -dcs            define a string c as s\n')
+  tlog(' -d xxx=str      define a string xxx as str\n')
   tlog(' -U              enable unsafe mode [not needed]\n')
   tlog(' -z              suppress formatted output to stdout [not needed]\n')
   tlog(' -t              preprocess with tbl [not needed]\n')
@@ -715,10 +715,10 @@ function troff2page_1pass(argc, argv)
             troff2page_help()
           end
           --
-        elseif string.match(arg, '^-c$') then
+        elseif arg=='-c' then
           --print('turning color off')
           Numreg_table['.color'].value = 0
-        elseif string.match(arg, '^-d$') then
+        elseif arg=='-d' then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'string')
           else tlog('option requires an argument -- d\n')
@@ -727,7 +727,7 @@ function troff2page_1pass(argc, argv)
           local regset = string.gsub(arg, '^-d(.*)', '%1')
           set_register(regset, 'string')
           --
-        elseif string.match(arg, '^-m$') then
+        elseif arg=='-m' then
           i=i+1; local tmacf = argv[i]
           if tmacf then load_tmac(tmacf)
           else tlog('option requires an argument -- m\n')
@@ -736,7 +736,7 @@ function troff2page_1pass(argc, argv)
           local tmacf = string.gsub(arg, '^-m(.*)', '%1')
           load_tmac(tmacf)
           --
-        elseif string.match(arg, '^-r$') then
+        elseif arg=='-r' then
           i=i+1; local regset = argv[i]
           if regset then set_register(regset, 'number')
           else tlog('option requires an argument -- r\n')
@@ -2407,7 +2407,7 @@ function begin_html_document()
   emit_start()
 
   do
-    local it = find_macro_file('.troff2pagerc.tmac')
+    local it = find_macro_file('.troff2pagerc')
     if it then troff2page_file(it) end
     it = Jobname .. '.t2p'
     if probe_file(it) then troff2page_file(it) end
@@ -5588,7 +5588,7 @@ function table_do_format_1(x)
     local cell_number = 0
     local w; local align; local font
     while true do
-      w = read_word()
+      w = read_till_chars({' ',',','\n'},true)
       if w then w=string_to_table(w) else w={} end
       align=false; font=false
       if #w == 0 then break end
