@@ -47,7 +47,12 @@ function start_css_file()
     text-align: center;
   }
 
+  .author {
+    font-style: italic;
+  }
+
   .abstract {
+    font-style: italic;
     margin-top: 2em;
   }
 

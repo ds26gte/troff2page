@@ -99,7 +99,7 @@ end
 
 function probe_file(f)
   local h = io.open(f)
-  if h then io.close(h); return true
+  if h then io.close(h); return f
   else return false
   end
 end
@@ -254,7 +254,7 @@ if Operating_system == 'windows' then
     'd:\\gs\\gs8.00\\bin\\gswin32.exe',
     'g:\\gs\\gs8.00\\bin\\gswin32.exe'} do
     if probe_file(f) then
-      Ghostscript = f
+      Ghostscript = f; break
     end
   end
 end
@@ -298,7 +298,6 @@ Current_pageno = nil
 Current_source_file = nil
 Current_troff_input = nil
 Diversion_table = nil
---End_hooks = nil
 Log_stream = nil
 End_macro = nil
 Escape_char = nil
@@ -477,7 +476,6 @@ end
 
 function close_all_open_streams()
   --print('doing close_all_open_streams')
-  -- End_hooks?
   if Aux_stream then Aux_stream:flush(); Aux_stream:close() end
   if Css_stream then Css_stream:flush(); Css_stream:close() end
   for _,c in pairs(Output_streams) do
@@ -545,16 +543,12 @@ function do_bye()
   end
   if Slides_p then
     --print('doing slide setup')
-    local slidy_css_file = 'slidy.css'
-    if not probe_file(slidy_css_file) then
-      slidy_css_file = 'http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css'
-    end
+    local slidy_css_file = probe_file('slidy.css') or
+      'http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css'
     write_aux('nb_stylesheet("', slidy_css_file , '")')
     --
-    local slidy_js_file = 'slidy.js'
-    if not probe_file(slidy_js_file) then
-      slidy_js_file = 'http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js'
-    end
+    local slidy_js_file = probe_file('slidy.js') or
+      'http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js'
     write_aux('nb_script("', slidy_js_file, '")')
     --print('done slide setup')
   end
@@ -639,7 +633,6 @@ function troff2page_1pass(argc, argv)
     Current_source_file = Main_troff_file,
     Current_troff_input = false,
     Diversion_table = {},
-    --End_hooks = {},
     End_macro = false,
     Escape_char = '\\',
     Ev_stack = { { name = '*global' } },
@@ -780,7 +773,6 @@ function troff2page(...)
   local argc = #argv
   --
   flet({
-    --End_hooks = {},
     Convert_to_info_p = false,
     Jobname = false,
     Last_page_number = false,
@@ -1011,7 +1003,12 @@ function start_css_file()
     text-align: center;
   }
 
+  .author {
+    font-style: italic;
+  }
+
   .abstract {
+    font-style: italic;
     margin-top: 2em;
   }
 
@@ -1772,6 +1769,17 @@ function emit_end_para()
   --print('eep setting ipp=false')
 end
 
+function emit_interleaved_para()
+  local continue_current_para = In_para_p
+  if continue_current_para_p then
+    emit_verbatim '</p>'
+  end
+  emit_verbatim '<p class=interleaved></p>\n'
+  if continue_current_para_p then
+    emit_verbatim '<p>'
+  end
+end
+
 function emit_para(opts)
   opts = opts or {}
   --print('doing emit_para', opts.style, opts.no_margins_p, opts.continue_top_ev_p)
@@ -1792,7 +1800,7 @@ function emit_para(opts)
   end
   --print('emit_para calling emit_end_para')
   emit_end_para()
-  if opts.interleaved_p then emit_verbatim '<p class=interleaved></p>\n' end
+  if opts.interleaved_p then emit_interleaved_para() end
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end
@@ -2399,8 +2407,9 @@ function begin_html_document()
 
   do
     local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
+    local fc = loadfile(f)
+    if fc then
+      fc()
       ensure_file_deleted(f)
     end
     Aux_stream = io.open(f, 'w')
@@ -3313,9 +3322,9 @@ function initialize_macros()
     --print('AB calling eep')
     emit_end_para()
     if w ~= 'no' then
-      emit_verbatim '<div align=center class=abstract><i>'
+      emit_verbatim '<div align=center class=abstract>'
       emit_verbatim(String_table.ABSTRACT())
-      emit_verbatim '</i></div>'
+      emit_verbatim '</div>'
       emit_para()
     end
     emit_verbatim '<blockquote>'
@@ -3491,11 +3500,21 @@ function initialize_macros()
 
   defrequest('DC', function()
     local big_letter, extra, color = read_args()
-    emit(switch_glyph_color(color))
-    emit_verbatim '<span class=dropcap>'
+    --print('big_letter=', big_letter, 'extra=', extra, 'color=', color)
+    if color then
+      local it = Color_table[color]
+      if it then color = it end
+    end
+    emit_interleaved_para()
+    emit_verbatim '<span class=dropcap'
+    if color then
+      emit_verbatim ' style="color: '
+      emit_verbatim(color)
+      emit_verbatim '"'
+    end
+    emit_verbatim '>'
     emit(big_letter)
     emit_verbatim '</span>'
-    emit(switch_glyph_color '')
     if extra then emit(extra) end
     emit_newline()
   end)
@@ -4165,6 +4184,17 @@ function initialize_strings()
 
 end
 
+function emit_interleaved_para()
+  local continue_current_para = In_para_p
+  if continue_current_para_p then
+    emit_verbatim '</p>'
+  end
+  emit_verbatim '<p class=interleaved></p>\n'
+  if continue_current_para_p then
+    emit_verbatim '<p>'
+  end
+end
+
 
 function anchor(lbl)
   --print('doing anchor', lbl)
@@ -4274,7 +4304,7 @@ function emit_navigation_bar(headerp)
   local index_page = Node_table['TAG:__troff2page_index']
   local index_page_p = (pageno == index_page)
   --
-  emit_verbatim '<div align=right class=navigation><i>['
+  emit_verbatim '<div align=right class=navigation>['
   emit(Navigation_sentence_begin)
   --
   emit_verbatim '<span'
@@ -4348,7 +4378,7 @@ function emit_navigation_bar(headerp)
   end
   emit(Navigation_sentence_end)
   emit_verbatim ']'
-  emit_verbatim '</i></div>\n'
+  emit_verbatim '</div>\n'
   --
 end
 
@@ -4849,7 +4879,7 @@ function read_arith_expr(opts)
   return acc
 end
 
-function author_info(italic_p)
+function author_info()
   --print('doing author_info')
   read_troff_line()
   --print('authorinfo calling eep')
@@ -4857,9 +4887,6 @@ function author_info(italic_p)
   emit_verbatim '<div align=center class=author>'
   --print('authorinfo calling par')
   emit_para()
-  --print('authorinfo setting style to italic')
-  --dprint('switching font to I')
-  if italic_p then emit(switch_font 'I') end
   --dprint('calling unfill')
   unfill_mode()
   Afterpar = function()
@@ -5446,7 +5473,7 @@ function find_macro_file(f)
     local function find_in_dir(dir)
       local f = dir .. '/' .. f
       --print('find_in_dir trying', f)
-      return probe_file(f) and f
+      return probe_file(f)
     end
     res = some(find_in_dir, Groff_tmac_path) or
     find_in_dir '.' or
@@ -5522,7 +5549,7 @@ function troff2page_file(f)
       end
     end)
   end
---  print('done troff2page_file', f)
+  --print('done troff2page_file', f)
 end 
 
 
@@ -5556,7 +5583,7 @@ function table_do_global_option_1(x)
        elseif w == 'box' or w == 'frame' or w == 'doublebox' or w == 'doubleframe' then
          Table_style.border = true
        elseif w == 'allbox' then
-         Table_style.border = true; Table_cell_style.border = true
+         Table_style.border = false; Table_cell_style.border = true
        elseif w == 'expand' then
          Table_options = Table_options .. ' width="100%"'
        elseif w == 'center' then
@@ -5590,16 +5617,20 @@ function table_do_format_1(x)
     local w; local align; local font
     while true do
       w = read_till_chars({' ',',','\n'},true)
-      if w then w=string_to_table(w) else w={} end
-      align=false; font=false
-      if #w == 0 then break end
+      --print('table foption=', w)
+      if not w then break end
+      align=false; font=false; width=false
       cell_number = cell_number+1
-      if table_member('b', w) then font='B' end
-      if table_member('i', w) then font='I' end
-      if table_member('c', w) then align='center' end
-      if table_member('l', w) then align='left' end
-      if table_member('r', w) then align='right' end
-      row_hash_table[cell_number] = {align = align, font = font}
+      if string.match(w, 'b') then font='B' end
+      if string.match(w, 'i') then font='I' end
+      if string.match(w, 'c') then align='center' end
+      if string.match(w, 'l') then align='left' end
+      if string.match(w, 'r') then align='right' end
+      if string.match(w, 'w%(.-%)') then
+        width=string.gsub(w, '.-w%s*%(%s*(.-)%s*%).*', '%1')
+        --print('width=', width)
+      end
+      row_hash_table[cell_number] = {align = align, font = font, width = width}
     end
     if cell_number > Table_number_of_columns then
       Table_number_of_columns = cell_number
@@ -5660,11 +5691,35 @@ function table_do_cell()
   Table_cell_number=Table_cell_number+1
   local cell_format_info =
   Table_format_table[math.min(Table_row_number, Table_default_format_line)][Table_cell_number]
-  local align, font = cell_format_info.align, cell_format_info.font
+  local align, font, width = cell_format_info.align, cell_format_info.font, cell_format_info.width
   local c; local it
+  local cell_style = ''
   emit_verbatim '\n<td valign=top'
   if align then emit_verbatim ' align='; emit_verbatim(align) end
-  if Table_cell_style.border then emit_verbatim ' style="border: 1px solid black"' end
+  if width then
+    --print('width=', width)
+    local width_num = string.gsub(width, '^([%d.]*).*$', '%1')
+    local width_unit = string.gsub(width, '^.-(%a?)$', '%1')
+    if width_num=='' then width_num=1 end
+    if width_unit=='' then width_unit='u' end
+    --print('width_unit=', width_unit)
+    --print('width_num=', width_num)
+    local width_in_px = width_num*point_equivalent_of(width_unit)
+    --print('width_in_px=' , width_in_px)
+    cell_style = cell_style .. 'width: ' .. width_in_px .. 'px; '
+  end
+  if Table_cell_style.border then
+    cell_style = cell_style .. 'border-bottom: 1px solid black; border-right: 1px solid black; '
+    if Table_row_number==1 then
+      cell_style = cell_style .. 'border-top: 1px solid black; '
+    end
+    if Table_cell_number==1 then
+      cell_style = cell_style .. 'border-left: 1px solid black; '
+    end
+  end
+  if cell_style ~= '' then
+    emit_verbatim ' style="'; emit_verbatim(cell_style); emit_verbatim '"'
+  end
   emit_verbatim '>'
   if font then emit(switch_font(font)) end
   local cell_contents = ''

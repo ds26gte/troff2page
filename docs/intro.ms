@@ -1,4 +1,4 @@
-.\" last modified 2020-11-19
+.\" last modified 2020-11-20
 .SH 1
 1. Introduction
 .LP
@@ -69,15 +69,23 @@ Commmand-line options
 \fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP,
 viz.,
 .TS
-tab(@) center box;
-l l.
-\fC-v\fP or \fC--version\fP @ display the version
+tab(@) center;
+lw(14m) lw(30m).
+_
+\fC-v\fP or \fC--version\fP @ display version
+_
 \fC-h\fP or \fC--help\fP @ display help
+_
 \fC-m\fP @ load macro files from \fCGROFF_TMAC_PATH\fP
+_
 \fC-r\fP @ pre-set number registers
+_
 \fC-d\fP @ pre-define strings
+_
 \fC-c\fP @ turn off color
-\fC--\fP @ signal the end of options
+_
+\fC--\fP @ signal end of options
+_
 .TE
 .EX
     % troff2page --help

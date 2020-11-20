@@ -1,4 +1,4 @@
--- last modified 2020-11-19
+-- last modified 2020-11-20
 
 function write_aux(...)
   Aux_stream:write(...)
@@ -22,8 +22,9 @@ function begin_html_document()
 
   do
     local f = Jobname .. Aux_file_suffix
-    if probe_file(f) then
-      dofile(f)
+    local fc = loadfile(f)
+    if fc then
+      fc()
       ensure_file_deleted(f)
     end
     Aux_stream = io.open(f, 'w')

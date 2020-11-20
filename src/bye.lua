@@ -1,4 +1,4 @@
--- last modified 2020-11-18
+-- last modified 2020-11-20
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -13,7 +13,6 @@ end
 
 function close_all_open_streams()
   --print('doing close_all_open_streams')
-  -- End_hooks?
   if Aux_stream then Aux_stream:flush(); Aux_stream:close() end
   if Css_stream then Css_stream:flush(); Css_stream:close() end
   for _,c in pairs(Output_streams) do
@@ -81,16 +80,12 @@ function do_bye()
   end
   if Slides_p then
     --print('doing slide setup')
-    local slidy_css_file = 'slidy.css'
-    if not probe_file(slidy_css_file) then
-      slidy_css_file = 'http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css'
-    end
+    local slidy_css_file = probe_file('slidy.css') or
+      'http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css'
     write_aux('nb_stylesheet("', slidy_css_file , '")')
     --
-    local slidy_js_file = 'slidy.js'
-    if not probe_file(slidy_js_file) then
-      slidy_js_file = 'http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js'
-    end
+    local slidy_js_file = probe_file('slidy.js') or
+      'http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js'
     write_aux('nb_script("', slidy_js_file, '")')
     --print('done slide setup')
   end

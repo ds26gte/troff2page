@@ -1,4 +1,4 @@
--- last modified 2020-11-19
+-- last modified 2020-11-20
 
 function table_do_global_options()
   --print('doing table_do_global_options')
@@ -30,7 +30,7 @@ function table_do_global_option_1(x)
        elseif w == 'box' or w == 'frame' or w == 'doublebox' or w == 'doubleframe' then
          Table_style.border = true
        elseif w == 'allbox' then
-         Table_style.border = true; Table_cell_style.border = true
+         Table_style.border = false; Table_cell_style.border = true
        elseif w == 'expand' then
          Table_options = Table_options .. ' width="100%"'
        elseif w == 'center' then
@@ -64,16 +64,20 @@ function table_do_format_1(x)
     local w; local align; local font
     while true do
       w = read_till_chars({' ',',','\n'},true)
-      if w then w=string_to_table(w) else w={} end
-      align=false; font=false
-      if #w == 0 then break end
+      --print('table foption=', w)
+      if not w then break end
+      align=false; font=false; width=false
       cell_number = cell_number+1
-      if table_member('b', w) then font='B' end
-      if table_member('i', w) then font='I' end
-      if table_member('c', w) then align='center' end
-      if table_member('l', w) then align='left' end
-      if table_member('r', w) then align='right' end
-      row_hash_table[cell_number] = {align = align, font = font}
+      if string.match(w, 'b') then font='B' end
+      if string.match(w, 'i') then font='I' end
+      if string.match(w, 'c') then align='center' end
+      if string.match(w, 'l') then align='left' end
+      if string.match(w, 'r') then align='right' end
+      if string.match(w, 'w%(.-%)') then
+        width=string.gsub(w, '.-w%s*%(%s*(.-)%s*%).*', '%1')
+        --print('width=', width)
+      end
+      row_hash_table[cell_number] = {align = align, font = font, width = width}
     end
     if cell_number > Table_number_of_columns then
       Table_number_of_columns = cell_number
@@ -134,11 +138,35 @@ function table_do_cell()
   Table_cell_number=Table_cell_number+1
   local cell_format_info =
   Table_format_table[math.min(Table_row_number, Table_default_format_line)][Table_cell_number]
-  local align, font = cell_format_info.align, cell_format_info.font
+  local align, font, width = cell_format_info.align, cell_format_info.font, cell_format_info.width
   local c; local it
+  local cell_style = ''
   emit_verbatim '\n<td valign=top'
   if align then emit_verbatim ' align='; emit_verbatim(align) end
-  if Table_cell_style.border then emit_verbatim ' style="border: 1px solid black"' end
+  if width then
+    --print('width=', width)
+    local width_num = string.gsub(width, '^([%d.]*).*$', '%1')
+    local width_unit = string.gsub(width, '^.-(%a?)$', '%1')
+    if width_num=='' then width_num=1 end
+    if width_unit=='' then width_unit='u' end
+    --print('width_unit=', width_unit)
+    --print('width_num=', width_num)
+    local width_in_px = width_num*point_equivalent_of(width_unit)
+    --print('width_in_px=' , width_in_px)
+    cell_style = cell_style .. 'width: ' .. width_in_px .. 'px; '
+  end
+  if Table_cell_style.border then
+    cell_style = cell_style .. 'border-bottom: 1px solid black; border-right: 1px solid black; '
+    if Table_row_number==1 then
+      cell_style = cell_style .. 'border-top: 1px solid black; '
+    end
+    if Table_cell_number==1 then
+      cell_style = cell_style .. 'border-left: 1px solid black; '
+    end
+  end
+  if cell_style ~= '' then
+    emit_verbatim ' style="'; emit_verbatim(cell_style); emit_verbatim '"'
+  end
   emit_verbatim '>'
   if font then emit(switch_font(font)) end
   local cell_contents = ''

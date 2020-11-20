@@ -531,9 +531,9 @@ function initialize_macros()
     --print('AB calling eep')
     emit_end_para()
     if w ~= 'no' then
-      emit_verbatim '<div align=center class=abstract><i>'
+      emit_verbatim '<div align=center class=abstract>'
       emit_verbatim(String_table.ABSTRACT())
-      emit_verbatim '</i></div>'
+      emit_verbatim '</div>'
       emit_para()
     end
     emit_verbatim '<blockquote>'
@@ -709,11 +709,21 @@ function initialize_macros()
 
   defrequest('DC', function()
     local big_letter, extra, color = read_args()
-    emit(switch_glyph_color(color))
-    emit_verbatim '<span class=dropcap>'
+    --print('big_letter=', big_letter, 'extra=', extra, 'color=', color)
+    if color then
+      local it = Color_table[color]
+      if it then color = it end
+    end
+    emit_interleaved_para()
+    emit_verbatim '<span class=dropcap'
+    if color then
+      emit_verbatim ' style="color: '
+      emit_verbatim(color)
+      emit_verbatim '"'
+    end
+    emit_verbatim '>'
     emit(big_letter)
     emit_verbatim '</span>'
-    emit(switch_glyph_color '')
     if extra then emit(extra) end
     emit_newline()
   end)

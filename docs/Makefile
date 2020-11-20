@@ -1,4 +1,4 @@
-# last modified 2020-11-17
+# last modified 2020-11-20
 
 src_files = [!i]*.css *.ms *.tmac
 
@@ -9,8 +9,7 @@ all: index.html
 index.html: index.ms $(src_files)
 	troff2page index.ms
 
-index.info: $(src_files)
-	troff2page index.ms
+index.info: index.html
 
 index.ms: $(src_dir)/index.ms
 	test "${USER}" = ds26gte || exit 0; \
@@ -25,6 +24,8 @@ index.ps: index.ms $(src_files) .trofftemp.ind
 	mpca index.ms
 
 ps: index.ps
+
+again: clean index.html
 
 clean:
 	rm -f .troff2page_temp* *-Z-* *.html *.info .trofftemp.ind

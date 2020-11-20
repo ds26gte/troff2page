@@ -1,4 +1,4 @@
--- last modified 2017-08-29
+-- last modified 2020-11-20
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -12,7 +12,7 @@ if Operating_system == 'windows' then
     'd:\\gs\\gs8.00\\bin\\gswin32.exe',
     'g:\\gs\\gs8.00\\bin\\gswin32.exe'} do
     if probe_file(f) then
-      Ghostscript = f
+      Ghostscript = f; break
     end
   end
 end
@@ -56,7 +56,6 @@ Current_pageno = nil
 Current_source_file = nil
 Current_troff_input = nil
 Diversion_table = nil
---End_hooks = nil
 Log_stream = nil
 End_macro = nil
 Escape_char = nil

@@ -1,4 +1,4 @@
-/* last modified 2020-11-17 */
+/* last modified 2020-11-20 */
 
 body {
     max-width: 54em;
@@ -6,6 +6,10 @@ body {
     margin-bottom: 2em;
     margin-left: 4em;
     margin-right: 2em;
+}
+
+.author {
+    font-style: normal;
 }
 
 @media screen {

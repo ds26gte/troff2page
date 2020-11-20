@@ -1,4 +1,4 @@
--- last modified 2017-08-28
+-- last modified 2020-11-20
 
 function find_macro_file(f)
   --print('doing find_macro_file', f)
@@ -11,7 +11,7 @@ function find_macro_file(f)
     local function find_in_dir(dir)
       local f = dir .. '/' .. f
       --print('find_in_dir trying', f)
-      return probe_file(f) and f
+      return probe_file(f)
     end
     res = some(find_in_dir, Groff_tmac_path) or
     find_in_dir '.' or
@@ -87,5 +87,5 @@ function troff2page_file(f)
       end
     end)
   end
---  print('done troff2page_file', f)
+  --print('done troff2page_file', f)
 end 

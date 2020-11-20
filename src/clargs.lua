@@ -1,4 +1,4 @@
--- last modified 2020-11-19
+-- last modified 2020-11-20
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -63,7 +63,6 @@ function troff2page_1pass(argc, argv)
     Current_source_file = Main_troff_file,
     Current_troff_input = false,
     Diversion_table = {},
-    --End_hooks = {},
     End_macro = false,
     Escape_char = '\\',
     Ev_stack = { { name = '*global' } },
@@ -204,7 +203,6 @@ function troff2page(...)
   local argc = #argv
   --
   flet({
-    --End_hooks = {},
     Convert_to_info_p = false,
     Jobname = false,
     Last_page_number = false,

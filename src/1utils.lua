@@ -1,4 +1,4 @@
--- last modified 2017-08-30
+-- last modified 2020-11-20
 
 if not table.unpack then
   table.unpack = unpack
@@ -91,7 +91,7 @@ end
 
 function probe_file(f)
   local h = io.open(f)
-  if h then io.close(h); return true
+  if h then io.close(h); return f
   else return false
   end
 end

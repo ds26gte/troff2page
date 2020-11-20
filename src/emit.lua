@@ -1,4 +1,4 @@
--- last modified 2020-11-17
+-- last modified 2020-11-20
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -310,6 +310,17 @@ function emit_end_para()
   --print('eep setting ipp=false')
 end
 
+function emit_interleaved_para()
+  local continue_current_para = In_para_p
+  if continue_current_para_p then
+    emit_verbatim '</p>'
+  end
+  emit_verbatim '<p class=interleaved></p>\n'
+  if continue_current_para_p then
+    emit_verbatim '<p>'
+  end
+end
+
 function emit_para(opts)
   opts = opts or {}
   --print('doing emit_para', opts.style, opts.no_margins_p, opts.continue_top_ev_p)
@@ -330,7 +341,7 @@ function emit_para(opts)
   end
   --print('emit_para calling emit_end_para')
   emit_end_para()
-  if opts.interleaved_p then emit_verbatim '<p class=interleaved></p>\n' end
+  if opts.interleaved_p then emit_interleaved_para() end
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end

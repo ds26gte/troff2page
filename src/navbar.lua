@@ -1,4 +1,4 @@
--- last modified 2019-09-29
+-- last modified 2020-11-20
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
@@ -15,7 +15,7 @@ function emit_navigation_bar(headerp)
   local index_page = Node_table['TAG:__troff2page_index']
   local index_page_p = (pageno == index_page)
   --
-  emit_verbatim '<div align=right class=navigation><i>['
+  emit_verbatim '<div align=right class=navigation>['
   emit(Navigation_sentence_begin)
   --
   emit_verbatim '<span'
@@ -89,7 +89,7 @@ function emit_navigation_bar(headerp)
   end
   emit(Navigation_sentence_end)
   emit_verbatim ']'
-  emit_verbatim '</i></div>\n'
+  emit_verbatim '</div>\n'
   --
 end
 

@@ -1,4 +1,4 @@
--- last modified 2020-11-09
+-- last modified 2020-11-20
 
 function make_bstream(opts)
   return {
@@ -420,7 +420,7 @@ function read_arith_expr(opts)
   return acc
 end
 
-function author_info(italic_p)
+function author_info()
   --print('doing author_info')
   read_troff_line()
   --print('authorinfo calling eep')
@@ -428,9 +428,6 @@ function author_info(italic_p)
   emit_verbatim '<div align=center class=author>'
   --print('authorinfo calling par')
   emit_para()
-  --print('authorinfo setting style to italic')
-  --dprint('switching font to I')
-  if italic_p then emit(switch_font 'I') end
   --dprint('calling unfill')
   unfill_mode()
   Afterpar = function()
