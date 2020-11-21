@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201120 -- last modified
+Troff2page_version = 20201121 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -319,6 +319,7 @@ It = nil
 Jobname = nil
 Just_after_par_start_p = nil
 Keep_newline_p = nil
+Last_line_had_leading_spaces_p = nil
 Last_page_number = nil
 Leading_spaces_macro = nil
 Leading_spaces_number = nil
@@ -651,6 +652,7 @@ function troff2page_1pass(argc, argv)
     Inside_table_text_block_p = false,
     Just_after_par_start_p = false,
     Keep_newline_p = true,
+    Last_line_had_leading_spaces_p = false,
     Leading_spaces_macro = false,
     Leading_spaces_number = 0,
     Lines_to_be_centered = 0,
@@ -1010,6 +1012,14 @@ function start_css_file()
   .abstract {
     font-style: italic;
     margin-top: 2em;
+  }
+
+  .manpage .sh {
+    font-size: 144%;
+  }
+
+  .manpage .ss {
+    font-size: 120%;
   }
 
   .dropcap {
@@ -1617,7 +1627,7 @@ function emit_expanded_line()
   local count_leading_spaces_p = fillp() and not Reading_table_p and
     not Macro_copy_mode_p and Outputting_to ~= 'troff'
   local insert_line_break_p = not Macro_copy_mode_p and Outputting_to == 'html' and
-    not Just_after_par_start_p
+    not Just_after_par_start_p and Last_line_had_leading_spaces_p
   local c
   if Just_after_par_start_p then Just_after_par_start_p = false end
   while true do
@@ -1666,6 +1676,9 @@ function emit_expanded_line()
   end
   if blank_line_p then
     --print('emitting blank line')
+    if Last_line_had_leading_spaces_p and insert_line_break_p then
+      Last_line_had_leading_spaces_p = false
+    end
     emit_blank_line()
   else
     --io.write('writing out->', r, '<-\n')
@@ -1698,6 +1711,7 @@ function emit_html_preamble()
   emit_verbatim '</head>\n'
   emit_verbatim '<body>\n'
   emit_verbatim '<div'
+  if Macro_package=='man' then emit_verbatim ' class=manpage' end
   if Slides_p then emit_verbatim ' class=slide' end
   emit_verbatim '>\n'
 end
@@ -1723,14 +1737,15 @@ function emit_blank_line()
       execute_macro_body(it); return end
     it = Request_table[Blank_line_macro]
     if it then --print('BLM req found');
-      toss_back_char('\n'); it(); return end
-  else emit_verbatim '<br>&#xa0;<br>'; emit_newline()
+      toss_back_char('\n'); it(); return
+    end
+  else emit_verbatim '<br class=blankline>&#xa0;<br class=blankline>'; emit_newline()
   end
 end
 
 function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
+  Leading_spaces_number = num_leading_spaces
   if num_leading_spaces > 0 then
-    Leading_spaces_number = num_leading_spaces
     if Leading_spaces_macro then
       local it
       if (function() it= Macro_table.Leading_spaces_macro; return it; end)()
@@ -1746,6 +1761,9 @@ function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
         emit '\\[htmlnbsp]'
       end
     end
+    Last_line_had_leading_spaces_p = true
+  else
+    Last_line_had_leading_spaces_p = false
   end
 end
 
@@ -5203,6 +5221,9 @@ function emit_section_header(level, opts)
     emit(hnum)
     emit_verbatim '>'
     emit_newline()
+    if Macro_package=='man' then
+      emit_para()
+    end
   end, {man_header_p=opts.man_header_p})
 end
 

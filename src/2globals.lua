@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-11-21
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -77,6 +77,7 @@ It = nil
 Jobname = nil
 Just_after_par_start_p = nil
 Keep_newline_p = nil
+Last_line_had_leading_spaces_p = nil
 Last_page_number = nil
 Leading_spaces_macro = nil
 Leading_spaces_number = nil

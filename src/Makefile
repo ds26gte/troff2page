@@ -1,4 +1,4 @@
-# last modified 2020-11-12
+# last modified 2020-11-21
 
 all: ../lua/troff2page.lua
 
@@ -16,6 +16,8 @@ all: ../lua/troff2page.lua
 	done;
 	echo "troff2page(...)" >> $@;
 	chmod +x $@
+
+again: clean all
 
 clean:
 	rm -f ../lua/troff2page.lua

@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-11-21
 
 function link_stylesheets()
   emit_verbatim '<link rel="stylesheet" href="'
@@ -54,6 +54,14 @@ function start_css_file()
   .abstract {
     font-style: italic;
     margin-top: 2em;
+  }
+
+  .manpage .sh {
+    font-size: 144%;
+  }
+
+  .manpage .ss {
+    font-size: 120%;
   }
 
   .dropcap {

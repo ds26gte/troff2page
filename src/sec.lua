@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-11-21
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -151,6 +151,9 @@ function emit_section_header(level, opts)
     emit(hnum)
     emit_verbatim '>'
     emit_newline()
+    if Macro_package=='man' then
+      emit_para()
+    end
   end, {man_header_p=opts.man_header_p})
 end
 

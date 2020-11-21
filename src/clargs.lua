@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-11-21
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -81,6 +81,7 @@ function troff2page_1pass(argc, argv)
     Inside_table_text_block_p = false,
     Just_after_par_start_p = false,
     Keep_newline_p = true,
+    Last_line_had_leading_spaces_p = false,
     Leading_spaces_macro = false,
     Leading_spaces_number = 0,
     Lines_to_be_centered = 0,
