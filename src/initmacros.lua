@@ -427,7 +427,7 @@ function initialize_macros()
     read_troff_line()
     --emit_newline()
     --print('LP calling emit_para')
-    emit_para{par_start_p = true}
+    emit_para()
   end)
 
   defrequest('RT', function()
@@ -441,7 +441,7 @@ function initialize_macros()
     execute_macro('ds@auto-end', 'noarg')
     read_troff_line()
     --emit_newline()
-    emit_para{par_start_p = true, indent_p = true}
+    emit_para{indent_p = true}
   end)
 
   defrequest('P', Request_table.PP)
@@ -451,7 +451,7 @@ function initialize_macros()
   defrequest('pause', function()
     read_troff_line()
     emit_newline()
-    emit_para{par_start_p = true, incremental_p = true}
+    emit_para{incremental_p = true}
   end)
 
   defrequest('sp', function()

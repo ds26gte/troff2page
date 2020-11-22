@@ -161,7 +161,6 @@ function emit_expanded_line()
                                       Outputting_to == 'html' and
                                       not Just_after_par_start_p
   local c
-  if Just_after_par_start_p then Just_after_par_start_p = false end
   while true do
     c = get_char(); --io.write('picked up ->', c or '', '<-\n')
     if not c then
@@ -220,9 +219,13 @@ function emit_expanded_line()
     end
   end
   if blank_line_p then
-    --print('emitting blank line)
+    --print('calling blank line')
     emit_blank_line()
   else
+    if Just_after_par_start_p then
+      --print('resetting I Just_after_par_start_p')
+      Just_after_par_start_p=false
+    end
     --io.write('writing out->', r, '<-\n')
     emit(r)
   end
@@ -286,7 +289,11 @@ function emit_blank_line()
     end
   else
     --print('doing EBL III')
+    if not Just_after_par_start_p then
+      emit_verbatim '<br>'
+    end
     emit_verbatim '<span class=blankline>&#xa0;</span>'; emit_newline()
+    --print('setting II Just_after_par_start_p')
     Just_after_par_start_p = true
     --emit_verbatim '<br class=blankline>&#xa0;<br class=blankline>'; emit_newline()
   end
@@ -384,7 +391,9 @@ function emit_para(opts)
     emit(switch_style(new_style))
   end
   In_para_p=true
-  Just_after_par_start_p = opts.par_start_p
+  --Just_after_par_start_p = opts.par_start_p
+  --print('setting III Just_after_par_start_p')
+  Just_after_par_start_p=true
   --emit_newline()
   --print('emit_para winding down')
 end
