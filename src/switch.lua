@@ -1,4 +1,4 @@
--- last modified 2020-11-18
+-- last modified 2020-11-22
 
 function switch_style(opts)
   opts = opts or {}
@@ -97,6 +97,11 @@ end
 
 function switch_font(f)
   --print('doing switch_font', f)
+  if Macro_package then
+    -- for man, seems better to treat I,B as monospace
+    if f=='I' then f='C' end
+    if f=='B' then f='CB' end
+  end
   if not f then f = false
   elseif f == 'I' then f = 'font-style: italic'
   elseif f == 'B' then f = 'font-weight: bold'

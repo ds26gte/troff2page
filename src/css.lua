@@ -1,4 +1,4 @@
--- last modified 2020-11-21
+-- last modified 2020-11-22
 
 function link_stylesheets()
   emit_verbatim '<link rel="stylesheet" href="'
@@ -69,6 +69,11 @@ function start_css_file()
     font-size: 410%;  /* was 400 */
     float: left;
     padding-right: 5px;
+  }
+
+  span.blankline {
+    display: block;
+    line-height: 1ex;
   }
 
   pre {

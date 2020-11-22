@@ -1,4 +1,4 @@
-.TH TROFF2PAGE 1 "2020-11-16" \" last modified
+.TH TROFF2PAGE 1 "2020-11-21" \" last modified
 .nh
 .ad l
 .SH NAME
@@ -14,7 +14,9 @@ troff2page \- makes Web pages from troff documents
 troff2page converts troff (\fI-man\fP and \fI-ms\fP) documents into HTML web
 pages and Info documents. E.g.,
 
+.EX
     troff2page jobname.ms
+.EE
 
 creates an output HTML document that consists of \fIjobname.html\fP
 and possibly other files \fIjobname-Z-H-1.html\fP,
@@ -25,11 +27,15 @@ and possibly other files \fIjobname-Z-H-1.html\fP,
 
 troff2page accepts many groff options. For example,
 
+.EX
     troff2page --version
+.EE
 
 displays the troff2page version.
 
+.EX
     troff2page --help
+.EE
 
 displays the version and a pointer to the comprehensive online
 manual, http://ds26gte.github.io/troff2page/index.html, whose troff
@@ -59,21 +65,21 @@ options were not used, troff2page exits with a “called with no argument”
 message.
 
 However, additional information may be fed to troff2page via the
-specially named macro file \fI.troff2pagerc.tmac\fP. Thus, a \fI-mpca\fP
+specially named macro file \fI.troff2pagerc\fP. Thus, a \fI-mpca\fP
 groff option would translate to the line
 
+.EX
     .mso pca.tmac
+.EE
 
-in \fI.troff2pagerc.tmac\fP.
+in \fI.troff2pagerc\fP.
 
-troff2page loads \fI.troff2pagerc.tmac\fP, if it can find it in the
+troff2page loads \fI.troff2pagerc\fP, if it can find it in the
 macro directories, before processing its argument file.
 
-Note that groff itself does not load \fI.troff2pagerc.tmac\fP
-automatically.  But that is presumably OK, since you are using
-groff command-line options to specify the same information
-anyway.  If you do want groff to pick up this file, you can use
-the option \fI-m.troff2pagerc\fP.
+Note that groff itself does not load \fI.troff2page.tmac\fP
+or \fIjobname.t2p\fP
+automatically.  
 
 If the input file is recognizably a man page (i.e., it has the
 command \fI.TH\fP), both troff2page and groff will load, if it
@@ -113,7 +119,9 @@ file in the current window.
 
 You can call the macro
 
+.EX
   .troff2page2info
+.EE
 
 within your document to signal to troff2page that it should also
 create an Info document.
@@ -126,7 +134,9 @@ If you’re sure you always want an Info file for whatever document
 you give to \fCtroff2page\fP, set the environment variable
 \fCTROFF2PAGE2INFO\fP (the value doesn’t matter):
 
+.EX
   export TROFF2PAGE2INFO=always
+.EE
 
 .SH SYSTEM REQUIREMENTS
 

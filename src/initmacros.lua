@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-11-22
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -601,13 +601,14 @@ function initialize_macros()
 
   defrequest('EX', function()
     --print('doing EX')
+    --read_troff_line()
     start_display('L')
     emit(switch_font 'C')
   end)
 
   defrequest('EE', function()
     --print('doing EE')
-    read_troff_line()
+    --read_troff_line()
     stop_display()
   end)
 

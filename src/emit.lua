@@ -1,4 +1,4 @@
--- last modified 2020-11-21
+-- last modified 2020-11-22
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -157,8 +157,9 @@ function emit_expanded_line()
   local blank_line_p = true
   local count_leading_spaces_p = fillp() and not Reading_table_p and
     not Macro_copy_mode_p and Outputting_to ~= 'troff'
-  local insert_line_break_p = not Macro_copy_mode_p and Outputting_to == 'html' and
-    not Just_after_par_start_p and Last_line_had_leading_spaces_p
+  local insert_leading_line_break_p = not Macro_copy_mode_p and
+                                      Outputting_to == 'html' and
+                                      not Just_after_par_start_p
   local c
   if Just_after_par_start_p then Just_after_par_start_p = false end
   while true do
@@ -167,12 +168,16 @@ function emit_expanded_line()
       Keep_newline_p = false --?
       c = '\n'
     end
-    if c == '\n' then break
+    --
+    if c == '\n' then
+      --print('EEL found NL')
+      break
     elseif count_leading_spaces_p and c == ' ' then
       num_leading_spaces = num_leading_spaces + 1
     elseif count_leading_spaces_p and c == '\t' then
       num_leading_spaces = num_leading_spaces + 8
     elseif escape_char_p(c) then
+      --print('EEE found esc', c)
       if blank_line_p then blank_line_p = false end
       c = snoop_char();       --print('Macro_copy_mode_p =', Macro_copy_mode_p)
       if not c then c = '\n' end
@@ -190,26 +195,32 @@ function emit_expanded_line()
         --print('eel 3')
         if count_leading_spaces_p then
           count_leading_spaces_p = false
-          emit_leading_spaces(num_leading_spaces, insert_line_break_p)
+          --print('calling ELS I')
+          if num_leading_spaces>0 then
+            emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
+            insert_leading_line_break_p=true
+          end
         end
         r = r .. expand_escape(c)
         if c == '{' or c == '\n' then break end
       end
     else
+      -- read a non-space
       if blank_line_p then blank_line_p = false end
       if count_leading_spaces_p then
         count_leading_spaces_p = false
-        emit_leading_spaces(num_leading_spaces, insert_line_break_p)
+        --print('calling ELS II')
+        if num_leading_spaces>0 then
+          emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
+          insert_leading_line_break_p=true
+        end
       end
       if c == '"' then check_verbatim_apostrophe_status() end
       r = r .. c
     end
   end
   if blank_line_p then
-    --print('emitting blank line')
-    if Last_line_had_leading_spaces_p and insert_line_break_p then
-      Last_line_had_leading_spaces_p = false
-    end
+    --print('emitting blank line)
     emit_blank_line()
   else
     --io.write('writing out->', r, '<-\n')
@@ -256,9 +267,12 @@ function emit_html_postamble()
 end
 
 function emit_blank_line()
-  --print('doing emit_blank_line with Outputting_to=', Outputting_to)
-  if Outputting_to == 'troff' then Keep_newline_p=false; emit_newline()
+  --print('doing emit_blank_line')
+  if Outputting_to == 'troff' then
+    --print('doing EBL I')
+    Keep_newline_p=false; emit_newline()
   elseif Blank_line_macro then
+    --print('doing EBL II')
     --print('emit_blank_line found Blank_line_macro')
     Keep_newline_p = false
     Previous_line_exec_p = true
@@ -270,31 +284,34 @@ function emit_blank_line()
     if it then --print('BLM req found');
       toss_back_char('\n'); it(); return
     end
-  else emit_verbatim '<br class=blankline>&#xa0;<br class=blankline>'; emit_newline()
+  else
+    --print('doing EBL III')
+    emit_verbatim '<span class=blankline>&#xa0;</span>'; emit_newline()
+    Just_after_par_start_p = true
+    --emit_verbatim '<br class=blankline>&#xa0;<br class=blankline>'; emit_newline()
   end
 end
 
-function emit_leading_spaces(num_leading_spaces, insert_line_break_p)
+function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
+  --print('doing emit_leading_spaces', num_leading_spaces, insert_leading_line_break_p)
   Leading_spaces_number = num_leading_spaces
-  if num_leading_spaces > 0 then
-    if Leading_spaces_macro then
-      local it
-      if (function() it= Macro_table.Leading_spaces_macro; return it; end)()
-      then execute_macro_body(it)
-      elseif (function() it= Request_table.Leading_spaces_macro; return it; end)()
-      then it()
-      end
-    else
-      if insert_line_break_p then
-        emit_verbatim '<!---***---><br>'
-      end
-      for j=1,Leading_spaces_number do
-        emit '\\[htmlnbsp]'
-      end
+  assert(num_leading_spaces > 0)
+  if Leading_spaces_macro then
+    local it
+    if (function() it= Macro_table.Leading_spaces_macro; return it; end)()
+    then execute_macro_body(it)
+    elseif (function() it= Request_table.Leading_spaces_macro; return it; end)()
+    then it()
     end
-    Last_line_had_leading_spaces_p = true
   else
-    Last_line_had_leading_spaces_p = false
+    -- true or insert_leading_line_break_p
+    -- Just_after_par_start_p
+    if insert_leading_line_break_p then
+      emit_verbatim '<!---***---><br>'
+    end
+    for j=1,Leading_spaces_number do
+      emit '\\[htmlnbsp]'
+    end
   end
 end
 
