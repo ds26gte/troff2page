@@ -1,4 +1,4 @@
--- last modified 2020-11-21
+-- last modified 2020-11-23
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -107,6 +107,7 @@ Redirected_p = nil
 Request_table = nil
 Rerun_needed_p = nil
 Saved_escape_char = nil
+Single_output_page_p = nil
 Slides_p = nil
 Sourcing_ascii_file_p = nil
 String_table = nil

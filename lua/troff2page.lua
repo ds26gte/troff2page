@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201122 -- last modified
+Troff2page_version = 20201123 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -349,6 +349,7 @@ Redirected_p = nil
 Request_table = nil
 Rerun_needed_p = nil
 Saved_escape_char = nil
+Single_output_page_p = nil
 Slides_p = nil
 Sourcing_ascii_file_p = nil
 String_table = nil
@@ -524,6 +525,9 @@ function do_bye()
   --print('pageno=', pageno)
   write_aux('nb_last_page_number(', pageno, ')')
   emit_end_page()
+  if raw_counter_value 'HTML1' ~= 0 then
+    write_aux('nb_single_output_page()')
+  end
   if Verbatim_apostrophe_p then
     write_aux('nb_verbatim_apostrophe()')
   end
@@ -678,6 +682,7 @@ function troff2page_1pass(argc, argv)
     Redirected_p = false,
     Request_table = {},
     Saved_escape_char = false,
+    Single_output_page_p = false,
     Slides_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},
@@ -959,11 +964,25 @@ end
 
 
 function link_stylesheets()
-  emit_verbatim '<link rel="stylesheet" href="'
-  emit_verbatim(Jobname)
-  emit_verbatim(Css_file_suffix)
-  emit_verbatim '" title=default>'
-  emit_newline()
+  local css_file = Jobname..Css_file_suffix
+  --print('doing link_stylesheets', css_file)
+  if Single_output_page_p then
+    if probe_file(css_file) then
+      Out:write('<style>\n')
+      copy_file_to_stream(css_file, Out)
+      Out:write('</style>\n')
+    else
+      flag_missing_piece 'stylesheet'
+    end
+  else
+    emit_verbatim '<link rel="stylesheet" href="'
+    emit_verbatim(css_file)
+    emit_verbatim '" title=default>'
+    emit_newline()
+  end
+  --print('II')
+  start_css_file(css_file)
+  --print('III')
   for _,css in pairs(Stylesheets) do
     emit_verbatim '<link rel="stylesheet" href="'
     emit_verbatim(css)
@@ -980,8 +999,7 @@ function link_scripts()
   end
 end
 
-function start_css_file()
-  local css_file = Jobname .. Css_file_suffix
+function start_css_file(css_file)
   ensure_file_deleted(css_file)
   Css_stream = io.open(css_file, 'w')
   Css_stream:write([[
@@ -1032,6 +1050,10 @@ function start_css_file()
   span.blankline {
     display: block;
     line-height: 1ex;
+  }
+
+  span.blankline::before {
+      content: '\a0';
   }
 
   pre {
@@ -1168,7 +1190,6 @@ function collect_css_info_from_preamble()
   local p_i = raw_counter_value 'PI'
   local pd = raw_counter_value 'PD'
   local ll = raw_counter_value 'LL'
-  local html1 = raw_counter_value 'HTML1'
   if ps ~= 10 then
     Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
@@ -1191,7 +1212,7 @@ function collect_css_info_from_preamble()
       Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n', display_margin, display_margin))
     end
   end
-  if html1 ~= 0 then
+  if Single_output_page_p then
     Css_stream:write '\n@media print {\n'
     Css_stream:write '\na.hrefinternal::after { content: target-counter(attr(href), page); }\n'
     Css_stream:write '\na.hrefinternal .hreftext { display: none; }\n'
@@ -1443,11 +1464,6 @@ function do_afterpar()
 end
 
 function do_eject()
-  local page_break_p = true
-  if raw_counter_value('HTML1') ~= 0 then
-    Last_page_number = 0
-    page_break_p = false
-  end
   if Slides_p then
     --print('eject for slides')
     --print('eject/slides calling eep')
@@ -1456,12 +1472,12 @@ function do_eject()
     emit_verbatim '<div class=slide>\n'
     emit_para()
     --print('done ejecting for slides')
-  elseif page_break_p then
-    emit_end_page(); emit_start()
-  else
+  elseif Single_output_page_p then
     emit_end_para()
     emit_verbatim '<div class=pagebreak></div>'
     emit_para()
+  else
+    emit_end_page(); emit_start()
   end
 end
 
@@ -1644,11 +1660,14 @@ function emit_expanded_line()
   while true do
     c = get_char(); --io.write('picked up ->', c or '', '<-\n')
     if not c then
-      Keep_newline_p = false --?
+      Keep_newline_p = false --QSTN
       c = '\n'
     end
     --
     if c == '\n' then
+      if blank_line_p then
+        Keep_newline_p=false
+      end
       --print('EEL found NL')
       break
     elseif count_leading_spaces_p and c == ' ' then
@@ -1772,7 +1791,7 @@ function emit_blank_line()
     if not Just_after_par_start_p then
       emit_verbatim '<br>'
     end
-    emit_verbatim '<span class=blankline>&#xa0;</span>'; emit_newline()
+    emit_verbatim '<span class=blankline></span>'; emit_newline()
     --print('setting II Just_after_par_start_p')
     Just_after_par_start_p = true
     --emit_verbatim '<br class=blankline>&#xa0;<br class=blankline>'; emit_newline()
@@ -2464,13 +2483,12 @@ function begin_html_document()
     local f = Jobname .. Aux_file_suffix
     local fc = loadfile(f)
     if fc then
+      --print('loading', f)
       fc()
       ensure_file_deleted(f)
     end
     Aux_stream = io.open(f, 'w')
   end
-
-  start_css_file()
 
   emit_start()
 
@@ -4476,6 +4494,12 @@ function nb_last_page_number(n)
   Last_page_number = n
 end
 
+function nb_single_output_page()
+  --print('calling nb_single_output_page')
+  Single_output_page_p = true
+  Last_page_number = 0
+end
+
 function nb_node(node, pageno, tag_value)
 --  print('doing nb_node')
   Node_table[node] = pageno
@@ -5112,14 +5136,16 @@ function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
   if opts.preferred_p then
     if not Title or not (Title == title) then
+      Title = title
       flag_missing_piece 'title'
     end
   else
     if not Title then
+      Title = title
       flag_missing_piece 'title'
     end
   end
-  Title = title
+  --Title = title
   if opts.emit_p then
     --print('storetitle calling eep')
     emit_end_para()

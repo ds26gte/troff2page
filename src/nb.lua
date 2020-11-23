@@ -1,4 +1,4 @@
--- last modified 2017-08-19
+-- last modified 2020-11-23
 
 function nb_macro_package(m)
   Macro_package = m
@@ -10,6 +10,12 @@ end
 
 function nb_last_page_number(n)
   Last_page_number = n
+end
+
+function nb_single_output_page()
+  --print('calling nb_single_output_page')
+  Single_output_page_p = true
+  Last_page_number = 0
 end
 
 function nb_node(node, pageno, tag_value)

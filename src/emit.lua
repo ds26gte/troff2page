@@ -1,4 +1,4 @@
--- last modified 2020-11-22
+-- last modified 2020-11-23
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -164,11 +164,14 @@ function emit_expanded_line()
   while true do
     c = get_char(); --io.write('picked up ->', c or '', '<-\n')
     if not c then
-      Keep_newline_p = false --?
+      Keep_newline_p = false --QSTN
       c = '\n'
     end
     --
     if c == '\n' then
+      if blank_line_p then
+        Keep_newline_p=false
+      end
       --print('EEL found NL')
       break
     elseif count_leading_spaces_p and c == ' ' then
@@ -292,7 +295,7 @@ function emit_blank_line()
     if not Just_after_par_start_p then
       emit_verbatim '<br>'
     end
-    emit_verbatim '<span class=blankline>&#xa0;</span>'; emit_newline()
+    emit_verbatim '<span class=blankline></span>'; emit_newline()
     --print('setting II Just_after_par_start_p')
     Just_after_par_start_p = true
     --emit_verbatim '<br class=blankline>&#xa0;<br class=blankline>'; emit_newline()

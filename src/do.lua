@@ -1,4 +1,4 @@
--- last modified 2017-08-20
+-- last modified 2020-11-23
 
 function do_afterpar()
   local it = Afterpar
@@ -9,11 +9,6 @@ function do_afterpar()
 end
 
 function do_eject()
-  local page_break_p = true
-  if raw_counter_value('HTML1') ~= 0 then
-    Last_page_number = 0
-    page_break_p = false
-  end
   if Slides_p then
     --print('eject for slides')
     --print('eject/slides calling eep')
@@ -22,12 +17,12 @@ function do_eject()
     emit_verbatim '<div class=slide>\n'
     emit_para()
     --print('done ejecting for slides')
-  elseif page_break_p then
-    emit_end_page(); emit_start()
-  else
+  elseif Single_output_page_p then
     emit_end_para()
     emit_verbatim '<div class=pagebreak></div>'
     emit_para()
+  else
+    emit_end_page(); emit_start()
   end
 end
 

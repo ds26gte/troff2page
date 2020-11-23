@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-11-23
 
 function write_aux(...)
   Aux_stream:write(...)
@@ -24,13 +24,12 @@ function begin_html_document()
     local f = Jobname .. Aux_file_suffix
     local fc = loadfile(f)
     if fc then
+      --print('loading', f)
       fc()
       ensure_file_deleted(f)
     end
     Aux_stream = io.open(f, 'w')
   end
-
-  start_css_file()
 
   emit_start()
 

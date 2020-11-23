@@ -1,4 +1,4 @@
--- last modified 2020-11-21
+-- last modified 2020-11-23
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -107,6 +107,7 @@ function troff2page_1pass(argc, argv)
     Redirected_p = false,
     Request_table = {},
     Saved_escape_char = false,
+    Single_output_page_p = false,
     Slides_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},

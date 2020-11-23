@@ -1,17 +1,19 @@
--- last modified 2020-11-21
+-- last modified 2020-11-22
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
   if opts.preferred_p then
     if not Title or not (Title == title) then
+      Title = title
       flag_missing_piece 'title'
     end
   else
     if not Title then
+      Title = title
       flag_missing_piece 'title'
     end
   end
-  Title = title
+  --Title = title
   if opts.emit_p then
     --print('storetitle calling eep')
     emit_end_para()
