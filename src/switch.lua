@@ -1,4 +1,4 @@
--- last modified 2020-11-22
+-- last modified 2020-11-24
 
 function switch_style(opts)
   opts = opts or {}
@@ -103,12 +103,17 @@ function switch_font(f)
     if f=='B' then f='CB' end
   end
   if not f then f = false
-  elseif f == 'I' then f = 'font-style: italic'
-  elseif f == 'B' then f = 'font-weight: bold'
-  elseif f == 'C' or f == 'CR' or f == 'CW' then f = 'font-family: monospace'
-  elseif f == 'CB' then f = 'font-weight: bold; font-family: monospace'
-  elseif f == 'CI' then f = 'font-style: oblique; font-family: monospace'
-  elseif f == 'P' then f = 'previous'
+  elseif f=='B' then f = 'font-weight: bold'
+  elseif f=='C' or f=='CR' or f=='CW' then f = 'font-family: monospace'
+  elseif f=='CB' then f = 'font-family: monospace; font-weight: bold'
+  elseif f=='CBI' or f=='CX' then f = 'font-family: monospace; font-style: oblique; font-weight: bold'
+  elseif f=='CI' or f=='CO' then f = 'font-family: monospace; font-style: oblique'
+  elseif f=='H' or f=='HR' then f = 'font-family: sans-serif'
+  elseif f=='HBI' or f=='HX' then f = 'font-family: sans-serif; font-weight: bold'
+  elseif f=='HI' or f=='HO' then f = 'font-family: sans-serif; font-style: oblique'
+  elseif f=='I' then f = 'font-style: italic'
+  elseif f=='NBI' or f=='NX' then f = 'font-style: italic; font-weight: bold'
+  elseif f=='P' then f = 'previous'
   else f = false
   end
   --print('f=', f)

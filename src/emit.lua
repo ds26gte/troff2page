@@ -1,4 +1,4 @@
--- last modified 2020-11-24
+-- last modified 2020-11-26
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -335,10 +335,9 @@ function emit_end_para()
   emit(switch_style())
   emit_verbatim '</p>\n'
   Margin_left = 0
-  local it = Request_table['par@reset']
-  if it then it() end
-  --print('eep switch style to default')
-  --emit(switch_style())
+  if Current_troff_input then
+    execute_macro_with_args('par@reset', {})
+  end
   fill_mode()
   do_afterpar()
   --print('eep/ipp should be true', In_para_p)

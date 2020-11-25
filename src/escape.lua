@@ -1,4 +1,4 @@
--- last modified 2017-08-22
+-- last modified 2020-11-24
 
 Escape_table = {}
 
@@ -145,7 +145,7 @@ defescape('[', function()
     end
   end
   if string.find(s, 'html') ~= 1 then
-    twarning("warning: can't find special character %s", s)
+    twarning("warning: can't find special character '%s'", s)
   end
   return '\\[' .. s .. ']'
 end)

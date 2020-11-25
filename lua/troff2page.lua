@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201124 -- last modified
+Troff2page_version = 20201126 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1244,7 +1244,7 @@ function collect_macro_body(w, ender)
     --print('inside collect_macro_body with', ln)
     flet({
       Current_troff_input = make_bstream {}
-    }, function() 
+    }, function()
       toss_back_line(ln)
       local c = snoop_char()
       if c == Control_char then
@@ -1271,7 +1271,7 @@ function expand_args(s)
       Macro_copy_mode_p = true,
       Outputting_to = 'troff',
       Out = o
-    }, function() 
+    }, function()
       --print('calling generate_html from expand_args with Out=', Out)
       --print('cti.b =', #(Current_troff_input.buffer))
       generate_html{'break', 'continue', 'ex', 'nx', 'return'}
@@ -1279,12 +1279,12 @@ function expand_args(s)
   end)
   --print('expand_args retng', res)
   return res
-end 
+end
 
 function execute_macro(w, noarg)
   --print('doing execute_macro', w)
   local it
-  if not w then 
+  if not w then
     return
   end
   --
@@ -1317,7 +1317,7 @@ function execute_macro(w, noarg)
     return
   end
   --
-  it = Request_table[w] 
+  it = Request_table[w]
   if it then
     --print('calling request', w)
     it()
@@ -1350,9 +1350,20 @@ function execute_macro_body(ss)
   end)
 end
 
+function execute_macro_with_args(w, args)
+  local it
+  it = Macro_table[w]
+  if not t then return end
+  flet({Macro_args = args}, function()
+    table.insert(Macro_args, 1, w)
+    execute_macro_body(it)
+  end)
+  return
+end
+
 function retrieve_diversion(div)
   local value = div.value
-  if not value then 
+  if not value then
     value = (div.stream):get_output_stream_string()
     div.value = value
   end
@@ -1831,10 +1842,9 @@ function emit_end_para()
   emit(switch_style())
   emit_verbatim '</p>\n'
   Margin_left = 0
-  local it = Request_table['par@reset']
-  if it then it() end
-  --print('eep switch style to default')
-  --emit(switch_style())
+  if Current_troff_input then
+    execute_macro_with_args('par@reset', {})
+  end
   fill_mode()
   do_afterpar()
   --print('eep/ipp should be true', In_para_p)
@@ -2126,7 +2136,7 @@ defescape('[', function()
     end
   end
   if string.find(s, 'html') ~= 1 then
-    twarning("warning: can't find special character %s", s)
+    twarning("warning: can't find special character '%s'", s)
   end
   return '\\[' .. s .. ']'
 end)
@@ -3306,9 +3316,7 @@ function initialize_macros()
     stop_display()
   end)
 
-  defrequest('par@reset', function()
-    no_op()
-  end)
+  deftmacro('par@reset', {})
 
   defrequest('LP', function()
     execute_macro('ds@auto-end', 'noarg')
@@ -3492,11 +3500,14 @@ function initialize_macros()
     --read_troff_line()
     start_display('L')
     emit(switch_font 'C')
+    Turn_off_escape_char_p = true
   end)
 
   defrequest('EE', function()
     --print('doing EE')
     --read_troff_line()
+    Escape_char = '\\'
+    Turn_off_escape_char_p = false
     stop_display()
   end)
 
@@ -5433,12 +5444,17 @@ function switch_font(f)
     if f=='B' then f='CB' end
   end
   if not f then f = false
-  elseif f == 'I' then f = 'font-style: italic'
-  elseif f == 'B' then f = 'font-weight: bold'
-  elseif f == 'C' or f == 'CR' or f == 'CW' then f = 'font-family: monospace'
-  elseif f == 'CB' then f = 'font-weight: bold; font-family: monospace'
-  elseif f == 'CI' then f = 'font-style: oblique; font-family: monospace'
-  elseif f == 'P' then f = 'previous'
+  elseif f=='B' then f = 'font-weight: bold'
+  elseif f=='C' or f=='CR' or f=='CW' then f = 'font-family: monospace'
+  elseif f=='CB' then f = 'font-family: monospace; font-weight: bold'
+  elseif f=='CBI' or f=='CX' then f = 'font-family: monospace; font-style: oblique; font-weight: bold'
+  elseif f=='CI' or f=='CO' then f = 'font-family: monospace; font-style: oblique'
+  elseif f=='H' or f=='HR' then f = 'font-family: sans-serif'
+  elseif f=='HBI' or f=='HX' then f = 'font-family: sans-serif; font-weight: bold'
+  elseif f=='HI' or f=='HO' then f = 'font-family: sans-serif; font-style: oblique'
+  elseif f=='I' then f = 'font-style: italic'
+  elseif f=='NBI' or f=='NX' then f = 'font-style: italic; font-weight: bold'
+  elseif f=='P' then f = 'previous'
   else f = false
   end
   --print('f=', f)

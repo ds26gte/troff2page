@@ -1,4 +1,4 @@
--- last modified 2019-09-26
+-- last modified 2020-11-26
 
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
@@ -15,7 +15,7 @@ function collect_macro_body(w, ender)
     --print('inside collect_macro_body with', ln)
     flet({
       Current_troff_input = make_bstream {}
-    }, function() 
+    }, function()
       toss_back_line(ln)
       local c = snoop_char()
       if c == Control_char then
@@ -42,7 +42,7 @@ function expand_args(s)
       Macro_copy_mode_p = true,
       Outputting_to = 'troff',
       Out = o
-    }, function() 
+    }, function()
       --print('calling generate_html from expand_args with Out=', Out)
       --print('cti.b =', #(Current_troff_input.buffer))
       generate_html{'break', 'continue', 'ex', 'nx', 'return'}
@@ -50,12 +50,12 @@ function expand_args(s)
   end)
   --print('expand_args retng', res)
   return res
-end 
+end
 
 function execute_macro(w, noarg)
   --print('doing execute_macro', w)
   local it
-  if not w then 
+  if not w then
     return
   end
   --
@@ -88,7 +88,7 @@ function execute_macro(w, noarg)
     return
   end
   --
-  it = Request_table[w] 
+  it = Request_table[w]
   if it then
     --print('calling request', w)
     it()
@@ -121,9 +121,20 @@ function execute_macro_body(ss)
   end)
 end
 
+function execute_macro_with_args(w, args)
+  local it
+  it = Macro_table[w]
+  if not t then return end
+  flet({Macro_args = args}, function()
+    table.insert(Macro_args, 1, w)
+    execute_macro_body(it)
+  end)
+  return
+end
+
 function retrieve_diversion(div)
   local value = div.value
-  if not value then 
+  if not value then
     value = (div.stream):get_output_stream_string()
     div.value = value
   end

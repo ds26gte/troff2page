@@ -1,4 +1,4 @@
--- last modified 2020-11-24
+-- last modified 2020-11-26
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -424,9 +424,7 @@ function initialize_macros()
     stop_display()
   end)
 
-  defrequest('par@reset', function()
-    no_op()
-  end)
+  deftmacro('par@reset', {})
 
   defrequest('LP', function()
     execute_macro('ds@auto-end', 'noarg')
@@ -610,11 +608,14 @@ function initialize_macros()
     --read_troff_line()
     start_display('L')
     emit(switch_font 'C')
+    Turn_off_escape_char_p = true
   end)
 
   defrequest('EE', function()
     --print('doing EE')
     --read_troff_line()
+    Escape_char = '\\'
+    Turn_off_escape_char_p = false
     stop_display()
   end)
 
