@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201123 -- last modified
+Troff2page_version = 20201124 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1926,6 +1926,24 @@ function emit_end_page()
   Out:close()
 end
 
+function emit_img(img_file, align, width, height)
+  --print('doing emit_img', img_file, align, width, height)
+  emit_verbatim '<div align='
+  emit_verbatim(align)
+  emit_verbatim '>\n'
+  emit_verbatim '<img src="'
+  emit_verbatim(img_file)
+  emit_verbatim '"'
+  if width and width ~= 0 then
+    emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '" '
+  end
+  if height and height ~= 0 then
+    emit_verbatim ' height="'; emit_verbatim(height); emit_verbatim '"'
+  end
+  emit_verbatim '>\n'
+  emit_verbatim '</div>\n'
+end
+
 
 function tlog(...)
   Log_stream:write(string.format(...))
@@ -3046,9 +3064,10 @@ function initialize_macros()
       value = (div.stream):get_output_stream_string()
     end
     --print('value(2) =', value)
-    value = string.gsub(value, '^(%s*)<br>', '%1\n')
+    value = string.gsub(value, '^(%s*)<br>\n?', '%1\n')
     value = string.gsub(value, '&', '\\[htmlamp]')
-    value = string.gsub(value, '<br>(%s*)$', '\n%1')
+    value = string.gsub(value, '%s*<br>\n?(%s*)$', '%1')
+    --print('value(3) = ->', value, '<-')
     div.value = value
   end)
 
@@ -3182,7 +3201,21 @@ function initialize_macros()
     emit_verbatim '</div>'
   end)
 
+  defrequest('IMG', function()
+    local align, img_file, width = read_args()
+    if not (align=='-L' or align=='-C' or align=='-R') then
+      width=img_file; img_file=align; align='-C'
+    end
+    if align=='-L' then align='left'
+    elseif align=='-C' then align='center'
+    elseif align=='-R' then align='right'
+    end
+    if not width then width=80 end
+    emit_img(img_file, align, width..'%')
+  end)
+
   defrequest('PIMG', function()
+    --print('doing .PIMG')
     local align = read_word()
     local img_file
     local width
@@ -3197,16 +3230,7 @@ function initialize_macros()
     elseif align=='-C' then align='center'
     elseif align=='-R' then align='right'
     end
-    emit_verbatim '<div align='
-    emit_verbatim(align)
-    emit_verbatim '>\n'
-    emit_verbatim '<img src="'
-    emit_verbatim(img_file)
-    emit_verbatim '"'
-    if width ~= 0 then emit_verbatim ' width='; emit_verbatim(width) end
-    if height ~= 0 then emit_verbatim ' height='; emit_verbatim(height) end
-    emit_verbatim '>\n'
-    emit_verbatim '</div>\n'
+    emit_img(img_file, align, width, height)
   end)
 
   defrequest('tmc', do_tmc)
@@ -4256,17 +4280,6 @@ function initialize_strings()
   defstring('url', urlh_string_value)
   defstring('urlh', urlh_string_value)
 
-end
-
-function emit_interleaved_para()
-  local continue_current_para = In_para_p
-  if continue_current_para_p then
-    emit_verbatim '</p>'
-  end
-  emit_verbatim '<p class=interleaved></p>\n'
-  if continue_current_para_p then
-    emit_verbatim '<p>'
-  end
 end
 
 

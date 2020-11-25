@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2020-11-24
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -428,4 +428,22 @@ function emit_end_page()
   end
   emit_html_postamble()
   Out:close()
+end
+
+function emit_img(img_file, align, width, height)
+  --print('doing emit_img', img_file, align, width, height)
+  emit_verbatim '<div align='
+  emit_verbatim(align)
+  emit_verbatim '>\n'
+  emit_verbatim '<img src="'
+  emit_verbatim(img_file)
+  emit_verbatim '"'
+  if width and width ~= 0 then
+    emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '" '
+  end
+  if height and height ~= 0 then
+    emit_verbatim ' height="'; emit_verbatim(height); emit_verbatim '"'
+  end
+  emit_verbatim '>\n'
+  emit_verbatim '</div>\n'
 end
