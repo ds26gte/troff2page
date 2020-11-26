@@ -307,11 +307,12 @@ function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
   Leading_spaces_number = num_leading_spaces
   assert(num_leading_spaces > 0)
   if Leading_spaces_macro then
-    local it
-    if (function() it= Macro_table.Leading_spaces_macro; return it; end)()
-    then execute_macro_body(it)
-    elseif (function() it= Request_table.Leading_spaces_macro; return it; end)()
-    then it()
+    local it = Macro_table[Leading_spaces_macro]
+    if it then
+      execute_macro_body(it)
+    else
+      it = Request_table[Leading_spaces_macro]
+      if it then it() end
     end
   else
     -- true or insert_leading_line_break_p
