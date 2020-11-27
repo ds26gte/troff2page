@@ -1,4 +1,4 @@
-# last modified 2020-11-17
+# last modified 2020-11-27
 *.ps
 *.txt
 *temp_*
@@ -10,7 +10,7 @@
 [^i]*.html
 docs/*[^cels]
 examples/*[^1e]
-examples/???*.1
+examples/????*.1
 lua/*[^a]
 man/man1/*[^1]
 troffput*

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201126 -- last modified
+Troff2page_version = 20201128 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1232,6 +1232,7 @@ end
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
   --print('Turn_off_escape_char_p =', Turn_off_escape_char_p)
+  if not ender then ender = '.' end
   local m = {}
   while true do
     if not snoop_char() then
@@ -2906,9 +2907,51 @@ function deftmacro(w, ss)
 end
 
 function call_ender(ender)
-  if not Exit_status and ender ~= '.' then
+  if not Exit_status and ender and ender ~= '.' then
     toss_back_char('\n')
     execute_macro(ender)
+  end
+end
+
+function tmacspec_string_indir(w, ender)
+  -- TODO figure out what groff wants if
+  -- 1. w undefined
+  -- 2. ender not provided
+  -- 3. ender provided but undefined
+  local w_th = String_table[w]
+  if w_th then w = w_th() end
+  --
+  local ender_th
+  if ender then
+    ender_th = String_table[ender]
+    if ender_th then ender = ender_th() end
+  else
+    ender = '.'
+  end
+  return w, ender
+end
+
+function addtmacro(w, ender)
+  if not ender then ender = '.' end
+  local extra_macro_body = collect_macro_body(w, ender)
+  local it
+  it = Macro_table[w]
+  if it then
+    table_nconc(it, extra_macro_body)
+    --deftmacro(w, it .. extra_macro_body)
+  else
+    it = Request_table[w]
+    if it then
+      local tmp_old_req, tmp_new_mac = gen_temp_string(), gen_temp_string()
+      defrequest(tmp_old_req, it)
+      table.insert(extra_macro_body, 1, '.' .. tmp_old_req .. ' \\$*')
+      deftmacro(tmp_new_mac, extra_macro_body)
+      defrequest(w, function()
+        execute_macro(tmp_new_mac)
+      end)
+    else
+      deftmacro(w, extra_macro_body)
+    end
   end
 end
 
@@ -2955,8 +2998,27 @@ function initialize_macros()
 
   defrequest('de', function()
     local w, ender = read_args()
-    ender = ender or '.'
+    --ender = ender or '.'
     deftmacro(w, collect_macro_body(w, ender))
+    call_ender(ender)
+  end)
+
+  defrequest('dei', function()
+    local w, ender = tmacspec_string_indir(read_args())
+    deftmacro(w, collect_macro_body(w, ender))
+    call_ender(ender)
+  end)
+
+  defrequest('am', function()
+    local w, ender = read_args()
+    --ender = ender or '.'
+    addtmacro(w, ender)
+    call_ender(ender)
+  end)
+
+  defrequest('ami', function()
+    local w, ender = tmacspec_string_indir(read_args())
+    addtmacro(w, ender)
     call_ender(ender)
   end)
 
@@ -3009,32 +3071,6 @@ function initialize_macros()
         terror('rn: unknown lhs %s', old)
       end
     end
-  end)
-
-  defrequest('am', function()
-    local w, ender = read_args()
-    ender = ender or '.'
-    local extra_macro_body = collect_macro_body(w, ender)
-    local it
-    it = Macro_table[w]
-    if it then
-      table_nconc(it, extra_macro_body)
-      --deftmacro(w, it .. extra_macro_body)
-    else
-      it = Request_table[w]
-      if it then
-        local tmp_old_req, tmp_new_mac = gen_temp_string(), gen_temp_string()
-        defrequest(tmp_old_req, it)
-        table.insert(extra_macro_body, 1, '.' .. tmp_old_req .. ' \\$*')
-        deftmacro(tmp_new_mac, extra_macro_body)
-        defrequest(w, function()
-          execute_macro(tmp_new_mac)
-        end)
-      else
-        deftmacro(w, extra_macro_body)
-      end
-    end
-    call_ender(ender)
   end)
 
   defrequest('eo', function()
@@ -3443,16 +3479,30 @@ function initialize_macros()
 
   defrequest('NH', function()
     Request_table['@NH']()
+    --execute_macro('@NH')
   end)
 
   defrequest('SH', function()
-    execute_macro('@SH')
+    Request_table['@SH']()
+    --execute_macro('@SH')
   end)
 
   defrequest('@NH', function()
-    local lvl = read_args()
-    local num = tonumber(lvl) or 1
-    emit_section_header(num, {numbered_p = true})
+    --print('doing @NH')
+    local args = {read_args()}
+    --print('args=', table_to_string(args))
+    local lvl = args[1]
+    --print('lvl=', lvl)
+    if lvl=='S' then
+      --print('doing @NH S')
+      table.remove(args,1)
+      lvl=#args
+      local secnum = table.concat(args, '.')
+      emit_section_header(lvl, {numbered_p=true, secnum=secnum})
+    else
+      --print('doing regular NH')
+      emit_section_header(tonumber(lvl), {numbered_p=true})
+    end
   end)
 
   defrequest('@SH', function()
@@ -5256,18 +5306,21 @@ end
 
 function emit_section_header(level, opts)
   --print('doing emit_section_header', level)
+  level = math.max(1,level)
   opts = opts or {}
   --
   if Slides_p and level==1 then do_eject() end
   --
-  local this_section_num = false
+  local this_section_num = opts.secnum
   local growps = raw_counter_value('GROWPS')
   --print('emitsectionheader calling eep')
   emit_end_para()
   if opts.numbered_p then
     get_counter_named('nh*hl').value = level
-    increment_section_counter(level)
-    this_section_num = section_counter_value()
+    if not this_section_num then
+      increment_section_counter(level)
+      this_section_num = section_counter_value()
+    end
     defstring('SN-NO-DOT', function() return this_section_num end)
     local this_section_num_dot = this_section_num .. '.'
     local function this_section_num_dot_thunk()

@@ -1,4 +1,4 @@
--- last modified 2020-11-22
+-- last modified 2020-11-28
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -99,18 +99,21 @@ end
 
 function emit_section_header(level, opts)
   --print('doing emit_section_header', level)
+  level = math.max(1,level)
   opts = opts or {}
   --
   if Slides_p and level==1 then do_eject() end
   --
-  local this_section_num = false
+  local this_section_num = opts.secnum
   local growps = raw_counter_value('GROWPS')
   --print('emitsectionheader calling eep')
   emit_end_para()
   if opts.numbered_p then
     get_counter_named('nh*hl').value = level
-    increment_section_counter(level)
-    this_section_num = section_counter_value()
+    if not this_section_num then
+      increment_section_counter(level)
+      this_section_num = section_counter_value()
+    end
     defstring('SN-NO-DOT', function() return this_section_num end)
     local this_section_num_dot = this_section_num .. '.'
     local function this_section_num_dot_thunk()

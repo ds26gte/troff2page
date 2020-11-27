@@ -1,8 +1,9 @@
--- last modified 2020-11-26
+-- last modified 2020-11-27
 
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
   --print('Turn_off_escape_char_p =', Turn_off_escape_char_p)
+  if not ender then ender = '.' end
   local m = {}
   while true do
     if not snoop_char() then
