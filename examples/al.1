@@ -1,0 +1,28 @@
+.de foo
+.  tm \\$0
+..
+.als bar foo
+.
+.de aaa
+.  foo
+..
+.de bbb
+.  bar
+..
+.de ccc
+\\*[foo]\\
+..
+.de ddd
+\\*[bar]\\
+..
+.
+START
+.aaa
+.\"    error-> foo
+.bbb
+.\"    error-> bar
+.ccc
+.\"    error-> ccc
+.ddd
+.\"    error-> ddd
+STOP

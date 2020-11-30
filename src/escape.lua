@@ -1,10 +1,10 @@
--- last modified 2020-11-24
+-- last modified 2020-11-30
 
 Escape_table = {}
 
 function defescape(c, th)
   Escape_table[c] = th
-end 
+end
 
 defescape('$', function()
   local x = read_escaped_word()
@@ -14,7 +14,7 @@ defescape('$', function()
   elseif x == '\\' then toss_back_char('\\')
     it = read_arith_expr()
     return Macro_args[it+1] or ''
-  elseif (function() it = tonumber(x); return it end)() 
+  elseif (function() it = tonumber(x); return it end)()
   then return Macro_args[it+1] or ''
   else return ''
   end
@@ -44,10 +44,18 @@ defescape('*', function()
   --print('s=', s, 'args=', table_to_string(args))
   local it
   it = String_table[s]
-  if it then --print('s it', it); 
-    return it(table.unpack(args)) end
+  if it then --print('s it', it);
+    return it(table.unpack(args))
+  end
+  it = Macro_table[s]
+  if it then
+    execute_macro_body(it)
+    return ''
+  end
   it = Diversion_table[s]
-  if it then return retrieve_diversion(it) end
+  if it then
+    return retrieve_diversion(it)
+  end
   return ''
 end)
 
@@ -96,7 +104,7 @@ defescape('n', function()
   local n = read_escaped_word()
   --print('numreg named', n)
   local c = get_counter_named(n)
-  local it 
+  local it
   it = c.thunk
   if it then
     if sign then
@@ -156,7 +164,7 @@ defescape('h', function()
   local x = read_length_in_pixels()
   local delim2 = get_char()
   if delim ~= delim2 then
-    terror('\\h bad delims %s %s', delim, delim2) 
+    terror('\\h bad delims %s %s', delim, delim2)
   end
   return verbatim_nbsp(x / 5)
 end)
@@ -196,4 +204,4 @@ defescape('e', function()
   return verbatim(Escape_char)
 end)
 
-defescape('E', Escape_table.e) 
+defescape('E', Escape_table.e)

@@ -1,4 +1,4 @@
--- last modified 2020-11-18
+-- last modified 2020-11-30
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -19,15 +19,12 @@ function initialize_numregs()
   defnumreg('lss', {thunk = function() return Leading_spaces_number * point_equivalent_of('n'); end})
 
   defnumreg('$$', {value = 0xbadc0de})
-  defnumreg('.g', {value = 1})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
   defnumreg('.troff2page', {value = Troff2page_version})
-  defnumreg('systat', {value = 0})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
   defnumreg('PS', {value = 10})
-  defnumreg('PSINCR', {value = 0})
   defnumreg('PI', {value = 5*point_equivalent_of 'n'})
   defnumreg('DI', {value = raw_counter_value 'PI'})
   defnumreg('PD', {value = .3*point_equivalent_of 'v'})

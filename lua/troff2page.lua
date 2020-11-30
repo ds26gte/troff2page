@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201128 -- last modified
+Troff2page_version = 20201130 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1997,7 +1997,7 @@ Escape_table = {}
 
 function defescape(c, th)
   Escape_table[c] = th
-end 
+end
 
 defescape('$', function()
   local x = read_escaped_word()
@@ -2007,7 +2007,7 @@ defescape('$', function()
   elseif x == '\\' then toss_back_char('\\')
     it = read_arith_expr()
     return Macro_args[it+1] or ''
-  elseif (function() it = tonumber(x); return it end)() 
+  elseif (function() it = tonumber(x); return it end)()
   then return Macro_args[it+1] or ''
   else return ''
   end
@@ -2037,10 +2037,18 @@ defescape('*', function()
   --print('s=', s, 'args=', table_to_string(args))
   local it
   it = String_table[s]
-  if it then --print('s it', it); 
-    return it(table.unpack(args)) end
+  if it then --print('s it', it);
+    return it(table.unpack(args))
+  end
+  it = Macro_table[s]
+  if it then
+    execute_macro_body(it)
+    return ''
+  end
   it = Diversion_table[s]
-  if it then return retrieve_diversion(it) end
+  if it then
+    return retrieve_diversion(it)
+  end
   return ''
 end)
 
@@ -2089,7 +2097,7 @@ defescape('n', function()
   local n = read_escaped_word()
   --print('numreg named', n)
   local c = get_counter_named(n)
-  local it 
+  local it
   it = c.thunk
   if it then
     if sign then
@@ -2149,7 +2157,7 @@ defescape('h', function()
   local x = read_length_in_pixels()
   local delim2 = get_char()
   if delim ~= delim2 then
-    terror('\\h bad delims %s %s', delim, delim2) 
+    terror('\\h bad delims %s %s', delim, delim2)
   end
   return verbatim_nbsp(x / 5)
 end)
@@ -2189,7 +2197,7 @@ defescape('e', function()
   return verbatim(Escape_char)
 end)
 
-defescape('E', Escape_table.e) 
+defescape('E', Escape_table.e)
 
 function ev_copy(lhs, rhs)
   lhs.hardlines = rhs.hardlines
@@ -4180,15 +4188,12 @@ function initialize_numregs()
   defnumreg('lss', {thunk = function() return Leading_spaces_number * point_equivalent_of('n'); end})
 
   defnumreg('$$', {value = 0xbadc0de})
-  defnumreg('.g', {value = 1})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
   defnumreg('.troff2page', {value = Troff2page_version})
-  defnumreg('systat', {value = 0})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
   defnumreg('PS', {value = 10})
-  defnumreg('PSINCR', {value = 0})
   defnumreg('PI', {value = 5*point_equivalent_of 'n'})
   defnumreg('DI', {value = raw_counter_value 'PI'})
   defnumreg('PD', {value = .3*point_equivalent_of 'v'})

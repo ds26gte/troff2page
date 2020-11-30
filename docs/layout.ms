@@ -1,4 +1,4 @@
-.\" last modified 2020-11-19
+.\" last modified 2020-11-30
 .SH 1
 3. Page layout
 .LP
@@ -99,7 +99,7 @@ browser gets.\**
 .FS
 If you prefer troff2page’s default fit-to-width text-width, but
 one of the macro files you loaded sets \fCLL\fP, simply reset
-\fCLL\fP to 0 inside an \fC.if \n[.troff2page]\fP conditional.
+\fCLL\fP to 0 inside an \fC.if \En[.troff2page]\fP conditional.
 Use the same ploy to set your HTML \fCLL\fP to whatever you want,
 without affecting the print output.
 .FE
