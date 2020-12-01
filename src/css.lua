@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2020-12-01
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -99,6 +99,11 @@ function start_css_file(css_file)
 
   blockquote {
     margin-left: 2em;
+  }
+
+  blockquote.quotebar {
+    border-left: 1px solid black;
+    padding-left: 2ex;
   }
 
   ol {

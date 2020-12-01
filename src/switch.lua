@@ -1,4 +1,4 @@
--- last modified 2020-11-24
+-- last modified 2020-12-01
 
 function switch_style(opts)
   opts = opts or {}
@@ -97,7 +97,7 @@ end
 
 function switch_font(f)
   --print('doing switch_font', f)
-  if Macro_package then
+  if Macro_package=='man' then
     -- for man, seems better to treat I,B as monospace
     if f=='I' then f='C' end
     if f=='B' then f='CB' end

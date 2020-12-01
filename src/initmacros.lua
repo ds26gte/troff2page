@@ -1,4 +1,4 @@
--- last modified 2020-11-28
+-- last modified 2020-12-01
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -915,14 +915,14 @@ function initialize_macros()
   defrequest('QP', function()
     read_troff_line()
     emit_para()
-    emit_verbatim '<blockquote>'
+    emit_verbatim '<blockquote class=quotebar>'
     Afterpar = function() emit_verbatim '</blockquote>' end
   end)
 
   defrequest('QS', function()
     read_troff_line()
     emit_para()
-    emit_verbatim '<blockquote>'
+    emit_verbatim '<blockquote class=quotebar>'
   end)
 
   defrequest('QE', function()
@@ -1253,15 +1253,6 @@ function initialize_macros()
 
   defrequest('AM', function()
     accent_marks()
-  end)
-
-  defrequest('DEBUG', function()
-    local w = read_args() or ''
-    local it = tonumber(w)
-    if it then Debug_p = (it>0)
-    else it = string.lower(w)
-      Debug_p = (it=='on') or (it=='t') or (it=='true') or (it=='y') or (it=='yes')
-    end
   end)
 
 end

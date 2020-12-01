@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-12-01
 
 if not table.unpack then
   table.unpack = unpack
@@ -6,12 +6,6 @@ end
 
 function no_op()
   do end
-end
-
-function dprint(...)
-  if Debug_p then
-    io.write(...); io.write('\n')
-  end
 end
 
 function flet(opts, thunk) 

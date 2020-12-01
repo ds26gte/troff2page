@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2020-12-01
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -128,5 +128,4 @@ Turn_off_escape_char_p = nil
 Verbatim_apostrophe_p = nil
 
 Single_pass_p = nil
-Debug_p = nil
 Image_format = 'png'

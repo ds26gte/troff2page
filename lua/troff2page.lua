@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201130 -- last modified
+Troff2page_version = 20201201 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -14,12 +14,6 @@ end
 
 function no_op()
   do end
-end
-
-function dprint(...)
-  if Debug_p then
-    io.write(...); io.write('\n')
-  end
 end
 
 function flet(opts, thunk) 
@@ -370,7 +364,6 @@ Turn_off_escape_char_p = nil
 Verbatim_apostrophe_p = nil
 
 Single_pass_p = nil
-Debug_p = nil
 Image_format = 'png'
 
 
@@ -1062,6 +1055,11 @@ function start_css_file(css_file)
 
   blockquote {
     margin-left: 2em;
+  }
+
+  blockquote.quotebar {
+    border-left: 1px solid black;
+    padding-left: 2ex;
   }
 
   ol {
@@ -3817,14 +3815,14 @@ function initialize_macros()
   defrequest('QP', function()
     read_troff_line()
     emit_para()
-    emit_verbatim '<blockquote>'
+    emit_verbatim '<blockquote class=quotebar>'
     Afterpar = function() emit_verbatim '</blockquote>' end
   end)
 
   defrequest('QS', function()
     read_troff_line()
     emit_para()
-    emit_verbatim '<blockquote>'
+    emit_verbatim '<blockquote class=quotebar>'
   end)
 
   defrequest('QE', function()
@@ -4155,15 +4153,6 @@ function initialize_macros()
 
   defrequest('AM', function()
     accent_marks()
-  end)
-
-  defrequest('DEBUG', function()
-    local w = read_args() or ''
-    local it = tonumber(w)
-    if it then Debug_p = (it>0)
-    else it = string.lower(w)
-      Debug_p = (it=='on') or (it=='t') or (it=='true') or (it=='y') or (it=='yes')
-    end
   end)
 
 end
@@ -5497,7 +5486,7 @@ end
 
 function switch_font(f)
   --print('doing switch_font', f)
-  if Macro_package then
+  if Macro_package=='man' then
     -- for man, seems better to treat I,B as monospace
     if f=='I' then f='C' end
     if f=='B' then f='CB' end
