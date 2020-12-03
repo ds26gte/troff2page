@@ -1,4 +1,4 @@
--- last modified 2020-11-26
+-- last modified 2020-12-03
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -242,11 +242,11 @@ function emit_html_preamble()
   emit_verbatim(Main_troff_file)
   emit_verbatim ' by troff2page, '
   emit_verbatim 'v. '
-  emit_verbatim(Troff2page_version); emit_newline()
-  emit_verbatim(Troff2page_copyright_notice); emit_newline()
+  emit_verbatim(troff2page_version); emit_newline()
+  emit_verbatim(troff2page_copyright_notice); emit_newline()
   emit_verbatim '(running on '
   emit_verbatim(_VERSION); emit_verbatim ')\n'
-  emit_verbatim(Troff2page_website); emit_newline()
+  emit_verbatim(troff2page_website); emit_newline()
   emit_verbatim '-->\n'
   emit_verbatim '<head>\n'
   emit_verbatim '<meta charset="utf-8">\n'
@@ -379,6 +379,8 @@ function emit_para(opts)
   if opts.interleaved_p then emit_interleaved_para() end
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
+  if opts.hanging_p then emit_verbatim ' class=hanging' end
+  if opts.break_p then emit_verbatim ' class=breakinpar' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end
   if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'

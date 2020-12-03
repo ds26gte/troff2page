@@ -1,4 +1,4 @@
--- last modified 2020-11-30
+-- last modified 2020-12-02
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -21,7 +21,9 @@ function initialize_numregs()
   defnumreg('$$', {value = 0xbadc0de})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
-  defnumreg('.troff2page', {value = Troff2page_version})
+  defnumreg('.troff2page', {value = troff2page_version})
+  defnumreg('.x', {value = math.floor(troff2page_version/100)})
+  defnumreg('.y', {value = troff2page_version%100})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
   defnumreg('PS', {value = 10})

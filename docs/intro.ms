@@ -1,11 +1,11 @@
-.\" last modified 2020-11-20
+.\" last modified 2020-12-02
 .SH 1
 1. Introduction
 .LP
 .IX troff2page, script
 \fCtroff2page\fP is a \*[url https://www.lua.org]Lua\& script that
 makes Web pages from troff manuscripts. It reads an input
-document that is marked up in troff (man or ms) and produces an
+document that is marked up in troff (-man or -ms) and produces an
 output document with the functionally equivalent HTML markup.
 .PP
 Troff is a venerable typesetting program that produces

@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2020-12-02
 
 function load_tmac(tmacf)
   if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
@@ -44,7 +44,7 @@ function troff2page_help()
   tlog(' -z              suppress formatted output to stdout [not needed]\n')
   tlog(' -t              preprocess with tbl [not needed]\n')
   tlog(' --              stop processing options\n')
-  tlog('For full details, please see %s\n', Troff2page_website)
+  tlog('For full details, please see %s\n', troff2page_website)
 end
 
 function troff2page_1pass(argc, argv)
@@ -134,8 +134,8 @@ function troff2page_1pass(argc, argv)
       if not document_found_p then
         if arg=='--help' or arg=='-h' or arg=='--version' or arg=='-v' then
           call_for_help_p = true
-          tlog('troff2page version %s\n', Troff2page_version)
-          tlog ('%s\n', Troff2page_copyright_notice)
+          tlog('troff2page version %s\n', troff2page_version)
+          tlog ('%s\n', troff2page_copyright_notice)
           if arg=='--help' or arg=='-h' then
             troff2page_help()
           end

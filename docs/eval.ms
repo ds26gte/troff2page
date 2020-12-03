@@ -1,4 +1,4 @@
-.\" last modified 2020-11-12
+.\" last modified 2020-12-03
 .SH 1
 7. Extending troff using Lua
 .LP
@@ -15,7 +15,7 @@ in a macro directory.
 .PP
 \&\fC.eval\fP does only one thing: It
 allows you to place arbitrary Lua code until the following
-\fC.endeval\fP, and the text written to standard output by
+\fC.endeval\fP, and the text written to the stream \fCtroff\fP by
 this Lua code
 is substituted for the \fC.eval\fP ... \fC.endeval\fP.
 The usefulness of this tactic will be apparent from an
@@ -28,12 +28,12 @@ Consider the following troff document, \fCtau.ms\fP:
     its radius is \(*t \(~=
     .eval
     -- following prints tau, because cos(tau/2) = -1
-    io.write(2*math.acos(-1), '.\n')
+    troff:write(2*math.acos(-1), '.\n')
     .endeval
 .EE
 .IX unsafe mode
-.IX z@-z, groff option
-.IX U@-U, groff option
+.IX z@-z, command-line option
+.IX U@-U, command-line option
 Run troff (actually groff, and in unsafe mode too) on \fCtau.ms\fP:
 .EX
     groff -z -U -ms tau.ms
@@ -58,7 +58,7 @@ The ratio of the circumference of a circle to
 its radius is \(*t \(~=
 .eval
 -- following prints tau, because cos(tau/2) = -1
-io.write(2*math.acos(-1), '.\n')
+troff:write(2*math.acos(-1), '.\n')
 .endeval
 .RE
 .B2
@@ -102,9 +102,10 @@ not useful) to the \fC.eval\fP code seen by troff.
 Defining color names using HSL
 .LP
 .IX color names, defining
+.IX defcolor@.defcolor, groff request
 For a more substantial example of \fC.eval\fP’s use, consider defining
 color names using the HSL (Hue/Saturation/Lightness) scheme rather than the
-RGB and CMYK schemes provided by groff.  For instance, we would like to
+RGB and CMYK schemes supported by groff’s \fC.defcolor\fP.  For instance, we would like to
 define the color Venetian red using its HSL spec (357\(de, 49%,
 24%), which to many is a more intuitive description than RGB
 (91, 31, 34).
@@ -160,7 +161,7 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
 .sp
       function def_hsl_color(name, h, s, l)
         local r, g, b = hsl_to_rgb(h, s, l)
-        io.write(string.format('.defcolor %s rgb %s %s %s\n', name, r, g, b))
+        troff:write(string.format('.defcolor %s rgb %s %s %s\n', name, r, g, b))
       end
     end
     .endeval

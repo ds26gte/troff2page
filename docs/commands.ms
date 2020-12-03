@@ -1,4 +1,4 @@
-.\" last modified 2020-11-12
+.\" last modified 2020-12-03
 .SH 1
 2. troff and troff2page commands
 .LP
@@ -7,7 +7,7 @@
 .DC T ROFF2PAGE terracottapink
 recognizes most of the commands (requests, macros,
 diversions, strings, escapes, glyphs) of raw troff and its
-ms and man macro packages, including such rather
+-ms and -man macro packages, including such rather
 recherché macros as \fC.DC\fP, here used to produce a drop cap
 colored terracotta pink.
 The syntax recognized is the improved kind
@@ -19,7 +19,9 @@ obvious HTML equivalent.\**
 .
 .FS
 .IX footnotes
-E.g., ms’s footnotes (\fC\e**\fP and \fC.FS\fP/\fC.FE\fP) have a
+.IX FS@.FS, macro
+.IX FE@.FE, macro
+E.g., -ms’s footnotes (\fC\e**\fP and \fC.FS\fP/\fC.FE\fP) have a
 straightforward translation in the HTML, with the footnote text set at the
 bottom of the HTML page, and with the footnote markers in the body and the
 footnote hyperlinking to each other.

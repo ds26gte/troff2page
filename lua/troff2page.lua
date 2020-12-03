@@ -1,11 +1,11 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201201 -- last modified
-Troff2page_website = 'http://ds26gte.github.io/troff2page'
+troff2page_version = 20201203 -- last modified
+troff2page_website = 'http://ds26gte.github.io/troff2page'
 
-Troff2page_copyright_notice =
+troff2page_copyright_notice =
   string.format('Copyright (C) 2003-%s Dorai Sitaram',
-                 string.sub(Troff2page_version, 1, 4))
+                 string.sub(troff2page_version, 1, 4))
 
 
 if not table.unpack then
@@ -612,7 +612,7 @@ function troff2page_help()
   tlog(' -z              suppress formatted output to stdout [not needed]\n')
   tlog(' -t              preprocess with tbl [not needed]\n')
   tlog(' --              stop processing options\n')
-  tlog('For full details, please see %s\n', Troff2page_website)
+  tlog('For full details, please see %s\n', troff2page_website)
 end
 
 function troff2page_1pass(argc, argv)
@@ -702,8 +702,8 @@ function troff2page_1pass(argc, argv)
       if not document_found_p then
         if arg=='--help' or arg=='-h' or arg=='--version' or arg=='-v' then
           call_for_help_p = true
-          tlog('troff2page version %s\n', Troff2page_version)
-          tlog ('%s\n', Troff2page_copyright_notice)
+          tlog('troff2page version %s\n', troff2page_version)
+          tlog ('%s\n', troff2page_copyright_notice)
           if arg=='--help' or arg=='-h' then
             troff2page_help()
           end
@@ -1003,12 +1003,6 @@ function start_css_file(css_file)
     margin-bottom: 2em;
   }
 
-  /*
-  p.noindent {
-    text-indent: 0;
-  }
-  */
-
   .title {
     font-size: 200%;
     /* font-weight: normal; */
@@ -1038,6 +1032,16 @@ function start_css_file(css_file)
     font-size: 410%;  /* was 400 */
     float: left;
     padding-right: 5px;
+  }
+
+  p.hanging {
+    padding-left: 22px;
+    text-indent: -22px;
+  }
+
+  p.breakinpar {
+      margin-top: 0;
+      margin-bottom: 0;
   }
 
   span.blankline {
@@ -1091,7 +1095,7 @@ function start_css_file(css_file)
   }
 
   .troffbox {
-    background-color: lightgray;
+    background-color: #fffef7;
   }
 
   .navigation {
@@ -1197,17 +1201,23 @@ function collect_css_info_from_preamble()
   if Macro_package ~= 'man' then
     if p_i ~= 0 then
       Css_stream:write(string.format('\np.indent { text-indent: %spx; }\n', p_i))
+      Css_stream:write(string.format('\np.hanging { padding-left: %spx; text-indent: -%spx; }\n',
+        p_i, p_i))
     end
     if pd >= 0 then
       local p_margin = pd
       local display_margin = pd*2
       local fnote_rule_margin = pd*2
       local navbar_margin = ps*2
-      Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n', p_margin, p_margin))
-      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; }\n', display_margin, display_margin))
+      Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
+        p_margin, p_margin))
+      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; }\n',
+        display_margin, display_margin))
       Css_stream:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
-      Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n', navbar_margin, navbar_margin))
-      Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n', display_margin, display_margin))
+      Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
+        navbar_margin, navbar_margin))
+      Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n',
+        display_margin, display_margin))
     end
   end
   if Single_output_page_p then
@@ -1748,11 +1758,11 @@ function emit_html_preamble()
   emit_verbatim(Main_troff_file)
   emit_verbatim ' by troff2page, '
   emit_verbatim 'v. '
-  emit_verbatim(Troff2page_version); emit_newline()
-  emit_verbatim(Troff2page_copyright_notice); emit_newline()
+  emit_verbatim(troff2page_version); emit_newline()
+  emit_verbatim(troff2page_copyright_notice); emit_newline()
   emit_verbatim '(running on '
   emit_verbatim(_VERSION); emit_verbatim ')\n'
-  emit_verbatim(Troff2page_website); emit_newline()
+  emit_verbatim(troff2page_website); emit_newline()
   emit_verbatim '-->\n'
   emit_verbatim '<head>\n'
   emit_verbatim '<meta charset="utf-8">\n'
@@ -1885,6 +1895,8 @@ function emit_para(opts)
   if opts.interleaved_p then emit_interleaved_para() end
   emit_verbatim '<p'
   if opts.indent_p then emit_verbatim ' class=indent' end
+  if opts.hanging_p then emit_verbatim ' class=hanging' end
+  if opts.break_p then emit_verbatim ' class=breakinpar' end
   if opts.incremental_p then emit_verbatim ' class=incremental' end
   if para_style then emit_verbatim(string.format(' style="%s"', para_style)) end
   emit_verbatim '>'
@@ -3383,9 +3395,15 @@ function initialize_macros()
     emit_para{indent_p = true}
   end)
 
+  defrequest('XP', function()
+    execute_macro('ds@auto-end', 'noarg')
+    read_troff_line()
+    emit_para{hanging_p=true}
+  end)
+
   defrequest('P', Request_table.PP)
 
-  defrequest('HP', Request_table.PP)
+  defrequest('HP', Request_table.XP)
 
   defrequest('pause', function()
     read_troff_line()
@@ -3431,11 +3449,11 @@ function initialize_macros()
       else Margin_left=num
       end
     end
+    local o = {continue_top_ev_p = true, break_p = true}
     if Margin_left ~= 0 then
-      emit_para{continue_top_ev_p = true,
-      style = specify_margin_left_style()}
-    else emit_para{continue_top_ev_p = true}
+      o.style = specify_margin_left_style()
     end
+    emit_para(o)
   end)
 
   defrequest('TL', function()
@@ -4179,7 +4197,9 @@ function initialize_numregs()
   defnumreg('$$', {value = 0xbadc0de})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
-  defnumreg('.troff2page', {value = Troff2page_version})
+  defnumreg('.troff2page', {value = troff2page_version})
+  defnumreg('.x', {value = math.floor(troff2page_version/100)})
+  defnumreg('.y', {value = troff2page_version%100})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
   defnumreg('PS', {value = 10})
@@ -4540,9 +4560,9 @@ function emit_colophon()
     emit_verbatim '<div align=right class=advertisement>\n'
     emit_verbatim(Html_conversion_by)
     emit_verbatim ' '
-    emit(link_start(Troff2page_website))
+    emit(link_start(troff2page_website))
     emit_verbatim 'troff2page '
-    emit_verbatim(Troff2page_version)
+    emit_verbatim(troff2page_version)
     emit(link_stop())
     emit_newline()
     emit_verbatim '</div>\n'

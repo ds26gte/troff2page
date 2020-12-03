@@ -1,4 +1,4 @@
-.\" last modified 2020-11-30
+.\" last modified 2020-12-02
 .SH 1
 3. Page layout
 .LP
@@ -35,6 +35,25 @@ released on 2015 March 20.  \fC\en[.troff2page]\fP could plausibly be used
 to distinguish not just troff2page from troff, but also between various versions
 of troff2page.  Thus, one could, if the need were dire, write a document
 that translates differently with different versions of troff2page.
+.PP
+.IX p@.p, number register
+If you’d prefer to stick to known groff registers, the read-only
+page-length register \fC\en[.p]\fP is a possibility. groff sets
+it to 11 inches, i.e., the length of a US Letter size paper.
+Presumably it could vary depending on country of use, but it is
+never 0. troff2page, since it doesn't deal in paper, sets
+\fC\en[.p]\fP to 0.
+.PP
+.IX x@.x, number register
+.IX y@.y, number register
+groff has its own version registers \fC\en[.x]\fP
+and \fC\en[.y]\fP, for the major and minor version numbers
+respectively. troff2page sets these too, splitting the value of
+\fC\en[.troff2page]\fP between month and day. Thus the troff2page
+released on 2020 December 2 sets \fC\en[.troff2page]\fP to 20201202,
+\fC\en[.x]\fP to 202012, and
+\fC\en[.y]\fP to 2. Note these are all numbers (not strings), so
+there’s no 0-left-padding.
 .FE
 .PP
 .IX page breaks for HTML only
@@ -64,7 +83,7 @@ lines of paragraphs are indented (unless explicitly disabled via an
 \fC.LP\fP), and
 the vertical distance between adjacent paragraphs is the same smallish
 amount that groff employs.  These two values are given by the number
-registers \fCPI\fP and \fCPD\fP, which (for the ms format) are 0.3n and 0.3v
+registers \fCPI\fP and \fCPD\fP, which (for the -ms format) are 0.3n and 0.3v
 respectively.\**
 .FS
 The length unit \fCn\fP (en) is half the width of the letter ‘\fCm\fP’ in
@@ -89,11 +108,11 @@ text in order to respect a negative \fCPD\fP:
     .nr PD 0-1p
     .\}
 .EE
-Unlike groff ms, which uses the line length given by the register
+Unlike groff -ms, which uses the line length given by the register
 \fCLL\fP,
 troff2page by default does not restrict the text width on its HTML pages.
 Text will narrow or widen to fit the current browser window width.  However, if
-you explicitly set \fCLL\fP (instead of relying on ms’s default), troff2page
+you explicitly set \fCLL\fP (instead of relying on -ms’s default), troff2page
 will respect that line length, regardless of how wide your
 browser gets.\**
 .FS
@@ -110,7 +129,7 @@ phones): the text will correspondingly shrink to
 fit the window, avoiding the need for horizontal scrolling.
 .PP
 A good \fCLL\fP value for troff2page should be a bit larger than
-ms’s 6 inches, which is too narrow for a browser.  The following sets it
+-ms’s 6 inches, which is too narrow for a browser.  The following sets it
 to 1 millifurlong, but it takes effect only for HTML:
 .EX
     .if \n[.troff2page] .nr LL 7.92i

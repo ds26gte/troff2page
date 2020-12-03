@@ -1,4 +1,4 @@
-.\" last modified 2020-11-21
+.\" last modified 2020-12-03
 .SH 1
 8. Recovery from errors
 .LP
@@ -22,7 +22,7 @@ In the second line, troff2page offers to fire up a text editor with the cursor
 approximately close to the
 offending line.
 .PP
-.IX errors, editing location of
+.IX errors!editing location of
 If you type \fCe\fP at the \fC?\fP prompt, troff2page starts the editor specified in your
 \fCEDITOR\fP environment variable, or if that is not set, the editor named
 \fCvi\fP on your system.  troff2page calls the editor with two arguments:

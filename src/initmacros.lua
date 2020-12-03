@@ -1,4 +1,4 @@
--- last modified 2020-12-01
+-- last modified 2020-12-03
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -483,9 +483,15 @@ function initialize_macros()
     emit_para{indent_p = true}
   end)
 
+  defrequest('XP', function()
+    execute_macro('ds@auto-end', 'noarg')
+    read_troff_line()
+    emit_para{hanging_p=true}
+  end)
+
   defrequest('P', Request_table.PP)
 
-  defrequest('HP', Request_table.PP)
+  defrequest('HP', Request_table.XP)
 
   defrequest('pause', function()
     read_troff_line()
@@ -531,11 +537,11 @@ function initialize_macros()
       else Margin_left=num
       end
     end
+    local o = {continue_top_ev_p = true, break_p = true}
     if Margin_left ~= 0 then
-      emit_para{continue_top_ev_p = true,
-      style = specify_margin_left_style()}
-    else emit_para{continue_top_ev_p = true}
+      o.style = specify_margin_left_style()
     end
+    emit_para(o)
   end)
 
   defrequest('TL', function()

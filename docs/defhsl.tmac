@@ -1,4 +1,4 @@
-.\" last change 2017-08-13
+.\" last change 2020-12-03
 .\" Dorai Sitaram
 .
 .if d defhsl:loaded .nx
@@ -54,7 +54,7 @@ do
 
   function def_hsl_color(name, h, s, l)
     local r, g, b = hsl_to_rgb(h, s, l)
-    io.write(string.format('.defcolor %s rgb %s %s %s\n', name, r, g, b))
+    troff:write(string.format('.defcolor %s rgb %s %s %s\n', name, r, g, b))
   end
 end
 .endeval

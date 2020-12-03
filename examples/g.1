@@ -1,9 +1,2 @@
-.nr num 12
-.ds strink moreso
-.de hoho
-List of \\$3 \\$2 \\$1
-..
-.de gogo
-.hoho \\n[num] \\*[strink] \\$1
-..
-.gogo UNO
+.ie \n[.g] .tm running groff
+.el .tm running something other than groff

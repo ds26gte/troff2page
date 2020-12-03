@@ -1,4 +1,4 @@
--- last modified 2020-12-01
+-- last modified 2020-12-03
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -47,12 +47,6 @@ function start_css_file(css_file)
     margin-bottom: 2em;
   }
 
-  /*
-  p.noindent {
-    text-indent: 0;
-  }
-  */
-
   .title {
     font-size: 200%;
     /* font-weight: normal; */
@@ -82,6 +76,16 @@ function start_css_file(css_file)
     font-size: 410%;  /* was 400 */
     float: left;
     padding-right: 5px;
+  }
+
+  p.hanging {
+    padding-left: 22px;
+    text-indent: -22px;
+  }
+
+  p.breakinpar {
+      margin-top: 0;
+      margin-bottom: 0;
   }
 
   span.blankline {
@@ -135,7 +139,7 @@ function start_css_file(css_file)
   }
 
   .troffbox {
-    background-color: lightgray;
+    background-color: #fffef7;
   }
 
   .navigation {
@@ -241,17 +245,23 @@ function collect_css_info_from_preamble()
   if Macro_package ~= 'man' then
     if p_i ~= 0 then
       Css_stream:write(string.format('\np.indent { text-indent: %spx; }\n', p_i))
+      Css_stream:write(string.format('\np.hanging { padding-left: %spx; text-indent: -%spx; }\n',
+        p_i, p_i))
     end
     if pd >= 0 then
       local p_margin = pd
       local display_margin = pd*2
       local fnote_rule_margin = pd*2
       local navbar_margin = ps*2
-      Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n', p_margin, p_margin))
-      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; }\n', display_margin, display_margin))
+      Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
+        p_margin, p_margin))
+      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; }\n',
+        display_margin, display_margin))
       Css_stream:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
-      Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n', navbar_margin, navbar_margin))
-      Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n', display_margin, display_margin))
+      Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
+        navbar_margin, navbar_margin))
+      Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n',
+        display_margin, display_margin))
     end
   end
   if Single_output_page_p then

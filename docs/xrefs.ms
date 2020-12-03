@@ -1,4 +1,4 @@
-.\" last modified 2020-12-01
+.\" last modified 2020-12-03
 .SH 1
 4. Cross-references
 .LP
@@ -34,6 +34,7 @@ of the current page number.
 .PP
 .IX pca-toc.tmac, macro file
 .IX table of contents
+.IX ToC@.ToC, macro
 The
 macro file \fCpca-toc.tmac\fP supplies a \fC.ToC\fP macro
 for automatic generation of a table of contents. This can be used

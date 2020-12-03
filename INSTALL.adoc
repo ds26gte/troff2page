@@ -27,21 +27,12 @@ files to your home directory.
 NOTE: `mpca` is available on its own from
       https://github.com/ds26gte/mpca.
 
-troff2page also includes the `mpca-t2p` directory which contains
-modifications of the `mpca` macro files that are appropriate for
-HTML conversion. While you don't need to load them explicitly,
-you need them available in your `GROFF_TMAC_PATH`. Do the same
-with this directory as you did with the `mpca` directory.
-
-These `*.tmac` files from `mpca` and `mpca-t2p`, while generally
-useful, are specifically needed to typeset the troff2page
-documentation, which is provided in `docs/index.ms`. If you don’t
-need these macros for anything other than processing `index.ms`,
-you may make do by copying these files to the directory
-containing `index.ms`.
-
-The `pca-t2p-*.tmac` are used only by `troff2page`, never by
-`groff`. The other `pca*.tmac` are used by both.
+These `*.tmac` files from `mpca`, while generally useful, are
+specifically needed to typeset the troff2page documentation,
+which is provided in `docs/index.ms`. If you don’t need these
+macros for anything other than processing `index.ms`, you may
+make do by copying these files to the directory containing
+`index.ms`.
 
 == Man page
 
