@@ -1,4 +1,4 @@
-.\" last modified 2020-12-02
+.\" last modified 2020-12-04
 .SH 1
 1. Introduction
 .LP
@@ -184,7 +184,7 @@ not\fP disable the autoloading of \fC.troff2pagerc\fP.
 .PP
 (Note that groff itself will \fInot\fP load either \fC.troff2pagerc\fP or
 \fCjobname.t2p\fP automatically.  But that is presumably OK, since
-these files presumably contain information that’s relevant
+these files typically contain information that’s relevant
 for HTML only.)
 .PP
 .IX man.local, -man init file

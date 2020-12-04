@@ -40,7 +40,7 @@ function with_input_from_string(s, fn)
   local i = io.open(f)
   local res = fn(i)
   i:close()
-  --os.remove(f)
+  os.remove(f)
   return res
 end
 
@@ -52,7 +52,7 @@ function with_output_to_string(fn)
   local i = io.open(f)
   local res = i:read('*a')
   i:close()
-  --os.remove(f)
+  os.remove(f)
   --print('wots retng', res)
   return res
 end
@@ -85,7 +85,7 @@ function make_string_output_stream()
     local i = io.open(f)
     local res = i:read('*a')
     i:close()
-    --os.remove(f)
+    os.remove(f)
     return res
   end
   return s
@@ -973,9 +973,6 @@ function link_stylesheets()
     emit_verbatim '" title=default>'
     emit_newline()
   end
-  --print('II')
-  start_css_file(css_file)
-  --print('III')
   for _,css in pairs(Stylesheets) do
     emit_verbatim '<link rel="stylesheet" href="'
     emit_verbatim(css)
@@ -992,7 +989,9 @@ function link_scripts()
   end
 end
 
-function start_css_file(css_file)
+function initialize_css_file(css_file)
+  --print('doing initialize_css_file', css_file)
+  local css_file = Jobname..Css_file_suffix
   ensure_file_deleted(css_file)
   Css_stream = io.open(css_file, 'w')
   Css_stream:write([[
@@ -1096,6 +1095,9 @@ function start_css_file(css_file)
 
   .troffbox {
     background-color: #fffef7;
+    border-style: solid;
+    border-color: #e6e6e6;
+    border-width: 1px;
   }
 
   .navigation {
@@ -2284,7 +2286,7 @@ end
 
 
 function eval_in_lua(tbl)
---  print('doing eval_in_lua')
+  --print('doing eval_in_lua', table_to_string(tbl))
   local tmpf = os.tmpname()
   local o = io.open(tmpf, 'w')
   for i=1,#tbl do
@@ -2292,7 +2294,7 @@ function eval_in_lua(tbl)
   end
   o:close()
   dofile(tmpf)
-  --os.remove(tmpf)
+  os.remove(tmpf)
 end
 
 
@@ -2518,6 +2520,7 @@ function begin_html_document()
   initialize_numregs()
   initialize_strings()
   initialize_macros()
+  initialize_css_file()
 
   Convert_to_info_p = false
 
@@ -3053,7 +3056,9 @@ function initialize_macros()
     function()
       local contents = collect_macro_body('collecting_ig', ender)
       if ender == '##' then
+        --print('ig## of ', table_to_string(contents))
         eval_in_lua(contents)
+        --print('ig## done')
       end
     end)
   end)
@@ -3767,7 +3772,7 @@ function initialize_macros()
   end)
 
   defrequest('TAG', function()
-    --    print('doing TAG')
+    --print('doing TAG')
     local node, tag_value = read_args()
     --    print('args=', table_to_string(args))
     node = 'TAG:' .. node
@@ -3779,7 +3784,7 @@ function initialize_macros()
     emit_newline()
     nb_node(node, pageno, tag_value)
     write_aux('nb_node("', node, '",', pageno, ',', tag_value, ')')
-    --    print('TAG done')
+    --print('TAG done')
   end)
 
   defrequest('ULS', function()

@@ -1,4 +1,4 @@
-.\" last modified 2020-12-03
+.\" last modified 2020-12-04
 .SH 1
 7. Extending troff using Lua
 .LP
@@ -81,6 +81,9 @@ We could run troff2page on the same document, \fCtau.ms\fP, and the
 resulting \fCtau.html\fP will show the same content.
 .PP
 .IX extending troff and troff2page differently with Lua
+.IX if@.if, troff request
+.IX ie@.ie, troff request
+.IX el@.el, troff request
 Furthermore, we can embed  \fC.eval\fP-enclosed Lua code inside an
 \fC.if\fP (or \fC.ie\fP or \fC.el\fP) statement so that it gets executed
 only for troff or only for troff2page.  (Recall we used the number register
@@ -191,11 +194,13 @@ The color name \fCvenetianred\fP can now be used like any other groff color name
 This produces:
 .PP
 .B1
+.sp
 .RS
 Prismacolor’s burnt ochre pencil is a close match for Derwent’s
 \fB\m[venetianred]Venetian red\m[]\fP, and either can be used to
 emulate the sanguine chalk drawings of the Old Masters.
 .RE
+.sp
 .B2
 .PP
 .SH 2
@@ -253,7 +258,7 @@ write out style information.  The user can also write to this stream, e.g.,
     .ig ##
     Css_stream:write([[
         h1,h2,h3,h4,h5,h6 {
-            color: rgb(61,35,39); /* chocolate */
+            color: #9b3d3d; /* terracotta pink */
         }
     ]])
     .##
@@ -261,17 +266,17 @@ write out style information.  The user can also write to this stream, e.g.,
 .ig ##
     Css_stream:write([[
         h1,h2,h3,h4,h5,h6 {
-            color: rgb(61,35,39); /* chocolate */
+            color: #9b3d3d; /* terracotta pink */
         }
     ]])
 .##
 This sets the HTML headers
 with a foreground color
-of chocolate.\**
+of \m[terracottapink]terracotta pink\m[].\**
 .FS
 The RGB values used in this manual for
-the colors chocolate,
-terracotta pink,
-and Venetian red are all courtesy \*[url \
+the colors
+terracotta pink
+and Venetian red are courtesy \*[url \
 https://www.resene.co.nz/swatches]Resene Paints\&.
 .FE

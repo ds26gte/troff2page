@@ -1,4 +1,4 @@
-.\" last modified 2020-12-03
+.\" last modified 2020-12-04
 .SH 1
 2. troff and troff2page commands
 .LP
@@ -162,7 +162,7 @@ resolve the aux files. This is exactly analogous to calling
 \fCgroff\fP twice on the same document to resolve aux files.
 .PP
 .TAG auxf
-.IX auxiliary files, naming of
+.IX auxiliary files!naming of
 .IX troff2page@.troff2page, number register
 The groff string \fC\e*[AUXF]\fP is used to construct the
 names of the

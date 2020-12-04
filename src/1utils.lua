@@ -1,4 +1,4 @@
--- last modified 2020-12-01
+-- last modified 2020-12-03
 
 if not table.unpack then
   table.unpack = unpack
@@ -32,7 +32,7 @@ function with_input_from_string(s, fn)
   local i = io.open(f)
   local res = fn(i)
   i:close()
-  --os.remove(f)
+  os.remove(f)
   return res
 end
 
@@ -44,7 +44,7 @@ function with_output_to_string(fn)
   local i = io.open(f)
   local res = i:read('*a')
   i:close()
-  --os.remove(f)
+  os.remove(f)
   --print('wots retng', res)
   return res
 end
@@ -77,7 +77,7 @@ function make_string_output_stream()
     local i = io.open(f)
     local res = i:read('*a')
     i:close()
-    --os.remove(f)
+    os.remove(f)
     return res
   end
   return s

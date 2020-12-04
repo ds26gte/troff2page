@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2020-12-03
 
 function write_aux(...)
   Aux_stream:write(...)
@@ -11,6 +11,7 @@ function begin_html_document()
   initialize_numregs()
   initialize_strings()
   initialize_macros()
+  initialize_css_file()
 
   Convert_to_info_p = false
 

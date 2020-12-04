@@ -141,7 +141,9 @@ function initialize_macros()
     function()
       local contents = collect_macro_body('collecting_ig', ender)
       if ender == '##' then
+        --print('ig## of ', table_to_string(contents))
         eval_in_lua(contents)
+        --print('ig## done')
       end
     end)
   end)
@@ -855,7 +857,7 @@ function initialize_macros()
   end)
 
   defrequest('TAG', function()
-    --    print('doing TAG')
+    --print('doing TAG')
     local node, tag_value = read_args()
     --    print('args=', table_to_string(args))
     node = 'TAG:' .. node
@@ -867,7 +869,7 @@ function initialize_macros()
     emit_newline()
     nb_node(node, pageno, tag_value)
     write_aux('nb_node("', node, '",', pageno, ',', tag_value, ')')
-    --    print('TAG done')
+    --print('TAG done')
   end)
 
   defrequest('ULS', function()

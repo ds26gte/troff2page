@@ -1,4 +1,4 @@
-.\" last modified 2020-12-02
+.\" last modified 2020-12-04
 .SH 1
 3. Page layout
 .LP
@@ -10,6 +10,7 @@ one.  \fC.bp\fP causes a page-break in both the HTML and the print outputs.
 .TAG cond-bp
 .IX conditional for troff2page versus troff
 .IX troff2page@.troff2page, number register
+.IX if@.if, troff request
 Generally, page-breaks require a different aesthetic in HTML than in
 print.  You can use troff conditionals to express this difference:
 .EX
@@ -38,7 +39,7 @@ that translates differently with different versions of troff2page.
 .PP
 .IX p@.p, number register
 If you’d prefer to stick to known groff registers, the read-only
-page-length register \fC\en[.p]\fP is a possibility. groff sets
+paper-length register \fC\en[.p]\fP is a possibility. groff sets
 it to 11 inches, i.e., the length of a US Letter size paper.
 Presumably it could vary depending on country of use, but it is
 never 0. troff2page, since it doesn't deal in paper, sets

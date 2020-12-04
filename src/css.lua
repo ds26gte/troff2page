@@ -17,9 +17,6 @@ function link_stylesheets()
     emit_verbatim '" title=default>'
     emit_newline()
   end
-  --print('II')
-  start_css_file(css_file)
-  --print('III')
   for _,css in pairs(Stylesheets) do
     emit_verbatim '<link rel="stylesheet" href="'
     emit_verbatim(css)
@@ -36,7 +33,9 @@ function link_scripts()
   end
 end
 
-function start_css_file(css_file)
+function initialize_css_file(css_file)
+  --print('doing initialize_css_file', css_file)
+  local css_file = Jobname..Css_file_suffix
   ensure_file_deleted(css_file)
   Css_stream = io.open(css_file, 'w')
   Css_stream:write([[
@@ -140,6 +139,9 @@ function start_css_file(css_file)
 
   .troffbox {
     background-color: #fffef7;
+    border-style: solid;
+    border-color: #e6e6e6;
+    border-width: 1px;
   }
 
   .navigation {
