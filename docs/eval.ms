@@ -7,7 +7,7 @@
 .IX endeval@.endeval, macro
 .IX pca-eval.tmac, macro file
 To invoke Lua from troff, we use the macro \fC.eval\fP with its closer
-\fC.endeval\fP.   These are
+\fC.endeval\fP. These are
 defined in the
 supplied
 troff macro file \fCpca-eval.tmac\fP, which you should put

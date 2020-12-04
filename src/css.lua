@@ -1,4 +1,4 @@
--- last modified 2020-12-03
+-- last modified 2020-12-05
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -133,6 +133,10 @@ function initialize_css_file(css_file)
     font-family: serif;
   }
 
+  .display.verbatim {
+    background-color: #f7f7f8;
+  }
+
   .verbatim em {
     font-family: serif;
   }
@@ -238,6 +242,7 @@ function collect_css_info_from_preamble()
   local p_i = raw_counter_value 'PI'
   local pd = raw_counter_value 'PD'
   local ll = raw_counter_value 'LL'
+  local dd = raw_counter_value 'DD'
   if ps ~= 10 then
     Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
@@ -252,18 +257,18 @@ function collect_css_info_from_preamble()
     end
     if pd >= 0 then
       local p_margin = pd
-      local display_margin = pd*2
+      local display_margin = dd*2
       local fnote_rule_margin = pd*2
       local navbar_margin = ps*2
       Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
         p_margin, p_margin))
-      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; }\n',
-        display_margin, display_margin))
+      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; padding-top: %spx; padding-bottom: %spx; }\n',
+        display_margin, display_margin, display_margin, display_margin))
+      Css_stream:write(string.format('\n.display.verbatim { padding-left: %spx; }',
+        display_margin))
       Css_stream:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
       Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
         navbar_margin, navbar_margin))
-      Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n',
-        display_margin, display_margin))
     end
   end
   if Single_output_page_p then

@@ -53,7 +53,7 @@ respectively. troff2page sets these too, splitting the value of
 \fC\en[.troff2page]\fP between month and day. Thus the troff2page
 released on 2020 December 2 sets \fC\en[.troff2page]\fP to 20201202,
 \fC\en[.x]\fP to 202012, and
-\fC\en[.y]\fP to 2. Note these are all numbers (not strings), so
+\fC\en[.y]\fP to 2. These are all numbers (not strings), so
 there’s no 0-left-padding.
 .FE
 .PP

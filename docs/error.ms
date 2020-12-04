@@ -1,6 +1,6 @@
-.\" last modified 2020-12-03
+.\" last modified 2020-12-04
 .SH 1
-8. Recovery from errors
+9. Recovery from errors
 .LP
 .IX errors
 If troff2page fails on your document, it will display a message giving its

@@ -1,4 +1,4 @@
--- last modified 2020-12-03
+-- last modified 2020-12-05
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -411,13 +411,11 @@ function initialize_macros()
   defrequest('pso', function()
     ignore_spaces()
     os.execute(with_output_to_string(function(o)
-      flet({
-        Turn_off_escape_char_p=true
-      }, function()
+      flet({Turn_off_escape_char_p=true}, function()
         o:write(expand_args(read_troff_line()), ' > ', Pso_temp_file, '\n')
       end)
     end))
-    troff2page_file(Pso_temp_file)
+    troff2page_file(Pso_temp_file, 'dont_check_date')
   end)
 
   defrequest('FS', function()
@@ -454,11 +452,6 @@ function initialize_macros()
     emit_end_para()
     emit_verbatim '</blockquote>\n'
     emit_para()
-  end)
-
-  defrequest('DE', function()
-    read_troff_line()
-    stop_display()
   end)
 
   deftmacro('par@reset', {})
@@ -631,9 +624,8 @@ function initialize_macros()
     --print('doing TH')
     local args = {read_args()}
     --print('TH args=', table.unpack(args))
-    local f = find_macro_file('pca-t2p-man.tmac')
-    if f then
-      troff2page_file(f)
+    local succeeded_p = load_man_defs()
+    if succeeded_p then
       call_redefined_TH(args)
     else
       twarning('TH called outside table')
@@ -660,24 +652,14 @@ function initialize_macros()
     end
   end)
 
-  defrequest('EX', function()
-    --print('doing EX')
-    --read_troff_line()
-    start_display('L')
-    emit(switch_font 'C')
-    Turn_off_escape_char_p = true
-  end)
-
-  defrequest('EE', function()
-    --print('doing EE')
-    --read_troff_line()
-    Escape_char = '\\'
-    Turn_off_escape_char_p = false
-    stop_display()
-  end)
 
   defrequest('ND', function()
     local w = expand_args(read_troff_line())
+    if not Preferred_last_modification_time and
+         Colophon_done_p then
+      flag_missing_piece 'last_modification_time'
+    end
+    Preferred_last_modification_time = w
     defstring('DY', function() return w end)
   end)
 
@@ -1142,7 +1124,9 @@ function initialize_macros()
     --print('MSO ', f)
     if f then f = find_macro_file(f) end
     --print('MSO2 ', f)
-    if f then troff2page_file(f) end
+    if f then
+      troff2page_file(f, 'dont_check_date')
+    end
   end)
 
   defrequest('HX', function()
@@ -1151,6 +1135,11 @@ function initialize_macros()
 
   defrequest('DS', function()
     start_display(read_word())
+  end)
+
+  defrequest('DE', function()
+    read_troff_line()
+    stop_display()
   end)
 
   defrequest('LD', function() start_display 'L' end)
@@ -1205,7 +1194,6 @@ function initialize_macros()
   defrequest('af', function()
     local c, f = read_args()
     c = get_counter_named(c)
-    read_troff_line()
     c.format = f
   end)
 

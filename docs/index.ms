@@ -1,7 +1,5 @@
 .so style.tmac
 .
-.ND 2020-11-16  \"last modified
-.
 .TL
 troff2page
 .AU
@@ -24,6 +22,7 @@ troff2page
 .so genindex.ms
 .so slideshow.ms
 .so eval.ms
+.so styling.ms
 .so error.ms
 .so infodoc.ms
 .so nvimtex.ms

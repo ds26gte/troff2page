@@ -3,12 +3,12 @@
 2. troff and troff2page commands
 .LP
 .IX drop caps in color
-.defcolor terracottapink rgb #9b3d3d
 .DC T ROFF2PAGE terracottapink
 recognizes most of the commands (requests, macros,
 diversions, strings, escapes, glyphs) of raw troff and its
 -ms and -man macro packages, including such rather
-recherché macros as \fC.DC\fP, here used to produce a drop cap
+recherch\('e macros as \fC.DC\fP, here used to produce a drop
+capital
 colored terracotta pink.
 The syntax recognized is the improved kind
 supported by \*[url https://www.gnu.org/software/groff]groff\& and \*[url \
@@ -167,8 +167,13 @@ resolve the aux files. This is exactly analogous to calling
 The groff string \fC\e*[AUXF]\fP is used to construct the
 names of the
 auxiliary files.  By default it
-will be quietly set to \fC.trofftemp\fP for groff and something slightly
-different for troff2page.  You can change it to anything else in
+will be quietly set to “\fC.trofftemp\fP” for groff and something slightly
+different\** for troff2page.
+.FS
+To be precise, “\fC.troff2page_temp_\fP\fIJobname\fP”, where
+\fIJobname\fP is the basename of the main input document file.
+.FE
+You can change it to anything else in
 your document before the first use of any macros that use or
 write aux files.  It is a good idea to set it so that it
 remains

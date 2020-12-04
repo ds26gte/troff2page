@@ -1,4 +1,4 @@
--- last modified 2020-12-01
+-- last modified 2020-12-04
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -47,6 +47,8 @@ Aux_stream = nil
 Blank_line_macro = nil
 Cascaded_if_p = nil
 Cascaded_if_stack = nil
+Check_file_write_date = nil
+Colophon_done_p = nil
 Color_table = nil
 Control_char = nil
 Convert_to_info_p = nil
@@ -78,6 +80,7 @@ Jobname = nil
 Just_after_par_start_p = nil
 Keep_newline_p = nil
 Last_line_had_leading_spaces_p = nil
+Last_modification_time = nil
 Last_page_number = nil
 Leading_spaces_macro = nil
 Leading_spaces_number = nil
@@ -97,6 +100,7 @@ Numreg_table = nil
 Out = nil
 Output_streams = nil
 Outputting_to = nil
+Preferred_last_modification_time = nil
 Previous_line_exec_p = nil
 Pso_temp_file = nil
 Reading_quoted_phrase_p = nil
@@ -109,6 +113,7 @@ Rerun_needed_p = nil
 Saved_escape_char = nil
 Single_output_page_p = nil
 Slides_p = nil
+Source_changed_since_last_time_p = nil
 Sourcing_ascii_file_p = nil
 String_table = nil
 Stylesheets = nil

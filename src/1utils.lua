@@ -1,4 +1,4 @@
--- last modified 2020-12-03
+-- last modified 2020-12-04
 
 if not table.unpack then
   table.unpack = unpack
@@ -150,6 +150,13 @@ function file_extension(f)
     return string.sub(f, dot)
   else return ''
   end
+end
+
+function file_write_date(f)
+  local s = io.popen('stat -c %Y '..f)
+  local t = tonumber(s:read())
+  s:close()
+  return t
 end
 
 function some(f, tbl)

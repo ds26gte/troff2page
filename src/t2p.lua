@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-12-04
 
 function find_macro_file(f)
   --print('doing find_macro_file', f)
@@ -63,22 +63,42 @@ function troff2page_line(s)
   end)
 end
 
-function troff2page_file(f)
+function aux_file_p(f)
+  local AUXF = String_table.AUXF()
+  return (f:sub(1,#AUXF) == AUXF)
+end
+
+function troff2page_file(f, dont_check_write_date)
   --print('troff2page_file of', f)
   if not f or not probe_file(f) then
-    twarning('cannot open %s: No such file or directory', f)
+    twarning('can\'t open %s: No such file or directory', f)
     flag_missing_piece(f)
   else
     flet({
+      Check_file_write_date = Check_file_write_date and
+                              not dont_check_write_date and
+                              not aux_file_p(f),
       File_postlude = false
     }, function()
+      if Check_file_write_date then
+        local t = file_write_date(f)
+        if not Last_modification_time or t>Last_modification_time then
+          Source_changed_since_last_time_p=true
+          Last_modification_time=t
+          if not Preferred_last_modification_time and
+               Colophon_done_p then
+            --print('lmt from', f)
+            flag_missing_piece 'last_modification_time'
+          end
+        end
+      end
       with_open_input_file(f, function(i)
         flet({
           Current_troff_input = make_bstream { stream = i },
           Input_line_no = 0,
           Current_source_file = f
         }, function()
-     --print('calling generate_html from troff2page_file with Out=', Out)
+          --print('calling generate_html from troff2page_file with Out=', Out)
           generate_html {'ex'}
         end)
       end)
@@ -88,4 +108,4 @@ function troff2page_file(f)
     end)
   end
   --print('done troff2page_file', f)
-end 
+end

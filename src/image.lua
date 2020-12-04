@@ -1,4 +1,4 @@
--- last modified 2017-08-28
+-- last modified 2020-12-04
 
 function next_html_image_file_stem()
   Image_file_count = Image_file_count + 1
@@ -15,7 +15,6 @@ function call_with_image_stream(p)
     source_image_file(troff_to_image(img_file_stem))
   end
 end
-
 
 function ps_to_image_png(f)
   local png_file = f .. '.png'
@@ -48,11 +47,11 @@ function source_ascii_file(ascii_file)
   start_display 'I'
   emit(switch_font 'C')
   flet({
-       Turn_off_escape_char_p = true,
-       Sourcing_ascii_file_p = true
-     }, function()
-     troff2page_file(ascii_file)
-   end)
+    Sourcing_ascii_file_p = true,
+    Turn_off_escape_char_p = true
+  }, function()
+    troff2page_file(ascii_file, 'dont_check_date')
+  end)
   stop_display()
 end
 
@@ -88,5 +87,4 @@ function make_image(env, endenv)
     o:write(endenv, '\n')
   end)
 end
-
 

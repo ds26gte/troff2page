@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2020-12-04
 
 function nb_macro_package(m)
   Macro_package = m
@@ -54,4 +54,12 @@ end
 
 function nb_slides()
   Slides_p = true
+end
+
+function nb_last_modification_time(t)
+  Last_modification_time = t
+end
+
+function nb_preferred_last_modification_time(s)
+  Preferred_last_modification_time = s
 end

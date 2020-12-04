@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2020-12-04
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -49,11 +49,10 @@ end
 
 function do_bye()
   --print('doing do_bye')
-  flet({
-       Blank_line_macro = false
-     }, function()
-     emit_blank_line()
-   end)
+  flet({ Blank_line_macro = false }, function()
+    emit_blank_line()
+  end)
+  Check_file_write_date=false
   do_end_macro()
   local pageno = Current_pageno
   nb_last_page_number(pageno)
@@ -80,6 +79,12 @@ function do_bye()
   end
   if Last_page_number == 0 then
     Css_stream:write('.navigation { display: none; }\n')
+  end
+  if Preferred_last_modification_time then
+    write_aux('nb_preferred_last_modification_time(\'', Preferred_last_modification_time, '\')')
+  end
+  if Last_modification_time then
+    write_aux('nb_last_modification_time(', Last_modification_time, ')')
   end
   if Slides_p then
     --print('doing slide setup')

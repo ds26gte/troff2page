@@ -1,0 +1,17 @@
+.SH 1
+Nested .de's
+
+.de me
+.de me modded
+.tm modded me
+.modded
+.tm original me
+..
+
+The original me:
+
+.me
+
+The modded me:
+
+.me

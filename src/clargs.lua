@@ -1,12 +1,26 @@
--- last modified 2020-12-02
+-- last modified 2020-12-05
+
+function load_man_defs()
+  local f = find_macro_file('pca-t2p-man.tmac')
+  if f then
+    troff2page_file(f, 'dont_check_date')
+    return true
+  else
+    return false
+  end
+end
 
 function load_tmac(tmacf)
-  if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
+  if tmacf=='an' or tmacf=='man' then
+    load_man_defs(); return
+  elseif tmacf=='s' or tmacf=='ms' then return
+  elseif tmacf=='www' then return
+  end
   local f = find_macro_file(tmacf .. '.tmac') or find_macro_file('tmac.' .. tmacf)
   if not f then
     tlog('can\'t open %s: No such file or directory\n', tmacf)
   else
-    troff2page_file(f)
+    troff2page_file(f, 'dont_check_date')
   end
 end
 
@@ -55,6 +69,8 @@ function troff2page_1pass(argc, argv)
     Blank_line_macro = false,
     Cascaded_if_p = false,
     Cascaded_if_stack = {},
+    Check_file_write_date = false,
+    Colophon_done_p = false,
     Color_table = {},
     Control_char = '.',
     Css_stream = false,
@@ -82,6 +98,7 @@ function troff2page_1pass(argc, argv)
     Just_after_par_start_p = false,
     Keep_newline_p = true,
     Last_line_had_leading_spaces_p = false,
+    Last_modification_time = false,
     Leading_spaces_macro = false,
     Leading_spaces_number = 0,
     Lines_to_be_centered = 0,
@@ -99,6 +116,7 @@ function troff2page_1pass(argc, argv)
     Out = false,
     Output_streams = {},
     Outputting_to = 'html',
+    Preferred_last_modification_time = false,
     Previous_line_exec_p = false,
     Reading_quoted_phrase_p = false,
     Reading_string_call_p = false,
@@ -109,6 +127,7 @@ function troff2page_1pass(argc, argv)
     Saved_escape_char = false,
     Single_output_page_p = false,
     Slides_p = false,
+    Source_changed_since_last_time_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},
     Stylesheets = {},

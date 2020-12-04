@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201203 -- last modified
+troff2page_version = 20201205 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -160,6 +160,13 @@ function file_extension(f)
   end
 end
 
+function file_write_date(f)
+  local s = io.popen('stat -c %Y '..f)
+  local t = tonumber(s:read())
+  s:close()
+  return t
+end
+
 function some(f, tbl)
   for _,x in ipairs(tbl) do
     local try = f(x)
@@ -283,6 +290,8 @@ Aux_stream = nil
 Blank_line_macro = nil
 Cascaded_if_p = nil
 Cascaded_if_stack = nil
+Check_file_write_date = nil
+Colophon_done_p = nil
 Color_table = nil
 Control_char = nil
 Convert_to_info_p = nil
@@ -314,6 +323,7 @@ Jobname = nil
 Just_after_par_start_p = nil
 Keep_newline_p = nil
 Last_line_had_leading_spaces_p = nil
+Last_modification_time = nil
 Last_page_number = nil
 Leading_spaces_macro = nil
 Leading_spaces_number = nil
@@ -333,6 +343,7 @@ Numreg_table = nil
 Out = nil
 Output_streams = nil
 Outputting_to = nil
+Preferred_last_modification_time = nil
 Previous_line_exec_p = nil
 Pso_temp_file = nil
 Reading_quoted_phrase_p = nil
@@ -345,6 +356,7 @@ Rerun_needed_p = nil
 Saved_escape_char = nil
 Single_output_page_p = nil
 Slides_p = nil
+Source_changed_since_last_time_p = nil
 Sourcing_ascii_file_p = nil
 String_table = nil
 Stylesheets = nil
@@ -507,11 +519,10 @@ end
 
 function do_bye()
   --print('doing do_bye')
-  flet({
-       Blank_line_macro = false
-     }, function()
-     emit_blank_line()
-   end)
+  flet({ Blank_line_macro = false }, function()
+    emit_blank_line()
+  end)
+  Check_file_write_date=false
   do_end_macro()
   local pageno = Current_pageno
   nb_last_page_number(pageno)
@@ -538,6 +549,12 @@ function do_bye()
   end
   if Last_page_number == 0 then
     Css_stream:write('.navigation { display: none; }\n')
+  end
+  if Preferred_last_modification_time then
+    write_aux('nb_preferred_last_modification_time(\'', Preferred_last_modification_time, '\')')
+  end
+  if Last_modification_time then
+    write_aux('nb_last_modification_time(', Last_modification_time, ')')
   end
   if Slides_p then
     --print('doing slide setup')
@@ -568,13 +585,27 @@ function do_bye()
 end
 
 
+function load_man_defs()
+  local f = find_macro_file('pca-t2p-man.tmac')
+  if f then
+    troff2page_file(f, 'dont_check_date')
+    return true
+  else
+    return false
+  end
+end
+
 function load_tmac(tmacf)
-  if tmacf=='ms' or tmacf=='s' or tmacf=='www' then return end
+  if tmacf=='an' or tmacf=='man' then
+    load_man_defs(); return
+  elseif tmacf=='s' or tmacf=='ms' then return
+  elseif tmacf=='www' then return
+  end
   local f = find_macro_file(tmacf .. '.tmac') or find_macro_file('tmac.' .. tmacf)
   if not f then
     tlog('can\'t open %s: No such file or directory\n', tmacf)
   else
-    troff2page_file(f)
+    troff2page_file(f, 'dont_check_date')
   end
 end
 
@@ -623,6 +654,8 @@ function troff2page_1pass(argc, argv)
     Blank_line_macro = false,
     Cascaded_if_p = false,
     Cascaded_if_stack = {},
+    Check_file_write_date = false,
+    Colophon_done_p = false,
     Color_table = {},
     Control_char = '.',
     Css_stream = false,
@@ -650,6 +683,7 @@ function troff2page_1pass(argc, argv)
     Just_after_par_start_p = false,
     Keep_newline_p = true,
     Last_line_had_leading_spaces_p = false,
+    Last_modification_time = false,
     Leading_spaces_macro = false,
     Leading_spaces_number = 0,
     Lines_to_be_centered = 0,
@@ -667,6 +701,7 @@ function troff2page_1pass(argc, argv)
     Out = false,
     Output_streams = {},
     Outputting_to = 'html',
+    Preferred_last_modification_time = false,
     Previous_line_exec_p = false,
     Reading_quoted_phrase_p = false,
     Reading_string_call_p = false,
@@ -677,6 +712,7 @@ function troff2page_1pass(argc, argv)
     Saved_escape_char = false,
     Single_output_page_p = false,
     Slides_p = false,
+    Source_changed_since_last_time_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},
     Stylesheets = {},
@@ -1089,6 +1125,10 @@ function initialize_css_file(css_file)
     font-family: serif;
   }
 
+  .display.verbatim {
+    background-color: #f7f7f8;
+  }
+
   .verbatim em {
     font-family: serif;
   }
@@ -1194,6 +1234,7 @@ function collect_css_info_from_preamble()
   local p_i = raw_counter_value 'PI'
   local pd = raw_counter_value 'PD'
   local ll = raw_counter_value 'LL'
+  local dd = raw_counter_value 'DD'
   if ps ~= 10 then
     Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
@@ -1208,18 +1249,18 @@ function collect_css_info_from_preamble()
     end
     if pd >= 0 then
       local p_margin = pd
-      local display_margin = pd*2
+      local display_margin = dd*2
       local fnote_rule_margin = pd*2
       local navbar_margin = ps*2
       Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
         p_margin, p_margin))
-      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; }\n',
-        display_margin, display_margin))
+      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; padding-top: %spx; padding-bottom: %spx; }\n',
+        display_margin, display_margin, display_margin, display_margin))
+      Css_stream:write(string.format('\n.display.verbatim { padding-left: %spx; }',
+        display_margin))
       Css_stream:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
       Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
         navbar_margin, navbar_margin))
-      Css_stream:write(string.format('\n.colophon { margin-top: %spx; margin-bottom: %spx; }\n',
-        display_margin, display_margin))
     end
   end
   if Single_output_page_p then
@@ -1441,11 +1482,15 @@ end
 
 function start_display(w)
   --print('### doing start_display')
-  local w = troff_align_to_html(w)
-  --print('start_display calling read_troff_line')
-  read_troff_line()
+  w = troff_align_to_html(w)
+  local extra_class = read_args()
   emit_para()
-  emit_verbatim '<div class=display align='
+  emit_verbatim '<div class="display'
+  if extra_class and w ~= 'indent' then
+    emit_verbatim ' '
+    emit_verbatim(extra_class)
+  end
+  emit_verbatim '" align='
   if w == 'block' then
     emit_verbatim 'center'
   elseif w == 'indent' then
@@ -2433,7 +2478,6 @@ function call_with_image_stream(p)
   end
 end
 
-
 function ps_to_image_png(f)
   local png_file = f .. '.png'
   os.execute(Ghostscript .. Ghostscript_options .. ' -sOutputFile=' .. f .. '.ppm.1 ' .. f .. '.ps quit.ps')
@@ -2465,11 +2509,11 @@ function source_ascii_file(ascii_file)
   start_display 'I'
   emit(switch_font 'C')
   flet({
-       Turn_off_escape_char_p = true,
-       Sourcing_ascii_file_p = true
-     }, function()
-     troff2page_file(ascii_file)
-   end)
+    Sourcing_ascii_file_p = true,
+    Turn_off_escape_char_p = true
+  }, function()
+    troff2page_file(ascii_file, 'dont_check_date')
+  end)
   stop_display()
 end
 
@@ -2505,7 +2549,6 @@ function make_image(env, endenv)
     o:write(endenv, '\n')
   end)
 end
-
 
 
 
@@ -2549,6 +2592,8 @@ function begin_html_document()
     it = Jobname .. '.t2p'
     if probe_file(it) then troff2page_file(it) end
   end
+
+  Check_file_write_date=true
 end
 
 
@@ -3326,13 +3371,11 @@ function initialize_macros()
   defrequest('pso', function()
     ignore_spaces()
     os.execute(with_output_to_string(function(o)
-      flet({
-        Turn_off_escape_char_p=true
-      }, function()
+      flet({Turn_off_escape_char_p=true}, function()
         o:write(expand_args(read_troff_line()), ' > ', Pso_temp_file, '\n')
       end)
     end))
-    troff2page_file(Pso_temp_file)
+    troff2page_file(Pso_temp_file, 'dont_check_date')
   end)
 
   defrequest('FS', function()
@@ -3369,11 +3412,6 @@ function initialize_macros()
     emit_end_para()
     emit_verbatim '</blockquote>\n'
     emit_para()
-  end)
-
-  defrequest('DE', function()
-    read_troff_line()
-    stop_display()
   end)
 
   deftmacro('par@reset', {})
@@ -3546,9 +3584,8 @@ function initialize_macros()
     --print('doing TH')
     local args = {read_args()}
     --print('TH args=', table.unpack(args))
-    local f = find_macro_file('pca-t2p-man.tmac')
-    if f then
-      troff2page_file(f)
+    local succeeded_p = load_man_defs()
+    if succeeded_p then
       call_redefined_TH(args)
     else
       twarning('TH called outside table')
@@ -3575,24 +3612,14 @@ function initialize_macros()
     end
   end)
 
-  defrequest('EX', function()
-    --print('doing EX')
-    --read_troff_line()
-    start_display('L')
-    emit(switch_font 'C')
-    Turn_off_escape_char_p = true
-  end)
-
-  defrequest('EE', function()
-    --print('doing EE')
-    --read_troff_line()
-    Escape_char = '\\'
-    Turn_off_escape_char_p = false
-    stop_display()
-  end)
 
   defrequest('ND', function()
     local w = expand_args(read_troff_line())
+    if not Preferred_last_modification_time and
+         Colophon_done_p then
+      flag_missing_piece 'last_modification_time'
+    end
+    Preferred_last_modification_time = w
     defstring('DY', function() return w end)
   end)
 
@@ -4057,7 +4084,9 @@ function initialize_macros()
     --print('MSO ', f)
     if f then f = find_macro_file(f) end
     --print('MSO2 ', f)
-    if f then troff2page_file(f) end
+    if f then
+      troff2page_file(f, 'dont_check_date')
+    end
   end)
 
   defrequest('HX', function()
@@ -4066,6 +4095,11 @@ function initialize_macros()
 
   defrequest('DS', function()
     start_display(read_word())
+  end)
+
+  defrequest('DE', function()
+    read_troff_line()
+    stop_display()
   end)
 
   defrequest('LD', function() start_display 'L' end)
@@ -4120,7 +4154,6 @@ function initialize_macros()
   defrequest('af', function()
     local c, f = read_args()
     c = get_counter_named(c)
-    read_troff_line()
     c.format = f
   end)
 
@@ -4211,6 +4244,7 @@ function initialize_numregs()
   defnumreg('PI', {value = 5*point_equivalent_of 'n'})
   defnumreg('DI', {value = raw_counter_value 'PI'})
   defnumreg('PD', {value = .3*point_equivalent_of 'v'})
+  defnumreg('DD', {value = .5*point_equivalent_of 'v'})
 
   do
     local t = os.date '*t'
@@ -4553,14 +4587,25 @@ end
 function emit_colophon()
   --print('colophon calling eep')
   emit_end_para()
-  emit_verbatim '<div align=right class=colophon>'
-  emit_newline()
-  local it = String_table.DY
-  if it then it = it()
-    if it ~= '' then
-      emit(Last_modified); emit(it); emit_verbatim '<br>\n'
-    end
+  emit_verbatim '<div align=right class=colophon>\n'
+  --
+  local it
+  local timestamp
+  if Preferred_last_modification_time then
+    timestamp = Preferred_last_modification_time
+  elseif Last_modification_time then
+    timestamp = os.date("%a, %Y-%m-%d", Last_modification_time)
+  else
+    it = String_table.DY
+    if it then it=it() end
+    if it ~= '' then timestamp = it end
   end
+  if timestamp and timestamp ~= '' then
+    emit_verbatim '<div align=right class=lastmod>\n'
+    emit(Last_modified); emit(timestamp)
+    emit_verbatim '<br>\n</div>\n'
+  end
+  --
   if true then
     emit_verbatim '<div align=right class=advertisement>\n'
     emit_verbatim(Html_conversion_by)
@@ -4569,10 +4614,10 @@ function emit_colophon()
     emit_verbatim 'troff2page '
     emit_verbatim(troff2page_version)
     emit(link_stop())
-    emit_newline()
-    emit_verbatim '</div>\n'
+    emit_verbatim '\n</div>\n'
   end
   emit_verbatim '</div>\n'
+  Colophon_done_p = true
 end
 
 
@@ -4630,6 +4675,14 @@ end
 
 function nb_slides()
   Slides_p = true
+end
+
+function nb_last_modification_time(t)
+  Last_modification_time = t
+end
+
+function nb_preferred_last_modification_time(s)
+  Preferred_last_modification_time = s
 end
 
 
@@ -5603,7 +5656,7 @@ function switch_size(n)
       local m = tonumber(n)
       n = 10*m
     end
-    n = math.floor(n + 1/2)
+    n = math_round(n)
     if n == 100 then n = false end
   end
   --print('calling switch_style w size=', n)
@@ -5717,22 +5770,42 @@ function troff2page_line(s)
   end)
 end
 
-function troff2page_file(f)
+function aux_file_p(f)
+  local AUXF = String_table.AUXF()
+  return (f:sub(1,#AUXF) == AUXF)
+end
+
+function troff2page_file(f, dont_check_write_date)
   --print('troff2page_file of', f)
   if not f or not probe_file(f) then
-    twarning('cannot open %s: No such file or directory', f)
+    twarning('can\'t open %s: No such file or directory', f)
     flag_missing_piece(f)
   else
     flet({
+      Check_file_write_date = Check_file_write_date and
+                              not dont_check_write_date and
+                              not aux_file_p(f),
       File_postlude = false
     }, function()
+      if Check_file_write_date then
+        local t = file_write_date(f)
+        if not Last_modification_time or t>Last_modification_time then
+          Source_changed_since_last_time_p=true
+          Last_modification_time=t
+          if not Preferred_last_modification_time and
+               Colophon_done_p then
+            --print('lmt from', f)
+            flag_missing_piece 'last_modification_time'
+          end
+        end
+      end
       with_open_input_file(f, function(i)
         flet({
           Current_troff_input = make_bstream { stream = i },
           Input_line_no = 0,
           Current_source_file = f
         }, function()
-     --print('calling generate_html from troff2page_file with Out=', Out)
+          --print('calling generate_html from troff2page_file with Out=', Out)
           generate_html {'ex'}
         end)
       end)
@@ -5742,7 +5815,7 @@ function troff2page_file(f)
     end)
   end
   --print('done troff2page_file', f)
-end 
+end
 
 
 function table_do_global_options()

@@ -1,4 +1,4 @@
--- last modified 2020-12-02
+-- last modified 2020-12-05
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -30,6 +30,7 @@ function initialize_numregs()
   defnumreg('PI', {value = 5*point_equivalent_of 'n'})
   defnumreg('DI', {value = raw_counter_value 'PI'})
   defnumreg('PD', {value = .3*point_equivalent_of 'v'})
+  defnumreg('DD', {value = .5*point_equivalent_of 'v'})
 
   do
     local t = os.date '*t'

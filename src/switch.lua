@@ -1,4 +1,4 @@
--- last modified 2020-12-01
+-- last modified 2020-12-04
 
 function switch_style(opts)
   opts = opts or {}
@@ -189,7 +189,7 @@ function switch_size(n)
       local m = tonumber(n)
       n = 10*m
     end
-    n = math.floor(n + 1/2)
+    n = math_round(n)
     if n == 100 then n = false end
   end
   --print('calling switch_style w size=', n)

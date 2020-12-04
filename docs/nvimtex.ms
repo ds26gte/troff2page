@@ -1,6 +1,6 @@
-.\" last modified 2020-11-17
+.\" last modified 2020-12-04
 .SH 1
-10. Some unusual ways to call troff2page
+11. Some unusual ways to call troff2page
 .LP
 .TAG nvimtex
 troff2page doesn’t need a standalone Lua implementation.

@@ -1,4 +1,4 @@
--- last modified 2020-12-03
+-- last modified 2020-12-04
 
 function write_aux(...)
   Aux_stream:write(...)
@@ -40,4 +40,6 @@ function begin_html_document()
     it = Jobname .. '.t2p'
     if probe_file(it) then troff2page_file(it) end
   end
+
+  Check_file_write_date=true
 end

@@ -1,4 +1,4 @@
--- last modified 2020-12-02
+-- last modified 2020-12-04
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
@@ -96,14 +96,25 @@ end
 function emit_colophon()
   --print('colophon calling eep')
   emit_end_para()
-  emit_verbatim '<div align=right class=colophon>'
-  emit_newline()
-  local it = String_table.DY
-  if it then it = it()
-    if it ~= '' then
-      emit(Last_modified); emit(it); emit_verbatim '<br>\n'
-    end
+  emit_verbatim '<div align=right class=colophon>\n'
+  --
+  local it
+  local timestamp
+  if Preferred_last_modification_time then
+    timestamp = Preferred_last_modification_time
+  elseif Last_modification_time then
+    timestamp = os.date("%a, %Y-%m-%d", Last_modification_time)
+  else
+    it = String_table.DY
+    if it then it=it() end
+    if it ~= '' then timestamp = it end
   end
+  if timestamp and timestamp ~= '' then
+    emit_verbatim '<div align=right class=lastmod>\n'
+    emit(Last_modified); emit(timestamp)
+    emit_verbatim '<br>\n</div>\n'
+  end
+  --
   if true then
     emit_verbatim '<div align=right class=advertisement>\n'
     emit_verbatim(Html_conversion_by)
@@ -112,8 +123,8 @@ function emit_colophon()
     emit_verbatim 'troff2page '
     emit_verbatim(troff2page_version)
     emit(link_stop())
-    emit_newline()
-    emit_verbatim '</div>\n'
+    emit_verbatim '\n</div>\n'
   end
   emit_verbatim '</div>\n'
+  Colophon_done_p = true
 end
