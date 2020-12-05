@@ -1,4 +1,4 @@
--- last modified 2020-12-04
+-- last modified 2020-12-05
 
 function nb_macro_package(m)
   Macro_package = m
@@ -62,4 +62,8 @@ end
 
 function nb_preferred_last_modification_time(s)
   Preferred_last_modification_time = s
+end
+
+function nb_source_changed_since_last_time_p()
+  Source_changed_since_last_time_p = true
 end

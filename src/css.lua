@@ -134,6 +134,7 @@ function initialize_css_file(css_file)
   }
 
   .display.verbatim {
+    overflow: auto;
     background-color: #f7f7f8;
   }
 
@@ -157,6 +158,10 @@ function initialize_css_file(css_file)
 
   .disable {
     color: gray;
+  }
+
+  .footnote {
+    font-size: 90%;
   }
 
   .footnote hr {
@@ -199,6 +204,7 @@ function initialize_css_file(css_file)
   @media screen and (orientation: portrait) and (max-width: 480px),
          screen and (orientation: landscape) and (max-width: 640px) {
     body {
+      max-width: none;
       margin: 5px;
     }
   }
@@ -238,11 +244,11 @@ function initialize_css_file(css_file)
 end
 
 function collect_css_info_from_preamble()
-  local ps = raw_counter_value 'PS'
-  local p_i = raw_counter_value 'PI'
-  local pd = raw_counter_value 'PD'
-  local ll = raw_counter_value 'LL'
-  local dd = raw_counter_value 'DD'
+  local ps = counter_value_in_pixels 'PS'
+  local p_i = counter_value_in_pixels 'PI'
+  local pd = counter_value_in_pixels 'PD'
+  local ll = counter_value_in_pixels 'LL'
+  local dd = counter_value_in_pixels 'DD'
   if ps ~= 10 then
     Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end

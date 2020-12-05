@@ -1,0 +1,10 @@
+.ds todayth \n(dy
+.
+.nr todays_last_digit \n(dy%10
+.
+.ie     \n[todays_last_digit]=1 .as todayth \*{st\*}
+.el .ie \n[todays_last_digit]=2 .as todayth \*{nd\*}
+.el .ie \n[todays_last_digit]=3 .as todayth \*{rd\*}
+.el                             .as todayth \*{th\*}
+.
+Today is the \*[todayth].

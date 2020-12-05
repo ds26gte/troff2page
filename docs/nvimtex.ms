@@ -1,8 +1,10 @@
-.\" last modified 2020-12-04
+.\" last modified 2020-12-05
 .SH 1
 11. Some unusual ways to call troff2page
 .LP
 .TAG nvimtex
+.IX Neovim
+.IX LuaTeX
 troff2page doesn’t need a standalone Lua implementation.
 It
 runs equally well in Lua embedded in other applications, e.g.,
@@ -14,7 +16,6 @@ Calling troff2page from Neovim
 .LP
 .TAG calling_troff2page_from_neovim
 .IX calling troff2page from!Neovim
-.
 One of the merits of using 
 Neovim’s Lua to run \fCtroff2page\fP is the tight integration of
 composing and previewing it offers. You can convert your troff
@@ -28,21 +29,19 @@ To set up, first copy the files \fClua/troff2page.lua\fP and
 \fCtroff2page\fP repo in a \fCpack/\fP subdirectory, somewhere in
 your \fC'runtimepath'\fP or \fC'packpath'\fP.
 .PP
-You now have the Neovim command \fCTroff2page\fP\**
-.FS
-Note capital \fCT\fP! Vim won’t allow
-non-primitive commands to start with a lowercase letter.
-.FE
+You now have the Neovim command \fCTroff2page\fP
 which is called with the same style of arguments 
 as \fCtroff2page\fP, with the following Vim-specific special
 features:
 .PP
-1. The argument \fC%\fP is replaced with the name of the file in
+i. The argument \fC%\fP is replaced with the name of the file in
 the current window (just as for other Vim commands).
 .PP
-2. If called with no argument, the name of the file in the
+ii. If called with no argument, the name of the file in the
 current window is assumed to be the single argument.
 .PP
+(Note the capital \fCT\fP! Vim won’t allow non-primitive commands
+to start with a lowercase letter.)
 .IX neovim-troff2page, script
 The script \fCneovim-troff2page\fP combines all this into a shell
 script that can be used exactly like the regular Lua script. Use

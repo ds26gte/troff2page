@@ -16,7 +16,7 @@ function initialize_numregs()
   defnumreg('.u', {thunk = function() return bool_to_num(not Ev_stack[1].hardlines); end})
   defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
-  defnumreg('lss', {thunk = function() return Leading_spaces_number * point_equivalent_of('n'); end})
+  defnumreg('lss', {thunk = function() return Leading_spaces_number * Gunit.p*2.5; end})
 
   defnumreg('$$', {value = 0xbadc0de})
   defnumreg('.U', {value = 1})
@@ -26,11 +26,13 @@ function initialize_numregs()
   defnumreg('.y', {value = troff2page_version%100})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
-  defnumreg('PS', {value = 10})
-  defnumreg('PI', {value = 5*point_equivalent_of 'n'})
+  defnumreg('PS', {value = 10*Gunit.p})
+  defnumreg('PSINCR', {value = Gunit.p})
+  defnumreg('PI', {value = 5*Gunit.n})
+  defnumreg('PD', {value = .3*Gunit.v})
+  defnumreg('DD', {value = .5*Gunit.v})
+
   defnumreg('DI', {value = raw_counter_value 'PI'})
-  defnumreg('PD', {value = .3*point_equivalent_of 'v'})
-  defnumreg('DD', {value = .5*point_equivalent_of 'v'})
 
   do
     local t = os.date '*t'

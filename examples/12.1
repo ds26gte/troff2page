@@ -1,0 +1,13 @@
+.nr num 3
+.
+.ds nationality French
+.
+.de pear_tree
+List of \\$3 \\$2 \\$1
+..
+.
+.de partridge
+.pear_tree \\$1 \\*[nationality] \\n[num]
+..
+.
+.partridge hens

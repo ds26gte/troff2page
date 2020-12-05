@@ -1,4 +1,4 @@
-.\" last modified 2020-12-04
+.\" last modified 2020-12-05
 .SH 1
 7. Extending troff using Lua
 .LP
@@ -63,17 +63,14 @@ troff:write(2*math.acos(-1), '.\n')
 .RE
 .B2
 .PP
-The first groff call produces a Lua file
-\fC.trofftemp.lua\fP.\**
-.FS
-This name may be different based on
-your setting of \fC\e*[AUXF]\fP — see page \*[TAG:auxf].
-.FE
+The first groff call produces a temp Lua file.
 The second groff
-call invokes Lua to create an auxiliary file for each \fC.eval\fP that gets sourced
-back into the document.
+call invokes Lua on this temp file to create an auxiliary file
+for each \fC.eval\fP, and each \fC.eval\fP sources its assigned
+aux file
+into the document.
 .PP
-It is clear that Lua code via \fC.eval\fP can
+Lua code via \fC.eval\fP can
 serve as a very powerful \fIsecond extension language\fP
 for troff.  This benefit is available even when the document
 is processed by troff2page:
@@ -249,34 +246,3 @@ when troff2page reads it:
 The procedures \fCdefstring\fP, \fClink_start\fP, and
 \fClink_stop\fP are defined in the troff2page code.
 .PP
-.IX stylesheet, modifying
-\fC.ig ##\fP can be used to specify settings that are relevant only
-when troff2page is used on a document, e.g., stylesheet changes.
-troff2page uses the output-stream \fCCss_stream\fP to
-write out style information.  The user can also write to this stream, e.g.,
-.EX
-    .ig ##
-    Css_stream:write([[
-        h1,h2,h3,h4,h5,h6 {
-            color: #9b3d3d; /* terracotta pink */
-        }
-    ]])
-    .##
-.EE
-.ig ##
-    Css_stream:write([[
-        h1,h2,h3,h4,h5,h6 {
-            color: #9b3d3d; /* terracotta pink */
-        }
-    ]])
-.##
-This sets the HTML headers
-with a foreground color
-of \m[terracottapink]terracotta pink\m[].\**
-.FS
-The RGB values used in this manual for
-the colors
-terracotta pink
-and Venetian red are courtesy \*[url \
-https://www.resene.co.nz/swatches]Resene Paints\&.
-.FE

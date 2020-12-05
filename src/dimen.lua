@@ -1,44 +1,63 @@
--- last modified 2017-08-20
+-- last modified 2020-12-05
 
-function point_equivalent_of(indicator)
-  if indicator == 'c' then return point_equivalent_of('i')/2.54
-  elseif indicator == 'i' then return 72
-  elseif indicator == 'm' then return 10
-  elseif indicator == 'v' then return 12
-  elseif indicator == 'M' then return point_equivalent_of('m') * .01
-  elseif indicator == 'n' then return point_equivalent_of('m') * .5
-  elseif indicator == 'p' then return 1
-  elseif indicator == 'P' then return 12
-  elseif indicator == 'u' then return 1
-  else terror('point_equivalent_of: unknown indicator %s', indicator)
-  end
+Gunit = {}
+
+function defunit(w, num)
+  Gunit[w] = num
+end
+
+defunit('u', 1)
+defunit('i', 72000)
+defunit('f', 2^16)
+
+defunit('p', Gunit.i / 72)
+
+defunit('m', Gunit.p * 10)
+
+defunit('M', Gunit.m * .01)
+defunit('P', Gunit.p * 12)
+defunit('c', Gunit.i / 2.54)
+defunit('n', Gunit.m / 2)
+defunit('v', Gunit.p * 12)
+
+Unit_pattern = '[cfiMmnPpuv]'
+
+function point_equivalent_of(u)
+  return Gunit[u]/Gunit.p
 end
 
 function read_number_or_length(unit)
   ignore_spaces()
   local n = read_arith_expr()
   local u = snoop_char()
-  if u == 'c' or u == 'i' or u == 'm' or u == 'n' or u == 'p' or u == 'P' or u == 'v' then
-    get_char(); return math_round(n*point_equivalent_of(u))
-  elseif u == 'f' then
-    get_char(); return math_round((2^16)*n)
-  elseif u == 'u' then
-    get_char(); return n
+  local res
+  if u and string.match(u, Unit_pattern) then
+    get_char(); res = math.floor(n*Gunit[u])
   elseif unit then
-    return n*point_equivalent_of(unit)
-  else return n
+    if string.match(unit, Unit_pattern) then
+      res = math.floor(n*Gunit[unit])
+    else terror('Unknown length indicator %s', unit)
+    end
+  else
+    res = n -- XXX should be floored, I think. Hope not relying on precise value in codebase
   end
+  return res
 end
 
-function read_length_in_pixels()
+function read_length_in_pixels(unit)
   ignore_spaces()
   local n = read_arith_expr()
   local u = snoop_char()
   local res
-  if u == 'c' or u == 'i' or u == 'm' or u == 'n' or u == 'p' or u == 'P' or u == 'u' then
-    get_char(); res= math_round(n*point_equivalent_of(u))
+  if u and string.match(u, Unit_pattern) then
+    get_char(); res = n*Gunit[u] / Gunit.p
+  elseif unit then
+    if string.match(unit, Unit_pattern) then
+      res = n*Gunit[unit] / Gunit.p
+    else terror('Unknown lenght indicator %s', unit)
+    end
   else
-    res= math_round(4.5*n)
+    res = math_round(4.5*n) -- XXX
   end
   --print('read_length_in_pixels ->', res)
   return res

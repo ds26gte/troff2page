@@ -909,6 +909,7 @@ function read_rgb_color()
   return '#'..table.concat(components)
 end
 
+
 function left_zero_pad(n, reqd_length)
   local n = tostring(n)
   local length_so_far = #n
@@ -917,6 +918,7 @@ function left_zero_pad(n, reqd_length)
     for i = 1, reqd_length - length_so_far do
       n = 0 .. n
     end
+    return n
   end
 end
 
@@ -959,6 +961,7 @@ function section_counter_value()
 end
 
 function get_counter_value(c)
+  --print('doing get_counter_value', c)
   local v, f, thk = c.value, c.format, c.thunk
   if thk then
     return tostring(thk()) -- but what if f = 's'
@@ -973,9 +976,9 @@ function get_counter_value(c)
     else return string.char(v + string.byte('a') - 1)
     end
   elseif f == 'I' then
-    return number_to_roman(v)
+    return toroman(v)
   elseif f == 'i' then
-    return number_to_roman(v, true)
+    return toroman(v, 'lowercase')
   elseif tonumber(f) and #f > 1 then
     return left_zero_pad(v, #f)
   else
@@ -985,6 +988,10 @@ end
 
 function raw_counter_value(str)
   return get_counter_named(str).value
+end
+
+function counter_value_in_pixels(str)
+  return raw_counter_value(str)/Gunit.p
 end
 
 function formatted_counter_value(str)
@@ -1126,6 +1133,7 @@ function initialize_css_file(css_file)
   }
 
   .display.verbatim {
+    overflow: auto;
     background-color: #f7f7f8;
   }
 
@@ -1149,6 +1157,10 @@ function initialize_css_file(css_file)
 
   .disable {
     color: gray;
+  }
+
+  .footnote {
+    font-size: 90%;
   }
 
   .footnote hr {
@@ -1191,6 +1203,7 @@ function initialize_css_file(css_file)
   @media screen and (orientation: portrait) and (max-width: 480px),
          screen and (orientation: landscape) and (max-width: 640px) {
     body {
+      max-width: none;
       margin: 5px;
     }
   }
@@ -1230,11 +1243,11 @@ function initialize_css_file(css_file)
 end
 
 function collect_css_info_from_preamble()
-  local ps = raw_counter_value 'PS'
-  local p_i = raw_counter_value 'PI'
-  local pd = raw_counter_value 'PD'
-  local ll = raw_counter_value 'LL'
-  local dd = raw_counter_value 'DD'
+  local ps = counter_value_in_pixels 'PS'
+  local p_i = counter_value_in_pixels 'PI'
+  local pd = counter_value_in_pixels 'PD'
+  local ll = counter_value_in_pixels 'LL'
+  local dd = counter_value_in_pixels 'DD'
   if ps ~= 10 then
     Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
@@ -1423,45 +1436,64 @@ function retrieve_diversion(div)
 end
 
 
-function point_equivalent_of(indicator)
-  if indicator == 'c' then return point_equivalent_of('i')/2.54
-  elseif indicator == 'i' then return 72
-  elseif indicator == 'm' then return 10
-  elseif indicator == 'v' then return 12
-  elseif indicator == 'M' then return point_equivalent_of('m') * .01
-  elseif indicator == 'n' then return point_equivalent_of('m') * .5
-  elseif indicator == 'p' then return 1
-  elseif indicator == 'P' then return 12
-  elseif indicator == 'u' then return 1
-  else terror('point_equivalent_of: unknown indicator %s', indicator)
-  end
+Gunit = {}
+
+function defunit(w, num)
+  Gunit[w] = num
+end
+
+defunit('u', 1)
+defunit('i', 72000)
+defunit('f', 2^16)
+
+defunit('p', Gunit.i / 72)
+
+defunit('m', Gunit.p * 10)
+
+defunit('M', Gunit.m * .01)
+defunit('P', Gunit.p * 12)
+defunit('c', Gunit.i / 2.54)
+defunit('n', Gunit.m / 2)
+defunit('v', Gunit.p * 12)
+
+Unit_pattern = '[cfiMmnPpuv]'
+
+function point_equivalent_of(u)
+  return Gunit[u]/Gunit.p
 end
 
 function read_number_or_length(unit)
   ignore_spaces()
   local n = read_arith_expr()
   local u = snoop_char()
-  if u == 'c' or u == 'i' or u == 'm' or u == 'n' or u == 'p' or u == 'P' or u == 'v' then
-    get_char(); return math_round(n*point_equivalent_of(u))
-  elseif u == 'f' then
-    get_char(); return math_round((2^16)*n)
-  elseif u == 'u' then
-    get_char(); return n
+  local res
+  if u and string.match(u, Unit_pattern) then
+    get_char(); res = math.floor(n*Gunit[u])
   elseif unit then
-    return n*point_equivalent_of(unit)
-  else return n
+    if string.match(unit, Unit_pattern) then
+      res = math.floor(n*Gunit[unit])
+    else terror('Unknown length indicator %s', unit)
+    end
+  else
+    res = n -- XXX should be floored, I think. Hope not relying on precise value in codebase
   end
+  return res
 end
 
-function read_length_in_pixels()
+function read_length_in_pixels(unit)
   ignore_spaces()
   local n = read_arith_expr()
   local u = snoop_char()
   local res
-  if u == 'c' or u == 'i' or u == 'm' or u == 'n' or u == 'p' or u == 'P' or u == 'u' then
-    get_char(); res= math_round(n*point_equivalent_of(u))
+  if u and string.match(u, Unit_pattern) then
+    get_char(); res = n*Gunit[u] / Gunit.p
+  elseif unit then
+    if string.match(unit, Unit_pattern) then
+      res = n*Gunit[unit] / Gunit.p
+    else terror('Unknown lenght indicator %s', unit)
+    end
   else
-    res= math_round(4.5*n)
+    res = math_round(4.5*n) -- XXX
   end
   --print('read_length_in_pixels ->', res)
   return res
@@ -1499,8 +1531,8 @@ function start_display(w)
   end
   if w == 'indent' then
     emit_verbatim ' style="margin-left: '
-    emit_verbatim(raw_counter_value 'DI')
-    emit_verbatim 'ps;"'
+    emit_verbatim(counter_value_in_pixels 'DI')
+    emit_verbatim 'px;"'
   end
   emit_verbatim '>'
   emit_newline()
@@ -2154,18 +2186,20 @@ defescape('n', function()
   local n = read_escaped_word()
   --print('numreg named', n)
   local c = get_counter_named(n)
-  local it
-  it = c.thunk
-  if it then
+  local th = c.thunk
+  if th then
     if sign then
       terror('\\n: cannot set readonly number register %s', n)
     end
-    return tostring(it())
+    return tostring(th())
   else
-    if sign == '+' then
-      c.value = c.value + 1
-    elseif sign == '-' then
-      c.vlaue = c.value - 1
+    if sign then
+      local incr = c.increment or 0
+      if sign == '+' then
+        c.value = c.value + incr
+      elseif sign == '-' then
+        c.value = c.value - incr
+      end
     end
     return get_counter_value(c)
   end
@@ -3456,9 +3490,9 @@ function initialize_macros()
 
   defrequest('sp', function()
     --print('doing sp')
-    local num = read_number_or_length('v')
+    local num = read_length_in_pixels('v')
     read_troff_line()
-    if num == 0 then num = point_equivalent_of('v') end
+    if num == 0 then num = Gunit.v/Gunit.p end
     --print('sp arg is', num)
     emit_para{interleaved_p = true,
       continue_top_ev_p = true,
@@ -3473,7 +3507,7 @@ function initialize_macros()
 
   defrequest('ti', function()
     toss_back_string(expand_args(read_word()))
-    local arg = read_length_in_pixels()
+    local arg = read_length_in_pixels('m')
     read_troff_line()
     if arg>0 then
       emit_verbatim '<br>'
@@ -3484,7 +3518,7 @@ function initialize_macros()
   defrequest('in', function()
     --print('doing in')
     local sign = read_opt_sign()
-    local num = read_number_or_length('m')
+    local num = read_length_in_pixels('m')
     read_troff_line()
     if num then
       if sign=='+' then Margin_left=Margin_left+num
@@ -3612,9 +3646,11 @@ function initialize_macros()
     end
   end)
 
-
   defrequest('ND', function()
     local w = expand_args(read_troff_line())
+    if string.match(w, '^%s+$') then w='' end
+    --io.write('ND read ->', w, '<-')
+    --print('ND arg?=', not not w)
     if not Preferred_last_modification_time and
          Colophon_done_p then
       flag_missing_piece 'last_modification_time'
@@ -4143,16 +4179,22 @@ function initialize_macros()
     if c.thunk then terror("nr: can't set readonly number register %s", n) end
     local sign = read_opt_sign()
     local num = read_number_or_length()
+    local incr = read_number_or_length()
+    --print('doing nr', n, sign, num, incr)
     read_troff_line()
     if not num then return
     elseif sign == '+' then c.value = c.value + num
     elseif sign == '-' then c.value = c.value - num
     else c.value = num
     end
+    if not incr or incr==0 then return
+    else c.increment = incr
+    end
   end)
 
   defrequest('af', function()
     local c, f = read_args()
+    --print('doing .af', c, f)
     c = get_counter_named(c)
     c.format = f
   end)
@@ -4230,7 +4272,7 @@ function initialize_numregs()
   defnumreg('.u', {thunk = function() return bool_to_num(not Ev_stack[1].hardlines); end})
   defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
-  defnumreg('lss', {thunk = function() return Leading_spaces_number * point_equivalent_of('n'); end})
+  defnumreg('lss', {thunk = function() return Leading_spaces_number * Gunit.p*2.5; end})
 
   defnumreg('$$', {value = 0xbadc0de})
   defnumreg('.U', {value = 1})
@@ -4240,11 +4282,13 @@ function initialize_numregs()
   defnumreg('.y', {value = troff2page_version%100})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
-  defnumreg('PS', {value = 10})
-  defnumreg('PI', {value = 5*point_equivalent_of 'n'})
+  defnumreg('PS', {value = 10*Gunit.p})
+  defnumreg('PSINCR', {value = Gunit.p})
+  defnumreg('PI', {value = 5*Gunit.n})
+  defnumreg('PD', {value = .3*Gunit.v})
+  defnumreg('DD', {value = .5*Gunit.v})
+
   defnumreg('DI', {value = raw_counter_value 'PI'})
-  defnumreg('PD', {value = .3*point_equivalent_of 'v'})
-  defnumreg('DD', {value = .5*point_equivalent_of 'v'})
 
   do
     local t = os.date '*t'
@@ -4683,6 +4727,10 @@ end
 
 function nb_preferred_last_modification_time(s)
   Preferred_last_modification_time = s
+end
+
+function nb_source_changed_since_last_time_p()
+  Source_changed_since_last_time_p = true
 end
 
 
@@ -5226,10 +5274,13 @@ function read_args()
   return table.unpack(r)
 end 
 
+
 do 
-  local roman_quanta = { 1000, 500, 100, 50, 10, 5, 1 }
+  local roman_quanta = { 10000, 5000, 1000, 500, 100, 50, 10, 5, 1 }
 
   local roman_digits = {
+    [10000] = { 'z', 1000 },
+    [5000] = { 'w', 1000 },
     [1000] = { 'm', 100 },
     [500] = { 'd', 100 },
     [100] = { 'c', 10 },
@@ -5384,7 +5435,7 @@ function emit_section_header(level, opts)
   if Slides_p and level==1 then do_eject() end
   --
   local this_section_num = opts.secnum
-  local growps = raw_counter_value('GROWPS')
+  local growps = raw_counter_value 'GROWPS'
   --print('emitsectionheader calling eep')
   emit_end_para()
   if opts.numbered_p then
@@ -5414,10 +5465,9 @@ function emit_section_header(level, opts)
       elseif level==2 then emit_verbatim ' class=ss'
       end
     end
-    local psincr_per_level = raw_counter_value 'PSINCR'
-    local ps = 10
-    if psincr_per_level >0 and level < growps then
-      ps = raw_counter_value 'PS'
+    local psincr_per_level = counter_value_in_pixels 'PSINCR'
+    if psincr_per_level >0 and growps >=2 and level < growps then
+      local ps = counter_value_in_pixels 'PS'
       emit_verbatim ' style="font-size: '
       emit_verbatim(math.floor(100*(ps + (growps - level)*psincr_per_level)/ps))
       emit_verbatim '%"'
@@ -5581,6 +5631,7 @@ function switch_font(f)
   elseif f=='I' then f = 'font-style: italic'
   elseif f=='NBI' or f=='NX' then f = 'font-style: italic; font-weight: bold'
   elseif f=='P' then f = 'previous'
+  elseif f=='R' then f = 'font-style: normal'
   else f = false
   end
   --print('f=', f)
@@ -5790,7 +5841,9 @@ function troff2page_file(f, dont_check_write_date)
       if Check_file_write_date then
         local t = file_write_date(f)
         if not Last_modification_time or t>Last_modification_time then
+          --flag_missing_piece 'source_changed_since_last_time'
           Source_changed_since_last_time_p=true
+          write_aux('nb_source_changed_since_last_time_p()')
           Last_modification_time=t
           if not Preferred_last_modification_time and
                Colophon_done_p then
@@ -5969,7 +6022,7 @@ function table_do_cell()
     if width_unit=='' then width_unit='u' end
     --print('width_unit=', width_unit)
     --print('width_num=', width_num)
-    local width_in_px = width_num*point_equivalent_of(width_unit)
+    local width_in_px = width_num*Gunit[width_unit]/Gunit.p
     --print('width_in_px=' , width_in_px)
     cell_style = cell_style .. 'width: ' .. width_in_px .. 'px; '
   end

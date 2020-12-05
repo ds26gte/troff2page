@@ -44,7 +44,8 @@ to get started with using troff2page.
 == System requirements
 
 `troff2page.lua` has been tested on Lua 5.1.5, 5.2.4 and
-5.3.3; LuaJIT 2.0.4; RaptorJIT 1.0.0; and Neovim 0.5.0-dev.
+5.3.3; LuaJIT 2.0.4; RaptorJIT 1.0.0; Neovim 0.5.0-dev; and
+LuaTeX 1.12.0.
 
 NOTE: The branch `lisp` in the troff2page git repository contains
       an implementation in Common Lisp.

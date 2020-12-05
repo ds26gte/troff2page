@@ -1,13 +1,19 @@
-.\" last modified 2020-12-04
+.\" last modified 2020-12-06
 .SH 1
 1. Introduction
 .LP
 .IX troff2page, script
+.IX -man, macro package
+.IX -ms, macro package
+.IX Lua
+.IX troff
 \fCtroff2page\fP is a \*[url https://www.lua.org]Lua\& script that
 makes Web pages from troff manuscripts. It reads an input
 document that is marked up in troff (-man or -ms) and produces an
 output document with the functionally equivalent HTML markup.
 .PP
+.IX TeX
+.IX Info
 Troff is a venerable typesetting program that produces
 high-quality print output from plain text source.
 It doesn’t require
@@ -26,6 +32,7 @@ With a flag, troff2page can also produce an Info version of your
 document that’s suitable for browing on a text terminal (chapter
 \*[TAG:gnuinfo]).
 .PP
+.IX PATH, environment variable
 First,
 ensure that the script \fCtroff2page\fP is in a directory in your
 \fCPATH\fP.
@@ -112,7 +119,7 @@ for troff2page.
 .PP
 Macro file options must be given without the suffix \fC.tmac\fP or prefix
 \fCtmac.\fP. Thus, \fC-mxyz\fP or \fC-m xyz\fP looks for the macro file
-\fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is found in the macro directories,
+\fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is found first in the macro directories,
 and loads it.
 .PP
 If after all the option processing, no file arguments remain, and
@@ -156,8 +163,8 @@ that order. The working directory is a good location if your
 changes are meant only for those
 documents that are in that directory.
 If your changes will be used in all your documents, place it in
-your home or a private \fCGROFF_TMAC_PATH\fP directory.\**
-.FS
+your home or a private \fCGROFF_TMAC_PATH\fP directory.
+.PP
 That your home directory is the last place troff2page looks in
 for \fC.troff2pagerc\fP has a nice benefit: Use
 \fC~/.troff2pagerc\fP for standard boilerplate customization that
@@ -165,7 +172,7 @@ you want unthinkingly autoloaded for \fImost\fP of your
 documents, but easily disable it for the documents that need
 special TLC by simply placing an empty or different
 \fC.troff2pagerc\fP in the local directory.
-.FE
+.PP
 A
 more system-level \fCGROFF_TMAC_PATH\fP placement is typically
 unadvised for such an ad hoc file.
@@ -198,16 +205,15 @@ Calling troff2page from within Lua
 .TAG calling_troff2page_within_lua
 .IX calling troff2page from!Lua
 .
-The script \fCtroff2page\fP runs on the Unix command-line on Cygwin,
-Linux, Mac
-OS X, and Solaris.
+The script \fCtroff2page\fP runs on the command-line on Unix-esque
+machines that have Lua installed.
 For more installation information,
 please see the file \*[url \
 https://github.com/ds26gte/troff2page/blob/master/INSTALL.adoc]INSTALL.adoc\&
 in the distribution.
 .PP
 However, it is not necessary to run the file \fCtroff2page\fP as a
-Unix script.  You can simply load \fCtroff2page.lua\fP (\fCtroff2page\fP is a soft link
+Unix script.  You can load \fCtroff2page.lua\fP (\fCtroff2page\fP is a soft link
 to the Lua file \fCtroff2page.lua\fP) into Lua, and then call the
 Lua procedure \fCtroff2page\fP on your source document.  E.g.,
 .EX

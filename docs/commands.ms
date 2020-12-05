@@ -1,4 +1,4 @@
-.\" last modified 2020-12-04
+.\" last modified 2020-12-05
 .SH 1
 2. troff and troff2page commands
 .LP
@@ -62,15 +62,6 @@ for “Macro Directories” in the groff info file for details.)
 .IX mso@.mso, groff request
 Your input document sources the \fCmpca\fP macro files using
 either the \fC-m\fP command-line option or the \fC.mso\fP request.
-While this is enough for groff, in order for
-troff2page to provide a truly effective HTML translation of
-\fCmpca\fP’s features, it is also necessary to install the
-additional tmac files provided in the subdirectory \fCmpca-t2p\fP.
-Once again, these should go in one of your troff macro
-directories. Note that the \fCmpca-t2p\fP macro files do not need not be
-specially sourced by the document. The \fCmpca\fP macros will
-take care to consult them whenever the document processor is
-recognized as troff2page (i.e., rather than groff).
 .PP
 .SH 2
 Auxiliary files
@@ -126,10 +117,10 @@ changes.)
 troff2page also needs to process the document twice in order to absorb
 information from the aux files. However:
 .PP
-(1) troff2page will automatically do the second processing
+i. troff2page will automatically do the second processing
 without needing the user to explicitly call it a second time; and
 .PP
-(2) troff2page doesn’t need any special option to run in “unsafe”
+ii. troff2page doesn’t need any special option to run in “unsafe”
 mode or to process tables.
 .EX
     % troff2page index.ms
@@ -167,12 +158,10 @@ resolve the aux files. This is exactly analogous to calling
 The groff string \fC\e*[AUXF]\fP is used to construct the
 names of the
 auxiliary files.  By default it
-will be quietly set to “\fC.trofftemp\fP” for groff and something slightly
-different\** for troff2page.
-.FS
-To be precise, “\fC.troff2page_temp_\fP\fIJobname\fP”, where
+will be quietly set to “\fC.trofftemp\fP” for groff and
+“\fC.troff2page_temp_\fP\fIJobname\fP” for troff2page, where
 \fIJobname\fP is the basename of the main input document file.
-.FE
+.PP
 You can change it to anything else in
 your document before the first use of any macros that use or
 write aux files.  It is a good idea to set it so that it

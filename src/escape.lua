@@ -1,4 +1,4 @@
--- last modified 2020-11-30
+-- last modified 2020-12-05
 
 Escape_table = {}
 
@@ -104,18 +104,20 @@ defescape('n', function()
   local n = read_escaped_word()
   --print('numreg named', n)
   local c = get_counter_named(n)
-  local it
-  it = c.thunk
-  if it then
+  local th = c.thunk
+  if th then
     if sign then
       terror('\\n: cannot set readonly number register %s', n)
     end
-    return tostring(it())
+    return tostring(th())
   else
-    if sign == '+' then
-      c.value = c.value + 1
-    elseif sign == '-' then
-      c.vlaue = c.value - 1
+    if sign then
+      local incr = c.increment or 0
+      if sign == '+' then
+        c.value = c.value + incr
+      elseif sign == '-' then
+        c.value = c.value - incr
+      end
     end
     return get_counter_value(c)
   end

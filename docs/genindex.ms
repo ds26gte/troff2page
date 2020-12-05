@@ -1,4 +1,4 @@
-.\" last modified 2020-11-12
+.\" last modified 2020-12-05
 .SH 1
 5. Making an index
 .LP
@@ -36,12 +36,13 @@ E.g.,
 identifies an index entry for “-m, groff option” but alphabetizes
 it as though it were “m” rather than something that starts with a
 hyphen.
+.PP
 .EX
     .IX groff!macro packages
 .EE
 makes “macro packages” an indented index subentry under “groff”.
-.PP
 Up to two \fC!\fPs may be used.
+.PP
 .EX
     .IX groff!macro packages!ms
 .EE
@@ -62,6 +63,7 @@ appear in the index entry as themselves, precede them with
 creates an index entry for “set!car” rather than creating a
 subentry “car” under “set"”.
 .PP
+.IX LaTeX
 Please see the
 makeindex
 documentation for all the details.  Essentially, the syntax for entering

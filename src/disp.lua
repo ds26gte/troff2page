@@ -1,4 +1,4 @@
--- last modified 2020-12-04
+-- last modified 2020-12-05
 
 function troff_align_to_html(i)
   if not i then
@@ -31,8 +31,8 @@ function start_display(w)
   end
   if w == 'indent' then
     emit_verbatim ' style="margin-left: '
-    emit_verbatim(raw_counter_value 'DI')
-    emit_verbatim 'ps;"'
+    emit_verbatim(counter_value_in_pixels 'DI')
+    emit_verbatim 'px;"'
   end
   emit_verbatim '>'
   emit_newline()

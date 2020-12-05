@@ -1,4 +1,4 @@
-# last modified 2020-11-21
+# last modified 2020-12-05
 
 src_files = [!i]*.css *.ms *.tmac
 
@@ -28,4 +28,4 @@ ps: index.ps
 again: clean all
 
 clean:
-	rm -f .troff2page_temp* *-Z-* *.html *.info .trofftemp.ind
+	rm -f .troff2page_temp* index*-Z-* *.html *.info .trofftemp.ind

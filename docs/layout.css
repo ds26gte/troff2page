@@ -1,4 +1,4 @@
-/* last modified 2020-12-04 */
+/* last modified 2020-12-05 */
 
 body {
     max-width: 54em;
@@ -6,10 +6,6 @@ body {
     margin-bottom: 2em;
     margin-left: 4em;
     margin-right: 2em;
-}
-
-.author {
-    font-style: normal;
 }
 
 @media screen {
@@ -26,19 +22,10 @@ body {
         margin-top: 1em;
         margin-bottom: 0.5em;
     }
-}
 
-@media screen and (orientation: portrait) and (max-width: 480px),
-       screen and (orientation: landscape) and (max-width: 640px) {
-    body {
-       max-width: none;
-       margin: 5px;
-    }
-}
-
-@media print {
-    .dontprint {
-        display: none;
+    a:hover {
+        /* color: #333333; */
+        background-color: #fdca01; /* ubuntu yellow */
     }
 }
 
@@ -48,15 +35,9 @@ a {
     border-bottom: 1px dotted;
 }
 
-a:hover {
-    /* color: #333333; */
-    background-color: #fdca01; /* ubuntu yellow */
-}
-
-.title {
+h1.title {
     margin-top: 2em;
     margin-bottom: 2em;
-    text-align: center;
     font-size: 161.8%;
 }
 
@@ -64,32 +45,12 @@ a:hover {
 h1,h2 {
     margin-top: 1.5em;
 }
-*/
-
-.footnotes {
-    margin-top: 2.5em;
-    font-size: 80%;
-}
 
 h1 {
     font-size: 127.2%;
 }
-
-.figure {
-    margin-top: 1em;
-    margin-bottom: 1em;
-}
+*/
 
 .dropcap {
-    line-height: 80%;
-    /* font-size: 410%; */
     font-size: 500%;
-    float: left;
-    padding-right: 5px;
-}
-
-.listing {
-    white-space: nowrap;
-    overflow: auto;
-    background-color: #f7f6f5; /* ubuntu warm gray */
 }

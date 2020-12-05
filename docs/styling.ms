@@ -50,7 +50,7 @@ Asciidoctor-like title:
     ]])
     .##
 .EE
-Of course, these CSS mods don't affect the groff output, but they
+Of course, these CSS mods don’t affect the groff output, but they
 do affect the printed output if you choose 
 to print from the browser! To prevent any CSS mods
 from leaking into the browser-mediated printout, wrap them inside
@@ -62,9 +62,9 @@ Colophon
 .IX colophon
 .IX last-modification time
 By default, troff2page places a colophon at the bottom right of the first
-page. The colophon mentions (1) the last-modification
+page. The colophon mentions (i) the last-modification
 time of the
-the document and (2) the troff2page version used for the conversion.
+the document and (ii) the troff2page version used for the conversion.
 Either or both can be suppressed via CSS.
 .PP
 .IX colophon@.colophon, CSS class
@@ -94,20 +94,19 @@ not.
 .IX DA@.DA, macro
 To specify a document timestamp without regard to the actual mod times
 of the files in it, use the -ms macros \fC.ND\fP or \fC.DA\fP.
-troff2page doesn't distinguish between them, but groff does.\**
-.FS
-See the -ms man page. \fC.ND\fP is probably what you want. groff
-doesn't really have any notion of the last-mod date anyway: It
+troff2page doesn’t distinguish between them, but groff does.
+\fC.ND\fP is probably what you want for both typesetters. (groff
+doesn’t really have any notion of the last-mod date anyway: It
 simply uses the date that it was called. 
-I.e., last-creation-of-printed-output date.
-.FE
+I.e., last-creation-of-printed-output date.)
+.PP
 For web pages, note that if
 either macro is called with an argument, that argument is used as the
 last-mod date, overriding the value that troff2page would
 have determined. 
 .PP
 .IX lastmod@.lastmod, CSS class
-If no argument is given, the colophon doesn't
+If no argument is given, the colophon doesn’t
 include the “Last modified” line at all, something that can also be
 accomplished via the CSS fragment:
 .EX

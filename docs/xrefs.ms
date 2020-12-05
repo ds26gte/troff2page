@@ -1,4 +1,4 @@
-.\" last modified 2020-12-03
+.\" last modified 2020-12-05
 .SH 1
 4. Cross-references
 .LP
@@ -32,6 +32,9 @@ name clashes, don’t start your own tags with two underscores.
 then associated with the text of the second argument instead
 of the current page number.
 .PP
+.SH 2
+ToC
+.LP
 .IX pca-toc.tmac, macro file
 .IX table of contents
 .IX ToC@.ToC, macro
@@ -47,6 +50,20 @@ headers of level \fC\\n[GROWPS]\fP or lower. By default,
 \fCGROWPS\fP is set to 0, so you should set it to at least 1 to see
 a ToC.
 .PP
+.IX PSINCR, number register
+The original purpose of \fCGROWPS\fP was to govern the font-size
+of headers at levels below it, provided it is set to at least 2
+and the register \fC\en[PSINCR]\fP is set (which it is, by
+default, to 10p).
+troff2page respects this too. If you’d rather use CSS to affect
+section-header style, including font-size, but you
+must have \fCGROWPS\fP \(>= 2
+because your ToC requires it, then conditionally set \fCPSINCR\fP
+to 0.
+.EX
+    .if \n[.troff2page] .nr PSINCR 0
+.EE
+.PP
 \fCpca-toc.tmac\fP doesn’t require you to modify how you use your header
 macros (\fC.SH\fP or \fC.NH\fP). It is a solution to the
 following statement from the groff manual:
@@ -56,7 +73,7 @@ is perhaps initially more difficult, but would save a great deal of time
 in the long run if you use ‘ms’ regularly.
 .QE
 .IX pca-t2p-man.tmac, macro file
-troff2page uses the macro file \fCpca-t2p-man.tmac\fP (if it can
+troff2page autoloads the macro file \fCpca-t2p-man.tmac\fP (if it can
 find it in \fCGROFF_TMAC_PATH\fP)
 to automatically generate a ToC for man pages,
 with a ToC entry for each \fC.SH\fP in the input.

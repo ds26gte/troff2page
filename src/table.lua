@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-12-05
 
 function table_do_global_options()
   --print('doing table_do_global_options')
@@ -151,7 +151,7 @@ function table_do_cell()
     if width_unit=='' then width_unit='u' end
     --print('width_unit=', width_unit)
     --print('width_num=', width_num)
-    local width_in_px = width_num*point_equivalent_of(width_unit)
+    local width_in_px = width_num*Gunit[width_unit]/Gunit.p
     --print('width_in_px=' , width_in_px)
     cell_style = cell_style .. 'width: ' .. width_in_px .. 'px; '
   end

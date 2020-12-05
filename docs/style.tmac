@@ -1,4 +1,4 @@
-.\" last change 2020-12-04
+.\" last change 2020-12-05
 .\" Dorai Sitaram
 .
 .ie \n[.X] \{\
@@ -74,13 +74,13 @@
 .\" follg only used by troff2page
 .CSS default.css
 .
+.ds troff2page_version_th \n[.troff2page]
+.
 .nr troff2page_version_last_digit \n[.troff2page]%10
 .
-.ds troff2page_version_suffix th
-.if \n[troff2page_version_last_digit]=1 .ds troff2page_version_suffix st
-.if \n[troff2page_version_last_digit]=2 .ds troff2page_version_suffix nd
-.if \n[troff2page_version_last_digit]=3 .ds troff2page_version_suffix rd
-.
-.ds troff2page_version_th \n[.troff2page]\*{\*[troff2page_version_suffix]\*}
+.ie     \n[troff2page_version_last_digit]=1 .as troff2page_version_th \*{st\*}
+.el .ie \n[troff2page_version_last_digit]=2 .as troff2page_version_th \*{nd\*}
+.el .ie \n[troff2page_version_last_digit]=3 .as troff2page_version_th \*{rd\*}
+.el                                         .as troff2page_version_th \*{th\*}
 .
 .if d troff2page2info .troff2page2info

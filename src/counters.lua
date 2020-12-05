@@ -1,3 +1,5 @@
+-- last modified 2020-12-05
+
 function left_zero_pad(n, reqd_length)
   local n = tostring(n)
   local length_so_far = #n
@@ -6,6 +8,7 @@ function left_zero_pad(n, reqd_length)
     for i = 1, reqd_length - length_so_far do
       n = 0 .. n
     end
+    return n
   end
 end
 
@@ -48,6 +51,7 @@ function section_counter_value()
 end
 
 function get_counter_value(c)
+  --print('doing get_counter_value', c)
   local v, f, thk = c.value, c.format, c.thunk
   if thk then
     return tostring(thk()) -- but what if f = 's'
@@ -62,9 +66,9 @@ function get_counter_value(c)
     else return string.char(v + string.byte('a') - 1)
     end
   elseif f == 'I' then
-    return number_to_roman(v)
+    return toroman(v)
   elseif f == 'i' then
-    return number_to_roman(v, true)
+    return toroman(v, 'lowercase')
   elseif tonumber(f) and #f > 1 then
     return left_zero_pad(v, #f)
   else
@@ -74,6 +78,10 @@ end
 
 function raw_counter_value(str)
   return get_counter_named(str).value
+end
+
+function counter_value_in_pixels(str)
+  return raw_counter_value(str)/Gunit.p
 end
 
 function formatted_counter_value(str)

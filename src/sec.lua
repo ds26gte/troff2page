@@ -1,4 +1,4 @@
--- last modified 2020-11-28
+-- last modified 2020-12-05
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -105,7 +105,7 @@ function emit_section_header(level, opts)
   if Slides_p and level==1 then do_eject() end
   --
   local this_section_num = opts.secnum
-  local growps = raw_counter_value('GROWPS')
+  local growps = raw_counter_value 'GROWPS'
   --print('emitsectionheader calling eep')
   emit_end_para()
   if opts.numbered_p then
@@ -135,10 +135,9 @@ function emit_section_header(level, opts)
       elseif level==2 then emit_verbatim ' class=ss'
       end
     end
-    local psincr_per_level = raw_counter_value 'PSINCR'
-    local ps = 10
-    if psincr_per_level >0 and level < growps then
-      ps = raw_counter_value 'PS'
+    local psincr_per_level = counter_value_in_pixels 'PSINCR'
+    if psincr_per_level >0 and growps >=2 and level < growps then
+      local ps = counter_value_in_pixels 'PS'
       emit_verbatim ' style="font-size: '
       emit_verbatim(math.floor(100*(ps + (growps - level)*psincr_per_level)/ps))
       emit_verbatim '%"'

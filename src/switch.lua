@@ -1,4 +1,4 @@
--- last modified 2020-12-04
+-- last modified 2020-12-05
 
 function switch_style(opts)
   opts = opts or {}
@@ -114,6 +114,7 @@ function switch_font(f)
   elseif f=='I' then f = 'font-style: italic'
   elseif f=='NBI' or f=='NX' then f = 'font-style: italic; font-weight: bold'
   elseif f=='P' then f = 'previous'
+  elseif f=='R' then f = 'font-style: normal'
   else f = false
   end
   --print('f=', f)

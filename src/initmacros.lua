@@ -496,9 +496,9 @@ function initialize_macros()
 
   defrequest('sp', function()
     --print('doing sp')
-    local num = read_number_or_length('v')
+    local num = read_length_in_pixels('v')
     read_troff_line()
-    if num == 0 then num = point_equivalent_of('v') end
+    if num == 0 then num = Gunit.v/Gunit.p end
     --print('sp arg is', num)
     emit_para{interleaved_p = true,
       continue_top_ev_p = true,
@@ -513,7 +513,7 @@ function initialize_macros()
 
   defrequest('ti', function()
     toss_back_string(expand_args(read_word()))
-    local arg = read_length_in_pixels()
+    local arg = read_length_in_pixels('m')
     read_troff_line()
     if arg>0 then
       emit_verbatim '<br>'
@@ -524,7 +524,7 @@ function initialize_macros()
   defrequest('in', function()
     --print('doing in')
     local sign = read_opt_sign()
-    local num = read_number_or_length('m')
+    local num = read_length_in_pixels('m')
     read_troff_line()
     if num then
       if sign=='+' then Margin_left=Margin_left+num
@@ -652,9 +652,11 @@ function initialize_macros()
     end
   end)
 
-
   defrequest('ND', function()
     local w = expand_args(read_troff_line())
+    if string.match(w, '^%s+$') then w='' end
+    --io.write('ND read ->', w, '<-')
+    --print('ND arg?=', not not w)
     if not Preferred_last_modification_time and
          Colophon_done_p then
       flag_missing_piece 'last_modification_time'
@@ -1183,16 +1185,22 @@ function initialize_macros()
     if c.thunk then terror("nr: can't set readonly number register %s", n) end
     local sign = read_opt_sign()
     local num = read_number_or_length()
+    local incr = read_number_or_length()
+    --print('doing nr', n, sign, num, incr)
     read_troff_line()
     if not num then return
     elseif sign == '+' then c.value = c.value + num
     elseif sign == '-' then c.value = c.value - num
     else c.value = num
     end
+    if not incr or incr==0 then return
+    else c.increment = incr
+    end
   end)
 
   defrequest('af', function()
     local c, f = read_args()
+    --print('doing .af', c, f)
     c = get_counter_named(c)
     c.format = f
   end)
