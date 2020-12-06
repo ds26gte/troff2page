@@ -14,6 +14,7 @@ index.info: index.html
 index.ms: $(src_dir)/index.ms
 	test "${USER}" = ds26gte || exit 0; \
 	cp -p $$(dirname $<)/*.css .; \
+	cp -p $$(dirname $<)/*.jpg .; \
 	cp -p $$(dirname $<)/*.ms .; \
 	cp -p $$(dirname $<)/*.tmac .
 

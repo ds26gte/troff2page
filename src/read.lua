@@ -1,38 +1,10 @@
--- last modified 2020-11-20
+-- last modified 2020-12-07
 
 function make_bstream(opts)
   return {
     stream = opts.stream,
     buffer = opts.buffer or {}
   }
-end
-
-function get_char()
-  --print('doing get_char')
-  local buf = Current_troff_input.buffer
-  --print('#buf=', #buf)
-  if #buf > 0 then
-    return table.remove(buf, 1)
-  end
-  local strm = Current_troff_input.stream 
-  if not strm then return false end
-  --print('strm=', strm)
-  local c = strm:read(1)
-  if c then
-    if c == '\r' then
-      c = '\n'
-      local c2 = strm:read(1)
-      if c2 and c2 ~= '\n' then
-        table.insert(buf, 1, c2)
-      end
-    end
-    if c == '\n' then
-      Input_line_no = Input_line_no + 1
-    end
-    return c
-  else
-    return false
-  end
 end
 
 function toss_back_char(c)
@@ -91,7 +63,7 @@ end
 
 function toss_back_line(s)
   --print('toss_back_line ', s)
-  toss_back_char('\n')
+  toss_back_char '\n'
   toss_back_string(s)
 end
 
@@ -271,7 +243,7 @@ function read_troff_string_and_args()
       while true do
         ignore_spaces()
         local c = snoop_char()
-        if not c then terror('read_troff_string_and_args: string too long')
+        if not c then terror 'read_troff_string_and_args: string too long'
         elseif c == '\n' then get_char()
         elseif c == ']' then get_char(); break
         else table.insert(r, expand_args(read_word()))
@@ -478,10 +450,10 @@ function ignore_branch()
     while true do
       c = get_char()
       --print('igb read', c)
-      if not c then terror('ignore_branch: eof')
+      if not c then terror 'ignore_branch: eof'
       elseif c == Escape_char then c = get_char()
         --print('igb read escaped', c)
-        if not c then terror('ignore_branch: escape eof')
+        if not c then terror 'ignore_branch: escape eof'
         elseif c == '}' then nesting=nesting-1; 
           if nesting==0 then break end
         elseif c == '{' then nesting=nesting+1
@@ -502,9 +474,12 @@ function unicode_escape(s)
   if #s == 5 and string.sub(s,1,1) == 'u' then
     local s = string.sub(s,2,-1)
     local n = tonumber('0x' .. s)
-    if n then
-      if n<256 then return string.char(n) end
+    if not n then
       return '??'
+    elseif n<128 then
+      return string.char(n)
+    elseif n==0x29f9 then
+      return string.char(0xe2,0xa7,0xb9)
     end
   end
   return false

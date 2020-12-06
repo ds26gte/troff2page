@@ -1,4 +1,4 @@
-.\" last modified 2020-12-05
+.\" last modified 2020-12-07
 .SH 1
 3. Page layout
 .LP
@@ -114,13 +114,15 @@ never going to be non-positive. troff2page, since it doesn’t deal in paper, se
 .PP
 .IX x@.x, number register
 .IX y@.y, number register
-groff has its own version registers \fC\en(.x\fP
-and \fC\en(.y\fP, which contain the major and minor version numbers
+.IX Y@.Y, number register
+groff has its own version registers \fC\en(.x\fP,
+\fC\en(.y\fP, and \fC\en(.Y\fP, which contain the major and minor version numbers
+and revision number
 respectively. troff2page sets these too, splitting the value of
-\fC\en[.troff2page]\fP between month and day. Thus the troff2page
+\fC\en[.troff2page]\fP between year, month and day. Thus the troff2page
 released on 2020 December 2 sets \fC\en[.troff2page]\fP to 20201202,
-\fC\en(.x\fP to 202012, and
-\fC\en(.y\fP to 2. (These are all numbers (not strings), so
+\fC\en(.x\fP to 2020, and
+\fC\en(.y\fP to 12, and \fC\en(.Y\fP to 2. (These are all numbers (not strings), so
 there’s no 0-left-padding.)
 .PP
 .PP
@@ -135,7 +137,7 @@ lines of paragraphs are indented (unless explicitly disabled via an
 the vertical distance between adjacent paragraphs is the same smallish
 amount that groff employs.  These two values are given by the number
 registers \fCPI\fP and \fCPD\fP, which (for the -ms format) are 0.3n and 0.3v
-respectively.\
+respectively.
 .PP
 If you wish to have the kind of block paragraphs customary in HTML, it
 is not enough to set \fCPI\fP to 0, for the prevailing value of \fCPD\fP is too
@@ -200,6 +202,8 @@ neither metric fish nor Imperial fowl); the underlying scaling
 factor is 1/1000 of the point; and
 the default offsets, margins, and widths are all nice multiples of
 inches.
+.PP
+.IMG inch.jpg 30
 .PP
 Finally, the scaling factor \fCf\fP is simply 2^16, so its
 coefficients can be used as fractions.

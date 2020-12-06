@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-07
 
 function switch_style(opts)
   opts = opts or {}
@@ -126,7 +126,7 @@ function make_span_open(opts)
   --print('doing make_span_open')
   --for k,v in pairs(opts) do print(k,v) end
   if not (opts.font or opts.color or opts.bgcolor or opts.size) then return '' end
-  local semic = verbatim('; ')
+  local semic = verbatim '; '
   local res= verbatim '<span style="' ..
   (opts.font and (verbatim(opts.font) .. semic) or '') ..
   (opts.color and (verbatim(opts.color) .. semic) or '') ..

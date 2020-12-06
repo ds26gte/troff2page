@@ -1,4 +1,4 @@
--- last modified 2020-11-20
+-- last modified 2020-12-07
 
 function defstring(w, th)
   String_table[w] = th
@@ -49,7 +49,7 @@ function initialize_strings()
   end)
 
   defstring('TOC', function()
-    return verbatim('Table of contents')
+    return verbatim 'Table of contents'
   end)
 
   defstring('MONTH1', function()
@@ -101,21 +101,21 @@ function initialize_strings()
   end)
 
   defstring('MO', function()
-    return String_table['MONTH'..get_counter_named('mo').value]()
+    return String_table['MONTH'..get_counter_named 'mo'.value]()
   end)
 
   defstring('DY', function()
-    return verbatim(get_counter_named('dy').value .. ' ' ..
+    return verbatim(get_counter_named 'dy'.value .. ' ' ..
     String_table.MO() .. ' ' ..
-    get_counter_named('year').value)
+    get_counter_named 'year'.value)
   end)
 
   defstring('Q', function()
-    return verbatim('&#x201c')
+    return verbatim '&#x201c'
   end)
 
   defstring('U', function()
-    return verbatim('&#x201d')
+    return verbatim '&#x201d'
   end)
 
   defstring('.T', function()

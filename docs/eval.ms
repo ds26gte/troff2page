@@ -1,4 +1,4 @@
-.\" last modified 2020-12-05
+.\" last modified 2020-12-06
 .SH 1
 7. Extending troff using Lua
 .LP
@@ -115,7 +115,7 @@ https://en.wikipedia.org/wiki/HSL_and_HSV]algorithm\& to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
-.EX
+.EX 1
     .mso pca-eval.tmac
     .
     .eval

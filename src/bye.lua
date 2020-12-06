@@ -1,4 +1,4 @@
--- last modified 2020-12-04
+-- last modified 2020-12-07
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -60,10 +60,10 @@ function do_bye()
   write_aux('nb_last_page_number(', pageno, ')')
   emit_end_page()
   if raw_counter_value 'HTML1' ~= 0 then
-    write_aux('nb_single_output_page()')
+    write_aux 'nb_single_output_page()'
   end
   if Verbatim_apostrophe_p then
-    write_aux('nb_verbatim_apostrophe()')
+    write_aux 'nb_verbatim_apostrophe()'
   end
   --print('nb_macro_package=>', Macro_package, '<=')
   write_aux('nb_macro_package("', Macro_package, '")')

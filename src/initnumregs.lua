@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-07
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -17,13 +17,20 @@ function initialize_numregs()
   defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
   defnumreg('lss', {thunk = function() return Leading_spaces_number * Gunit.p*2.5; end})
+  defnumreg('$$', {thunk = function()
+    local s = io.open '/proc/self/stat'
+    if s then return s:read '*number' else return 0xbadc0de end
+  end})
 
-  defnumreg('$$', {value = 0xbadc0de})
+  defnumreg('.T', {value = 1})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
   defnumreg('.troff2page', {value = troff2page_version})
-  defnumreg('.x', {value = math.floor(troff2page_version/100)})
-  defnumreg('.y', {value = troff2page_version%100})
+  local version_yr = math.floor(troff2page_version/10000)
+  local version_wo_yr = troff2page_version - version_yr*10000
+  defnumreg('.x', {value = version_yr})
+  defnumreg('.y', {value = math.floor(version_wo_yr/100)})
+  defnumreg('.Y', {value = version_wo_yr%100})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
   defnumreg('PS', {value = 10*Gunit.p})
@@ -46,4 +53,4 @@ function initialize_numregs()
     defnumreg('yr', {value = t.year - 1900})
   end
 
-end 
+end

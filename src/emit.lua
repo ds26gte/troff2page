@@ -1,26 +1,33 @@
--- last modified 2020-12-03
+-- last modified 2020-12-07
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
   c = string.sub(s, i, i)
-  if c == '' then --print('rptse nil');
-    return '', i end
+  if c == '' then
+    return '', i
+  end
+  i=i+1
+  if c == '(' then
+    local c1,c2
+    c1 = string.sub(s, i, i)
+    if c1 ~= '' then i=i+1; c2 = s:sub(i,i) end
+    if c2 ~= '' then i=i+1 end
+    return c1..c2, i
+  end
   if c == '[' then
-    i=i+1
-    local r = c
+    local r = ''
     while true do
       c = string.sub(s, i, i)
       --print('rptse of ', c, string.match(c, '%a'), i)
       if c ~= '' then i=i+1 end
       if string.match(c, '%a') then r = r .. c
-      elseif c == ']' then r = r .. c; break
+      elseif c == ']' then break
       else break
       end
     end
-    --print('rptse -> ', r, i)
     return r, i
-  else --print('rptse nil');
-    return '', i
+  else
+    return c, i
   end
 end
 
@@ -47,39 +54,51 @@ function emit(s)
     if c == '' then break end
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
-      -- COMBAK glyph-table lookup of unicode char?
       if c == '\\' then
         --print('emit found \\')
         e, i = read_possible_troff2page_specific_escape(s, i)
-        --print('rptse gave ', e)
-        if e == '[htmllt]' then
+        --print('rptse found escaped ', e)
+        if e == 'htmllt' then
           if Outputting_to == 'title' then
             inside_html_angle_brackets_p = true
-          else Out:write('<') end
-        elseif e == '[htmlgt]' then
+          else Out:write '<' end
+        elseif e == 'htmlgt' then
           if Outputting_to == 'title' then
             inside_html_angle_brackets_p = false
-          else Out:write('>') end
-        elseif e == '[htmlamp]' then Out:write('&')
-        elseif e == '[htmlquot]' then Out:write('"')
-        elseif e == '[htmlbackslash]' then Out:write('\\')
-        elseif e == '[htmlspace]' then Out:write(' ')
-        elseif e == '[htmlnbsp]' then Out:write('&#xa0;')
-        elseif e == '[htmleightnbsp]' then
-          for j=1,8 do Out:write('&#xa0;') end
-        elseif e == '[htmlempty]' then no_op()
-        else Out:write(c, e) end
+          else Out:write '>' end
+        elseif e == 'htmlamp' then Out:write '&'
+        elseif e == 'htmlquot' then Out:write '"'
+        elseif e == 'htmlbackslash' then Out:write '\\'
+        elseif e == 'htmlspace' then Out:write ' '
+        elseif e == 'htmlnbsp' then Out:write '&#xa0;'
+        elseif e == 'htmleightnbsp' then
+          for j=1,8 do Out:write '&#xa0;' end
+        elseif e == 'htmlempty' then no_op()
+        else
+          --print('checking glyphname', e)
+          local g = Glyph_table[e]
+          if g then Out:write(g)
+          else Out:write(c, e)
+          end
+        end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
-      elseif c == '<' then Out:write('&#x3c;')
-      elseif c == '>' then Out:write('&#x3e;')
-      elseif c == '&' then Out:write('&#x26;')
-      elseif c == '"' then Out:write('&#x22;')
+      elseif c == '<' then Out:write '&#x3c;'
+      elseif c == '>' then Out:write '&#x3e;'
+      elseif c == '&' then Out:write '&#x26;'
+      elseif c == '"' then Out:write '&#x22;'
       elseif c == '`' or c == "'" then Out:write(c)
       elseif fillp() then Out:write(c)
       elseif c == ' ' then emit_nbsp(1)
       elseif c == '\t' then emit_nbsp(8)
-      else Out:write(c) end
-    elseif Outputting_to == 'troff' then Out:write(c) end
+      else
+        local g = Unescaped_glyph_table[c]
+        if g then Out:write(g)
+        else Out:write(c)
+        end
+      end
+    elseif Outputting_to == 'troff' then Out:write(c)
+    else terror(0xdeadc0de)
+    end
   end
 end
 
@@ -88,7 +107,7 @@ function emit_verbatim(s)
 end
 
 function emit_newline()
-  Out:write('\n')
+  Out:write '\n'
 end
 
 function emit_nbsp(n)
@@ -274,10 +293,7 @@ end
 
 function emit_blank_line()
   --print('doing emit_blank_line')
-  if Outputting_to == 'troff' then
-    --print('doing EBL I')
-    Keep_newline_p=false; emit_newline()
-  elseif Blank_line_macro then
+  if Blank_line_macro then
     --print('doing EBL II')
     --print('emit_blank_line found Blank_line_macro')
     Keep_newline_p = false
@@ -290,6 +306,9 @@ function emit_blank_line()
     if it then --print('BLM req found');
       toss_back_char('\n'); it(); return
     end
+  elseif Outputting_to == 'troff' then
+    --print('doing EBL I')
+    Keep_newline_p=false; emit_newline()
   else
     --print('doing EBL III')
     if not Just_after_par_start_p then

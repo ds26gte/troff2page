@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-06
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -144,6 +144,7 @@ function troff2page_1pass(argc, argv)
     This_footnote_is_numbered_p = false,
     Title = false,
     Turn_off_escape_char_p = false,
+    Unescaped_glyph_table = {},
     Verbatim_apostrophe_p = false
   }, function()
     begin_html_document()

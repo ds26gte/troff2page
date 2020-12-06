@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-07
 
 do 
   local roman_quanta = { 10000, 5000, 1000, 500, 100, 50, 10, 5, 1 }
@@ -17,7 +17,7 @@ do
 
   function toroman(n, downcasep)
     if not (type(n) == 'number' and math.floor(n) == n and n >= 0) then
-      terror('toroman: Missing number')
+      terror 'toroman: Missing number'
     end
 
     local function approp_case(c) 

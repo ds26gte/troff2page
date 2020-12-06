@@ -13,7 +13,7 @@ document that is marked up in troff (-man or -ms) and produces an
 output document with the functionally equivalent HTML markup.
 .PP
 .IX TeX
-.IX Info
+.IX Info files, generating
 Troff is a venerable typesetting program that produces
 high-quality print output from plain text source.
 It doesn’t require

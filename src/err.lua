@@ -1,4 +1,4 @@
--- last modified 2017-08-16
+-- last modified 2020-12-07
 
 function tlog(...)
   Log_stream:write(string.format(...))
@@ -7,7 +7,7 @@ end
 function twarning(...)
   tlog('%s:%s: ', Current_source_file, Input_line_no)
   tlog(...)
-  tlog('\n')
+  tlog '\n'
 end
 
 function edit_offending_file()
@@ -26,7 +26,7 @@ function terror(...)
   twarning(...)
   close_all_open_streams()
   edit_offending_file()
-  error('troff2page fatal error')
+  error 'troff2page fatal error'
 end 
 
 function flag_missing_piece(mp)

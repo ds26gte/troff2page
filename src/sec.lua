@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-07
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -109,7 +109,7 @@ function emit_section_header(level, opts)
   --print('emitsectionheader calling eep')
   emit_end_para()
   if opts.numbered_p then
-    get_counter_named('nh*hl').value = level
+    get_counter_named 'nh*hl'.value = level
     if not this_section_num then
       increment_section_counter(level)
       this_section_num = section_counter_value()

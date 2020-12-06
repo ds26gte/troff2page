@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-07
 
 function find_macro_file(f)
   --print('doing find_macro_file', f)
@@ -85,7 +85,7 @@ function troff2page_file(f, dont_check_write_date)
         if not Last_modification_time or t>Last_modification_time then
           --flag_missing_piece 'source_changed_since_last_time'
           Source_changed_since_last_time_p=true
-          write_aux('nb_source_changed_since_last_time_p()')
+          write_aux 'nb_source_changed_since_last_time_p()'
           Last_modification_time=t
           if not Preferred_last_modification_time and
                Colophon_done_p then

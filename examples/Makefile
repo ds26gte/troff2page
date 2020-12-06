@@ -1,5 +1,5 @@
-# last modified 2020-11-22
-#
+# last modified 2020-12-07
+
 src_files = $(wildcard ?.1 ??.1)
 
 html_files = $(src_files:%.1=%.html)
@@ -12,4 +12,4 @@ all: $(html_files)
 again: clean all
 
 clean:
-	rm -f $(html_files)
+	rm -f *.html *.pdf *.ps *-Z-*

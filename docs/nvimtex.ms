@@ -1,4 +1,4 @@
-.\" last modified 2020-12-05
+.\" last modified 2020-12-06
 .SH 1
 11. Some unusual ways to call troff2page
 .LP
@@ -42,6 +42,7 @@ current window is assumed to be the single argument.
 .PP
 (Note the capital \fCT\fP! Vim won’t allow non-primitive commands
 to start with a lowercase letter.)
+.PP
 .IX neovim-troff2page, script
 The script \fCneovim-troff2page\fP combines all this into a shell
 script that can be used exactly like the regular Lua script. Use

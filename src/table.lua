@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-07
 
 function table_do_global_options()
   --print('doing table_do_global_options')
@@ -181,7 +181,7 @@ function table_do_cell()
           get_char()
           Inside_table_text_block_p=false
         else
-          toss_back_char('T')
+          toss_back_char 'T'
           more = read_one_line()
           cell_contents = cell_contents .. more .. '\n'
         end

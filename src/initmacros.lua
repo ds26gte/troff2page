@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-07
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -14,7 +14,7 @@ end
 
 function call_ender(ender)
   if not Exit_status and ender and ender ~= '.' then
-    toss_back_char('\n')
+    toss_back_char '\n'
     execute_macro(ender)
   end
 end
@@ -86,10 +86,15 @@ function initialize_macros()
     String_table[w] = nil
   end)
 
+  defrequest('rr', function()
+    local w = read_args()
+    Numreg_table[w] = nil
+  end)
+
   defrequest('blm', function()
     local w = read_args() or false
-    --print('doing blm', w)
-    --print('its a mac=', Macro_table[w])
+    print('doing blm', w)
+    print('its a mac=', Macro_table[w])
     Blank_line_macro = w
   end)
 
@@ -302,13 +307,19 @@ function initialize_macros()
   end)
 
   defrequest('char', function()
+    --print('doing char')
     ignore_spaces()
-    if get_char() ~= Escape_char then terror('char') end
-    local glyph_name = read_escaped_word()
-    local unicode_char = unicode_escape(glyph_name)
-    local s = expand_args(read_troff_string_line())
-    defglyph(unicode_char or glyph_name)
+    local c = get_char()
+    if c == Escape_char then
+      local glyph_name = read_escaped_word()
+      local rhs = expand_args(read_troff_string_line())
+      defglyph(glyph_name, rhs)
+    else
+      local rhs = expand_args(read_troff_string_line())
+      Unescaped_glyph_table[c] = rhs
+    end
   end)
+
 
   defrequest('substring', function()
     local s, n1, n2 = read_args()
@@ -598,7 +609,7 @@ function initialize_macros()
     --print('doing @NH')
     local args = {read_args()}
     --print('args=', table_to_string(args))
-    local lvl = args[1]
+    local lvl = args[1] or 1
     --print('lvl=', lvl)
     if lvl=='S' then
       --print('doing @NH S')
@@ -653,8 +664,8 @@ function initialize_macros()
   end)
 
   defrequest('ND', function()
-    local w = expand_args(read_troff_line())
-    if string.match(w, '^%s+$') then w='' end
+    local w = expand_args(read_troff_string_line())
+    --if string.match(w, '^%s+$') then w='' end
     --io.write('ND read ->', w, '<-')
     --print('ND arg?=', not not w)
     if not Preferred_last_modification_time and
@@ -701,7 +712,7 @@ function initialize_macros()
 
   defrequest('SLIDES', function()
     if not Slides_p then flag_missing_piece 'slides' end
-    write_aux('nb_slides()')
+    write_aux 'nb_slides()'
   end)
 
   defrequest('gcolor', function()
@@ -1056,7 +1067,7 @@ function initialize_macros()
 
   defrequest('do', function()
     ignore_spaces()
-    toss_back_char('.')
+    toss_back_char '.'
   end)
 
   defrequest('nx', function()
@@ -1076,7 +1087,7 @@ function initialize_macros()
   end)
 
   defrequest('ab', function()
-    do_tmc('newline')
+    do_tmc 'newline'
     Exit_status = 'ex'
   end)
 
@@ -1088,6 +1099,15 @@ function initialize_macros()
   defrequest('continue', function()
     read_troff_line()
     Exit_status='continue'
+  end)
+
+  defrequest('pm', function()
+    for k,v in pairs(Macro_table) do
+      io.write(k, '\n')
+    end
+    for k,v in pairs(String_table) do
+      io.write(k, '\n')
+    end
   end)
 
   defrequest('nf', function()
@@ -1132,7 +1152,7 @@ function initialize_macros()
   end)
 
   defrequest('HX', function()
-    get_counter_named('www:HX').value = tonumber(read_args())
+    get_counter_named 'www:HX'.value = tonumber(read_args())
   end)
 
   defrequest('DS', function()

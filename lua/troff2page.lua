@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201205 -- last modified
+troff2page_version = 20201207 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -373,6 +373,7 @@ Temp_string_count = nil
 This_footnote_is_numbered_p = nil
 Title = nil
 Turn_off_escape_char_p = nil
+Unescaped_glyph_table = nil
 Verbatim_apostrophe_p = nil
 
 Single_pass_p = nil
@@ -530,10 +531,10 @@ function do_bye()
   write_aux('nb_last_page_number(', pageno, ')')
   emit_end_page()
   if raw_counter_value 'HTML1' ~= 0 then
-    write_aux('nb_single_output_page()')
+    write_aux 'nb_single_output_page()'
   end
   if Verbatim_apostrophe_p then
-    write_aux('nb_verbatim_apostrophe()')
+    write_aux 'nb_verbatim_apostrophe()'
   end
   --print('nb_macro_package=>', Macro_package, '<=')
   write_aux('nb_macro_package("', Macro_package, '")')
@@ -729,6 +730,7 @@ function troff2page_1pass(argc, argv)
     This_footnote_is_numbered_p = false,
     Title = false,
     Turn_off_escape_char_p = false,
+    Unescaped_glyph_table = {},
     Verbatim_apostrophe_p = false
   }, function()
     begin_html_document()
@@ -1515,12 +1517,12 @@ end
 function start_display(w)
   --print('### doing start_display')
   w = troff_align_to_html(w)
-  local extra_class = read_args()
+  local extra_arg = read_args()
   emit_para()
   emit_verbatim '<div class="display'
-  if extra_class and w ~= 'indent' then
+  if extra_arg and w ~= 'indent' then
     emit_verbatim ' '
-    emit_verbatim(extra_class)
+    emit_verbatim 'verbatim'
   end
   emit_verbatim '" align='
   if w == 'block' then
@@ -1598,24 +1600,31 @@ end
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
   c = string.sub(s, i, i)
-  if c == '' then --print('rptse nil');
-    return '', i end
+  if c == '' then
+    return '', i
+  end
+  i=i+1
+  if c == '(' then
+    local c1,c2
+    c1 = string.sub(s, i, i)
+    if c1 ~= '' then i=i+1; c2 = s:sub(i,i) end
+    if c2 ~= '' then i=i+1 end
+    return c1..c2, i
+  end
   if c == '[' then
-    i=i+1
-    local r = c
+    local r = ''
     while true do
       c = string.sub(s, i, i)
       --print('rptse of ', c, string.match(c, '%a'), i)
       if c ~= '' then i=i+1 end
       if string.match(c, '%a') then r = r .. c
-      elseif c == ']' then r = r .. c; break
+      elseif c == ']' then break
       else break
       end
     end
-    --print('rptse -> ', r, i)
     return r, i
-  else --print('rptse nil');
-    return '', i
+  else
+    return c, i
   end
 end
 
@@ -1642,39 +1651,51 @@ function emit(s)
     if c == '' then break end
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
-      -- COMBAK glyph-table lookup of unicode char?
       if c == '\\' then
         --print('emit found \\')
         e, i = read_possible_troff2page_specific_escape(s, i)
-        --print('rptse gave ', e)
-        if e == '[htmllt]' then
+        --print('rptse found escaped ', e)
+        if e == 'htmllt' then
           if Outputting_to == 'title' then
             inside_html_angle_brackets_p = true
-          else Out:write('<') end
-        elseif e == '[htmlgt]' then
+          else Out:write '<' end
+        elseif e == 'htmlgt' then
           if Outputting_to == 'title' then
             inside_html_angle_brackets_p = false
-          else Out:write('>') end
-        elseif e == '[htmlamp]' then Out:write('&')
-        elseif e == '[htmlquot]' then Out:write('"')
-        elseif e == '[htmlbackslash]' then Out:write('\\')
-        elseif e == '[htmlspace]' then Out:write(' ')
-        elseif e == '[htmlnbsp]' then Out:write('&#xa0;')
-        elseif e == '[htmleightnbsp]' then
-          for j=1,8 do Out:write('&#xa0;') end
-        elseif e == '[htmlempty]' then no_op()
-        else Out:write(c, e) end
+          else Out:write '>' end
+        elseif e == 'htmlamp' then Out:write '&'
+        elseif e == 'htmlquot' then Out:write '"'
+        elseif e == 'htmlbackslash' then Out:write '\\'
+        elseif e == 'htmlspace' then Out:write ' '
+        elseif e == 'htmlnbsp' then Out:write '&#xa0;'
+        elseif e == 'htmleightnbsp' then
+          for j=1,8 do Out:write '&#xa0;' end
+        elseif e == 'htmlempty' then no_op()
+        else
+          --print('checking glyphname', e)
+          local g = Glyph_table[e]
+          if g then Out:write(g)
+          else Out:write(c, e)
+          end
+        end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
-      elseif c == '<' then Out:write('&#x3c;')
-      elseif c == '>' then Out:write('&#x3e;')
-      elseif c == '&' then Out:write('&#x26;')
-      elseif c == '"' then Out:write('&#x22;')
+      elseif c == '<' then Out:write '&#x3c;'
+      elseif c == '>' then Out:write '&#x3e;'
+      elseif c == '&' then Out:write '&#x26;'
+      elseif c == '"' then Out:write '&#x22;'
       elseif c == '`' or c == "'" then Out:write(c)
       elseif fillp() then Out:write(c)
       elseif c == ' ' then emit_nbsp(1)
       elseif c == '\t' then emit_nbsp(8)
-      else Out:write(c) end
-    elseif Outputting_to == 'troff' then Out:write(c) end
+      else
+        local g = Unescaped_glyph_table[c]
+        if g then Out:write(g)
+        else Out:write(c)
+        end
+      end
+    elseif Outputting_to == 'troff' then Out:write(c)
+    else terror(0xdeadc0de)
+    end
   end
 end
 
@@ -1683,7 +1704,7 @@ function emit_verbatim(s)
 end
 
 function emit_newline()
-  Out:write('\n')
+  Out:write '\n'
 end
 
 function emit_nbsp(n)
@@ -1869,10 +1890,7 @@ end
 
 function emit_blank_line()
   --print('doing emit_blank_line')
-  if Outputting_to == 'troff' then
-    --print('doing EBL I')
-    Keep_newline_p=false; emit_newline()
-  elseif Blank_line_macro then
+  if Blank_line_macro then
     --print('doing EBL II')
     --print('emit_blank_line found Blank_line_macro')
     Keep_newline_p = false
@@ -1885,6 +1903,9 @@ function emit_blank_line()
     if it then --print('BLM req found');
       toss_back_char('\n'); it(); return
     end
+  elseif Outputting_to == 'troff' then
+    --print('doing EBL I')
+    Keep_newline_p=false; emit_newline()
   else
     --print('doing EBL III')
     if not Just_after_par_start_p then
@@ -2053,7 +2074,7 @@ end
 function twarning(...)
   tlog('%s:%s: ', Current_source_file, Input_line_no)
   tlog(...)
-  tlog('\n')
+  tlog '\n'
 end
 
 function edit_offending_file()
@@ -2072,7 +2093,7 @@ function terror(...)
   twarning(...)
   close_all_open_streams()
   edit_offending_file()
-  error('troff2page fatal error')
+  error 'troff2page fatal error'
 end 
 
 function flag_missing_piece(mp)
@@ -3008,7 +3029,7 @@ end
 
 function call_ender(ender)
   if not Exit_status and ender and ender ~= '.' then
-    toss_back_char('\n')
+    toss_back_char '\n'
     execute_macro(ender)
   end
 end
@@ -3080,10 +3101,15 @@ function initialize_macros()
     String_table[w] = nil
   end)
 
+  defrequest('rr', function()
+    local w = read_args()
+    Numreg_table[w] = nil
+  end)
+
   defrequest('blm', function()
     local w = read_args() or false
-    --print('doing blm', w)
-    --print('its a mac=', Macro_table[w])
+    print('doing blm', w)
+    print('its a mac=', Macro_table[w])
     Blank_line_macro = w
   end)
 
@@ -3296,13 +3322,19 @@ function initialize_macros()
   end)
 
   defrequest('char', function()
+    --print('doing char')
     ignore_spaces()
-    if get_char() ~= Escape_char then terror('char') end
-    local glyph_name = read_escaped_word()
-    local unicode_char = unicode_escape(glyph_name)
-    local s = expand_args(read_troff_string_line())
-    defglyph(unicode_char or glyph_name)
+    local c = get_char()
+    if c == Escape_char then
+      local glyph_name = read_escaped_word()
+      local rhs = expand_args(read_troff_string_line())
+      defglyph(glyph_name, rhs)
+    else
+      local rhs = expand_args(read_troff_string_line())
+      Unescaped_glyph_table[c] = rhs
+    end
   end)
+
 
   defrequest('substring', function()
     local s, n1, n2 = read_args()
@@ -3592,7 +3624,7 @@ function initialize_macros()
     --print('doing @NH')
     local args = {read_args()}
     --print('args=', table_to_string(args))
-    local lvl = args[1]
+    local lvl = args[1] or 1
     --print('lvl=', lvl)
     if lvl=='S' then
       --print('doing @NH S')
@@ -3647,8 +3679,8 @@ function initialize_macros()
   end)
 
   defrequest('ND', function()
-    local w = expand_args(read_troff_line())
-    if string.match(w, '^%s+$') then w='' end
+    local w = expand_args(read_troff_string_line())
+    --if string.match(w, '^%s+$') then w='' end
     --io.write('ND read ->', w, '<-')
     --print('ND arg?=', not not w)
     if not Preferred_last_modification_time and
@@ -3695,7 +3727,7 @@ function initialize_macros()
 
   defrequest('SLIDES', function()
     if not Slides_p then flag_missing_piece 'slides' end
-    write_aux('nb_slides()')
+    write_aux 'nb_slides()'
   end)
 
   defrequest('gcolor', function()
@@ -4050,7 +4082,7 @@ function initialize_macros()
 
   defrequest('do', function()
     ignore_spaces()
-    toss_back_char('.')
+    toss_back_char '.'
   end)
 
   defrequest('nx', function()
@@ -4070,7 +4102,7 @@ function initialize_macros()
   end)
 
   defrequest('ab', function()
-    do_tmc('newline')
+    do_tmc 'newline'
     Exit_status = 'ex'
   end)
 
@@ -4082,6 +4114,15 @@ function initialize_macros()
   defrequest('continue', function()
     read_troff_line()
     Exit_status='continue'
+  end)
+
+  defrequest('pm', function()
+    for k,v in pairs(Macro_table) do
+      io.write(k, '\n')
+    end
+    for k,v in pairs(String_table) do
+      io.write(k, '\n')
+    end
   end)
 
   defrequest('nf', function()
@@ -4126,7 +4167,7 @@ function initialize_macros()
   end)
 
   defrequest('HX', function()
-    get_counter_named('www:HX').value = tonumber(read_args())
+    get_counter_named 'www:HX'.value = tonumber(read_args())
   end)
 
   defrequest('DS', function()
@@ -4273,13 +4314,20 @@ function initialize_numregs()
   defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
   defnumreg('lss', {thunk = function() return Leading_spaces_number * Gunit.p*2.5; end})
+  defnumreg('$$', {thunk = function()
+    local s = io.open '/proc/self/stat'
+    if s then return s:read '*number' else return 0xbadc0de end
+  end})
 
-  defnumreg('$$', {value = 0xbadc0de})
+  defnumreg('.T', {value = 1})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
   defnumreg('.troff2page', {value = troff2page_version})
-  defnumreg('.x', {value = math.floor(troff2page_version/100)})
-  defnumreg('.y', {value = troff2page_version%100})
+  local version_yr = math.floor(troff2page_version/10000)
+  local version_wo_yr = troff2page_version - version_yr*10000
+  defnumreg('.x', {value = version_yr})
+  defnumreg('.y', {value = math.floor(version_wo_yr/100)})
+  defnumreg('.Y', {value = version_wo_yr%100})
   defnumreg('www:HX', {value = -1})
   defnumreg('GROWPS', {value = 1})
   defnumreg('PS', {value = 10*Gunit.p})
@@ -4302,7 +4350,7 @@ function initialize_numregs()
     defnumreg('yr', {value = t.year - 1900})
   end
 
-end 
+end
 
 
 function defstring(w, th)
@@ -4354,7 +4402,7 @@ function initialize_strings()
   end)
 
   defstring('TOC', function()
-    return verbatim('Table of contents')
+    return verbatim 'Table of contents'
   end)
 
   defstring('MONTH1', function()
@@ -4406,21 +4454,21 @@ function initialize_strings()
   end)
 
   defstring('MO', function()
-    return String_table['MONTH'..get_counter_named('mo').value]()
+    return String_table['MONTH'..get_counter_named 'mo'.value]()
   end)
 
   defstring('DY', function()
-    return verbatim(get_counter_named('dy').value .. ' ' ..
+    return verbatim(get_counter_named 'dy'.value .. ' ' ..
     String_table.MO() .. ' ' ..
-    get_counter_named('year').value)
+    get_counter_named 'year'.value)
   end)
 
   defstring('Q', function()
-    return verbatim('&#x201c')
+    return verbatim '&#x201c'
   end)
 
   defstring('U', function()
-    return verbatim('&#x201d')
+    return verbatim '&#x201d'
   end)
 
   defstring('.T', function()
@@ -4440,6 +4488,85 @@ function initialize_strings()
   defstring('urlh', urlh_string_value)
 
 end
+
+
+B_1000_0000 = 0x80
+B_1100_0000 = 0xc0
+B_1110_0000 = 0xe0
+B_1111_0000 = 0xf0
+B_1111_1000 = 0xf8
+B_0001_1111 = 0x1f
+B_0000_1111 = 0x0f
+B_0000_0111 = 0x07
+B_0011_1111 = 0x3f
+
+function get_char()
+  local buf = Current_troff_input.buffer
+  if #buf > 0 then
+    return table.remove(buf, 1)
+  end
+  local strm = Current_troff_input.stream
+  if not strm then return false end
+  local c = strm:read(1)
+  if not c then return false end
+  if c == '\r' then
+    -- if \r return \n. If a real \n follows, discard it
+    c = '\n'
+    local c2 = strm:read(1)
+    if c2 and c2 ~= '\n' then
+      table.insert(buf, 1, c2)
+    end
+    return c
+  end
+  --
+  --
+  local c1byte = string.byte(c)
+  if c1byte < B_1000_0000 then
+    -- c1byte = 0xxx_xxxx
+    return c
+  end
+  --
+  local ucode
+  if c1byte < B_1110_0000 then
+    -- c1byte = 110x_xxxx
+    local c2byte = string.byte(strm:read(1))
+    --print('c1=', c1byte, 'c2=', c2byte)
+    ucode = ((c1byte & B_0001_1111) << 6) +
+    (         c2byte & B_0011_1111)
+    --
+  elseif c1byte < B_1111_0000 then
+    --     c1byte = 1110_xxxx
+    local c2byte = string.byte(strm:read(1))
+    local c3byte = string.byte(strm:read(1))
+    --print('c1=', c1byte, 'c2=', c2byte, 'c3=', c3byte)
+    ucode = ((c1byte & B_0000_1111) << 12) +
+    (        (c2byte & B_0011_1111) <<  6) +
+    (         c3byte & B_0011_1111)
+    --
+  elseif c1byte < B_1111_1000 then
+    --     c1byte = 1111_0xxx
+    local c2byte = string.byte(strm:read(1))
+    local c3byte = string.byte(strm:read(1))
+    local c4byte = string.byte(strm:read(1))
+    --print('c1=', c1byte, 'c2=', c2byte, 'c3=', c3byte, 'c4=', c4byte)
+    ucode = ((c1byte & B_0000_0111) << 18) +
+    (        (c2byte & B_0011_1111) << 12) +
+    (        (c3byte & B_0011_1111) <<  6) +
+    (         c4byte & B_0011_1111)
+    --
+  else
+    terror 'get_char'
+    return false
+  end
+  --
+  --print(string.format('get_char returned unicode %X\n', ucode))
+  toss_back_string(string.format('[u%X]', ucode))
+  return Escape_char
+end
+
+x = 12
++ 34
+
 
 
 function anchor(lbl)
@@ -4741,34 +4868,6 @@ function make_bstream(opts)
   }
 end
 
-function get_char()
-  --print('doing get_char')
-  local buf = Current_troff_input.buffer
-  --print('#buf=', #buf)
-  if #buf > 0 then
-    return table.remove(buf, 1)
-  end
-  local strm = Current_troff_input.stream 
-  if not strm then return false end
-  --print('strm=', strm)
-  local c = strm:read(1)
-  if c then
-    if c == '\r' then
-      c = '\n'
-      local c2 = strm:read(1)
-      if c2 and c2 ~= '\n' then
-        table.insert(buf, 1, c2)
-      end
-    end
-    if c == '\n' then
-      Input_line_no = Input_line_no + 1
-    end
-    return c
-  else
-    return false
-  end
-end
-
 function toss_back_char(c)
   --io.write('toss_back_char "', c, '"\n')
   table.insert(Current_troff_input.buffer, 1, c)
@@ -4825,7 +4924,7 @@ end
 
 function toss_back_line(s)
   --print('toss_back_line ', s)
-  toss_back_char('\n')
+  toss_back_char '\n'
   toss_back_string(s)
 end
 
@@ -5005,7 +5104,7 @@ function read_troff_string_and_args()
       while true do
         ignore_spaces()
         local c = snoop_char()
-        if not c then terror('read_troff_string_and_args: string too long')
+        if not c then terror 'read_troff_string_and_args: string too long'
         elseif c == '\n' then get_char()
         elseif c == ']' then get_char(); break
         else table.insert(r, expand_args(read_word()))
@@ -5212,10 +5311,10 @@ function ignore_branch()
     while true do
       c = get_char()
       --print('igb read', c)
-      if not c then terror('ignore_branch: eof')
+      if not c then terror 'ignore_branch: eof'
       elseif c == Escape_char then c = get_char()
         --print('igb read escaped', c)
-        if not c then terror('ignore_branch: escape eof')
+        if not c then terror 'ignore_branch: escape eof'
         elseif c == '}' then nesting=nesting-1; 
           if nesting==0 then break end
         elseif c == '{' then nesting=nesting+1
@@ -5236,9 +5335,12 @@ function unicode_escape(s)
   if #s == 5 and string.sub(s,1,1) == 'u' then
     local s = string.sub(s,2,-1)
     local n = tonumber('0x' .. s)
-    if n then
-      if n<256 then return string.char(n) end
+    if not n then
       return '??'
+    elseif n<128 then
+      return string.char(n)
+    elseif n==0x29f9 then
+      return string.char(0xe2,0xa7,0xb9)
     end
   end
   return false
@@ -5292,7 +5394,7 @@ do
 
   function toroman(n, downcasep)
     if not (type(n) == 'number' and math.floor(n) == n and n >= 0) then
-      terror('toroman: Missing number')
+      terror 'toroman: Missing number'
     end
 
     local function approp_case(c) 
@@ -5439,7 +5541,7 @@ function emit_section_header(level, opts)
   --print('emitsectionheader calling eep')
   emit_end_para()
   if opts.numbered_p then
-    get_counter_named('nh*hl').value = level
+    get_counter_named 'nh*hl'.value = level
     if not this_section_num then
       increment_section_counter(level)
       this_section_num = section_counter_value()
@@ -5643,7 +5745,7 @@ function make_span_open(opts)
   --print('doing make_span_open')
   --for k,v in pairs(opts) do print(k,v) end
   if not (opts.font or opts.color or opts.bgcolor or opts.size) then return '' end
-  local semic = verbatim('; ')
+  local semic = verbatim '; '
   local res= verbatim '<span style="' ..
   (opts.font and (verbatim(opts.font) .. semic) or '') ..
   (opts.color and (verbatim(opts.color) .. semic) or '') ..
@@ -5843,7 +5945,7 @@ function troff2page_file(f, dont_check_write_date)
         if not Last_modification_time or t>Last_modification_time then
           --flag_missing_piece 'source_changed_since_last_time'
           Source_changed_since_last_time_p=true
-          write_aux('nb_source_changed_since_last_time_p()')
+          write_aux 'nb_source_changed_since_last_time_p()'
           Last_modification_time=t
           if not Preferred_last_modification_time and
                Colophon_done_p then
@@ -6052,7 +6154,7 @@ function table_do_cell()
           get_char()
           Inside_table_text_block_p=false
         else
-          toss_back_char('T')
+          toss_back_char 'T'
           more = read_one_line()
           cell_contents = cell_contents .. more .. '\n'
         end

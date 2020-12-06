@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-06
 
 function troff_align_to_html(i)
   if not i then
@@ -15,12 +15,12 @@ end
 function start_display(w)
   --print('### doing start_display')
   w = troff_align_to_html(w)
-  local extra_class = read_args()
+  local extra_arg = read_args()
   emit_para()
   emit_verbatim '<div class="display'
-  if extra_class and w ~= 'indent' then
+  if extra_arg and w ~= 'indent' then
     emit_verbatim ' '
-    emit_verbatim(extra_class)
+    emit_verbatim 'verbatim'
   end
   emit_verbatim '" align='
   if w == 'block' then
