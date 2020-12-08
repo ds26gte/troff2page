@@ -1,16 +1,16 @@
-.\" last modified 2020-12-06
+.\" last modified 2020-12-08
 .SH 1
-7. Extending troff using Lua
+7. Extending groff using Lua
 .LP
-.IX extending troff and troff2page with Lua
+.IX extending groff and troff2page with Lua
 .IX eval@.eval, macro
 .IX endeval@.endeval, macro
 .IX pca-eval.tmac, macro file
-To invoke Lua from troff, we use the macro \fC.eval\fP with its closer
+To invoke Lua from groff, we use the macro \fC.eval\fP with its closer
 \fC.endeval\fP. These are
 defined in the
 supplied
-troff macro file \fCpca-eval.tmac\fP, which you should put
+groff macro file \fCpca-eval.tmac\fP, which you should put
 in a macro directory.
 .PP
 \&\fC.eval\fP does only one thing: It
@@ -20,7 +20,7 @@ this Lua code
 is substituted for the \fC.eval\fP ... \fC.endeval\fP.
 The usefulness of this tactic will be apparent from an
 example.
-Consider the following troff document, \fCtau.ms\fP:
+Consider the following groff document, \fCtau.ms\fP:
 .EX
     .mso pca-eval.tmac
     .
@@ -34,7 +34,7 @@ Consider the following troff document, \fCtau.ms\fP:
 .IX unsafe mode
 .IX z@-z, command-line option
 .IX U@-U, command-line option
-Run troff (actually groff, and in unsafe mode too) on \fCtau.ms\fP:
+Run groff in unsafe mode on \fCtau.ms\fP:
 .EX
     groff -z -U -ms tau.ms
 .EE
@@ -72,18 +72,18 @@ into the document.
 .PP
 Lua code via \fC.eval\fP can
 serve as a very powerful \fIsecond extension language\fP
-for troff.  This benefit is available even when the document
+for groff.  This benefit is available even when the document
 is processed by troff2page:
 We could run troff2page on the same document, \fCtau.ms\fP, and the
 resulting \fCtau.html\fP will show the same content.
 .PP
-.IX extending troff and troff2page differently with Lua
-.IX if@.if, troff request
-.IX ie@.ie, troff request
-.IX el@.el, troff request
+.IX extending groff and troff2page differently with Lua
+.IX if@.if, groff request
+.IX ie@.ie, groff request
+.IX el@.el, groff request
 Furthermore, we can embed  \fC.eval\fP-enclosed Lua code inside an
 \fC.if\fP (or \fC.ie\fP or \fC.el\fP) statement so that it gets executed
-only for troff or only for troff2page.  (Recall we used the number register
+only for groff or only for troff2page.  (Recall we used the number register
 \fC\en[.troff2page]\fP for this purpose on page \*[TAG:cond-bp].)  In
 particular, by calling Lua code only for troff2page, the
 user has the
@@ -96,7 +96,7 @@ Note that when troff2page sees
 code, it runs it in a Lua environment that has not only the basic
 Lua language but also includes the procedures and data structures
 defined in troff2page.  These extras are not available (and are arguably
-not useful) to the \fC.eval\fP code seen by troff.
+not useful) to the \fC.eval\fP code seen by groff.
 .PP
 .SH 2
 Defining color names using HSL
@@ -205,7 +205,7 @@ Extending troff2page only
 .LP
 .IX extending troff2page with Lua without producing output
 .IX ig@.ig ##, as troff2page extender
-troff2page treats troff’s \fC.ig\fP
+troff2page treats groff’s \fC.ig\fP
 environment, whenever it uses \fC##\fP as ender, as
 containing Lua code that can be used to extend
 troff2page.  This syntactic overloading of \fC.ig ##\fP is an innovation introduced by
@@ -215,13 +215,13 @@ http://www-rn.informatik.uni-bremen.de/software/unroff]unroff\&.
 Any Lua code enclosed within
 \&\fC.ig ##\fP ... \fC.##\fP will be processed by
 troff2page but not by
-troff, which treats it as a multiline comment of course.
+groff, which treats it as a multiline comment of course.
 Note that \fC.ig ##\fP does not pipe its stdout back into
 the document, as \fC.eval\fP does.  This is to maintain the invariant
 that as far as output is
 concerned, \fC.ig ##\fP, like other \fC.ig\fPs, is \fIalways\fP a
 comment.  However, you can add Lua code within \fC.ig ##\fP
-to influence how troff2page — but not troff! — processes the rest of the
+to influence how troff2page — but not groff! — processes the rest of the
 document.
 .PP
 For example, let’s define a

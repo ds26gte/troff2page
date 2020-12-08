@@ -1,4 +1,4 @@
-.\" last modified 2020-12-07
+.\" last modified 2020-12-08
 .SH 1
 3. Page layout
 .LP
@@ -15,18 +15,18 @@ index page doesn’t exist, it is absent from the bar.
 Page breaks
 .LP
 .IX page breaks
-.IX bp@.bp, troff request
+.IX bp@.bp, groff request
 Multiple pages are created because the document source implicitly or
 explicilty used
 the page-break command \fC.bp\fP.  Each call to \fC.bp\fP ends the current HTML page and start a new
 one.  Thus \fC.bp\fP causes a page-break in both the HTML and the print outputs.
 .PP
 .TAG cond-bp
-.IX conditional for troff2page versus troff
+.IX conditional for troff2page versus groff
 .IX troff2page@.troff2page, number register
-.IX if@.if, troff request
+.IX if@.if, groff request
 Generally, page-breaks require a different \(aesthetic in HTML than in
-print.  You can use troff conditionals to express this difference:
+print.  You can use groff conditionals to express this difference:
 .EX
     .if \n[.troff2page] .bp
 .EE
@@ -48,7 +48,7 @@ only for HTML:
     .if \n[.troff2page] .bp
     ..
 .EE
-Note that troff2page, like troff, does not automatically cause a page break
+Note that troff2page, like groff, does not automatically cause a page break
 at the sectioning commands.  Use \fC.bp\fP or a macro like \fC.HBP\fP to
 explicitly to insert breaks as needed, or define your own
 sectioning commands
@@ -58,10 +58,10 @@ to embed a page break.
 .IX SH@."@SH, macro
 .IX SH@.SH, macro
 .IX rn@.rn, macro
-.IX de@.de, troff request
-.IX nr@.nr, troff request
-.IX shift@.shift, troff request
-.IX als@.als, troff request
+.IX de@.de, groff request
+.IX nr@.nr, groff request
+.IX shift@.shift, groff request
+.IX als@.als, groff request
 Here’s a way to create pagebreaks in HTML before every top-level \fC.SH\fP, by
 redefining the underlying \fC.@SH\fP macro:
 .EX
@@ -99,7 +99,7 @@ is in fact the version
 number of the troff2page program processing the document.  This is a number
 such as 20150320, which would be the version number of the troff2page
 released on 2015 March 20.  \fC\en[.troff2page]\fP could plausibly be used
-to distinguish not just troff2page from troff, but also between various versions
+to distinguish not just troff2page from groff, but also between various versions
 of troff2page.  Thus, one could, if the need were dire, write a document
 that translates differently with different versions of
 troff2page. But don’t do this.

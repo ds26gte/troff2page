@@ -1,4 +1,4 @@
-.\" last modified 2020-12-06
+.\" last modified 2020-12-08
 .SH 1
 11. Some unusual ways to call troff2page
 .LP
@@ -18,7 +18,7 @@ Calling troff2page from Neovim
 .IX calling troff2page from!Neovim
 One of the merits of using 
 Neovim’s Lua to run \fCtroff2page\fP is the tight integration of
-composing and previewing it offers. You can convert your troff
+composing and previewing it offers. You can convert your groff
 source and browse the HTML output as you’re editing it, using 
 appropriate autocommands.
 .PP

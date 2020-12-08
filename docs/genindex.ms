@@ -1,4 +1,4 @@
-.\" last modified 2020-12-05
+.\" last modified 2020-12-08
 .SH 1
 5. Making an index
 .LP
@@ -68,7 +68,7 @@ Please see the
 makeindex
 documentation for all the details.  Essentially, the syntax for entering
 index entries is the same \*[url \
-http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in troff we use
+http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in groff we use
 “\fC.IX item\fP” where in LaTeX one would use
 \%“\fC\eindex{item}\fP”.
 .PP

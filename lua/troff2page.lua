@@ -1609,7 +1609,7 @@ function read_possible_troff2page_specific_escape(s, i)
     c1 = string.sub(s, i, i)
     if c1 ~= '' then i=i+1; c2 = s:sub(i,i) end
     if c2 ~= '' then i=i+1 end
-    return c1..c2, i
+    return c1..c2, i, '('
   end
   if c == '[' then
     local r = ''
@@ -1617,12 +1617,12 @@ function read_possible_troff2page_specific_escape(s, i)
       c = string.sub(s, i, i)
       --print('rptse of ', c, string.match(c, '%a'), i)
       if c ~= '' then i=i+1 end
-      if string.match(c, '%a') then r = r .. c
-      elseif c == ']' then break
-      else break
+      if c == '' then return r, i, '[', 'unclosed' end --TODO better
+      if c == ']' then break
+      else r = r .. c
       end
     end
-    return r, i
+    return r, i, '['
   else
     return c, i
   end
@@ -1651,9 +1651,9 @@ function emit(s)
     if c == '' then break end
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
-      if c == '\\' then
+      if c == Escape_char then
         --print('emit found \\')
-        e, i = read_possible_troff2page_specific_escape(s, i)
+        e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
         if e == 'htmllt' then
           if Outputting_to == 'title' then
@@ -1675,7 +1675,13 @@ function emit(s)
           --print('checking glyphname', e)
           local g = Glyph_table[e]
           if g then Out:write(g)
-          else Out:write(c, e)
+          elseif bkt == '[' then
+            Out:write(c, '[', e)
+            if not unclosed_p then Out:write(']') end
+          elseif bkt == '(' then
+            Out:write(c, '(', e)
+          else
+            Out:write(c, e)
           end
         end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
@@ -3331,10 +3337,29 @@ function initialize_macros()
       defglyph(glyph_name, rhs)
     else
       local rhs = expand_args(read_troff_string_line())
+      --print('setting', c, 'to', rhs)
       Unescaped_glyph_table[c] = rhs
     end
   end)
 
+  defrequest('rchar', function()
+    --print('doing rchar')
+    ignore_spaces()
+    --problem is it translates anyway
+    local c = get_char('dont_translate')
+    if c == Escape_char then
+      --this part works OK
+      local glyph_name = read_escaped_word()
+      read_troff_line()
+      Glyph_table[glyph_name] = nil
+    else
+      --FIXME
+      --TODO
+      --print('rchar`ing', c)
+      read_troff_line()
+      Unescaped_glyph_table[c] = nil
+    end
+  end)
 
   defrequest('substring', function()
     local s, n1, n2 = read_args()
@@ -4500,7 +4525,7 @@ B_0000_1111 = 0x0f
 B_0000_0111 = 0x07
 B_0011_1111 = 0x3f
 
-function get_char()
+function get_char(dont_translate_p)
   local buf = Current_troff_input.buffer
   if #buf > 0 then
     return table.remove(buf, 1)
@@ -4523,7 +4548,17 @@ function get_char()
   local c1byte = string.byte(c)
   if c1byte < B_1000_0000 then
     -- c1byte = 0xxx_xxxx
-    return c
+    local g = false
+    --FIXME
+    if true or not dont_translate_p or Outputting_to ~= 'troff' then
+      g = Unescaped_glyph_table[c]
+    end
+    if g then
+      toss_back_string(g)
+      return get_char()
+    else
+      return c
+    end
   end
   --
   local ucode

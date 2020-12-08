@@ -1,4 +1,4 @@
-.\" last modified 2020-12-06
+.\" last modified 2020-12-08
 .SH 1
 1. Introduction
 .LP
@@ -14,13 +14,13 @@ output document with the functionally equivalent HTML markup.
 .PP
 .IX TeX
 .IX Info files, generating
-Troff is a venerable typesetting program that produces
+troff is a venerable typesetting program that produces
 high-quality print output from plain text source.
 It doesn’t require
 special-purpose software to create content; any text
-editor will do. Troff macros and standard Unix external tools can
+editor will do. troff macros and standard Unix external tools can
 be used to arbitrarily enhance troff’s print output.
-Troff is very compact (unlike its great rival TeX) and is
+troff is very compact (unlike its great rival TeX) and is
 practically ubiquitous, being available by default on
 all Unixish machines. These are significant benefits: so even
 though
@@ -74,6 +74,7 @@ Commmand-line options
 .IX c@-c, command-line option
 .IX -@--, command-line option
 \fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP,
+a widely used and actively developed implementation of troff.
 viz.,
 .TS
 tab(@) center;

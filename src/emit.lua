@@ -12,7 +12,7 @@ function read_possible_troff2page_specific_escape(s, i)
     c1 = string.sub(s, i, i)
     if c1 ~= '' then i=i+1; c2 = s:sub(i,i) end
     if c2 ~= '' then i=i+1 end
-    return c1..c2, i
+    return c1..c2, i, '('
   end
   if c == '[' then
     local r = ''
@@ -20,12 +20,12 @@ function read_possible_troff2page_specific_escape(s, i)
       c = string.sub(s, i, i)
       --print('rptse of ', c, string.match(c, '%a'), i)
       if c ~= '' then i=i+1 end
-      if string.match(c, '%a') then r = r .. c
-      elseif c == ']' then break
-      else break
+      if c == '' then return r, i, '[', 'unclosed' end --TODO better
+      if c == ']' then break
+      else r = r .. c
       end
     end
-    return r, i
+    return r, i, '['
   else
     return c, i
   end
@@ -54,9 +54,9 @@ function emit(s)
     if c == '' then break end
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
-      if c == '\\' then
+      if c == Escape_char then
         --print('emit found \\')
-        e, i = read_possible_troff2page_specific_escape(s, i)
+        e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
         if e == 'htmllt' then
           if Outputting_to == 'title' then
@@ -78,7 +78,13 @@ function emit(s)
           --print('checking glyphname', e)
           local g = Glyph_table[e]
           if g then Out:write(g)
-          else Out:write(c, e)
+          elseif bkt == '[' then
+            Out:write(c, '[', e)
+            if not unclosed_p then Out:write(']') end
+          elseif bkt == '(' then
+            Out:write(c, '(', e)
+          else
+            Out:write(c, e)
           end
         end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()

@@ -1,4 +1,4 @@
-.\" last modified 2020-12-05
+.\" last modified 2020-12-08
 .SH 1
 4. Cross-references
 .LP
@@ -19,7 +19,7 @@ is defined to typeset as that page number.
 Thus, in a hand-crafted table of contents, you could
 use
 .EX
-    Extending troff using Lua, \*[TAG:sec_trofflua]
+    Extending groff using Lua, \*[TAG:sec_trofflua]
 .EE
 In the HTML output, the string \fC\e*[TAG:sec_trofflua]\fP
 furthermore is a link to where \fC.TAG sec_trofflua\fP was

@@ -10,7 +10,7 @@ B_0000_1111 = 0x0f
 B_0000_0111 = 0x07
 B_0011_1111 = 0x3f
 
-function get_char()
+function get_char(dont_translate_p)
   local buf = Current_troff_input.buffer
   if #buf > 0 then
     return table.remove(buf, 1)
@@ -33,7 +33,17 @@ function get_char()
   local c1byte = string.byte(c)
   if c1byte < B_1000_0000 then
     -- c1byte = 0xxx_xxxx
-    return c
+    local g = false
+    --FIXME
+    if true or not dont_translate_p or Outputting_to ~= 'troff' then
+      g = Unescaped_glyph_table[c]
+    end
+    if g then
+      toss_back_string(g)
+      return get_char()
+    else
+      return c
+    end
   end
   --
   local ucode

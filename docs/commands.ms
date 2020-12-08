@@ -1,6 +1,6 @@
-.\" last modified 2020-12-05
+.\" last modified 2020-12-08
 .SH 1
-2. troff and troff2page commands
+2. troff, groff, and troff2page commands
 .LP
 .IX drop caps in color
 .DC T ROFF2PAGE terracottapink
@@ -29,7 +29,10 @@ footnote hyperlinking to each other.
 .
 Please consult troff and groff documentation for these commands.  We will
 concentrate here on those commands whose HTML counterpart is not immediately
-obvious.
+obvious. In order to avoid constantly qualifying my sentences, I shall
+henceforth use groff as the troff implementation to work alongside
+troff2page. There will be some modification needed when using
+other troff implementations. 
 .PP
 .SH 2
 mpca macro files
@@ -45,14 +48,14 @@ provided in \*[url http://github.com/ds26gte/mpca]mpca\&. For
 convenience, this repo is included as a submodule \fCmpca\fP.
 It includes general-purpose extensions to the \fCms\fP package,
 e.g., \fCpca-tag.tmac\fP for cross-references; \fCpca-ix.tmac\fP
-for index generation; \fCpca-eval.tmac\fP for extending troff
+for index generation; \fCpca-eval.tmac\fP for extending groff
 using Lua, etc. These extensions may loaded severally or as the
 single comprehensive macro file \fCpca.tmac\fP. Please consult
 this submodule’s documentation for more information.
 .PP
 .IX GROFF_TMAC_PATH, environment variable
 In order to take advantage of the \fCmpca\fP tmac files, you
-should place them in one of your troff macro directories. (Both
+should place them in one of your groff macro directories. (Both
 groff and troff2page search for macro files first in the
 directories in \fCGROFF_TMAC_PATH\fP, then in the working
 directory, and finally in your home directory. See the section

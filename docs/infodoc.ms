@@ -1,4 +1,4 @@
-.\" last modified 2020-12-04
+.\" last modified 2020-12-08
 .SH 1
 10. GNU Info docs
 .LP
@@ -12,13 +12,13 @@ You can call the macro
 within your document to signal to \fCtroff2page\fP that it should
 also create an Info document.
 .PP
-If the basename of the input troff document is \fCjobname\fP, the
+If the basename of the input groff document is \fCjobname\fP, the
 Info file is created in \fCjobname.info\fP, which may be
 displayed on any Info viewer.
 .PP
 .IX troff2pagerc@.troff2pagerc, macro file
 .IX t2p@.t2p, macro file
-A good place to set \fC.troff2page2info\fP without modifying the input troff
+A good place to set \fC.troff2page2info\fP without modifying the input groff
 document is in \fC.troff2pagerc\fP or \fCjobname.t2p\fP,
 described on page \*[TAG:troff2pagerc].
 .PP

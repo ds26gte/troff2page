@@ -1,10 +1,10 @@
-.\" last modified 2020-11-16
+.\" last modified 2020-12-08
 .SH 1
 6. Slideshows
 .LP
 .IX slideshow
 .IX Slidy
-To have your troff source to be converted into slideshow-ready HTML, insert
+To have your groff source to be converted into slideshow-ready HTML, insert
 into it (somewhere) the macro call
 .EX
     .SLIDES
@@ -21,7 +21,7 @@ presentation doesn’t rely on WiFi.
 A new slide is started for each
 level-1 section, i.e., \fC.SH 1\fP and \fC.NH 1\fP.
 (Note of course
-that it doesn’t make sense to convert generic troff documents
+that it doesn’t make sense to convert generic groff documents
 into presentations. The sections have got to be pretty short!)
 .PP
 An HTML page meant for presentation uses larger, bolder fonts by

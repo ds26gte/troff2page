@@ -316,10 +316,29 @@ function initialize_macros()
       defglyph(glyph_name, rhs)
     else
       local rhs = expand_args(read_troff_string_line())
+      --print('setting', c, 'to', rhs)
       Unescaped_glyph_table[c] = rhs
     end
   end)
 
+  defrequest('rchar', function()
+    --print('doing rchar')
+    ignore_spaces()
+    --problem is it translates anyway
+    local c = get_char('dont_translate')
+    if c == Escape_char then
+      --this part works OK
+      local glyph_name = read_escaped_word()
+      read_troff_line()
+      Glyph_table[glyph_name] = nil
+    else
+      --FIXME
+      --TODO
+      --print('rchar`ing', c)
+      read_troff_line()
+      Unescaped_glyph_table[c] = nil
+    end
+  end)
 
   defrequest('substring', function()
     local s, n1, n2 = read_args()
