@@ -4,6 +4,7 @@
 .LP
 .IX slideshow
 .IX Slidy
+.IX SLIDES@.SLIDES, troff2page macro
 To have your groff source to be converted into slideshow-ready HTML, insert
 into it (somewhere) the macro call
 .EX
@@ -28,7 +29,7 @@ An HTML page meant for presentation uses larger, bolder fonts by
 default (but you can add your own CSS). There are no navigation
 bars between slides.
 .PP
-.IX pause@.pause, macro
+.IX pause@.pause, troff2page macro
 Use the \fC.pause\fP macro to
 interrupt display of the rest of the current slide.
 .PP

@@ -3,9 +3,9 @@
 7. Extending groff using Lua
 .LP
 .IX extending groff and troff2page with Lua
-.IX eval@.eval, macro
-.IX endeval@.endeval, macro
-.IX pca-eval.tmac, macro file
+.IX eval@.eval, mpca macro
+.IX endeval@.endeval, mpca macro
+.IX pca-eval.tmac, mpca macro file
 To invoke Lua from groff, we use the macro \fC.eval\fP with its closer
 \fC.endeval\fP. These are
 defined in the
@@ -21,6 +21,8 @@ is substituted for the \fC.eval\fP ... \fC.endeval\fP.
 The usefulness of this tactic will be apparent from an
 example.
 Consider the following groff document, \fCtau.ms\fP:
+.IX mso@.mso, groff request
+.IX troff, troff2page output stream
 .EX
     .mso pca-eval.tmac
     .
@@ -32,8 +34,8 @@ Consider the following groff document, \fCtau.ms\fP:
     .endeval
 .EE
 .IX unsafe mode
-.IX z@-z, command-line option
-.IX U@-U, command-line option
+.IX z@-z, groff command-line option
+.IX U@-U, groff command-line option
 Run groff in unsafe mode on \fCtau.ms\fP:
 .EX
     groff -z -U -ms tau.ms
@@ -227,6 +229,7 @@ document.
 For example, let’s define a
 \fC\e*[url ...]\fP string register that simply typesets its URL
 argument within angle brackets.
+.IX ds@.ds, groff request
 .EX
     .ds url \(la\fC\\$1\fP\(ra
 .EE

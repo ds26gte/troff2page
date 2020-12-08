@@ -19,8 +19,8 @@ obvious HTML equivalent.\**
 .
 .FS
 .IX footnotes
-.IX FS@.FS, macro
-.IX FE@.FE, macro
+.IX FS@.FS, ms macro
+.IX FE@.FE, ms macro
 E.g., -ms’s footnotes (\fC\e**\fP and \fC.FS\fP/\fC.FE\fP) have a
 straightforward translation in the HTML, with the footnote text set at the
 bottom of the HTML page, and with the footnote markers in the body and the
@@ -61,7 +61,7 @@ directories in \fCGROFF_TMAC_PATH\fP, then in the working
 directory, and finally in your home directory. See the section
 for “Macro Directories” in the groff info file for details.)
 .PP
-.IX m@-m, command-line option
+.IX m@-m, groff command-line option
 .IX mso@.mso, groff request
 Your input document sources the \fCmpca\fP macro files using
 either the \fC-m\fP command-line option or the \fC.mso\fP request.
@@ -71,7 +71,7 @@ Auxiliary files
 .LP
 .IX unsafe mode
 .IX auxiliary files
-.IX U@-U, command-line option
+.IX U@-U, groff command-line option
 Many of the macros defined in these \fC.tmac\fP files write
 auxiliary files that are absorbed into the document during a
 second run.  Let’s first investigate how groff deals with them,
@@ -79,8 +79,8 @@ and then see how troff2page does the same in its own way. Note
 that in order to write these aux files, groff must be run with
 the \fC-U\fP option for “unsafe” mode.
 .PP
-.IX t@-t, command-line option
-.IX z@-z, command-line option
+.IX t@-t, groff command-line option
+.IX z@-z, groff command-line option
 As an example, consider \fCindex.ms\fP (the groff source for the
 document you’re reading, which is the \fCdoc\fP subdirectory).  The following is one
 way to get the correct PostScript output:
@@ -157,7 +157,7 @@ resolve the aux files. This is exactly analogous to calling
 .PP
 .TAG auxf
 .IX auxiliary files!naming of
-.IX troff2page@.troff2page, number register
+.IX troff2page@.troff2page, troff2page number register
 The groff string \fC\e*[AUXF]\fP is used to construct the
 names of the
 auxiliary files.  By default it

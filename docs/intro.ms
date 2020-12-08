@@ -64,15 +64,15 @@ etc.
 Commmand-line options
 .LP
 .IX command-line options
-.IX version@--version, command-line option
+.IX version@--version, groff command-line option
 .IX help@--help, command-line option
-.IX v@-v, command-line option
-.IX h@-h, command-line option
-.IX m@-m, command-line option
-.IX r@-r, command-line option
-.IX d@-d, command-line option
-.IX c@-c, command-line option
-.IX -@--, command-line option
+.IX v@-v, groff command-line option
+.IX h@-h, groff command-line option
+.IX m@-m, groff command-line option
+.IX r@-r, groff command-line option
+.IX d@-d, groff command-line option
+.IX c@-c, groff command-line option
+.IX -@--, groff command-line option
 \fCtroff2page\fP takes some, but not all, of the same options as \fCgroff\fP,
 a widely used and actively developed implementation of troff.
 viz.,
@@ -110,9 +110,9 @@ In the unlikely event that you have a document file named
 .EX
     % troff2page -- --help
 .EE
-.IX z@-z, command-line option
-.IX t@-t, command-line option
-.IX U@-U, command-line option
+.IX z@-z, groff command-line option
+.IX t@-t, groff command-line option
+.IX U@-U, groff command-line option
 \fCtroff2page\fP ignores all other \fCgroff\fP options, most with a warning.
 The options
 \fC-z\fP, \fC-t\fP, and \fC-U\fP are silently ignored, as they’re always valid
@@ -150,7 +150,7 @@ Autoloaded init files
 .LP
 .TAG troff2pagerc
 .IX init files for troff2page
-.IX troff2pagerc@.troff2pagerc, macro file
+.IX troff2pagerc@.troff2pagerc, user macro file
 \fCtroff2page\fP can read directives in some autoloaded files
 without the need to explicitly use a command-line option. These
 are useful to specify information that is relevant only for the HTML
@@ -181,7 +181,7 @@ unadvised for such an ad hoc file.
 \fCtroff2page\fP loads only the first \fC.troff2pagerc\fP it
 finds.
 .PP
-.IX t2p@.t2p, macro file
+.IX t2p@.t2p, user macro file
 In addition, \fCtroff2page\fP will also pick up a file
 \fCjobname.t2p\fP, where \fCjobname\fP is the basename of the input document.
 This is useful for directives that are specific to this document.
@@ -195,7 +195,7 @@ not\fP disable the autoloading of \fC.troff2pagerc\fP.
 these files typically contain information that’s relevant
 for HTML only.)
 .PP
-.IX man.local, -man init file
+.IX man.local, man init file
 If the input file is recognizably a man page (i.e., it has the
 command \fC.TH\fP), both troff2page and groff will load, if it
 exists, the init file \fCman.local\fP in the home directory.

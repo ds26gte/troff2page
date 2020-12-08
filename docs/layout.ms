@@ -23,7 +23,7 @@ one.  Thus \fC.bp\fP causes a page-break in both the HTML and the print outputs.
 .PP
 .TAG cond-bp
 .IX conditional for troff2page versus groff
-.IX troff2page@.troff2page, number register
+.IX troff2page@.troff2page, troff2page number register
 .IX if@.if, groff request
 Generally, page-breaks require a different \(aesthetic in HTML than in
 print.  You can use groff conditionals to express this difference:
@@ -55,9 +55,9 @@ sectioning commands
 or modify the existing ones
 to embed a page break.
 .PP
-.IX SH@."@SH, macro
-.IX SH@.SH, macro
-.IX rn@.rn, macro
+.IX SH@."@SH, ms macro
+.IX SH@.SH, ms macro
+.IX rn@.rn, groff request
 .IX de@.de, groff request
 .IX nr@.nr, groff request
 .IX shift@.shift, groff request
@@ -104,7 +104,7 @@ of troff2page.  Thus, one could, if the need were dire, write a document
 that translates differently with different versions of
 troff2page. But don’t do this.
 .PP
-.IX p@.p, number register
+.IX p@.p, groff number register
 If you’d rather stick to known groff registers, the read-only
 paper-length register \fC\en(.p\fP is a candidate. groff sets
 it to 11 inches, i.e., the length of a US Letter size paper.
@@ -112,9 +112,9 @@ Presumably it could vary depending on country of use, but it is
 never going to be non-positive. troff2page, since it doesn’t deal in paper, sets
 \fC\en(.p\fP to 0.
 .PP
-.IX x@.x, number register
-.IX y@.y, number register
-.IX Y@.Y, number register
+.IX x@.x, groff number register
+.IX y@.y, groff number register
+.IX Y@.Y, groff number register
 groff has its own version registers \fC\en(.x\fP,
 \fC\en(.y\fP, and \fC\en(.Y\fP, which contain the major and minor version numbers
 and revision number
@@ -129,8 +129,8 @@ there’s no 0-left-padding.)
 .SH 2
 HTML-style paragraphs
 .LP
-.IX n, scaling factor
-.IX v, scaling factor
+.IX n, groff scaling factor
+.IX v, groff scaling factor
 By default, troff2page sets paragraphs exactly as groff does: the first
 lines of paragraphs are indented (unless explicitly disabled via an
 \fC.LP\fP), and
@@ -164,25 +164,26 @@ the default font size. \fCv\fP is the distance between two consecutive
 baselines. Scaling factors are generally, but not always, what
 you might think of as length units.
 .PP
-.IX i, scaling factor (inch)
-.IX c, scaling factor (centim\(`etre)
-.IX p, scaling factor (point)
-.IX P, scaling factor (pica)
-.IX m, scaling factor
-.IX M, scaling factor
+.IX i, groff scaling factor (inch)
+.IX c, groff scaling factor (centim\(`etre)
+.IX p, groff scaling factor (point)
+.IX P, groff scaling factor (pica)
+.IX m, groff scaling factor
+.IX M, groff scaling factor
 Other groff scaling factors that troff2page recognizes
 are: \fCi\fP (inch = 1/12 foot), \fCc\fP (cm =
 50/127 inch), \fCp\fP (point = 1/72 inch), \fCP\fP (pica = 12
 points), \fCm\fP (em = 2 ens), and \fCM\fP (1/100 em).
 .PP
-.IX u, scaling factor
-.IX f, scaling factor
+.IX u, groff scaling factor
+.IX f, groff scaling factor
 .IX TeX
 Internally, both groff and troff2page store lengths in the scaling
 factor \fCu\fP, which
 is 1/72000 of an inch, and all lengths are integral multiples of
 u, thereby avoiding floating-point messes. If this seems too precise, consider that TeX stores all
 its lengths in “scaled points” (sp), where 1 sp = 1 / (2^16 * 72.27) =
+.IX troff, troff2page output stream
 .eval
 troff:write('1/', (2^16)*72.27, '\n')
 .endeval
@@ -211,6 +212,7 @@ coefficients can be used as fractions.
 .SH 2
 Line length
 .LP
+.IX LL@.LL, ms number register
 Unlike groff -ms, which uses the line length given by the register
 \fCLL\fP,
 troff2page by default does not restrict the text width on its HTML pages.

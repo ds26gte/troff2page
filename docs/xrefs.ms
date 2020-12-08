@@ -3,8 +3,8 @@
 4. Cross-references
 .LP
 .IX cross-references
-.IX TAG@.TAG, macro
-.IX pca-tag.tmac, macro file
+.IX TAG@.TAG, mpca macro
+.IX pca-tag.tmac, mpca macro file
 troff2page provides a \fC.TAG\fP macro for managing
 cross-references. A compatible groff definition is provided in
 the supplied macro file \fCpca-tag.tmac\fP. (This overrides the
@@ -35,22 +35,22 @@ of the current page number.
 .SH 2
 ToC
 .LP
-.IX pca-toc.tmac, macro file
+.IX pca-toc.tmac, mpca macro file
 .IX table of contents
-.IX ToC@.ToC, macro
+.IX ToC@.ToC, mpca macro
 The
 macro file \fCpca-toc.tmac\fP supplies a \fC.ToC\fP macro
 for automatic generation of a table of contents. This can be used
 by both groff and troff2page.
 .PP
-.IX GROWPS, number register
+.IX GROWPS, ms number register
 The troff2page aspect of \fCpca-toc.tmac\fP
 uses \fC.TAG\fP. For both outputs, ToC entries are created for
 headers of level \fC\\n[GROWPS]\fP or lower. By default,
 \fCGROWPS\fP is set to 0, so you should set it to at least 1 to see
 a ToC.
 .PP
-.IX PSINCR, number register
+.IX PSINCR, ms number register
 The original purpose of \fCGROWPS\fP was to govern the font-size
 of headers at levels below it, provided it is set to at least 2
 and the register \fC\en[PSINCR]\fP is set (which it is, by
@@ -72,7 +72,7 @@ Altering the ‘NH’ macro to automatically build the table of contents
 is perhaps initially more difficult, but would save a great deal of time
 in the long run if you use ‘ms’ regularly.
 .QE
-.IX pca-t2p-man.tmac, macro file
+.IX pca-t2p-man.tmac, mpca macro file
 troff2page autoloads the macro file \fCpca-t2p-man.tmac\fP (if it can
 find it in \fCGROFF_TMAC_PATH\fP)
 to automatically generate a ToC for man pages,

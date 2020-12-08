@@ -4,7 +4,7 @@
 .LP
 .TAG gnuinfo
 .IX Info files, generating
-.IX troff2page2info@.troff2page2info, macro
+.IX troff2page2info@.troff2page2info, troff2page macro
 You can call the macro
 .EX
     .troff2page2info
@@ -16,8 +16,8 @@ If the basename of the input groff document is \fCjobname\fP, the
 Info file is created in \fCjobname.info\fP, which may be
 displayed on any Info viewer.
 .PP
-.IX troff2pagerc@.troff2pagerc, macro file
-.IX t2p@.t2p, macro file
+.IX troff2pagerc@.troff2pagerc, user macro file
+.IX t2p@.t2p, user macro file
 A good place to set \fC.troff2page2info\fP without modifying the input groff
 document is in \fC.troff2pagerc\fP or \fCjobname.t2p\fP,
 described on page \*[TAG:troff2pagerc].
