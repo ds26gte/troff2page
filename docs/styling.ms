@@ -1,4 +1,4 @@
-.\" last modified 2020-12-08
+.\" last modified 2020-12-12
 .SH 1
 8. Styling
 .LP
@@ -135,8 +135,8 @@ U+26A0 (\s-2WARNING SIGN\s0)
 — in a suitable color and size — may be used rather than
 the pedestrian “\fBCAUTION\fP” and “\fBWARNING\fP” for admonition titles.
 .if \n[.troff2page] \{\
-.DS L
-    \M[yellow]\s+4\fB☡\fP\s0\M[]   \M[red]\m[white]\s+4\fB⚠\fP\s0\m[]\M[]
+.DS C
+\M[yellow]\s+4\fB☡\fP\s0\M[]                 \M[red]\m[white]\s+4\fB⚠\fP\s0\m[]\M[]
 .DE
 .\}
 Unfortunately,

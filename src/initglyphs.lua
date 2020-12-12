@@ -1,4 +1,4 @@
--- last modified 2020-11-17
+-- last modified 2020-12-12
 
 --refer groff_char(7)
 Standard_glyphs = {
@@ -342,6 +342,20 @@ Standard_glyphs = {
   ['~n'] = 0xf1,
   ['~o'] = 0xf5,
   ['~~'] = 0x2248,
+
+}
+
+Html_glyphs = {
+
+  ['htmlamp'] = '&',
+  ['htmlbackslash'] = '\\',
+  ['htmleightnbsp'] = '&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;',
+  ['htmlempty'] = '',
+  ['htmlgt'] = '>',
+  ['htmllt'] = '<',
+  ['htmlnbsp'] = '&#xa0;',
+  ['htmlquot'] = '"',
+  ['htmlspace'] = ' ',
 
 }
 

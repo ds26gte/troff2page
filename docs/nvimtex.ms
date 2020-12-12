@@ -1,4 +1,4 @@
-.\" last modified 2020-12-08
+.\" last modified 2020-12-12
 .SH 1
 11. Some unusual ways to call troff2page
 .LP
@@ -70,7 +70,7 @@ all the option and filename inputs, e.g.,
       troff2page.troff2page('-mpca -t doc.ms')
     }
 .EE
-The above commands can be supplied to a LuaTeX either via a TeX
+The above commands can be supplied to LuaTeX either via a TeX
 file or as a console interaction.
 .PP
 .IX luatex-troff2page, script

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201207 -- last modified
+troff2page_version = 20201212 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -1630,6 +1630,17 @@ end
 
 --emitCalled = 0
 
+function emit_verbatim_escape(e, bkt, unclosed_p)
+  if bkt == '[' then
+    Out:write('\\', '[', e)
+    if not unclosed_p then Out:write(']') end
+  elseif bkt == '(' then
+    Out:write('\\', '(', e)
+  else
+    Out:write('\\', e)
+  end
+end
+
 function emit(s)
   --print('emit of', s, 'to', Out)
   --print('outputtingto=', Outputting_to)
@@ -1655,33 +1666,21 @@ function emit(s)
         --print('emit found \\')
         e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
-        if e == 'htmllt' then
+        local h = Html_glyphs[e]
+        if h then
           if Outputting_to == 'title' then
-            inside_html_angle_brackets_p = true
-          else Out:write '<' end
-        elseif e == 'htmlgt' then
-          if Outputting_to == 'title' then
-            inside_html_angle_brackets_p = false
-          else Out:write '>' end
-        elseif e == 'htmlamp' then Out:write '&'
-        elseif e == 'htmlquot' then Out:write '"'
-        elseif e == 'htmlbackslash' then Out:write '\\'
-        elseif e == 'htmlspace' then Out:write ' '
-        elseif e == 'htmlnbsp' then Out:write '&#xa0;'
-        elseif e == 'htmleightnbsp' then
-          for j=1,8 do Out:write '&#xa0;' end
-        elseif e == 'htmlempty' then no_op()
+            if e == 'htmllt' then inside_html_angle_brackets_p = true
+            elseif e == 'htmlgt' then inside_html_angle_brackets_p = false
+            end
+          end
+          Out:write(h)
+        elseif Turn_off_escape_char_p then
+          emit_verbatim_escape(e, bkt, unclosed_p)
         else
-          --print('checking glyphname', e)
           local g = Glyph_table[e]
           if g then Out:write(g)
-          elseif bkt == '[' then
-            Out:write(c, '[', e)
-            if not unclosed_p then Out:write(']') end
-          elseif bkt == '(' then
-            Out:write(c, '(', e)
           else
-            Out:write(c, e)
+            emit_verbatim_escape(e, bkt, unclosed_p)
           end
         end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
@@ -1853,6 +1852,7 @@ function emit_expanded_line()
     end
     --io.write('writing out->', r, '<-\n')
     emit(r)
+    --print('eel DONE')
   end
 end
 
@@ -2438,7 +2438,7 @@ function generate_html(percolatable_status_values)
   local returned_status_value
   flet({
     Exit_status = false
-  }, function() 
+  }, function()
     --print('doing generate_html2', Exit_status)
     while true do
       if Exit_status then break end
@@ -2511,16 +2511,34 @@ function expand_escape(c)
   --print('doing expand_escape', c)
   local it
   if not c then c = '\n'
-  else get_char() end
-  --
-  if Turn_off_escape_char_p then return Escape_char .. c
-  elseif (function() it=Escape_table[c]; return it end)''
-  then return it()
-  elseif (function() it=Glyph_table[c]; return it end)''
-  then return it
-  else return verbatim(c)
+  else get_char()
   end
-end 
+  --
+  if Turn_off_escape_char_p then
+    return Escape_char .. c
+  end
+  --
+  local it = Escape_table[c]
+  if it and
+    (not Macro_copy_mode_p or
+    c=='n' or c=='*' or c=='$' or c=='\\') then
+    return it()
+  end
+  --
+  if Macro_copy_mode_p then
+    return Escape_char..c
+  end
+  --
+  if it then
+    return it()
+  end
+  --
+  it = Glyph_table[c]
+  if it then
+    return it
+  end
+  return verbatim(c)
+end
 
 
 function next_html_image_file_stem()
@@ -3000,6 +3018,20 @@ Standard_glyphs = {
   ['~n'] = 0xf1,
   ['~o'] = 0xf5,
   ['~~'] = 0x2248,
+
+}
+
+Html_glyphs = {
+
+  ['htmlamp'] = '&',
+  ['htmlbackslash'] = '\\',
+  ['htmleightnbsp'] = '&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;',
+  ['htmlempty'] = '',
+  ['htmlgt'] = '>',
+  ['htmllt'] = '<',
+  ['htmlnbsp'] = '&#xa0;',
+  ['htmlquot'] = '"',
+  ['htmlspace'] = ' ',
 
 }
 

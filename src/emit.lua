@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2020-12-12
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -33,6 +33,17 @@ end
 
 --emitCalled = 0
 
+function emit_verbatim_escape(e, bkt, unclosed_p)
+  if bkt == '[' then
+    Out:write('\\', '[', e)
+    if not unclosed_p then Out:write(']') end
+  elseif bkt == '(' then
+    Out:write('\\', '(', e)
+  else
+    Out:write('\\', e)
+  end
+end
+
 function emit(s)
   --print('emit of', s, 'to', Out)
   --print('outputtingto=', Outputting_to)
@@ -58,33 +69,21 @@ function emit(s)
         --print('emit found \\')
         e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
-        if e == 'htmllt' then
+        local h = Html_glyphs[e]
+        if h then
           if Outputting_to == 'title' then
-            inside_html_angle_brackets_p = true
-          else Out:write '<' end
-        elseif e == 'htmlgt' then
-          if Outputting_to == 'title' then
-            inside_html_angle_brackets_p = false
-          else Out:write '>' end
-        elseif e == 'htmlamp' then Out:write '&'
-        elseif e == 'htmlquot' then Out:write '"'
-        elseif e == 'htmlbackslash' then Out:write '\\'
-        elseif e == 'htmlspace' then Out:write ' '
-        elseif e == 'htmlnbsp' then Out:write '&#xa0;'
-        elseif e == 'htmleightnbsp' then
-          for j=1,8 do Out:write '&#xa0;' end
-        elseif e == 'htmlempty' then no_op()
+            if e == 'htmllt' then inside_html_angle_brackets_p = true
+            elseif e == 'htmlgt' then inside_html_angle_brackets_p = false
+            end
+          end
+          Out:write(h)
+        elseif Turn_off_escape_char_p then
+          emit_verbatim_escape(e, bkt, unclosed_p)
         else
-          --print('checking glyphname', e)
           local g = Glyph_table[e]
           if g then Out:write(g)
-          elseif bkt == '[' then
-            Out:write(c, '[', e)
-            if not unclosed_p then Out:write(']') end
-          elseif bkt == '(' then
-            Out:write(c, '(', e)
           else
-            Out:write(c, e)
+            emit_verbatim_escape(e, bkt, unclosed_p)
           end
         end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
@@ -256,6 +255,7 @@ function emit_expanded_line()
     end
     --io.write('writing out->', r, '<-\n')
     emit(r)
+    --print('eel DONE')
   end
 end
 

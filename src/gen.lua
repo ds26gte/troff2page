@@ -1,11 +1,11 @@
--- last modified 2020-11-22
+-- last modified 2020-12-12
 
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
   local returned_status_value
   flet({
     Exit_status = false
-  }, function() 
+  }, function()
     --print('doing generate_html2', Exit_status)
     while true do
       if Exit_status then break end
@@ -78,13 +78,31 @@ function expand_escape(c)
   --print('doing expand_escape', c)
   local it
   if not c then c = '\n'
-  else get_char() end
-  --
-  if Turn_off_escape_char_p then return Escape_char .. c
-  elseif (function() it=Escape_table[c]; return it end)''
-  then return it()
-  elseif (function() it=Glyph_table[c]; return it end)''
-  then return it
-  else return verbatim(c)
+  else get_char()
   end
-end 
+  --
+  if Turn_off_escape_char_p then
+    return Escape_char .. c
+  end
+  --
+  local it = Escape_table[c]
+  if it and
+    (not Macro_copy_mode_p or
+    c=='n' or c=='*' or c=='$' or c=='\\') then
+    return it()
+  end
+  --
+  if Macro_copy_mode_p then
+    return Escape_char..c
+  end
+  --
+  if it then
+    return it()
+  end
+  --
+  it = Glyph_table[c]
+  if it then
+    return it
+  end
+  return verbatim(c)
+end
