@@ -1,92 +1,98 @@
-.TH TROFF2PAGE 1 "2020-11-21" \" last modified
+.TH TROFF2PAGE 1 "2020-12-13" \" last modified
 .nh
 .ad l
 .SH NAME
-
+.PP
 troff2page \- makes Web pages from troff documents
-
+.PP
 .SH SYNOPSIS
-
+.LP
     troff2page [options] [pathnames]
-
+.LP
 .SH DESCRIPTION
-
-troff2page converts troff (\fI-man\fP and \fI-ms\fP) documents into HTML web
-pages and Info documents. E.g.,
-
+.PP
+troff2page is a Lua script that converts troff (\fI-man\fP and \fI-ms\fP) documents into HTML web
+pages. E.g.,
+.PP
 .EX
     troff2page jobname.ms
 .EE
-
+.PP
 creates an output HTML document that consists of \fIjobname.html\fP
 and possibly other files \fIjobname-Z-H-1.html\fP,
 \fIjobname-Z-H-2.html\fP, etc., which are linked by navigation to
 \fIjobname.html\fP.
-
+.PP
+troff2page can also be optionally instructed to create an Info document
+in \fIjobname.info\fP.
+.PP
 .SH OPTIONS
-
+.PP
 troff2page accepts many groff options. For example,
-
+.PP
 .EX
     troff2page --version
 .EE
-
+.PP
 displays the troff2page version.
-
+.PP
 .EX
     troff2page --help
 .EE
-
+.PP
 displays the version and a pointer to the comprehensive online
 manual, http://ds26gte.github.io/troff2page/index.html, whose troff
 source is included in the troff2page distribution.
-
+.PP
 The \fI-v\fP and \fI-h\fP options are short for \fI--help\fP and
 \fI--version\fP respectively.
-
+.PP
 The options \fI-m\fP, \fI-r\fP, and \fI-d\fP respectively load macro files, set
 registers, and define strings, just as in groff. troff2page also accepts groff
 options that are not relevant to it, if only to ignore them. Please see the
 groff man page for further information on options.
-
-Arguments that don’t look like options are treated as pathnames. The option
+.PP
+Arguments that don't look like options are treated as pathnames. The option
 \fI--\fP marks the end of options, implying that the remaining arguments are to
 be treated as pathnames (even if they look like options).
-
+.PP
 If there is only one pathname argument \fIjobname.ext\fP, it is converted to
 \fIjobname.html\fP (and possibly other aux HTML files) as described above.
-
+.PP
 If there is more than one pathname argument, their content is concatenated to
 produce the output HTML file(s), whose name is fashioned from the final
 pathname argument.
-
+.PP
 If there are no pathname arguments, and the \fI--help\fP or \fI--version\fP
 options were not used, troff2page exits with a “called with no argument”
 message.
-
-However, additional information may be fed to troff2page via the
-specially named macro file \fI.troff2pagerc\fP. Thus, a \fI-mpca\fP
-groff option would translate to the line
-
+.PP
+.SH INIT FILES
+.PP
+Additional information may be fed to troff2page via the
+specially named macro files \fI.troff2pagerc\fP and
+\fIjobname.t2p\fP. Thus, a \fI-mpca\fP
+groff option could also be specified as
+.PP
 .EX
     .mso pca.tmac
 .EE
-
+.PP
 in \fI.troff2pagerc\fP.
-
-troff2page loads \fI.troff2pagerc\fP, if it can find it in the
+.PP
+troff2page loads these files, if it can find them in the
 macro directories, before processing its argument file.
-
+.PP
 Note that groff itself does not load \fI.troff2page.tmac\fP
 or \fIjobname.t2p\fP
-automatically.  
-
+automatically.
+.PP
 If the input file is recognizably a man page (i.e., it has the
 command \fI.TH\fP), both troff2page and groff will load, if it
 exists, the init file \fIman.local\fP in the home directory.
-
+.PP
 .SH COMMANDS
-
+.PP
 troff2page recognizes most of the commands (requests, macros,
 diversions, strings, escapes, glyphs) of raw troff and its \fI-ms\fP
 and \fI-man\fP macro packages. The syntax recognized is the improved
@@ -94,60 +100,94 @@ kind supported by groff (http://gnu.org/software/groff) and Heirloom
 troff (http://github.com/n-t-roff/heirloom-doctools), i.e., macro,
 string, and glyph names can be arbitrarily long, and strings can
 have arguments.  Most of the commands are converted to their
-obvious HTML equivalent.  E.g., \fI-ms\fP’s footnotes have a
+obvious HTML equivalent.  E.g., \fI-ms\fP's footnotes have a
 straightforward translation in the HTML, with the footnote text
 set at the bottom of the HTML page, and with the footnote markers
 in the body and the footnote hyperlinking to each other.  Please
 consult troff and groff documentation for the commands.
-
+.PP
 The troff2page distribution also includes the \fImpca\fP submodule
 that contains several useful macro files. Both groff and
 troff2page can process these macro files, and give compatible
 results. Please see the troff2page manual for further details.
-
+.PP
 .SH NEOVIM
-
+.PP
 If the files \fIlua/troff2page.lua\fP and \fIplugin/troff2page.vim\fP are
 installed in your Neovim path, you can use the command \fI:Troff2page\fP to
 convert files directly from Neovim.
-
+.PP
 The \fI:Troff2page\fP accepts the same style of arguments as the \fItroff2page\fP
 script. In addition, if called with no arguments, \fI:Troff2page\fP will convert the
 file in the current window.
-
-.SH INFO DOCS
-
-You can call the macro
-
+.PP
+.SH LuaTeX
+.PP
+If the file \fIlua/troff2page\fP is in installed in your
+\fITEXINPUTS\fP path, it can be loaded into LuaTeX by
+.PP
 .EX
-  .troff2page2info
+    \edirectlua{troff2page = require 'troff2page'}
 .EE
-
+.PP
+This defines the Lua function \fItroff2page.troff2page\fP which
+can be called on troff documents with options as needed, e.g.,
+.PP
+.EX
+    \edirectlua{
+      troff2page.troff2page('-mpca -t doc.ms')
+    }
+.EE
+.PP
+.PP
+.SH INFO DOCS
+.PP
+You can call the macro
+.PP
+.EX
+    .troff2page2info
+.EE
+.PP
 within your document to signal to troff2page that it should also
 create an Info document.
-
+.PP
 A good place to place the \fI.troff2page2info\fP call is in your
-\fI.troff2pagerc.tmac\fP file, as it is relevant only to troff2page
+\fI.troff2pagerc\fP or \fIjobname.t2p\fP, as it is relevant only to troff2page
 and not to groff.
-
-If you’re sure you always want an Info file for whatever document
-you give to \fCtroff2page\fP, set the environment variable
-\fCTROFF2PAGE2INFO\fP (the value doesn’t matter):
-
+.PP
+.SH ENVIRONMENT VARIABLES
+.PP
+troff2page, like groff, uses \fIGROFF_TMAC_PATH\fP to find its
+macro files
+(viz., \fI-m\fP options,
+\fI.mso\fP'd files, and \fI.troff2pagerc\fP). In general, given a
+macro file, troff2page, like groff, searches for it in
+\fIGROFF_TMAC_PATH\fP, then the working directory, then
+\fIHOME\fP.
+.PP
+All regularly sourced files (with request \fI.so\fP), including
+the init file \fIjobname.t2p\fP, are found relative to the
+working directory.
+.PP
+If you're sure you will always want an Info file for whatever document
+you give to \fItroff2page\fP, set the environment variable
+\fITROFF2PAGE2INFO\fP (the value doesn't matter):
+.PP
 .EX
-  export TROFF2PAGE2INFO=always
+    export TROFF2PAGE2INFO=always
 .EE
-
+.PP
 .SH SYSTEM REQUIREMENTS
-
+.PP
 \fItroff2page\fP requires Lua. For more information, please see the
 file \fIINSTALL.adoc\fP in the
 distribution.
-
+.PP
 .SH AVAILABILITY
-
+.PP
 troff2page is downloadable from http://github.com/ds26gte/troff2page.
-
+.PP
 .SH SEE ALSO
-
-groff(1), groff_tmac(5), groff_man(7), groff_ms(7), lua(1), nvim(1)
+.PP
+groff(1), groff_tmac(5), groff_man(7), groff_ms(7), lua(1),
+luatex(1), nvim(1)

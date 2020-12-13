@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2020-12-13
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -214,7 +214,8 @@ function troff2page_1pass(argc, argv)
       i=i+1
     end -- while
     if not document_found_p and not call_for_help_p then
-      tlog('troff2page called with no document files.\n')
+      --tlog('troff2page called with no document files.\n')
+      troff2page_stream(io.stdin)
     end
     do_bye()
   end) -- flet
@@ -232,10 +233,14 @@ function troff2page(...)
     Main_troff_file = argv[argc],
     Rerun_needed_p = false
   }, function()
-    if argc==0 then tlog('troff2page called with no arguments.\n'); return end
-    if not(string.match(Main_troff_file, '^-')) then
+    --if argc==0 then tlog('troff2page called with no arguments.\n'); return end
+    if Main_troff_file and not(string.match(Main_troff_file, '^-')) then
       Jobname = file_stem_name(Main_troff_file)
-    else Jobname = 'troffput'
+    else
+      --print('reading from stdin')
+      Main_troff_file = 'troffput'
+      Single_pass_p = true
+      Jobname = 'troffput'
     end
     with_open_output_file(Jobname..Log_file_suffix, function(o)
       Log_stream = make_broadcast_stream(o, io.stdout)

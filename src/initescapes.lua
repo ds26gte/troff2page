@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-13
 
 Escape_table = {}
 
@@ -126,7 +126,7 @@ end)
 defescape('B', function()
   local delim = get_char()
   if delim == "'" or delim == '"' then
-    local arg = expand_args(read_till_char(read_till_char(delim, 'eat_delim')))
+    local arg = expand_args(read_till_char(delim, 'eat_delim'))
     local n = tonumber(arg)
     return (n and '1' or '0')
   else terror('\\B: bad delim %s', delim)
@@ -143,21 +143,30 @@ defescape('(', function()
   return Glyph_table[s] or ('\\(' .. s)
 end)
 
-defescape('[', function()
-  local s = read_till_char(']', 'eat_delim')
-  local s1
-  local it = Glyph_table[s]
+function glyphname_to_htmlchar(name)
+  local it = Glyph_table[name]
   if it then return it end
-  if string.find(s, 'u') == 1 then
-    s1 = string.sub(s, 2, -1)
-    if tonumber('0x' .. s1) then
-      return '\\[htmlamp]#x' .. s1 .. ';'
+  if string.find(name, 'u') == 1 then
+    local hnum = string.sub(name, 2)
+    if tonumber('0x' .. hnum) then
+      return '\\[htmlamp]#x' .. hnum .. ';'
     end
   end
-  if string.find(s, 'html') ~= 1 then
-    twarning("warning: can't find special character '%s'", s)
+  if string.find(name, 'html') ~= 1 then
+    twarning("warning: can't find special character '%s'", name)
   end
-  return '\\[' .. s .. ']'
+  return '\\[' .. name .. ']'
+end
+
+defescape('[', function()
+  local glyph_name = read_till_char(']', 'eat_delim')
+  return glyphname_to_htmlchar(glyph_name)
+end)
+
+defescape('C', function()
+  local delim = get_char()
+  local glyph_name = read_till_char(delim, 'eat_delim')
+  return glyphname_to_htmlchar(glyph_name)
 end)
 
 defescape('h', function()

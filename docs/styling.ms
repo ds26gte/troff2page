@@ -64,9 +64,13 @@ Colophon
 .IX colophon
 .IX last-modification time
 By default, troff2page places a colophon at the bottom right of the first
-page. The colophon mentions (i) the last-modification
+page. The colophon mentions
+.PP
+i. the last-modification
 time of
-the document and (ii) the troff2page version used for the conversion.
+the document, and
+.PP
+ii. the troff2page version used for the conversion.
 Either or both can be suppressed via CSS.
 .PP
 .IX colophon@.colophon, CSS class
@@ -117,6 +121,11 @@ accomplished via the CSS fragment:
     }
 .EE
 .PP
+As a special case, for man pages, troff2page (like groff -man)
+takes the third argument of the titling macro \fC.TH\fP as the
+last-mod date. If there isn’t a third argument, the colophon
+won’t mention any date.
+.PP
 .SH 2
 Glyph substition
 .LP
@@ -165,10 +174,13 @@ Typing verbatim \\e in displays
 The display used above brings up another use-case for glyph
 translation, even when (and especially if) no exotic characters
 are desired. The display shows the backslash (\fC\e\fP) character, which
-is also the default escape character for groff. In a display
-containing verbatim
-code, we want to
-suppress the backslash’s escape effect, and have it simply render as itself. 
+is also the default escape character for groff.
+.PP
+We could use the
+escape sequence \fC\ee\fP in our input to stand for a backslash,
+but especially in an extended display containing verbatim code,
+we would like to input the backslash as-is and have groff and
+troff2page temporarily suspend its escape effect.
 We could do this by having our display
 macros
 implicitly turn the escape character off when entering the display and back on when
@@ -230,10 +242,12 @@ In the Vim editor, for instance, adding the command \fCexec 'dig
 \e\e' 0x29F9\fP to your vimrc lets you use the digraph \fC\e\e\fP
 to enter U+29F9.
 .FE
+.PP
 So now your
 displayed code has something that \fIlooks\fP like a backslash,
 at least on
-browsers, but it most probably fails for print. Even in the browser,
+browsers, but it most probably fails for print, because the print
+font lacks the exotic character. Even in the browser,
 close is no cigar: Somebody cutting and pasting your code is in
 for a nasty surprise. You really do want the \fIreal\fP backslash in
 there even on the HTML page, but you don’t want to disable

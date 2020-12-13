@@ -1,0 +1,14 @@
+.de makro
+This is still double-u: \\$1.
+..
+.
+.char Z w
+.PP
+This is double-u: Z (but typed cap-zee).
+.PP
+.makro Z
+.PP
+.tm rchar's arg should be cap-zee, not w.
+.rchar Z
+.PP
+This is the real cap-zee: Z.

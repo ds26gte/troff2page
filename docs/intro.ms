@@ -1,4 +1,4 @@
-.\" last modified 2020-12-08
+.\" last modified 2020-12-13
 .SH 1
 1. Introduction
 .LP
@@ -123,20 +123,6 @@ Macro file options must be given without the suffix \fC.tmac\fP or prefix
 \fCxyz.tmac\fP or \fCtmac.xyz\fP, whichever is found first in the macro directories,
 and loads it.
 .PP
-If after all the option processing, no file arguments remain, and
-the options for help or version were not used,
-\fCtroff2page\fP displays a “could not find” message.
-.PP
-If there is \fIone\fP file argument, say \fCfilename.ext\fP,
-\fCtroff2page\fP converts it to \fCfilename.html\fP (and possibly
-some auxiliary HTML files whose names are of form
-\fCfilename-Z-H-number.html\fP).
-.PP
-If there is \fImore than one\fP file argument, say \fCf1.e1, f2.e2, ...
-flast.elast\fP, \fCtroff2page\fP concatenates their content to create a
-corresponding HTML version in \fCflast.html\fP (and possibly some
-aux HTML files \fCflast-Z-H-number.html\fP).
-.PP
 If you find you need to specify an option that \fCtroff2page\fP
 doesn’t accept, you can always supply it in a macro file via
 \fC-m\fP.
@@ -144,6 +130,39 @@ doesn’t accept, you can always supply it in a macro file via
 The options can be varied with each call to \fCtroff2page\fP, just as
 with \fCgroff\fP. Please see the groff man page
 for details on all the provided options.
+.PP
+.SH 2
+Filename arguments
+.LP
+The arguments remaining after all the option processing are
+considered to be the names of document files.
+.PP
+If there is \fIone\fP file argument, say \fCfilename.ext\fP,
+\fCtroff2page\fP converts it to \fCfilename.html\fP (and possibly
+some auxiliary HTML files whose names are of form
+\fCfilename-Z-H-number.html\fP). This is unlike groff, which
+writes to console (“standard output”).
+.PP
+If there is \fImore than one\fP file argument, say \fCf1.e1, f2.e2, ...
+flast.elast\fP, \fCtroff2page\fP concatenates their content to create a
+corresponding HTML version in \fCflast.html\fP (and possibly some
+aux HTML files \fCflast-Z-H-number.html\fP). Again, this is
+unlike groff.
+.PP
+If any of the argument files don’t exist, \fCtroff2page\fP, like groff, issues a
+“cannot open ... No such file or directory” diagnostic, but does
+its best with the files that do exist.
+.PP
+If after all the option processing, \fIno\fP file arguments remain, and
+the options for help or version were not used,
+\fCtroff2page\fP reads from the console (“standard input”), like
+groff.  The output HTML file(s) in this case use the basename
+\fCtroffput\fP.\**  This part is unlike groff, which always writes
+to console.
+.FS
+The name \fCtroffput\fP is inspired by \fCtexput\fP,
+the name that TeX uses when it isn’t given an input file.
+.FE
 .PP
 .SH 2
 Autoloaded init files
@@ -195,6 +214,9 @@ not\fP disable the autoloading of \fC.troff2pagerc\fP.
 these files typically contain information that’s relevant
 for HTML only.)
 .PP
+.SH 2
+Man-page conversion
+.LP
 .IX man.local, man init file
 If the input file is recognizably a man page (i.e., it has the
 command \fC.TH\fP), both troff2page and groff will load, if it
@@ -205,7 +227,6 @@ Calling troff2page from within Lua
 .LP
 .TAG calling_troff2page_within_lua
 .IX calling troff2page from!Lua
-.
 The script \fCtroff2page\fP runs on the command-line on Unix-esque
 machines that have Lua installed.
 For more installation information,
