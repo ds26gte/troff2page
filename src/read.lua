@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2020-12-13
 
 function make_bstream(opts)
   return {
@@ -13,7 +13,7 @@ function toss_back_char(c)
 end
 
 function snoop_char()
-  local c = get_char()
+  local c = get_char('dont_translate')
   --print('snoop_char ->', c, '<-')
   if c then toss_back_char(c) end
   return c
@@ -71,8 +71,8 @@ function ignore_spaces()
   local c
   while true do
     c = snoop_char()
-    if not c then return 
-    elseif c == ' ' or c == '\t' then get_char() 
+    if not c then return
+    elseif c == ' ' or c == '\t' then get_char()
     else return
     end
   end
@@ -83,7 +83,7 @@ function ignore_char(c)
     ignore_spaces()
   end
   local d = snoop_char()
-  if not d then return 
+  if not d then return
   elseif d == c then get_char()
   end
 end
@@ -108,7 +108,7 @@ function read_word()
     end
   else return read_bare_word()
   end
-end 
+end
 
 function read_rest_of_line()
   ignore_spaces()
@@ -117,9 +117,9 @@ function read_rest_of_line()
   while true do
     c = snoop_char()
     if not c or c == '\n' then
-      get_char(); break
+      c = get_char(); break
     else
-      get_char(); r = r .. c
+      c = get_char(); r = r .. c
     end
   end
   return expand_args(r)
@@ -137,7 +137,7 @@ function read_quoted_phrase()
       c = snoop_char()
       if read_escape_p then
         read_escape_p = false
-        get_char()
+        c = get_char()
         if c == '\n' then no_op()
         else r = r .. Escape_char .. c
         end
@@ -147,7 +147,8 @@ function read_quoted_phrase()
       elseif c == '"' or c == '\n' then
         if c == '"' then get_char() end
         break
-      else get_char()
+      else
+        c = get_char()
         r = r .. c
       end
     end
@@ -167,7 +168,8 @@ function read_bare_word()
       read_escape_p = false
       if not c then break
       elseif c == '\n' then get_char()
-      else get_char()
+      else
+        c = get_char()
         r = r .. Escape_char .. c
       end
     elseif not c or c == ' ' or c == '\t' or c == '\n' or
@@ -177,7 +179,8 @@ function read_bare_word()
     elseif escape_char_p(c) then
       read_escape_p = true
       get_char()
-    else get_char()
+    else
+      c = get_char()
       if Reading_string_call_p then
         if c == '[' then bracket_nesting = bracket_nesting+1
         elseif c == ']' then bracket_nesting = bracket_nesting-1
@@ -205,13 +208,15 @@ function read_troff_line(stop_before_newline_p)
     if read_escape_p then
       read_escape_p = false
       if c == '\n' then get_char()
-      else get_char()
+      else
+        c = get_char()
         r = r .. Escape_char .. c
       end
     elseif escape_char_p(c) then
       read_escape_p = true
       get_char()
-    else get_char()
+    else
+      c = get_char()
       r = r .. c
     end
   end
@@ -223,21 +228,21 @@ function read_troff_string_line()
   ignore_spaces()
   local c = snoop_char()
   if not c then return ''
-  else 
+  else
     if c == '"' then get_char() end
     return read_troff_line()
   end
-end 
+end
 
 function read_troff_string_and_args()
   local c = get_char()
-  if c == '(' then 
+  if c == '(' then
     local c1 = get_char(); local c2 = get_char()
     return c1..c2, {}
-  elseif c == '[' then 
+  elseif c == '[' then
     return flet({
       Reading_string_call_p = true
-    }, function() 
+    }, function()
       local s = expand_args(read_word())
       local r = {}
       while true do
@@ -262,7 +267,7 @@ function if_test_passed_p()
     local left = expand_args(read_till_char(c, 'eat_delim'))
     local right = expand_args(read_till_char(c, 'eat_delim'))
     res = (left == right)
-  elseif c == '!' then --print('itpp found !'); 
+  elseif c == '!' then --print('itpp found !');
     res= not(if_test_passed_p())
   elseif c == 'n' then res= false
   elseif c == 't' then res= true
@@ -315,11 +320,11 @@ function read_arith_expr(opts)
     elseif c == '<' then get_char()
       --print('rae found lt')
       local proc; local c = snoop_char()
-      if c == '=' then get_char(); 
+      if c == '=' then get_char();
         proc = function(x,y) return x <= y end
       elseif c == '?' then get_char();
         proc = math.min
-      else 
+      else
         proc = function(x,y) return x < y end
       end
       ignore_spaces()
@@ -330,11 +335,11 @@ function read_arith_expr(opts)
     elseif c == '>' then get_char()
       --print('rae encd gt')
       local proc; local c = snoop_char()
-      if c == '=' then get_char(); 
+      if c == '=' then get_char();
         proc = function(x,y) return x >= y end
       elseif c == '?' then get_char();
         proc = math.max
-      else 
+      else
         proc = function(x,y) return x > y end
       end
       ignore_spaces()
@@ -346,7 +351,7 @@ function read_arith_expr(opts)
       if snoop_char() == '=' then get_char() end
       ignore_spaces()
       acc = bool_to_num(acc == read_arith_expr{stop = true})
-    elseif c == '(' then 
+    elseif c == '(' then
       --print('rae encd lparen')
       get_char(); ignore_spaces()
       acc = read_arith_expr{inside_paren_p = true}; ignore_spaces()
@@ -368,7 +373,7 @@ function read_arith_expr(opts)
       while true do
         c = snoop_char()
         if not c then break end
-        if c == '.' then 
+        if c == '.' then
           if dot_read_p then break end
           dot_read_p = true; get_char()
           r =  r..c
@@ -379,7 +384,7 @@ function read_arith_expr(opts)
       end
       acc = tonumber(r)
       --print('num acc=', acc)
-      if opts.inside_paren_p then --print('rae continuing with acc=', acc); 
+      if opts.inside_paren_p then --print('rae continuing with acc=', acc);
         ignore_spaces() end
       if opts.stop then break end
     elseif c == Escape_char then get_char()
@@ -412,7 +417,7 @@ function read_opt_sign()
   ignore_spaces()
   local c = snoop_char()
   if not c then return false
-  elseif c == '+' or c == '-' then get_char(); return c 
+  elseif c == '+' or c == '-' then get_char(); return c
   else return false
   end
 end
@@ -432,7 +437,7 @@ function ignore_branch()
   while true do
     c = snoop_char()
     if not c then break
-    elseif c=='\n' then --get_char(); 
+    elseif c=='\n' then --get_char();
       --if not fillp() then get_char() end
       break
     elseif c == Escape_char then get_char()
@@ -454,7 +459,7 @@ function ignore_branch()
       elseif c == Escape_char then c = get_char()
         --print('igb read escaped', c)
         if not c then terror 'ignore_branch: escape eof'
-        elseif c == '}' then nesting=nesting-1; 
+        elseif c == '}' then nesting=nesting-1;
           if nesting==0 then break end
         elseif c == '{' then nesting=nesting+1
         end
@@ -511,6 +516,6 @@ function read_args()
     --print('read_args found word a', w, 'a')
     table.insert(r, w)
   end
-  --print('read_args returning a' , table_to_string(r), 'a')
+  --print('read_args returning' , table_to_string(r))
   return table.unpack(r)
-end 
+end

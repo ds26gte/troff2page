@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2020-12-13
 
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
@@ -20,12 +20,12 @@ function generate_html(percolatable_status_values)
 end
 
 function process_line()
-  --print('<<< doing process_line to', Out)
+  --print('doing process_line')
   local c = snoop_char()
-  --io.write('process_line starting with ->', c or 'NULL', '<- ')
-  --io.write('Control_char=', Control_char, ' ')
-  --io.write('Macro_copy_mode_p=', tostring(Macro_copy_mode_p), ' ')
-  --io.write('Sourcing_ascii_code_p=', tostring(Sourcing_ascii_code_p), ' ')
+  --io.write('process_line starting with ->', c or 'NULL', '<-\n')
+  --io.write('\tControl_char=', Control_char, '\n')
+  --io.write('\tMacro_copy_mode_p=', tostring(Macro_copy_mode_p), '\n')
+  --io.write('\tSourcing_ascii_code_p=', tostring(Sourcing_ascii_code_p), '\n')
   --io.write('\n')
   flet({
     Keep_newline_p = true
@@ -40,7 +40,7 @@ function process_line()
            not Macro_copy_mode_p and
            not Sourcing_ascii_file_p and
            (function() it = read_macro_name(); return it end)() then
-      --print('found control char', c)
+      --print('found control char', c, it)
       Keep_newline_p = false
       -- if it ~= true ??
       execute_macro(it)

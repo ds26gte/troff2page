@@ -1,4 +1,4 @@
-.\" last modified 2020-12-12
+.\" last modified 2020-12-13
 .SH 1
 8. Styling
 .LP
@@ -65,7 +65,7 @@ Colophon
 .IX last-modification time
 By default, troff2page places a colophon at the bottom right of the first
 page. The colophon mentions (i) the last-modification
-time of the
+time of
 the document and (ii) the troff2page version used for the conversion.
 Either or both can be suppressed via CSS.
 .PP
@@ -155,18 +155,25 @@ boring equivalents for print:
     .\}
 .EE
 .PP
+.PP
+.SH 2
+Typing verbatim \\e in displays
+.LP
 .IX \\@\e, groff escape character
 .IX eo@.eo, groff request
 .IX ec@.ec, groff request
 The display used above brings up another use-case for glyph
 translation, even when (and especially if) no exotic characters
-are desired. The display shows the \fC\e\fP character, which
-is an escape character for groff. In a display, we want to
-suppress its effect. We could do this by having our display
+are desired. The display shows the backslash (\fC\e\fP) character, which
+is also the default escape character for groff. In a display
+containing verbatim
+code, we want to
+suppress the backslash’s escape effect, and have it simply render as itself. 
+We could do this by having our display
 macros
 implicitly turn the escape character off when entering the display and back on when
 exiting it. The requests for these actions are \fC.eo\fP and
-\fC.ec\fP respectively.
+\fC.ec\fP respectively:
 .IX LD@.LD, ms macro
 .IX DE@.DE, ms macro
 .IX ft@.ft, groff request
@@ -187,7 +194,7 @@ exiting it. The requests for these actions are \fC.eo\fP and
 .EE
 .PP
 We then use the macros \fC.EX\fP and \fC.EE\fP around the code text to
-display it, in mononspace font and with the escape character
+display it, in monospace font and with the escape character
 temporarily disabled. (An improved version of these macros are provided
 in \fCpca-verb.tmac\fP.)
 .PP
@@ -195,7 +202,7 @@ This works for short displays that are entirely within a page
 (we’re talking printed pages via groff now, not HTML pages). The
 various traps that spring into action when groff breaks at a page
 rely on the escape character being active, and these will start
-failing catastrophicaly when our display straddles a page
+failing catastrophically when our display straddles a page
 boundary.
 .PP
 .IX KS@.KS, ms macro
@@ -217,13 +224,19 @@ Unicode glyph substitution offers another way out. The Unicode
 characters U+29F9 (\s-2BIG REVERSE SOLIDUS\s0) and U+FE68 (\s-2SMALL REVERSE
 SOLIDUS\s0) are passable replacements for the regular backslash (aka
 \s-2REVERSE SOLIDUS\s0, U+005C). You can enter these substitute
-backslashes with text-editor macros fairly easily. So now your
-displayed code now has something that looks like a backslash,
+backslashes with text-editor macros fairly easily.\**
+.FS
+In the Vim editor, for instance, adding the command \fCexec 'dig
+\e\e' 0x29F9\fP to your vimrc lets you use the digraph \fC\e\e\fP
+to enter U+29F9.
+.FE
+So now your
+displayed code has something that \fIlooks\fP like a backslash,
 at least on
 browsers, but it most probably fails for print. Even in the browser,
 close is no cigar: Somebody cutting and pasting your code is in
 for a nasty surprise. You really do want the \fIreal\fP backslash in
-there even in the HTML page, but you don’t want to disable
+there even on the HTML page, but you don’t want to disable
 groff’s escape character.
 Glyph substitution to the rescue:
 .PP
@@ -233,8 +246,20 @@ Glyph substitution to the rescue:
 .PP
 This lets you type the exotic backslash in your source but have
 groff and troff2page convert it into the regular backslash when
-the it lands on the page.
-Even better, there is no requirement that the font used actually
+it lands on the page.
+Note there is no requirement that the font used by groff or the
+browser actually
 have the exotic backslash glyph at that Unicode position!
-You still have to type the exotic backslash but a competent text
-editors (with a Unicode font!) can help you do this.
+You still have to \fItype\fP the exotic backslash, so you do require a competent text
+editor with a Unicode font.
+.PP
+.SH 2
+\\e in a section heading
+.LP
+This and the previous section’s headers both have a verbatim backslash in the
+header.  You could use glyph substitution here too. However, if
+you aren’t, \fIand\fP you’re using the \fC.ToC\fP macro, the fact that
+the ToC macros use groff diversions creates a hitch. You can use
+the \fC\\e\fP escape to get a literal backslash, but the
+diversion eats an escape, so you have to double it. Ergo:
+\fC\\\\e\fP.

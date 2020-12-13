@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2020-12-13
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -226,6 +226,7 @@ function initialize_macros()
     --print('value(2) =', value)
     value = string.gsub(value, '^(%s*)<br>\n?', '%1\n')
     value = string.gsub(value, '&', '\\[htmlamp]')
+    value = string.gsub(value, '\\e', '\\[htmlbackslash]')
     value = string.gsub(value, '%s*<br>\n?(%s*)$', '%1')
     --print('value(3) = ->', value, '<-')
     div.value = value

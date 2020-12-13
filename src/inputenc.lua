@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2020-12-13
 
 B_1000_0000 = 0x80
 B_1100_0000 = 0xc0
@@ -11,22 +11,31 @@ B_0000_0111 = 0x07
 B_0011_1111 = 0x3f
 
 function get_char(dont_translate_p)
+  --print('doing get_char', dont_translate_p)
   local buf = Current_troff_input.buffer
-  if #buf > 0 then
-    return table.remove(buf, 1)
-  end
   local strm = Current_troff_input.stream
-  if not strm then return false end
-  local c = strm:read(1)
-  if not c then return false end
-  if c == '\r' then
-    -- if \r return \n. If a real \n follows, discard it
-    c = '\n'
-    local c2 = strm:read(1)
-    if c2 and c2 ~= '\n' then
-      table.insert(buf, 1, c2)
+  local c
+  if #buf > 0 then
+    c = table.remove(buf, 1)
+    --print('\tbuf nonempty <', c, '>')
+  elseif not strm then
+    --print('\tno stream')
+    return false
+  else
+    c = strm:read(1)
+    if not c then
+      --print('\tno c')
+      return false
+    elseif c == '\r' then
+      -- if \r return \n. If a real \n follows, discard it
+      c = '\n'
+      local c2 = strm:read(1)
+      if c2 and c2 ~= '\n' then
+        table.insert(buf, 1, c2)
+      end
+      --print('\treturn char')
+      return c
     end
-    return c
   end
   --
   --
@@ -35,7 +44,11 @@ function get_char(dont_translate_p)
     -- c1byte = 0xxx_xxxx
     local g = false
     --FIXME
-    if true or not dont_translate_p or Outputting_to ~= 'troff' then
+    if Macro_copy_mode_p or dont_translate_p then
+      --print('\tnot translating', c)
+      no_op()
+    else
+      --print('\ttranslating', c)
       g = Unescaped_glyph_table[c]
     end
     if g then
