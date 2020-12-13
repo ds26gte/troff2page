@@ -6,13 +6,13 @@
 .IX ig@.ig, groff request
 \fC.ig ##\fP can be used to specify settings that are relevant only
 when troff2page is used on a document, e.g., stylesheet changes.
-troff2page uses the output-stream \fCCss_stream\fP to
+troff2page uses the output-stream \fCCSS\fP to
 write out its default style information.  The user can also
 append to this stream. E.g.,
-.IX Css_stream, troff2page output stream
+.IX CSS, troff2page output stream
 .EX
     .ig ##
-    Css_stream:write([[
+    CSS:write([[
         h1,h2,h3,h4,h5,h6 {
             color: #9b3d3d; /* terracotta pink */
             font-family: sans-serif;
@@ -43,7 +43,7 @@ instance, the HTML element for the document title has class
 Asciidoctor-like title:
 .EX
     .ig ##
-    Css_stream:write([[
+    CSS:write([[
       h1.title {
           color: #333333;
           padding-bottom: 10px;

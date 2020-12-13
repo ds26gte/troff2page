@@ -295,7 +295,7 @@ Colophon_done_p = nil
 Color_table = nil
 Control_char = nil
 Convert_to_info_p = nil
-Css_stream = nil
+CSS = nil
 Current_diversion = nil
 Current_pageno = nil
 Current_source_file = nil
@@ -485,7 +485,7 @@ end
 function close_all_open_streams()
   --print('doing close_all_open_streams')
   if Aux_stream then Aux_stream:flush(); Aux_stream:close() end
-  if Css_stream then Css_stream:flush(); Css_stream:close() end
+  if CSS then CSS:flush(); CSS:close() end
   for _,c in pairs(Output_streams) do
     --print('strm=', c)
    -- c:flush();
@@ -549,7 +549,7 @@ function do_bye()
     write_aux('nb_title(\'', escaped_Title, '\')')
   end
   if Last_page_number == 0 then
-    Css_stream:write('.navigation { display: none; }\n')
+    CSS:write('.navigation { display: none; }\n')
   end
   if Preferred_last_modification_time then
     write_aux('nb_preferred_last_modification_time(\'', Preferred_last_modification_time, '\')')
@@ -659,7 +659,7 @@ function troff2page_1pass(argc, argv)
     Colophon_done_p = false,
     Color_table = {},
     Control_char = '.',
-    Css_stream = false,
+    CSS = false,
     Current_diversion = false,
     Current_pageno = -1,
     Current_source_file = Main_troff_file,
@@ -1038,8 +1038,8 @@ function initialize_css_file(css_file)
   --print('doing initialize_css_file', css_file)
   local css_file = Jobname..Css_file_suffix
   ensure_file_deleted(css_file)
-  Css_stream = io.open(css_file, 'w')
-  Css_stream:write([[
+  CSS = io.open(css_file, 'w')
+  CSS:write([[
   body {
     /* color: black;
     background-color: #ffffff; */
@@ -1251,15 +1251,15 @@ function collect_css_info_from_preamble()
   local ll = counter_value_in_pixels 'LL'
   local dd = counter_value_in_pixels 'DD'
   if ps ~= 10 then
-    Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
+    CSS:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
   if ll ~= 0 then
-    Css_stream:write(string.format('\nbody { max-width: %spx; }\n', ll))
+    CSS:write(string.format('\nbody { max-width: %spx; }\n', ll))
   end
   if Macro_package ~= 'man' then
     if p_i ~= 0 then
-      Css_stream:write(string.format('\np.indent { text-indent: %spx; }\n', p_i))
-      Css_stream:write(string.format('\np.hanging { padding-left: %spx; text-indent: -%spx; }\n',
+      CSS:write(string.format('\np.indent { text-indent: %spx; }\n', p_i))
+      CSS:write(string.format('\np.hanging { padding-left: %spx; text-indent: -%spx; }\n',
         p_i, p_i))
     end
     if pd >= 0 then
@@ -1267,22 +1267,22 @@ function collect_css_info_from_preamble()
       local display_margin = dd*2
       local fnote_rule_margin = pd*2
       local navbar_margin = ps*2
-      Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
+      CSS:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
         p_margin, p_margin))
-      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; padding-top: %spx; padding-bottom: %spx; }\n',
+      CSS:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; padding-top: %spx; padding-bottom: %spx; }\n',
         display_margin, display_margin, display_margin, display_margin))
-      Css_stream:write(string.format('\n.display.verbatim { padding-left: %spx; }',
+      CSS:write(string.format('\n.display.verbatim { padding-left: %spx; }',
         display_margin))
-      Css_stream:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
-      Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
+      CSS:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
+      CSS:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
         navbar_margin, navbar_margin))
     end
   end
   if Single_output_page_p then
-    Css_stream:write '\n@media print {\n'
-    Css_stream:write '\na.hrefinternal::after { content: target-counter(attr(href), page); }\n'
-    Css_stream:write '\na.hrefinternal .hreftext { display: none; }\n'
-    Css_stream:write '\n}\n'
+    CSS:write '\n@media print {\n'
+    CSS:write '\na.hrefinternal::after { content: target-counter(attr(href), page); }\n'
+    CSS:write '\na.hrefinternal .hreftext { display: none; }\n'
+    CSS:write '\n}\n'
   end
 end
 
@@ -1968,7 +1968,8 @@ function emit_end_para()
 end
 
 function emit_interleaved_para()
-  local continue_current_para = In_para_p
+  local continue_current_para_p = In_para_p
+  --print('doing emit_interleaved_para', In_para_p)
   if continue_current_para_p then
     emit_verbatim '</p>'
   end
@@ -3772,7 +3773,7 @@ function initialize_macros()
         end
       end
       w = read_one_line()
-      Css_stream:write(w, '\n')
+      CSS:write(w, '\n')
     end
   end)
 
@@ -3841,7 +3842,7 @@ function initialize_macros()
 
   defrequest('DC', function()
     local big_letter, extra, color = read_args()
-    --print('big_letter=', big_letter, 'extra=', extra, 'color=', color)
+    --print('doing DC big_letter=', big_letter, 'extra=', extra, 'color=', color)
     if color then
       local it = Color_table[color]
       if it then color = it end

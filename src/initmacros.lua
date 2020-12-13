@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2020-12-12
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -719,7 +719,7 @@ function initialize_macros()
         end
       end
       w = read_one_line()
-      Css_stream:write(w, '\n')
+      CSS:write(w, '\n')
     end
   end)
 
@@ -788,7 +788,7 @@ function initialize_macros()
 
   defrequest('DC', function()
     local big_letter, extra, color = read_args()
-    --print('big_letter=', big_letter, 'extra=', extra, 'color=', color)
+    --print('doing DC big_letter=', big_letter, 'extra=', extra, 'color=', color)
     if color then
       local it = Color_table[color]
       if it then color = it end

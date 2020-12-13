@@ -1,4 +1,4 @@
--- last modified 2020-12-06
+-- last modified 2020-12-12
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -52,7 +52,7 @@ Colophon_done_p = nil
 Color_table = nil
 Control_char = nil
 Convert_to_info_p = nil
-Css_stream = nil
+CSS = nil
 Current_diversion = nil
 Current_pageno = nil
 Current_source_file = nil

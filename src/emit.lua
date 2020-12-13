@@ -371,7 +371,8 @@ function emit_end_para()
 end
 
 function emit_interleaved_para()
-  local continue_current_para = In_para_p
+  local continue_current_para_p = In_para_p
+  --print('doing emit_interleaved_para', In_para_p)
   if continue_current_para_p then
     emit_verbatim '</p>'
   end

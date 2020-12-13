@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2020-12-12
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -14,7 +14,7 @@ end
 function close_all_open_streams()
   --print('doing close_all_open_streams')
   if Aux_stream then Aux_stream:flush(); Aux_stream:close() end
-  if Css_stream then Css_stream:flush(); Css_stream:close() end
+  if CSS then CSS:flush(); CSS:close() end
   for _,c in pairs(Output_streams) do
     --print('strm=', c)
    -- c:flush();
@@ -78,7 +78,7 @@ function do_bye()
     write_aux('nb_title(\'', escaped_Title, '\')')
   end
   if Last_page_number == 0 then
-    Css_stream:write('.navigation { display: none; }\n')
+    CSS:write('.navigation { display: none; }\n')
   end
   if Preferred_last_modification_time then
     write_aux('nb_preferred_last_modification_time(\'', Preferred_last_modification_time, '\')')

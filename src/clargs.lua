@@ -1,4 +1,4 @@
--- last modified 2020-12-06
+-- last modified 2020-12-12
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -73,7 +73,7 @@ function troff2page_1pass(argc, argv)
     Colophon_done_p = false,
     Color_table = {},
     Control_char = '.',
-    Css_stream = false,
+    CSS = false,
     Current_diversion = false,
     Current_pageno = -1,
     Current_source_file = Main_troff_file,

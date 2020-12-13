@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2020-12-12
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -37,8 +37,8 @@ function initialize_css_file(css_file)
   --print('doing initialize_css_file', css_file)
   local css_file = Jobname..Css_file_suffix
   ensure_file_deleted(css_file)
-  Css_stream = io.open(css_file, 'w')
-  Css_stream:write([[
+  CSS = io.open(css_file, 'w')
+  CSS:write([[
   body {
     /* color: black;
     background-color: #ffffff; */
@@ -250,15 +250,15 @@ function collect_css_info_from_preamble()
   local ll = counter_value_in_pixels 'LL'
   local dd = counter_value_in_pixels 'DD'
   if ps ~= 10 then
-    Css_stream:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
+    CSS:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
   if ll ~= 0 then
-    Css_stream:write(string.format('\nbody { max-width: %spx; }\n', ll))
+    CSS:write(string.format('\nbody { max-width: %spx; }\n', ll))
   end
   if Macro_package ~= 'man' then
     if p_i ~= 0 then
-      Css_stream:write(string.format('\np.indent { text-indent: %spx; }\n', p_i))
-      Css_stream:write(string.format('\np.hanging { padding-left: %spx; text-indent: -%spx; }\n',
+      CSS:write(string.format('\np.indent { text-indent: %spx; }\n', p_i))
+      CSS:write(string.format('\np.hanging { padding-left: %spx; text-indent: -%spx; }\n',
         p_i, p_i))
     end
     if pd >= 0 then
@@ -266,22 +266,22 @@ function collect_css_info_from_preamble()
       local display_margin = dd*2
       local fnote_rule_margin = pd*2
       local navbar_margin = ps*2
-      Css_stream:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
+      CSS:write(string.format('\np { margin-top: %spx; margin-bottom: %spx; }\n',
         p_margin, p_margin))
-      Css_stream:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; padding-top: %spx; padding-bottom: %spx; }\n',
+      CSS:write(string.format('\n.display { margin-top: %spx; margin-bottom: %spx; padding-top: %spx; padding-bottom: %spx; }\n',
         display_margin, display_margin, display_margin, display_margin))
-      Css_stream:write(string.format('\n.display.verbatim { padding-left: %spx; }',
+      CSS:write(string.format('\n.display.verbatim { padding-left: %spx; }',
         display_margin))
-      Css_stream:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
-      Css_stream:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
+      CSS:write(string.format('\n.footnote { margin-top: %spx; }\n', fnote_rule_margin))
+      CSS:write(string.format('\n.navigation { margin-top: %spx; margin-bottom: %spx; }\n',
         navbar_margin, navbar_margin))
     end
   end
   if Single_output_page_p then
-    Css_stream:write '\n@media print {\n'
-    Css_stream:write '\na.hrefinternal::after { content: target-counter(attr(href), page); }\n'
-    Css_stream:write '\na.hrefinternal .hreftext { display: none; }\n'
-    Css_stream:write '\n}\n'
+    CSS:write '\n@media print {\n'
+    CSS:write '\na.hrefinternal::after { content: target-counter(attr(href), page); }\n'
+    CSS:write '\na.hrefinternal .hreftext { display: none; }\n'
+    CSS:write '\n}\n'
   end
 end
 
