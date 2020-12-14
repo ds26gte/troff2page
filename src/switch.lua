@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2020-12-14
 
 function switch_style(opts)
   opts = opts or {}
@@ -224,6 +224,7 @@ end
 
 function ms_font_macro(f)
   local w, post, pre = read_args()
+  --print('w=', w, 'post=', post, 'pre=', pre)
   if pre then emit(pre) end
   emit(switch_font(f))
   if w then

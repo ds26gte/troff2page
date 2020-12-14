@@ -1,9 +1,9 @@
-.\" last modified 2020-12-08
+.\" last modified 2020-12-14
 .SH 1
 5. Making an index
 .LP
 .IX index
-.IX pca-ix.tmac, mpca macro file
+.IX pca-ix.tmac, macro file
 .IX makeindex
 The supplied macro file \fCpca-ix.tmac\fP
 creates a sorted
@@ -19,7 +19,7 @@ are different.  In addition, the index generated for
 troff2page has the additional feature of hyperlinking to the
 appropriate locations in the body text.
 .PP
-.IX IX@.IX, mpca macro
+.IX IX@.IX, -mpca macro
 The call
 .EX
     .IX item

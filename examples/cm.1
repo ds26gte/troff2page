@@ -1,0 +1,19 @@
+.de makro1
+i arg = \\$1, ii arg = \\$2
+..
+.PP
+This call sees only one arg, because the dq comment leaves eol
+.PP
+.makro1 1 \" comment
+.PP
+This call sees both args, because the sharp comment swallows the
+eol
+.PP
+.makro1 3 \# comment
+4
+.PP
+.PP
+Laborum sint consequatur accusantium sed quia. Quidem sapiente
+atque nobis hic quia. Dicta minima cupiditate quidem labore qui
+tempore qui. Fugiat ut ducimus enim repellat sed qui est. Veniam
+in rerum praesentium incidunt sint asperiores.

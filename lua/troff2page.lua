@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201213 -- last modified
+troff2page_version = 20201214 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -1334,17 +1334,17 @@ function collect_macro_body(w, ender)
   return m
 end
 
-function expand_args(s)
+function expand_args(s, not_copy_mode_p)
   --print('doing expand_args', s)
   if not s then return '' end
   local res = with_output_to_string(function (o)
     flet({
       Current_troff_input = make_bstream{buffer = string_to_table(s)},
-      Macro_copy_mode_p = true,
+      Macro_copy_mode_p = not not_copy_mode_p,
       Outputting_to = 'troff',
       Out = o
     }, function()
-      --print('calling generate_html from expand_args with Out=', Out)
+      --print('calling generate_html from expand_args')
       --print('cti.b =', #(Current_troff_input.buffer))
       generate_html{'break', 'continue', 'ex', 'nx', 'return'}
     end)
@@ -1806,6 +1806,7 @@ function emit_expanded_line()
       num_leading_spaces = num_leading_spaces + 8
     elseif escape_char_p(c) then
       --print('EEE found esc', c)
+      --print('clsp=', count_leading_spaces_p, 'rqpp=', Reading_quoted_phrase_p)
       if blank_line_p then blank_line_p = false end
       c = snoop_char();       --print('Macro_copy_mode_p =', Macro_copy_mode_p)
       if not c then c = '\n' end
@@ -2301,14 +2302,14 @@ function process_line()
       emit_newline()
     end
   end)
-  --print('>>> process_line done, Out is', Out)
+  --print('process_line done')
 end
 
 function expand_escape(c)
   --print('doing expand_escape', c)
   local it
   if not c then c = '\n'
-  else get_char()
+  else c=get_char()
   end
   --
   if Turn_off_escape_char_p then
@@ -2316,9 +2317,13 @@ function expand_escape(c)
   end
   --
   local it = Escape_table[c]
+  --print('it=', it)
+  --print('copymode=', Macro_copy_mode_p)
   if it and
     (not Macro_copy_mode_p or
-    c=='n' or c=='*' or c=='$' or c=='\\') then
+    c=='n' or c=='*' or c=='$' or c=='\\' or
+    c=='"' or c=='#') then
+    --print('escape action')
     return it()
   end
   --
@@ -2538,8 +2543,11 @@ defescape('c', function()
 end)
 
 defescape('"', function()
+  --print('reading comment')
   if Reading_quoted_phrase_p then return verbatim '"'
-  else read_troff_line('stop_before_newline_p'); return ''
+  else
+    --print('reading comment I')
+    read_troff_line('stop_before_newline_p'); return ''
   end
 end)
 
@@ -3381,7 +3389,7 @@ function initialize_macros()
     local c = get_char()
     if c == Escape_char then
       local glyph_name = read_escaped_word()
-      local rhs = expand_args(read_troff_string_line())
+      local rhs = expand_args(read_troff_string_line(), 'not_copy_mode')
       defglyph(glyph_name, rhs)
     else
       local rhs = expand_args(read_troff_string_line())
@@ -3401,8 +3409,6 @@ function initialize_macros()
       read_troff_line()
       Glyph_table[glyph_name] = nil
     else
-      --FIXME
-      --TODO
       --print('rchar`ing', c)
       read_troff_line()
       Unescaped_glyph_table[c] = nil
@@ -3456,36 +3462,27 @@ function initialize_macros()
   end)
 
   defrequest('IMG', function()
-    local align, img_file, width = read_args()
-    if not (align=='-L' or align=='-C' or align=='-R') then
-      width=img_file; img_file=align; align='-C'
-    end
-    if align=='-L' then align='left'
-    elseif align=='-C' then align='center'
-    elseif align=='-R' then align='right'
-    end
-    if not width then width=80 end
-    emit_img(img_file, align, width..'%')
-  end)
-
-  defrequest('PIMG', function()
-    --print('doing .PIMG')
     local align = read_word()
-    local img_file
-    local width
-    local height
-    if align=='-L' or align=='-C' or align=='-R' then img_file=read_word()
-    else img_file=align; align='-C'
+    local img_file, width, height
+    if align=='-L' or align=='-C' or align=='-R' then
+      img_file = read_word()
+    else
+      img_file = align; align = '-C'
     end
     width=read_length_in_pixels()
-    height=read_length_in_pixels()
+    --height=read_length_in_pixels()
     read_troff_line()
     if align=='-L' then align='left'
     elseif align=='-C' then align='center'
     elseif align=='-R' then align='right'
     end
-    emit_img(img_file, align, width, height)
+    if width==0 then
+      width = point_equivalent_of 'i'
+    end
+    emit_img(img_file, align, width)
   end)
+
+  defrequest('PIMG', Request_table.IMG)
 
   defrequest('tmc', do_tmc)
 
@@ -4660,10 +4657,6 @@ function get_char(dont_translate_p)
   return Escape_char
 end
 
-x = 12
-+ 34
-
-
 
 function anchor(lbl)
   --print('doing anchor', lbl)
@@ -5046,6 +5039,7 @@ function ignore_char(c)
 end
 
 function escape_char_p(c)
+  --if (c==Escape_char) then print('Turn_off_escape_char_p=', Turn_off_escape_char_p) end
   return not Turn_off_escape_char_p and c == Escape_char
 end
 
@@ -5456,7 +5450,7 @@ function read_macro_name()
 end
 
 function read_args()
-  --print('doing read_args')
+  --print('doing read_args, calling read_troff_line, then expand_args')
   local ln = expand_args(read_troff_line())
   local r = {}
   local c, w
@@ -5944,6 +5938,7 @@ end
 
 function ms_font_macro(f)
   local w, post, pre = read_args()
+  --print('w=', w, 'post=', post, 'pre=', pre)
   if pre then emit(pre) end
   emit(switch_font(f))
   if w then

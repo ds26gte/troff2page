@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2020-12-14
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -204,6 +204,7 @@ function emit_expanded_line()
       num_leading_spaces = num_leading_spaces + 8
     elseif escape_char_p(c) then
       --print('EEE found esc', c)
+      --print('clsp=', count_leading_spaces_p, 'rqpp=', Reading_quoted_phrase_p)
       if blank_line_p then blank_line_p = false end
       c = snoop_char();       --print('Macro_copy_mode_p =', Macro_copy_mode_p)
       if not c then c = '\n' end

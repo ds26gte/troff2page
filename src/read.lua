@@ -1,4 +1,4 @@
--- last modified 2020-12-13
+-- last modified 2020-12-14
 
 function make_bstream(opts)
   return {
@@ -89,6 +89,7 @@ function ignore_char(c)
 end
 
 function escape_char_p(c)
+  --if (c==Escape_char) then print('Turn_off_escape_char_p=', Turn_off_escape_char_p) end
   return not Turn_off_escape_char_p and c == Escape_char
 end
 
@@ -499,7 +500,7 @@ function read_macro_name()
 end
 
 function read_args()
-  --print('doing read_args')
+  --print('doing read_args, calling read_troff_line, then expand_args')
   local ln = expand_args(read_troff_line())
   local r = {}
   local c, w

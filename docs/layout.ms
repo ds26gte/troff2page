@@ -1,4 +1,4 @@
-.\" last modified 2020-12-08
+.\" last modified 2020-12-14
 .SH 1
 3. Page layout
 .LP
@@ -40,7 +40,7 @@ As can be seen, the number register \fC\en[.troff2page]\fP has a \fItrue\fP
 value, i.e., a number greater than zero, only when troff2page processes the
 document.
 .PP
-.IX page breaks for HTML only
+.IX page breaks!for HTML only
 If may be convenient to define a \fC.HBP\fP macro that causes a page-break
 only for HTML:
 .EX
@@ -55,8 +55,8 @@ sectioning commands
 or modify the existing ones
 to embed a page break.
 .PP
-.IX SH@."@SH, ms macro
-.IX SH@.SH, ms macro
+.IX SH@."@SH, -ms macro
+.IX SH@.SH, -ms macro
 .IX rn@.rn, groff request
 .IX de@.de, groff request
 .IX nr@.nr, groff request
@@ -131,6 +131,9 @@ HTML-style paragraphs
 .LP
 .IX n, groff scaling factor
 .IX v, groff scaling factor
+.IX PD, -ms number register
+.IX PI, -ms number register
+.IX LP, groff macro
 By default, troff2page sets paragraphs exactly as groff does: the first
 lines of paragraphs are indented (unless explicitly disabled via an
 \fC.LP\fP), and
@@ -147,6 +150,7 @@ to a \fInegative\fP value, which leads to whatever default paragraph
 separation that HTML uses.  Note that setting \fCPD\fP to a negative value
 should be done only for HTML, as groff will happily overstrike
 text in order to respect a negative \fCPD\fP:
+.IX p, groff scaling factor
 .EX
     .if \n[.troff2page] \{\
     .  nr PI 0n
@@ -164,12 +168,19 @@ the default font size. \fCv\fP is the distance between two consecutive
 baselines. Scaling factors are generally, but not always, what
 you might think of as length units.
 .PP
-.IX i, groff scaling factor (inch)
-.IX c, groff scaling factor (centim\(`etre)
-.IX p, groff scaling factor (point)
-.IX P, groff scaling factor (pica)
-.IX m, groff scaling factor
+.IX Fu\(ss, length unit
+.IX centim\(`etre, length unit
+.IX em, length unit
+.IX en, length unit
+.IX inch, length unit
+.IX pica, length unit
+.IX point, length unit
 .IX M, groff scaling factor
+.IX P, groff scaling factor (pica)
+.IX c, groff scaling factor (centim\(`etre)
+.IX i, groff scaling factor (inch)
+.IX m, groff scaling factor
+.IX p, groff scaling factor (point)
 Other groff scaling factors that troff2page recognizes
 are: \fCi\fP (inch = 1/12 foot), \fCc\fP (cm =
 50/127 inch), \fCp\fP (point = 1/72 inch), \fCP\fP (pica = 12
@@ -178,12 +189,14 @@ points), \fCm\fP (em = 2 ens), and \fCM\fP (1/100 em).
 .IX u, groff scaling factor
 .IX f, groff scaling factor
 .IX TeX
+.IX scaled point, length unit
+.IX TeX point, length unit
 Internally, both groff and troff2page store lengths in the scaling
 factor \fCu\fP, which
 is 1/72000 of an inch, and all lengths are integral multiples of
 u, thereby avoiding floating-point messes. If this seems too precise, consider that TeX stores all
 its lengths in “scaled points” (sp), where 1 sp = 1 / (2^16 * 72.27) =
-.IX troff, troff2page output stream
+.IX troff, groff Lua output stream
 .eval
 troff:write('1/', (2^16)*72.27, '\n')
 .endeval
@@ -193,18 +206,21 @@ troff:write(1/((2^16)*72.27), '\n')
 .endeval
 of an inch!
 .PP
+.IX PostScript
+.IX PostScript point, length unit
+.IX big point, length unit
 At any rate, do learn your inches and keep your inch measure
 handy. The groff manual throws the usual shade on “antiquated”
 units, but it can’t really mean it, as easy factors and
 multiples of the inch are all over the place.
-The groff point is exactly 1/72 of an inch
+The groff point (aka PostScript point, “big” point) is exactly 1/72 of an inch
 (unlike TeX’s slightly smaller point of 1/72.27 inch, which is
 neither metric fish nor Imperial fowl); the underlying scaling
 factor is 1/1000 of the point; and
 the default offsets, margins, and widths are all nice multiples of
 inches.
 .PP
-.IMG inch.jpg 30
+.IMG inch.jpg 3.5i
 .PP
 Finally, the scaling factor \fCf\fP is simply 2^16, so its
 coefficients can be used as fractions.
@@ -212,7 +228,7 @@ coefficients can be used as fractions.
 .SH 2
 Line length
 .LP
-.IX LL@.LL, ms number register
+.IX LL@.LL, -ms number register
 Unlike groff -ms, which uses the line length given by the register
 \fCLL\fP,
 troff2page by default does not restrict the text width on its HTML pages.
@@ -232,9 +248,49 @@ wide than \fCLL\fP (as is certainly unavoidable on cell
 phones): the text will correspondingly shrink to
 fit the window, avoiding the need for horizontal scrolling.
 .PP
+.IX mile, length unit
 A good \fCLL\fP value for troff2page should be a bit larger than
 -ms’s 6 inches, which is too narrow for a browser.  The following sets it
-to 1/8000 of a statute mile, but it takes effect only for HTML:
+to 1/8000 of a mile, but it takes effect only for HTML:
 .EX
     .if \n[.troff2page] .nr LL 7.92i
 .EE
+.PP
+.SH 2
+Images
+.LP
+.IX images
+.IX IMG@.IMG, groff macro
+troff2page supports a generalized version of the \fC.IMG\fP macro
+from groff’s \fCwww.tmac\fP. It accepts all the usual image file
+formats. An example call:
+.EX
+    .IMG t2p.png
+.EE
+This produces:
+.IMG t2p.png
+.PP
+.IX images!alignment
+An optional first argument of \fC-L\fP aligns the image to the
+left; \fC-R\fP to the right; and \fC-C\fP, the default, centers
+it.
+.PP
+.IX images!width
+An optional final argument specifies the width of the image. The
+default is 1 inch.
+E.g.,
+.EX
+    .IMG -L t2p.png 2.718281828i
+.EE
+produces a left-justified, \fIe\fP-inch-wide image:
+.IMG -L t2p.png 2.718281828i
+.LP
+.IX convert, image program
+.IX mkbitmap, image program
+.IX potrace, image program
+.IX inkscape, image program
+\fC.IMG\fP relies on external programs \fCconvert\fP (from
+ImageMagick); \fCmkbitmap\fP and \fCpotrace\fP (both from the
+\fCpotrace\fP package); and \fCinkscape\fP. \fCmkbitmap\fP and
+\fCpotrace\fP are needed for PNG images; \fCinkscape\fP for SVG
+images.

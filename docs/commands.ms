@@ -1,8 +1,11 @@
-.\" last modified 2020-12-08
+.\" last modified 2020-12-14
 .SH 1
 2. troff, groff, and troff2page commands
 .LP
-.IX drop caps in color
+.IX drop caps
+.IX man@-man, macro package
+.IX ms@-ms, macro package
+.IX groff
 .DC T ROFF2PAGE terracottapink
 recognizes most of the commands (requests, macros,
 diversions, strings, escapes, glyphs) of raw troff and its
@@ -19,8 +22,8 @@ obvious HTML equivalent.\**
 .
 .FS
 .IX footnotes
-.IX FS@.FS, ms macro
-.IX FE@.FE, ms macro
+.IX FS@.FS, -ms macro
+.IX FE@.FE, -ms macro
 E.g., -ms’s footnotes (\fC\e**\fP and \fC.FS\fP/\fC.FE\fP) have a
 straightforward translation in the HTML, with the footnote text set at the
 bottom of the HTML page, and with the footnote markers in the body and the
@@ -32,25 +35,41 @@ concentrate here on those commands whose HTML counterpart is not immediately
 obvious. In order to avoid constantly qualifying my sentences, I shall
 henceforth use groff as the troff implementation to work alongside
 troff2page. There will be some modification needed when using
-other troff implementations. 
+other troff implementations.
 .PP
 .SH 2
 mpca macro files
 .LP
 .IX macro files provided with troff2page
+.IX mpca@-mpca, macro package
 .IX mpca macros
-.IX pca-tag.tmac, macro file
-.IX pca-ix.tmac, macro file
+.IX pca-dc.tmac, macro file
 .IX pca-eval.tmac, macro file
+.IX pca-img.tmac, macro file
+.IX pca-ix.tmac, macro file
+.IX pca-sc.tmac, macro file
+.IX pca-tag.tmac, macro file
+.IX pca-toc.tmac, macro file
+.IX pca-verb.tmac, macro file
 .IX pca.tmac, macro file
 troff2page can process documents that use the \fCms\fP extension macros
 provided in \*[url http://github.com/ds26gte/mpca]mpca\&. For
 convenience, this repo is included as a submodule \fCmpca\fP.
 It includes general-purpose extensions to the \fCms\fP package,
-e.g., \fCpca-tag.tmac\fP for cross-references; \fCpca-ix.tmac\fP
-for index generation; \fCpca-eval.tmac\fP for extending groff
-using Lua, etc. These extensions may loaded severally or as the
-single comprehensive macro file \fCpca.tmac\fP. Please consult
+viz.,
+\fCpca-dc.tmac\fP for drop caps;
+\fCpca-eval.tmac\fP for extending groff using Lua;
+\fCpca-img.tmac\fP for image insertion;
+\fCpca-ix.tmac\fP for index generation;
+\fCpca-sc.tmac\fP for thought breaks;
+\fCpca-tag.tmac\fP for cross-references;
+\fCpca-toc.tmac\fP for table of contents;
+\fCpca-verb.tmac\fP for verbatim displays.
+These extensions may loaded severally or as the
+single comprehensive macro file \fCpca.tmac\fP.
+To load them all, use the command-line option \fC-mpca\fP or
+include \fC.mso pca.tmac\fP in your document source.
+Please consult
 this submodule’s documentation for more information.
 .PP
 .IX GROFF_TMAC_PATH, environment variable
@@ -81,6 +100,7 @@ the \fC-U\fP option for “unsafe” mode.
 .PP
 .IX t@-t, groff command-line option
 .IX z@-z, groff command-line option
+.IX PostScript
 As an example, consider \fCindex.ms\fP (the groff source for the
 document you’re reading, which is the \fCdoc\fP subdirectory).  The following is one
 way to get the correct PostScript output:

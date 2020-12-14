@@ -1,11 +1,12 @@
-.\" last modified 2020-12-08
+.\" last modified 2020-12-14
 .SH 1
 7. Extending groff using Lua
 .LP
+.IX extending groff with Lua
 .IX extending groff and troff2page with Lua
-.IX eval@.eval, mpca macro
-.IX endeval@.endeval, mpca macro
-.IX pca-eval.tmac, mpca macro file
+.IX eval@.eval, -mpca macro
+.IX endeval@.endeval, -mpca macro
+.IX pca-eval.tmac, macro file
 To invoke Lua from groff, we use the macro \fC.eval\fP with its closer
 \fC.endeval\fP. These are
 defined in the
@@ -22,7 +23,9 @@ The usefulness of this tactic will be apparent from an
 example.
 Consider the following groff document, \fCtau.ms\fP:
 .IX mso@.mso, groff request
-.IX troff, troff2page output stream
+.IX troff, groff Lua output stream
+.IX t@\e(*t, groff glyph name (\(*t, U+03C4 \s-2GREEK SMALL LETTER TAU\s0)
+.IX =@\e(~=, groff glyph name (\(~=, U+2248 \s-2ALMOST EQUAL TO\s0)
 .EX
     .mso pca-eval.tmac
     .
@@ -72,6 +75,7 @@ for each \fC.eval\fP, and each \fC.eval\fP sources its assigned
 aux file
 into the document.
 .PP
+.IX extending troff2page with Lua
 Lua code via \fC.eval\fP can
 serve as a very powerful \fIsecond extension language\fP
 for groff.  This benefit is available even when the document
@@ -79,7 +83,7 @@ is processed by troff2page:
 We could run troff2page on the same document, \fCtau.ms\fP, and the
 resulting \fCtau.html\fP will show the same content.
 .PP
-.IX extending groff and troff2page differently with Lua
+.IX extending troff2page with Lua!differently from groff
 .IX if@.if, groff request
 .IX ie@.ie, groff request
 .IX el@.el, groff request
@@ -205,7 +209,7 @@ emulate the sanguine chalk drawings of the Old Masters.
 .SH 2
 Extending troff2page only
 .LP
-.IX extending troff2page with Lua without producing output
+.IX extending troff2page with Lua!without producing output
 .IX ig@.ig ##, as troff2page extender
 troff2page treats groff’s \fC.ig\fP
 environment, whenever it uses \fC##\fP as ender, as
@@ -239,6 +243,9 @@ re-define this macro, in Lua, to create a hyperlink.
 We enclose this re-definition in a \fC.ig ##\fP, which not
 only allows it to be in Lua, but also makes it apply only
 when troff2page reads it:
+.IX defstring, troff2page Lua function
+.IX link_start, troff2page Lua function
+.IX link_stop, troff2page Lua function
 .EX
     .ig ##
     defstring('url', function(url)

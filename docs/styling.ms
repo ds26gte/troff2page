@@ -1,4 +1,4 @@
-.\" last modified 2020-12-13
+.\" last modified 2020-12-14
 .SH 1
 8. Styling
 .LP
@@ -9,7 +9,7 @@ when troff2page is used on a document, e.g., stylesheet changes.
 troff2page uses the output-stream \fCCSS\fP to
 write out its default style information.  The user can also
 append to this stream. E.g.,
-.IX CSS, troff2page output stream
+.IX CSS, troff2page Lua output stream
 .EX
     .ig ##
     CSS:write([[
@@ -96,8 +96,8 @@ of the newest of the source documents that make up the document.
 Only user content is considered; macro and auxiliary files are
 not.
 .PP
-.IX ND@.ND, ms macro
-.IX DA@.DA, ms macro
+.IX ND@.ND, -ms macro
+.IX DA@.DA, -ms macro
 To specify a document timestamp without regard to the actual mod times
 of the files in it, use the -ms macros \fC.ND\fP or \fC.DA\fP.
 troff2page doesn’t distinguish between them, but groff does.
@@ -121,6 +121,7 @@ accomplished via the CSS fragment:
     }
 .EE
 .PP
+.IX TH@.TH, -man macro
 As a special case, for man pages, troff2page (like groff -man)
 takes the third argument of the titling macro \fC.TH\fP as the
 last-mod date. If there isn’t a third argument, the colophon
@@ -136,11 +137,11 @@ sequences of the form \fC\e[u\fIxxxx\fP]\fP, where \fIxxxx\fP is
 the corresponding hex number (in uppercase).
 .PP
 .IX char@.char, groff request
-.IX U+2621, \s-2CAUTION SIGN\s0
-.IX U+26A0, \s-2WARNING SIGN\s0
-E.g., U+2621 (\s-2CAUTION SIGN\s0)
+.IX U+2621 \s-2CAUTION SIGN\s0 (\[u2621])
+.IX U+26A0 \s-2WARNING SIGN\s0 (\[u26A0])
+E.g., U+2621 \s-2CAUTION SIGN\s0
 and
-U+26A0 (\s-2WARNING SIGN\s0)
+U+26A0 \s-2WARNING SIGN\s0
 — in a suitable color and size — may be used rather than
 the pedestrian “\fBCAUTION\fP” and “\fBWARNING\fP” for admonition titles.
 .if \n[.troff2page] \{\
@@ -186,11 +187,11 @@ macros
 implicitly turn the escape character off when entering the display and back on when
 exiting it. The requests for these actions are \fC.eo\fP and
 \fC.ec\fP respectively:
-.IX LD@.LD, ms macro
-.IX DE@.DE, ms macro
+.IX LD@.LD, -ms macro
+.IX DE@.DE, -ms macro
 .IX ft@.ft, groff request
-.IX EX@.EX, ms macro
-.IX EE@.EE, ms macro
+.IX EX@.EX, -ms macro
+.IX EE@.EE, -ms macro
 .PP
 .EX
     .de EX
@@ -217,9 +218,9 @@ rely on the escape character being active, and these will start
 failing catastrophically when our display straddles a page
 boundary.
 .PP
-.IX KS@.KS, ms macro
-.IX KF@.KF, ms macro
-.IX DS@.DS, ms macro
+.IX KS@.KS, -ms macro
+.IX KF@.KF, -ms macro
+.IX DS@.DS, -ms macro
 One way out is to
 \fIforce\fP code displays to never cross a page boundary by
 using groff’s “keep” macros \fC.KS\fP or \fC.KF\fP or the keep
@@ -229,13 +230,14 @@ macros. The problem then becomes what to do with large
 page-crossing displays. This is almost unavoidable in computer
 technical prose.
 .PP
-.IX U+29F9, \s-2BIG REVERSE SOLIDUS\s0
-.IX U+FE68, \s-2SMALL REVERSE SOLIDUS\s0
-.IX U+005C, \s-2REVERSE SOLIDUS\s0
+.IX U+29F9 \s-2BIG REVERSE SOLIDUS\s0 (\[u29F9])
+.IX U+FE68 \s-2SMALL REVERSE SOLIDUS\s0 (\[uFE68])
+.IX U+005C \s-2REVERSE SOLIDUS\s0 (\[u005C])
+.IX text editor
 Unicode glyph substitution offers another way out. The Unicode
-characters U+29F9 (\s-2BIG REVERSE SOLIDUS\s0) and U+FE68 (\s-2SMALL REVERSE
-SOLIDUS\s0) are passable replacements for the regular backslash (aka
-\s-2REVERSE SOLIDUS\s0, U+005C). You can enter these substitute
+characters U+29F9 \s-2BIG REVERSE SOLIDUS\s0 and U+FE68 \s-2SMALL REVERSE
+SOLIDUS\s0 are passable replacements for the regular backslash
+(U+005C \s-2REVERSE SOLIDUS\s0). You can enter these substitute
 backslashes with text-editor macros fairly easily.\**
 .FS
 In the Vim editor, for instance, adding the command \fCexec 'dig

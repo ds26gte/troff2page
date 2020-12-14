@@ -1,4 +1,4 @@
--- last modified 2020-12-13
+-- last modified 2020-12-14
 
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
@@ -71,14 +71,14 @@ function process_line()
       emit_newline()
     end
   end)
-  --print('>>> process_line done, Out is', Out)
+  --print('process_line done')
 end
 
 function expand_escape(c)
   --print('doing expand_escape', c)
   local it
   if not c then c = '\n'
-  else get_char()
+  else c=get_char()
   end
   --
   if Turn_off_escape_char_p then
@@ -86,9 +86,13 @@ function expand_escape(c)
   end
   --
   local it = Escape_table[c]
+  --print('it=', it)
+  --print('copymode=', Macro_copy_mode_p)
   if it and
     (not Macro_copy_mode_p or
-    c=='n' or c=='*' or c=='$' or c=='\\') then
+    c=='n' or c=='*' or c=='$' or c=='\\' or
+    c=='"' or c=='#') then
+    --print('escape action')
     return it()
   end
   --

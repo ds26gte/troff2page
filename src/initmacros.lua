@@ -1,4 +1,4 @@
--- last modified 2020-12-13
+-- last modified 2020-12-14
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -313,7 +313,7 @@ function initialize_macros()
     local c = get_char()
     if c == Escape_char then
       local glyph_name = read_escaped_word()
-      local rhs = expand_args(read_troff_string_line())
+      local rhs = expand_args(read_troff_string_line(), 'not_copy_mode')
       defglyph(glyph_name, rhs)
     else
       local rhs = expand_args(read_troff_string_line())
@@ -333,8 +333,6 @@ function initialize_macros()
       read_troff_line()
       Glyph_table[glyph_name] = nil
     else
-      --FIXME
-      --TODO
       --print('rchar`ing', c)
       read_troff_line()
       Unescaped_glyph_table[c] = nil
@@ -388,36 +386,27 @@ function initialize_macros()
   end)
 
   defrequest('IMG', function()
-    local align, img_file, width = read_args()
-    if not (align=='-L' or align=='-C' or align=='-R') then
-      width=img_file; img_file=align; align='-C'
-    end
-    if align=='-L' then align='left'
-    elseif align=='-C' then align='center'
-    elseif align=='-R' then align='right'
-    end
-    if not width then width=80 end
-    emit_img(img_file, align, width..'%')
-  end)
-
-  defrequest('PIMG', function()
-    --print('doing .PIMG')
     local align = read_word()
-    local img_file
-    local width
-    local height
-    if align=='-L' or align=='-C' or align=='-R' then img_file=read_word()
-    else img_file=align; align='-C'
+    local img_file, width, height
+    if align=='-L' or align=='-C' or align=='-R' then
+      img_file = read_word()
+    else
+      img_file = align; align = '-C'
     end
     width=read_length_in_pixels()
-    height=read_length_in_pixels()
+    --height=read_length_in_pixels()
     read_troff_line()
     if align=='-L' then align='left'
     elseif align=='-C' then align='center'
     elseif align=='-R' then align='right'
     end
-    emit_img(img_file, align, width, height)
+    if width==0 then
+      width = point_equivalent_of 'i'
+    end
+    emit_img(img_file, align, width)
   end)
+
+  defrequest('PIMG', Request_table.IMG)
 
   defrequest('tmc', do_tmc)
 

@@ -1,8 +1,6 @@
 .TH TROFF2PAGE 1 "2020-12-13" \" last modified
-.nh
-.ad l
 .SH NAME
-.PP
+.LP
 troff2page \- makes Web pages from troff documents
 .PP
 .SH SYNOPSIS
@@ -10,7 +8,7 @@ troff2page \- makes Web pages from troff documents
     troff2page [options] [pathnames]
 .LP
 .SH DESCRIPTION
-.PP
+.LP
 troff2page is a Lua script that converts troff (\fI-man\fP and \fI-ms\fP) documents into HTML web
 pages. E.g.,
 .PP
@@ -27,7 +25,7 @@ troff2page can also be optionally instructed to create an Info document
 in \fIjobname.info\fP.
 .PP
 .SH OPTIONS
-.PP
+.LP
 troff2page accepts many groff options. For example,
 .PP
 .EX
@@ -68,7 +66,7 @@ options were not used, troff2page exits with a “called with no argument”
 message.
 .PP
 .SH INIT FILES
-.PP
+.LP
 Additional information may be fed to troff2page via the
 specially named macro files \fI.troff2pagerc\fP and
 \fIjobname.t2p\fP. Thus, a \fI-mpca\fP
@@ -92,7 +90,7 @@ command \fI.TH\fP), both troff2page and groff will load, if it
 exists, the init file \fIman.local\fP in the home directory.
 .PP
 .SH COMMANDS
-.PP
+.LP
 troff2page recognizes most of the commands (requests, macros,
 diversions, strings, escapes, glyphs) of raw troff and its \fI-ms\fP
 and \fI-man\fP macro packages. The syntax recognized is the improved
@@ -112,7 +110,7 @@ troff2page can process these macro files, and give compatible
 results. Please see the troff2page manual for further details.
 .PP
 .SH NEOVIM
-.PP
+.LP
 If the files \fIlua/troff2page.lua\fP and \fIplugin/troff2page.vim\fP are
 installed in your Neovim path, you can use the command \fI:Troff2page\fP to
 convert files directly from Neovim.
@@ -122,7 +120,7 @@ script. In addition, if called with no arguments, \fI:Troff2page\fP will convert
 file in the current window.
 .PP
 .SH LuaTeX
-.PP
+.LP
 If the file \fIlua/troff2page\fP is in installed in your
 \fITEXINPUTS\fP path, it can be loaded into LuaTeX by
 .PP
@@ -141,7 +139,7 @@ can be called on troff documents with options as needed, e.g.,
 .PP
 .PP
 .SH INFO DOCS
-.PP
+.LP
 You can call the macro
 .PP
 .EX
@@ -156,7 +154,7 @@ A good place to place the \fI.troff2page2info\fP call is in your
 and not to groff.
 .PP
 .SH ENVIRONMENT VARIABLES
-.PP
+.LP
 troff2page, like groff, uses \fIGROFF_TMAC_PATH\fP to find its
 macro files
 (viz., \fI-m\fP options,
@@ -178,16 +176,16 @@ you give to \fItroff2page\fP, set the environment variable
 .EE
 .PP
 .SH SYSTEM REQUIREMENTS
-.PP
+.LP
 \fItroff2page\fP requires Lua. For more information, please see the
 file \fIINSTALL.adoc\fP in the
 distribution.
 .PP
 .SH AVAILABILITY
-.PP
+.LP
 troff2page is downloadable from http://github.com/ds26gte/troff2page.
 .PP
 .SH SEE ALSO
-.PP
+.LP
 groff(1), groff_tmac(5), groff_man(7), groff_ms(7), lua(1),
 luatex(1), nvim(1)

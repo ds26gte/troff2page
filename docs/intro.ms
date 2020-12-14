@@ -1,10 +1,10 @@
-.\" last modified 2020-12-13
+.\" last modified 2020-12-14
 .SH 1
 1. Introduction
 .LP
 .IX troff2page, script
-.IX -man, macro package
-.IX -ms, macro package
+.IX man@-man, macro package
+.IX ms@-ms, macro package
 .IX Lua
 .IX troff
 \fCtroff2page\fP is a \*[url https://www.lua.org]Lua\& script that
@@ -12,6 +12,7 @@ makes Web pages from troff manuscripts. It reads an input
 document that is marked up in troff (-man or -ms) and produces an
 output document with the functionally equivalent HTML markup.
 .PP
+.IX groff
 .IX TeX
 .IX Info files, generating
 troff is a venerable typesetting program that produces

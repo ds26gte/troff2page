@@ -1,4 +1,4 @@
--- last modified 2020-11-27
+-- last modified 2020-12-14
 
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
@@ -34,17 +34,17 @@ function collect_macro_body(w, ender)
   return m
 end
 
-function expand_args(s)
+function expand_args(s, not_copy_mode_p)
   --print('doing expand_args', s)
   if not s then return '' end
   local res = with_output_to_string(function (o)
     flet({
       Current_troff_input = make_bstream{buffer = string_to_table(s)},
-      Macro_copy_mode_p = true,
+      Macro_copy_mode_p = not not_copy_mode_p,
       Outputting_to = 'troff',
       Out = o
     }, function()
-      --print('calling generate_html from expand_args with Out=', Out)
+      --print('calling generate_html from expand_args')
       --print('cti.b =', #(Current_troff_input.buffer))
       generate_html{'break', 'continue', 'ex', 'nx', 'return'}
     end)

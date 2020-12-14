@@ -1,4 +1,4 @@
--- last modified 2020-12-13
+-- last modified 2020-12-14
 
 Escape_table = {}
 
@@ -65,8 +65,11 @@ defescape('c', function()
 end)
 
 defescape('"', function()
+  --print('reading comment')
   if Reading_quoted_phrase_p then return verbatim '"'
-  else read_troff_line('stop_before_newline_p'); return ''
+  else
+    --print('reading comment I')
+    read_troff_line('stop_before_newline_p'); return ''
   end
 end)
 
