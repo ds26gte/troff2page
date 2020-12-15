@@ -1,4 +1,4 @@
--- last modified 2020-12-14
+-- last modified 2020-12-15
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -324,19 +324,22 @@ function initialize_macros()
 
   defrequest('rchar', function()
     --print('doing rchar')
-    ignore_spaces()
-    --problem is it translates anyway
-    local c = get_char('dont_translate')
-    if c == Escape_char then
-      --this part works OK
-      local glyph_name = read_escaped_word()
-      read_troff_line()
-      Glyph_table[glyph_name] = nil
-    else
-      --print('rchar`ing', c)
-      read_troff_line()
-      Unescaped_glyph_table[c] = nil
+    while true do
+      ignore_spaces()
+      --problem is it translates anyway
+      local c = get_char('dont_translate')
+      if c == Escape_char then
+        --this part works OK
+        local glyph_name = read_escaped_word()
+        Glyph_table[glyph_name] = nil
+      elseif c and c ~= '\n' then
+        --print('rchar`ing ->', c, '<-')
+        Unescaped_glyph_table[c] = nil
+      else
+        break
+      end
     end
+    --read_troff_line()
   end)
 
   defrequest('substring', function()

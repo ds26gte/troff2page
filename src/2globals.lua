@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2020-12-15
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -58,6 +58,7 @@ Current_pageno = nil
 Current_source_file = nil
 Current_troff_input = nil
 Diversion_table = nil
+Expanding_args_p = nil
 Log_stream = nil
 End_macro = nil
 Escape_char = nil

@@ -1,4 +1,4 @@
--- last modified 2017-08-19
+-- last modified 2020-12-15
 
 function accent_marks()
 
@@ -87,5 +87,7 @@ function accent_marks()
   defstring('Ae', function()
     return verbatim '&#xc6'
   end)
+
+  defglyph('hooko', verbatim '&#x1eb;')
 
 end

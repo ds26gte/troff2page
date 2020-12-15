@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201214 -- last modified
+troff2page_version = 20201215 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -301,6 +301,7 @@ Current_pageno = nil
 Current_source_file = nil
 Current_troff_input = nil
 Diversion_table = nil
+Expanding_args_p = nil
 Log_stream = nil
 End_macro = nil
 Escape_char = nil
@@ -467,6 +468,8 @@ function accent_marks()
   defstring('Ae', function()
     return verbatim '&#xc6'
   end)
+
+  defglyph('hooko', verbatim '&#x1eb;')
 
 end
 
@@ -670,6 +673,7 @@ function troff2page_1pass(argc, argv)
     Ev_stack = { { name = '*global' } },
     Ev_table = {},
     Exit_status = false,
+    Expanding_args_p = false,
     File_postlude = false,
     Footnote_buffer = {},
     Footnote_count = 0,
@@ -1341,6 +1345,7 @@ function expand_args(s, not_copy_mode_p)
     flet({
       Current_troff_input = make_bstream{buffer = string_to_table(s)},
       Macro_copy_mode_p = not not_copy_mode_p,
+      Expanding_args_p = true,
       Outputting_to = 'troff',
       Out = o
     }, function()
@@ -2269,6 +2274,7 @@ function process_line()
       Exit_status = 'Done'
     elseif (c == Control_char or c == No_break_control_char) and
            not Macro_copy_mode_p and
+           not Expanding_args_p and
            not Sourcing_ascii_file_p and
            (function() it = read_macro_name(); return it end)() then
       --print('found control char', c, it)
@@ -2523,7 +2529,12 @@ defescape('*', function()
   local it
   it = String_table[s]
   if it then --print('s it', it);
-    return it(table.unpack(args))
+    --print('calling string', s)
+    local x = it(table.unpack(args))
+    --print('x=', x)
+    local y= expand_args(x, 'not_copy_mode')
+    --print('y=', y)
+    return y
   end
   it = Macro_table[s]
   if it then
@@ -3400,19 +3411,22 @@ function initialize_macros()
 
   defrequest('rchar', function()
     --print('doing rchar')
-    ignore_spaces()
-    --problem is it translates anyway
-    local c = get_char('dont_translate')
-    if c == Escape_char then
-      --this part works OK
-      local glyph_name = read_escaped_word()
-      read_troff_line()
-      Glyph_table[glyph_name] = nil
-    else
-      --print('rchar`ing', c)
-      read_troff_line()
-      Unescaped_glyph_table[c] = nil
+    while true do
+      ignore_spaces()
+      --problem is it translates anyway
+      local c = get_char('dont_translate')
+      if c == Escape_char then
+        --this part works OK
+        local glyph_name = read_escaped_word()
+        Glyph_table[glyph_name] = nil
+      elseif c and c ~= '\n' then
+        --print('rchar`ing ->', c, '<-')
+        Unescaped_glyph_table[c] = nil
+      else
+        break
+      end
     end
+    --read_troff_line()
   end)
 
   defrequest('substring', function()

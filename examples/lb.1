@@ -3,55 +3,55 @@
 Some constants
 .SH
 Mathematical
-.PP
+.LP
 \[*p] =
 .eval
 -- following prints pi, because cos(pi) = -1
-io.write(math.acos(-1))
-io.write('\n')
+troff:write(math.acos(-1))
+troff:write('\n')
 .endeval
 .PP
 e =
 .eval
-io.write(math.exp(1))
-io.write('\n')
+troff:write(math.exp(1))
+troff:write('\n')
 .endeval
 .PP
 \[*f] =
 .eval
-io.write((math.sqrt(5)+1)/2)
-io.write('\n')
+troff:write((math.sqrt(5)+1)/2)
+troff:write('\n')
 .endeval
 .PP
 \fIi\fP =
 .eval
-io.write('\\[sqrt](\\[mi]1)\n')
+troff:write('\\[sqrt](\\[mi]1)\n')
 .endeval
 .SH
 Weights & measures
-.PP
+.LP
 1 oz =
 .eval
-io.write((1/16) * .45359237 * 1000)
-io.write(' g\n')
+troff:write((1/16) * .45359237 * 1000)
+troff:write(' g\n')
 .endeval
 .PP
 1 gal =
 .eval
-io.write(231 * math.pow(2.54, 3) * (1/1000))
-io.write(' L\n')
+troff:write(231 * math.pow(2.54, 3) * (1/1000))
+troff:write(' L\n')
 .endeval
 .PP
 1 nmi =
 .eval
-io.write(1852 * 100 * (1/2.54) * (1/12))
-io.write(' ft\n')
+troff:write(1852 * 100 * (1/2.54) * (1/12))
+troff:write(' ft\n')
 .endeval
 .PP
 1 phoot\** =
 .eval
-io.write(.299792458 * 100 * (1/2.54) * (1/12))
-io.write(' foot\n')
+troff:write(.299792458 * 100 * (1/2.54) * (1/12))
+troff:write(' foot\n')
 .endeval
 .FS
 A phoot is the distance traveled by a photon in 1 second, i.e., a

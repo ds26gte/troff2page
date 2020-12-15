@@ -1,3 +1,5 @@
+.mso pca.tmac
+.PP
 .SH 1
 Eval in action
 .LP
@@ -5,8 +7,8 @@ The ratio of the circumference of a circle to
 its radius is \(*t \(~=
 .eval
 -- following prints tau, because cos(tau/2) = -1
-
-io.write(2*math.acos(-1), '.\n')
+--
+troff:write(2*math.acos(-1), '.\n')
 .endeval
 .PP
 Bye.

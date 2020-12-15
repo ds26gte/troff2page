@@ -1,4 +1,4 @@
--- last modified 2020-12-14
+-- last modified 2020-12-15
 
 function collect_macro_body(w, ender)
   --print('doing collect_macro_body', w, ender)
@@ -41,6 +41,7 @@ function expand_args(s, not_copy_mode_p)
     flet({
       Current_troff_input = make_bstream{buffer = string_to_table(s)},
       Macro_copy_mode_p = not not_copy_mode_p,
+      Expanding_args_p = true,
       Outputting_to = 'troff',
       Out = o
     }, function()

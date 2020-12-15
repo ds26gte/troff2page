@@ -1,4 +1,4 @@
--- last modified 2020-12-14
+-- last modified 2020-12-15
 
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
@@ -38,6 +38,7 @@ function process_line()
       Exit_status = 'Done'
     elseif (c == Control_char or c == No_break_control_char) and
            not Macro_copy_mode_p and
+           not Expanding_args_p and
            not Sourcing_ascii_file_p and
            (function() it = read_macro_name(); return it end)() then
       --print('found control char', c, it)

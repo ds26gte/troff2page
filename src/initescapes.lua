@@ -1,4 +1,4 @@
--- last modified 2020-12-14
+-- last modified 2020-12-15
 
 Escape_table = {}
 
@@ -45,7 +45,12 @@ defescape('*', function()
   local it
   it = String_table[s]
   if it then --print('s it', it);
-    return it(table.unpack(args))
+    --print('calling string', s)
+    local x = it(table.unpack(args))
+    --print('x=', x)
+    local y= expand_args(x, 'not_copy_mode')
+    --print('y=', y)
+    return y
   end
   it = Macro_table[s]
   if it then

@@ -1,4 +1,4 @@
-.\" last modified 2020-12-14
+.\" last modified 2020-12-15
 .SH 1
 3. Page layout
 .LP
@@ -186,41 +186,14 @@ are: \fCi\fP (inch = 1/12 foot), \fCc\fP (cm =
 50/127 inch), \fCp\fP (point = 1/72 inch), \fCP\fP (pica = 12
 points), \fCm\fP (em = 2 ens), and \fCM\fP (1/100 em).
 .PP
+.IMG inch.jpg 3.5i
+.PP
 .IX u, groff scaling factor
 .IX f, groff scaling factor
-.IX TeX
-.IX scaled point, length unit
-.IX TeX point, length unit
 Internally, both groff and troff2page store lengths in the scaling
 factor \fCu\fP, which
 is 1/72000 of an inch, and all lengths are integral multiples of
-u, thereby avoiding floating-point messes. If this seems too precise, consider that TeX stores all
-its lengths in “scaled points” (sp), where 1 sp = 1 / (2^16 * 72.27) =
-.IX troff, groff Lua output stream
-.eval
-troff:write('1/', (2^16)*72.27, '\n')
-.endeval
-\(~=
-.eval
-troff:write(1/((2^16)*72.27), '\n')
-.endeval
-of an inch!
-.PP
-.IX PostScript
-.IX PostScript point, length unit
-.IX big point, length unit
-At any rate, do learn your inches and keep your inch measure
-handy. The groff manual throws the usual shade on “antiquated”
-units, but it can’t really mean it, as easy factors and
-multiples of the inch are all over the place.
-The groff point (aka PostScript point, “big” point) is exactly 1/72 of an inch
-(unlike TeX’s slightly smaller point of 1/72.27 inch, which is
-neither metric fish nor Imperial fowl); the underlying scaling
-factor is 1/1000 of the point; and
-the default offsets, margins, and widths are all nice multiples of
-inches.
-.PP
-.IMG inch.jpg 3.5i
+u, thereby avoiding floating-point messes.
 .PP
 Finally, the scaling factor \fCf\fP is simply 2^16, so its
 coefficients can be used as fractions.

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201214 -- last modified
+troff2page_version = 20201215 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =

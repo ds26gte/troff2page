@@ -1,4 +1,4 @@
--- last modified 2020-12-13
+-- last modified 2020-12-15
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -84,6 +84,7 @@ function troff2page_1pass(argc, argv)
     Ev_stack = { { name = '*global' } },
     Ev_table = {},
     Exit_status = false,
+    Expanding_args_p = false,
     File_postlude = false,
     Footnote_buffer = {},
     Footnote_count = 0,
