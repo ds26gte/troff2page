@@ -1,4 +1,4 @@
-.\" last modified 2020-12-15
+.\" last modified 2020-12-16
 .SH 1
 3. Page layout
 .LP
@@ -188,15 +188,29 @@ points), \fCm\fP (em = 2 ens), and \fCM\fP (1/100 em).
 .PP
 .IMG inch.jpg 3.5i
 .PP
+.IX millipoint, length unit
+.IX mile, length unit
+.IX light year, length unit
 .IX u, groff scaling factor
 .IX f, groff scaling factor
 Internally, both groff and troff2page store lengths in the scaling
 factor \fCu\fP, which
-is 1/72000 of an inch, and all lengths are integral multiples of
-u, thereby avoiding floating-point messes.
+is 1/1000 of a point, i.e., 1 millipoint (mpt). groff keeps all
+its lengths as integral multiples of
+millipoints, thereby avoiding floating-point arithmetic.
+troff2page uses Lua's FP, so fractions of mpt are allowed.
 .PP
-Finally, the scaling factor \fCf\fP is simply 2^16, so its
-coefficients can be used as fractions.
+The largest
+length expressible in groff is 2\*{31\*} \- 1 mpt, which is a shade
+over 0.47 miles. troff2page is a bit more generous, allowing
+lengths of up to
+6.7 \(mu 10\*{285\*} light years.
+.PP
+The scaling factor \fCf\fP is simply 2\*{16\*}, so its
+coefficients can be used as fractions in a purely integer world.
+I.e., groff will let you write the coefficients as decimal rationals,
+but the product with \fCf\fP is always reduced to integer.
+troff2page uses Lua's FP, so its fractions can be finer grained.
 .PP
 .SH 2
 Line length
@@ -207,13 +221,14 @@ Unlike groff -ms, which uses the line length given by the register
 troff2page by default does not restrict the text width on its HTML pages.
 Text will narrow or widen to fit the current browser window width.  However, if
 you explicitly set \fCLL\fP (instead of relying on -ms’s default), troff2page
-will respect that line length, regardless of how wide your
+will respect that line length as an upper bound, regardless of how wide your
 browser gets.
 .PP
 If you prefer troff2page’s default fit-to-width text-width, but
 one of the macro files you loaded sets \fCLL\fP, simply reset
 \fCLL\fP to 0 inside an \fC.if \en[.troff2page]\fP conditional.
-Use the same ploy to set your HTML \fCLL\fP to whatever you want,
+Use the same ploy to set your HTML \fCLL\fP to whatever max-width
+you want,
 without affecting the print output.
 .PP
 It is always OK to have the browser window less
@@ -221,7 +236,6 @@ wide than \fCLL\fP (as is certainly unavoidable on cell
 phones): the text will correspondingly shrink to
 fit the window, avoiding the need for horizontal scrolling.
 .PP
-.IX mile, length unit
 A good \fCLL\fP value for troff2page should be a bit larger than
 -ms’s 6 inches, which is too narrow for a browser.  The following sets it
 to 1/8000 of a mile, but it takes effect only for HTML:

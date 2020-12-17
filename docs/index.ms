@@ -25,7 +25,7 @@ troff2page
 .so styling.ms
 .so error.ms
 .so infodoc.ms
-.so nvimtex.ms
+.\"so nvimtex.ms
 .PP
 .if t \{\
 .SH 1

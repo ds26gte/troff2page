@@ -1,4 +1,4 @@
-.\" last modified 2020-12-14
+.\" last modified 2020-12-17
 .SH 1
 1. Introduction
 .LP
@@ -158,12 +158,13 @@ If after all the option processing, \fIno\fP file arguments remain, and
 the options for help or version were not used,
 \fCtroff2page\fP reads from the console (“standard input”), like
 groff.  The output HTML file(s) in this case use the basename
-\fCtroffput\fP.\**  This part is unlike groff, which always writes
-to console.
+\fCtroffput\fP.\**
 .FS
 The name \fCtroffput\fP is inspired by \fCtexput\fP,
 the name that TeX uses when it isn’t given an input file.
 .FE
+This part is unlike groff, which always writes
+to console.
 .PP
 .SH 2
 Autoloaded init files
@@ -240,13 +241,13 @@ Unix script.  You can load \fCtroff2page.lua\fP (\fCtroff2page\fP is a soft link
 to the Lua file \fCtroff2page.lua\fP) into Lua, and then call the
 Lua procedure \fCtroff2page\fP on your source document.  E.g.,
 .EX
-    dofile('troff2page.lua')
-    troff2page('my-troff-document.ms')
+    dofile 'troff2page.lua'
+    troff2page 'my-troff-document.ms'
 .EE
 The procedure \fCtroff2page\fP can be called
 several times, on the same or different documents, from within
 the same Lua session. It takes the same options as the script,
 supplied as multiple string arguments.
 .PP
-For some more exotic ways of invoking \fCtroff2page\fP, see
-section \*[TAG:nvimtex].
+.\" For some more exotic ways of invoking \fCtroff2page\fP, see
+.\" section \*[TAG:nvimtex].

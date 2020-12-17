@@ -1,4 +1,4 @@
-.\" last modified 2020-12-12
+.\" last modified 2020-12-17
 .SH 1
 11. Some unusual ways to call troff2page
 .LP
@@ -16,10 +16,10 @@ Calling troff2page from Neovim
 .LP
 .TAG calling_troff2page_from_neovim
 .IX calling troff2page from!Neovim
-One of the merits of using 
+One of the merits of using
 Neovim’s Lua to run \fCtroff2page\fP is the tight integration of
 composing and previewing it offers. You can convert your groff
-source and browse the HTML output as you’re editing it, using 
+source and browse the HTML output as you’re editing it, using
 appropriate autocommands.
 .PP
 To set up, first copy the files \fClua/troff2page.lua\fP and
@@ -30,7 +30,7 @@ To set up, first copy the files \fClua/troff2page.lua\fP and
 your \fC'runtimepath'\fP or \fC'packpath'\fP.
 .PP
 You now have the Neovim command \fCTroff2page\fP
-which is called with the same style of arguments 
+which is called with the same style of arguments
 as \fCtroff2page\fP, with the following Vim-specific special
 features:
 .PP
@@ -67,7 +67,7 @@ You can than call it on a single argument string that includes
 all the option and filename inputs, e.g.,
 .EX
     \directlua{
-      troff2page.troff2page('-mpca -t doc.ms')
+      troff2page.troff2page '-mpca -t doc.ms'
     }
 .EE
 The above commands can be supplied to LuaTeX either via a TeX

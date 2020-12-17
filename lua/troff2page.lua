@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201215 -- last modified
+troff2page_version = 20201217 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -1474,41 +1474,28 @@ function point_equivalent_of(u)
   return Gunit[u]/Gunit.p
 end
 
-function read_number_or_length(unit)
-  ignore_spaces()
-  local n = read_arith_expr()
-  local u = snoop_char()
-  local res
-  if u and string.match(u, Unit_pattern) then
-    get_char(); res = math.floor(n*Gunit[u])
-  elseif unit then
-    if string.match(unit, Unit_pattern) then
-      res = math.floor(n*Gunit[unit])
-    else terror('Unknown length indicator %s', unit)
-    end
-  else
-    res = n -- XXX should be floored, I think. Hope not relying on precise value in codebase
-  end
-  return res
-end
-
 function read_length_in_pixels(unit)
   ignore_spaces()
-  local n = read_arith_expr()
-  local u = snoop_char()
-  local res
-  if u and string.match(u, Unit_pattern) then
-    get_char(); res = n*Gunit[u] / Gunit.p
-  elseif unit then
-    if string.match(unit, Unit_pattern) then
-      res = n*Gunit[unit] / Gunit.p
-    else terror('Unknown lenght indicator %s', unit)
-    end
-  else
-    res = math_round(4.5*n) -- XXX
+  local n, unit_already_read_p = read_arith_expr()
+  --print('\tread_arith_expr retd', n, unit_already_read_p)
+  if unit_already_read_p then
+    return n / Gunit.p
   end
-  --print('read_length_in_pixels ->', res)
-  return res
+  --
+  if unit then
+    if string.match(unit, Unit_pattern) then
+      return n*Gunit[unit] / Gunit.p
+    end
+    terror('Unknown length indicator %s', unit)
+  end
+  --
+  --XXX: deadc0de?
+  local u = snoop_char()
+  if u and string.match(u, Unit_pattern) then get_char()
+    return n*Gunit[u] / Gunit.p
+  end
+  --
+  return  math_round(4.5*n) -- XXX
 end 
 
 
@@ -4201,10 +4188,18 @@ function initialize_macros()
   end)
 
   defrequest('pm', function()
+    local pm_table = {}
+    for k,v in pairs(Request_table) do
+      table.insert(pm_table, k)
+    end
     for k,v in pairs(Macro_table) do
-      io.write(k, '\n')
+      table.insert(pm_table, k)
     end
     for k,v in pairs(String_table) do
+      table.insert(pm_table, k)
+    end
+    table.sort(pm_table)
+    for _,k in ipairs(pm_table) do
       io.write(k, '\n')
     end
   end)
@@ -4303,8 +4298,8 @@ function initialize_macros()
     local c = get_counter_named(n)
     if c.thunk then terror("nr: can't set readonly number register %s", n) end
     local sign = read_opt_sign()
-    local num = read_number_or_length()
-    local incr = read_number_or_length()
+    local num = read_arith_expr()
+    local incr = read_arith_expr()
     --print('doing nr', n, sign, num, incr)
     read_troff_line()
     if not num then return
@@ -4377,6 +4372,23 @@ function initialize_macros()
   defrequest('AM', function()
     accent_marks()
   end)
+
+  defrequest('rd', function()
+    local prompt = read_word()
+    local args = {read_args()}
+    io.write(prompt, ': ')
+    local ss = {}
+    while true do
+      local x = io.read('*line')
+      if x == '' then break end
+      table.insert(ss, expand_args(x))
+    end
+    flet({Macro_args = args}, function()
+      table.insert(Macro_args, 1, 'rd')
+      execute_macro_body(ss)
+    end)
+
+end)
 
 end
 
@@ -5268,6 +5280,7 @@ end
 function read_arith_expr(opts)
   opts=opts or {}
   local acc = 0
+  local unit_already_read_p = false
   while true do
     local c = snoop_char()
     --if acc ~=0 then print('rae continuing with', c, acc) end
@@ -5335,6 +5348,9 @@ function read_arith_expr(opts)
       --print('rae encd num')
       local r = c
       local dot_read_p = (c == '.')
+      local e_read_p = false
+      local e_sign_read_p = false
+      local unit = 1
       while true do
         c = snoop_char()
         if not c then break end
@@ -5342,12 +5358,22 @@ function read_arith_expr(opts)
           if dot_read_p then break end
           dot_read_p = true; get_char()
           r =  r..c
+        elseif c == 'e' and not e_read_p then
+          e_read_p = true; get_char()
+          r = r..c
+        elseif (c == '+' or c == '-') and e_read_p and not e_sign_read_p then get_char()
+          e_sign_read_p = true
+          r = r..c
         elseif string.find(c, '%d') then get_char()
           r = r..c
+        elseif string.match(c, Unit_pattern) and not unit_already_read_p then get_char()
+          unit_already_read_p = true
+          unit = Gunit[c]
+          break
         else break
         end
       end
-      acc = tonumber(r)
+      acc = tonumber(r) * unit
       --print('num acc=', acc)
       if opts.inside_paren_p then --print('rae continuing with acc=', acc);
         ignore_spaces() end
@@ -5355,11 +5381,15 @@ function read_arith_expr(opts)
     elseif c == Escape_char then get_char()
       --print('rae doing esc')
       toss_back_string(expand_escape(snoop_char()))
+    elseif string.match(c, Unit_pattern) and not unit_already_read_p then
+      --print('rae found unit', c)
+      get_char(); ignore_spaces(); unit_already_read_p = true
+      acc = acc * Gunit[c]
     else break
     end
   end
   --print('read_arith_expr retung', acc)
-  return acc
+  return acc, unit_already_read_p
 end
 
 function author_info()

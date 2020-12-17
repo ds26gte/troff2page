@@ -1,4 +1,5 @@
-" last modified 2019-09-30
+" last modified 2020-12-17
+" created 2019-09-30
 " Dorai Sitaram
 
 func! Troff2page(...)
@@ -15,7 +16,7 @@ func! Troff2page(...)
       let l:i += 1
     endwhile
   endif
-  call luaeval('require("troff2page").troff2page(table.unpack(_A))', l:args)
+  call luaeval('require "troff2page".troff2page(table.unpack(_A))', l:args)
 endfunc
 
 com! -nargs=* Troff2page call Troff2page(<f-args>)

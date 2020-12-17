@@ -1,4 +1,4 @@
--- last modified 2020-12-15
+-- last modified 2020-12-17
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -1114,10 +1114,18 @@ function initialize_macros()
   end)
 
   defrequest('pm', function()
+    local pm_table = {}
+    for k,v in pairs(Request_table) do
+      table.insert(pm_table, k)
+    end
     for k,v in pairs(Macro_table) do
-      io.write(k, '\n')
+      table.insert(pm_table, k)
     end
     for k,v in pairs(String_table) do
+      table.insert(pm_table, k)
+    end
+    table.sort(pm_table)
+    for _,k in ipairs(pm_table) do
       io.write(k, '\n')
     end
   end)
@@ -1216,8 +1224,8 @@ function initialize_macros()
     local c = get_counter_named(n)
     if c.thunk then terror("nr: can't set readonly number register %s", n) end
     local sign = read_opt_sign()
-    local num = read_number_or_length()
-    local incr = read_number_or_length()
+    local num = read_arith_expr()
+    local incr = read_arith_expr()
     --print('doing nr', n, sign, num, incr)
     read_troff_line()
     if not num then return
@@ -1290,5 +1298,22 @@ function initialize_macros()
   defrequest('AM', function()
     accent_marks()
   end)
+
+  defrequest('rd', function()
+    local prompt = read_word()
+    local args = {read_args()}
+    io.write(prompt, ': ')
+    local ss = {}
+    while true do
+      local x = io.read('*line')
+      if x == '' then break end
+      table.insert(ss, expand_args(x))
+    end
+    flet({Macro_args = args}, function()
+      table.insert(Macro_args, 1, 'rd')
+      execute_macro_body(ss)
+    end)
+
+end)
 
 end

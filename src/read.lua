@@ -1,4 +1,4 @@
--- last modified 2020-12-14
+-- last modified 2020-12-16
 
 function make_bstream(opts)
   return {
@@ -304,6 +304,7 @@ end
 function read_arith_expr(opts)
   opts=opts or {}
   local acc = 0
+  local unit_already_read_p = false
   while true do
     local c = snoop_char()
     --if acc ~=0 then print('rae continuing with', c, acc) end
@@ -371,6 +372,9 @@ function read_arith_expr(opts)
       --print('rae encd num')
       local r = c
       local dot_read_p = (c == '.')
+      local e_read_p = false
+      local e_sign_read_p = false
+      local unit = 1
       while true do
         c = snoop_char()
         if not c then break end
@@ -378,12 +382,22 @@ function read_arith_expr(opts)
           if dot_read_p then break end
           dot_read_p = true; get_char()
           r =  r..c
+        elseif c == 'e' and not e_read_p then
+          e_read_p = true; get_char()
+          r = r..c
+        elseif (c == '+' or c == '-') and e_read_p and not e_sign_read_p then get_char()
+          e_sign_read_p = true
+          r = r..c
         elseif string.find(c, '%d') then get_char()
           r = r..c
+        elseif string.match(c, Unit_pattern) and not unit_already_read_p then get_char()
+          unit_already_read_p = true
+          unit = Gunit[c]
+          break
         else break
         end
       end
-      acc = tonumber(r)
+      acc = tonumber(r) * unit
       --print('num acc=', acc)
       if opts.inside_paren_p then --print('rae continuing with acc=', acc);
         ignore_spaces() end
@@ -391,11 +405,15 @@ function read_arith_expr(opts)
     elseif c == Escape_char then get_char()
       --print('rae doing esc')
       toss_back_string(expand_escape(snoop_char()))
+    elseif string.match(c, Unit_pattern) and not unit_already_read_p then
+      --print('rae found unit', c)
+      get_char(); ignore_spaces(); unit_already_read_p = true
+      acc = acc * Gunit[c]
     else break
     end
   end
   --print('read_arith_expr retung', acc)
-  return acc
+  return acc, unit_already_read_p
 end
 
 function author_info()

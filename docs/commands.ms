@@ -1,4 +1,4 @@
-.\" last modified 2020-12-14
+.\" last modified 2020-12-17
 .SH 1
 2. troff, groff, and troff2page commands
 .LP
@@ -36,6 +36,13 @@ obvious. In order to avoid constantly qualifying my sentences, I shall
 henceforth use groff as the troff implementation to work alongside
 troff2page. There will be some modification needed when using
 other troff implementations.
+.PP
+.IX pm@.pm, groff request
+The request `\fC.pm\fP lists on the console, in alphabetical
+order,
+all the requests, macros, and strings defined by troff2page. You
+can then search for their behavior in the troff2page and/or groff
+manuals.
 .PP
 .SH 2
 mpca macro files
@@ -169,7 +176,7 @@ the Lua procedure perform just one pass on the document, set the
 global \fCSingle_pass_p\fP to true, i.e.,
 .EX
     Single_pass_p = true
-    troff2page('index.ms')
+    troff2page 'index.ms'
 .EE
 Call it the same way a second time to run the second pass, which
 resolve the aux files. This is exactly analogous to calling
@@ -178,6 +185,7 @@ resolve the aux files. This is exactly analogous to calling
 .TAG auxf
 .IX auxiliary files!naming of
 .IX troff2page@.troff2page, troff2page number register
+.IX AUXF@\e*[AUXF], groff string register
 The groff string \fC\e*[AUXF]\fP is used to construct the
 names of the
 auxiliary files.  By default it
