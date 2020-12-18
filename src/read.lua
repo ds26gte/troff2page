@@ -1,4 +1,4 @@
--- last modified 2020-12-16
+-- last modified 2020-12-17
 
 function make_bstream(opts)
   return {
@@ -276,9 +276,9 @@ function if_test_passed_p()
   elseif c == 'c' then res= Color_table[read_word()]
   elseif c == 'd' then local w = expand_args(read_word())
     res= (Request_table[w] or Macro_table[w] or String_table[w])
-  elseif c == 'o' then twarning("if: oddness of pageno shouldn't be relevant for HTML")
+  elseif c == 'o' then twarning 'if: oddness of pageno shouldn\'t be relevant for HTML'
     res= ((Current_pageno%2) ~= 0)
-  elseif c == 'e' then twarning("if: oddness of pageno shouldn't be relevant for HTML")
+  elseif c == 'e' then twarning 'if: oddness of pageno shouldn\'t be relevant for HTML'
     res= ((Current_pageno%2) == 0)
   elseif c == '(' then toss_back_char(c)
     res= ((read_arith_expr{stop = true}) > 0)

@@ -1,0 +1,75 @@
+.\" last modified 2020-12-18
+.
+.\"nr HTML1 1
+.
+.de HBP
+.bp
+..
+.
+.nr PI 0
+.nr PD 1v
+.nr LL 8i
+.
+.rn @SH @SH_orig
+.
+.de @SH
+.nr style:@SH:arg1 \\$1
+.shift
+.if '\\n[style:@SH:arg1]'1' .HBP
+.@SH_orig \\n[style:@SH:arg1] \\$*
+..
+.
+.als SH @SH
+.
+.HX 1
+.
+.ds troff2page_version_th \n[.troff2page]
+.
+.nr troff2page_version_last_2_digits \n[.troff2page]%100
+.nr troff2page_version_last_digit \n[troff2page_version_last_2_digits]%10
+.
+.ie     \n[troff2page_version_last_2_digits]=11 .as troff2page_version_th \*{th\*}
+.el .ie \n[troff2page_version_last_2_digits]=12 .as troff2page_version_th \*{th\*}
+.el .ie \n[troff2page_version_last_2_digits]=13 .as troff2page_version_th \*{th\*}
+.el .ie \n[troff2page_version_last_digit]=1     .as troff2page_version_th \*{st\*}
+.el .ie \n[troff2page_version_last_digit]=2     .as troff2page_version_th \*{nd\*}
+.el .ie \n[troff2page_version_last_digit]=3     .as troff2page_version_th \*{rd\*}
+.el                                             .as troff2page_version_th \*{th\*}
+.
+.troff2page2info
+.
+.ig ##
+CSS:write([[
+@media screen {
+    h1.title {
+        color: #333333;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dddddf;
+    }
+
+    h1,h2,h3,h4,h5 {
+        color: #9b3d3d; /* terracotta pink */
+    }
+
+    a {
+        /* color: #dd4814; /* ubuntu orange */
+        text-decoration: none;
+        border-bottom: 1px dotted;
+    }
+
+    a:hover {
+        /* color: #333333; */
+        background-color: #fdca01; /* ubuntu yellow */
+    }
+}
+
+body {
+  font-family: georgia, serif;
+  line-height: 1.4;
+}
+
+.dropcap {
+    font-size: 500%;
+}
+]])
+.##

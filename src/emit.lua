@@ -1,4 +1,4 @@
--- last modified 2020-12-14
+-- last modified 2020-12-19
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -45,7 +45,7 @@ function emit_verbatim_escape(e, bkt, unclosed_p)
 end
 
 function emit(s)
-  --print('emit of', s, 'to', Out)
+  --print('emit of', s)
   --print('outputtingto=', Outputting_to)
   --emitCalled = emitCalled+1
   --if emitCalled > 50 then
@@ -66,6 +66,8 @@ function emit(s)
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
       if c == Escape_char then
+        --XXX: probably also need a superescape that works even
+        --when .eo
         --print('emit found \\')
         e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
@@ -76,14 +78,20 @@ function emit(s)
             elseif e == 'htmlgt' then inside_html_angle_brackets_p = false
             end
           end
-          Out:write(h)
-        elseif Turn_off_escape_char_p then
-          emit_verbatim_escape(e, bkt, unclosed_p)
+          Out:write(h) --CHECK
         else
-          local g = Glyph_table[e]
-          if g then Out:write(g)
-          else
+          local starts_with_u_p = (string.find(e, 'u') == 1)
+          local hnum = starts_with_u_p and string.sub(e, 2)
+          if hnum and tonumber('0x'..hnum) then
+            Out:write('&#x' .. hnum .. ';')
+          elseif Turn_off_escape_char_p then
             emit_verbatim_escape(e, bkt, unclosed_p)
+          else
+            local g = Glyph_table[e]
+            if g then Out:write(g)
+            else
+              emit_verbatim_escape(e, bkt, unclosed_p)
+            end
           end
         end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()

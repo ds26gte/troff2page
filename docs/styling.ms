@@ -1,6 +1,6 @@
-.\" last modified 2020-12-14
+.\" last modified 2020-12-19
 .SH 1
-8. Styling
+8.  Styling
 .LP
 .IX stylesheet, modifying
 .IX ig@.ig, groff request
@@ -8,28 +8,22 @@
 when troff2page is used on a document, e.g., stylesheet changes.
 troff2page uses the output-stream \fCCSS\fP to
 write out its default style information.  The user can also
-append to this stream. E.g.,
+append to this stream.  E.g.,
 .IX CSS, troff2page Lua output stream
 .EX
     .ig ##
     CSS:write([[
         h1,h2,h3,h4,h5,h6 {
             color: #9b3d3d; /* terracotta pink */
-            font-family: sans-serif;
-            font-weight: normal;
-            margin-top: 1em;
-            margin-bottom: 0.5em;
         }
     ]])
     .##
 .EE
-This sets the HTML headers
+This renders the section headers
 with a foreground color
-of \m[terracottapink]terracotta pink\m[]\**,
-along with some other changes from the default.
+of \m[terracottapink]terracotta pink\m[]\**.
 .FS
-The RGB values used in this manual for
-the colors
+The color names and values for
 terracotta pink
 and Venetian red are courtesy \*[url \
 https://www.resene.co.nz/swatches]Resene Paints\&.
@@ -37,9 +31,9 @@ https://www.resene.co.nz/swatches]Resene Paints\&.
 .PP
 .IX title@.title, CSS class
 troff2page makes available many CSS classes that you can modify
-in this manner to change the look of your web pages. For
+in this manner to change the look of your web pages.  For
 instance, the HTML element for the document title has class
-\fCtitle\fP. Here’s a way to get a more happening,
+\fCtitle\fP.  Here’s a way to get a more happening,
 Asciidoctor-like title:
 .EX
     .ig ##
@@ -54,9 +48,9 @@ Asciidoctor-like title:
 .EE
 Of course, these CSS mods don’t affect the groff output, but they
 do affect the printed output if you choose
-to print from the browser! To prevent any CSS mods
+to print from the browser!  To prevent any CSS mods
 from leaking into the browser-mediated printout, wrap them inside
-\fC@media screen {...}\fP.
+\fC@media screen\fP.
 .PP
 .SH 2
 Colophon
@@ -64,13 +58,13 @@ Colophon
 .IX colophon
 .IX last-modification time
 By default, troff2page places a colophon at the bottom right of the first
-page. The colophon mentions
+page.  The colophon mentions
 .PP
-i. the last-modification
+i.  the last-modification
 time of
 the document, and
 .PP
-ii. the troff2page version used for the conversion.
+ii.  the troff2page version used for the conversion.
 Either or both can be suppressed via CSS.
 .PP
 .IX colophon@.colophon, CSS class
@@ -124,7 +118,7 @@ accomplished via the CSS fragment:
 .IX TH@.TH, -man macro
 As a special case, for man pages, troff2page (like groff -man)
 takes the third argument of the titling macro \fC.TH\fP as the
-last-mod date. If there isn’t a third argument, the colophon
+last-mod date.  If there isn’t a third argument, the colophon
 won’t mention any date.
 .PP
 .SH 2
@@ -174,7 +168,7 @@ Typing verbatim \\e in displays
 .IX ec@.ec, groff request
 The display used above brings up another use-case for glyph
 translation, even when (and especially if) no exotic characters
-are desired. The display shows the backslash (\fC\e\fP) character, which
+are desired.  The display shows the backslash (\fC\e\fP) character, which
 is also the default escape character for groff.
 .PP
 We could use the
@@ -185,7 +179,7 @@ troff2page temporarily suspend its escape effect.
 We could do this by having our display
 macros
 implicitly turn the escape character off when entering the display and back on when
-exiting it. The requests for these actions are \fC.eo\fP and
+exiting it.  The requests for these actions are \fC.eo\fP and
 \fC.ec\fP respectively:
 .IX LD@.LD, -ms macro
 .IX DE@.DE, -ms macro
@@ -226,15 +220,15 @@ One way out is to
 using groff’s “keep” macros \fC.KS\fP or \fC.KF\fP or the keep
 versions of the display macros (e.g., \fC.DS L\fP rather than
 \fC.LD\fP). Please see the groff docs for more info about these
-macros. The problem then becomes what to do with large
-page-crossing displays. This is almost unavoidable in computer
+macros.  The problem then becomes what to do with large
+page-crossing displays.  This is almost unavoidable in computer
 technical prose.
 .PP
 .IX U+29F9 \s-2BIG REVERSE SOLIDUS\s0 (\[u29F9])
 .IX U+FE68 \s-2SMALL REVERSE SOLIDUS\s0 (\[uFE68])
 .IX U+005C \s-2REVERSE SOLIDUS\s0 (\[u005C])
 .IX text editor
-Unicode glyph substitution offers another way out. The Unicode
+Unicode glyph substitution offers another way out.  The Unicode
 characters U+29F9 \s-2BIG REVERSE SOLIDUS\s0 and U+FE68 \s-2SMALL REVERSE
 SOLIDUS\s0 are passable replacements for the regular backslash
 (U+005C \s-2REVERSE SOLIDUS\s0). You can enter these substitute
@@ -249,9 +243,9 @@ So now your
 displayed code has something that \fIlooks\fP like a backslash,
 at least on
 browsers, but it most probably fails for print, because the print
-font lacks the exotic character. Even in the browser,
+font lacks the exotic character.  Even in the browser,
 close is no cigar: Somebody cutting and pasting your code is in
-for a nasty surprise. You really do want the \fIreal\fP backslash in
+for a nasty surprise.  You really do want the \fIreal\fP backslash in
 there even on the HTML page, but you don’t want to disable
 groff’s escape character.
 Glyph substitution to the rescue:
@@ -273,9 +267,9 @@ editor with a Unicode font.
 \\e in a section heading
 .LP
 This and the previous section’s headers both have a verbatim backslash in the
-header.  You could use glyph substitution here too. However, if
+header.  You could use glyph substitution here too.  However, if
 you aren’t, \fIand\fP you’re using the \fC.ToC\fP macro, the fact that
-the ToC macros use groff diversions creates a hitch. You can use
+the ToC macros use groff diversions creates a hitch.  You can use
 the \fC\\e\fP escape to get a literal backslash, but the
-diversion eats an escape, so you have to double it. Ergo:
+diversion eats an escape, so you have to double it.  Ergo:
 \fC\\\\e\fP.

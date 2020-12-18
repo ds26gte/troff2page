@@ -1,6 +1,6 @@
-.\" last modified 2020-12-14
+.\" last modified 2020-12-19
 .SH 1
-5. Making an index
+5.  Making an index
 .LP
 .IX index
 .IX pca-ix.tmac, macro file
@@ -63,7 +63,6 @@ appear in the index entry as themselves, precede them with
 creates an index entry for “set!car” rather than creating a
 subentry “car” under “set"”.
 .PP
-.IX LaTeX
 Please see the
 makeindex
 documentation for all the details.  Essentially, the syntax for entering

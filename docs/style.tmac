@@ -1,11 +1,10 @@
-.\" last change 2020-12-12
+.\" last change 2020-12-17
 .\" Dorai Sitaram
 .
-.ie \n[.X] \{\
+.if \n[.X] \{\
 .mso s  \" heirloom troff
 .nr .U 1
 .\}
-.el .mso ms.tmac   \" groff
 .
 .mso pca.tmac
 .
@@ -22,7 +21,7 @@
 .\"nr FPS \n[PS]
 .\"nr FVS \n[VS]
 .
-.nr PI 1.5m
+.if !\n[.troff2page] .nr PI 1.5m
 .
 .defcolor terracottapink rgb #9b3d3d
 .
@@ -30,61 +29,10 @@
 .  ft R
 ..
 .
-.\"nr HTML1 1
-.
 .nr GROWPS 3
-.
-.if !d LK \{\
-.de LK
-.ToC
-..
-.\}
 .
 .if \n[.X] \{\
 .de DC
 \\$1\\$2
 ..
 .\}
-.
-.de HBP
-..
-.
-.if \n[.troff2page] \{\
-.if !\n[HTML1] \{\
-.de HBP
-.bp
-..
-.\}
-.nr PI 0
-.nr PD 1v
-.nr LL 8i
-.
-.rn @SH @SH_orig
-.de @SH
-.nr style:@SH:arg1 \\$1
-.shift
-.if '\\n[style:@SH:arg1]'1' .HBP
-.@SH_orig \\n[style:@SH:arg1] \\$*
-..
-.als SH @SH
-.\}
-.
-.HX 1
-.
-.\" follg only used by troff2page
-.CSS default.css
-.
-.ds troff2page_version_th \n[.troff2page]
-.
-.nr troff2page_version_last_2_digits \n[.troff2page]%100
-.nr troff2page_version_last_digit \n[troff2page_version_last_2_digits]%10
-.
-.ie     \n[troff2page_version_last_2_digits]=11 .as troff2page_version_th \*{th\*}
-.el .ie \n[troff2page_version_last_2_digits]=12 .as troff2page_version_th \*{th\*}
-.el .ie \n[troff2page_version_last_2_digits]=13 .as troff2page_version_th \*{th\*}
-.el .ie \n[troff2page_version_last_digit]=1     .as troff2page_version_th \*{st\*}
-.el .ie \n[troff2page_version_last_digit]=2     .as troff2page_version_th \*{nd\*}
-.el .ie \n[troff2page_version_last_digit]=3     .as troff2page_version_th \*{rd\*}
-.el                                             .as troff2page_version_th \*{th\*}
-.
-.if d troff2page2info .troff2page2info

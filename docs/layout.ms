@@ -1,6 +1,6 @@
-.\" last modified 2020-12-16
+.\" last modified 2020-12-19
 .SH 1
-3. Page layout
+3.  Page layout
 .LP
 .IX navigation bar
 Each page in a multiple-page HTML output has a navigation bar at its
@@ -87,7 +87,7 @@ Recognizing when troff2page is running
 We used the value stored in the number register
 \fC\en[.troff2page]\fP to determine
 which typesetter — troff2page or groff — is operating on our
-text. A positive number is considered true. (Perhaps
+text.  A positive number is considered true. (Perhaps
 contrary
 to expectation, not just 0 but all negative numbers are false for
 groff.)
@@ -102,14 +102,14 @@ released on 2015 March 20.  \fC\en[.troff2page]\fP could plausibly be used
 to distinguish not just troff2page from groff, but also between various versions
 of troff2page.  Thus, one could, if the need were dire, write a document
 that translates differently with different versions of
-troff2page. But don’t do this.
+troff2page.  But don’t do this.
 .PP
 .IX p@.p, groff number register
 If you’d rather stick to known groff registers, the read-only
-paper-length register \fC\en(.p\fP is a candidate. groff sets
+paper-length register \fC\en(.p\fP is a candidate.  groff sets
 it to 11 inches, i.e., the length of a US Letter size paper.
 Presumably it could vary depending on country of use, but it is
-never going to be non-positive. troff2page, since it doesn’t deal in paper, sets
+never going to be non-positive.  troff2page, since it doesn’t deal in paper, sets
 \fC\en(.p\fP to 0.
 .PP
 .IX x@.x, groff number register
@@ -118,8 +118,8 @@ never going to be non-positive. troff2page, since it doesn’t deal in paper, se
 groff has its own version registers \fC\en(.x\fP,
 \fC\en(.y\fP, and \fC\en(.Y\fP, which contain the major and minor version numbers
 and revision number
-respectively. troff2page sets these too, splitting the value of
-\fC\en[.troff2page]\fP between year, month and day. Thus the troff2page
+respectively.  troff2page sets these too, splitting the value of
+\fC\en[.troff2page]\fP between year, month and day.  Thus the troff2page
 released on 2020 December 2 sets \fC\en[.troff2page]\fP to 20201202,
 \fC\en(.x\fP to 2020, and
 \fC\en(.y\fP to 12, and \fC\en(.Y\fP to 2. (These are all numbers (not strings), so
@@ -165,7 +165,7 @@ Scaling factors
 The scaling factor \fCn\fP (en)
 used above is half the width of the letter ‘\fCm\fP’ in
 the default font size. \fCv\fP is the distance between two consecutive
-baselines. Scaling factors are generally, but not always, what
+baselines.  Scaling factors are generally, but not always, what
 you might think of as length units.
 .PP
 .IX Fu\(ss, length unit
@@ -202,7 +202,7 @@ troff2page uses Lua's FP, so fractions of mpt are allowed.
 .PP
 The largest
 length expressible in groff is 2\*{31\*} \- 1 mpt, which is a shade
-over 0.47 miles. troff2page is a bit more generous, allowing
+over 0.47 miles.  troff2page is a bit more generous, allowing
 lengths of up to
 6.7 \(mu 10\*{285\*} light years.
 .PP
@@ -249,8 +249,8 @@ Images
 .IX images
 .IX IMG@.IMG, groff macro
 troff2page supports a generalized version of the \fC.IMG\fP macro
-from groff’s \fCwww.tmac\fP. It accepts all the usual image file
-formats. An example call:
+from groff’s \fCwww.tmac\fP.  It accepts all the usual image file
+formats.  An example call:
 .EX
     .IMG t2p.png
 .EE
@@ -263,7 +263,7 @@ left; \fC-R\fP to the right; and \fC-C\fP, the default, centers
 it.
 .PP
 .IX images!width
-An optional final argument specifies the width of the image. The
+An optional final argument specifies the width of the image.  The
 default is 1 inch.
 E.g.,
 .EX

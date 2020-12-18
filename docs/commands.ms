@@ -1,6 +1,6 @@
-.\" last modified 2020-12-17
+.\" last modified 2020-12-19
 .SH 1
-2. troff, groff, and troff2page commands
+2.  troff, groff, and troff2page commands
 .LP
 .IX drop caps
 .IX man@-man, macro package
@@ -14,8 +14,9 @@ recherch\('e macros as \fC.DC\fP, here used to produce a drop
 capital
 colored terracotta pink.
 The syntax recognized is the improved kind
-supported by \*[url https://www.gnu.org/software/groff]groff\& and \*[url \
-http://heirloom.sf.net/doctools.html]Heirloom troff\&, i.e., macro, string,
+supported by \*[url https://www.gnu.org/software/groff]groff\&, \*[url \
+http://heirloom.sf.net/doctools.html]Heirloom troff\&, and \*[url
+http://github.com/aligrudi/neatroff]Neatroff\&, i.e., macro, string,
 and glyph names can be arbitrarily long, and strings can
 have arguments.  Most of the commands are converted to their
 obvious HTML equivalent.\**
@@ -32,15 +33,15 @@ footnote hyperlinking to each other.
 .
 Please consult troff and groff documentation for these commands.  We will
 concentrate here on those commands whose HTML counterpart is not immediately
-obvious. In order to avoid constantly qualifying my sentences, I shall
+obvious.  In order to avoid constantly qualifying my sentences, I shall
 henceforth use groff as the troff implementation to work alongside
-troff2page. There will be some modification needed when using
+troff2page.  There will be some modification needed when using
 other troff implementations.
 .PP
 .IX pm@.pm, groff request
-The request `\fC.pm\fP lists on the console, in alphabetical
+The request \fC.pm\fP lists on the console, in alphabetical
 order,
-all the requests, macros, and strings defined by troff2page. You
+all the requests, macros, and strings defined by troff2page.  You
 can then search for their behavior in the troff2page and/or groff
 manuals.
 .PP
@@ -50,6 +51,7 @@ mpca macro files
 .IX macro files provided with troff2page
 .IX mpca@-mpca, macro package
 .IX mpca macros
+.IX pca-bib.tmac, macro file
 .IX pca-dc.tmac, macro file
 .IX pca-eval.tmac, macro file
 .IX pca-img.tmac, macro file
@@ -64,6 +66,7 @@ provided in \*[url http://github.com/ds26gte/mpca]mpca\&. For
 convenience, this repo is included as a submodule \fCmpca\fP.
 It includes general-purpose extensions to the \fCms\fP package,
 viz.,
+\fCpca-bib.tmac\fP for bibliographic citations;
 \fCpca-dc.tmac\fP for drop caps;
 \fCpca-eval.tmac\fP for extending groff using Lua;
 \fCpca-img.tmac\fP for image insertion;
@@ -84,7 +87,7 @@ In order to take advantage of the \fCmpca\fP tmac files, you
 should place them in one of your groff macro directories. (Both
 groff and troff2page search for macro files first in the
 directories in \fCGROFF_TMAC_PATH\fP, then in the working
-directory, and finally in your home directory. See the section
+directory, and finally in your home directory.  See the section
 for “Macro Directories” in the groff info file for details.)
 .PP
 .IX m@-m, groff command-line option
@@ -101,7 +104,7 @@ Auxiliary files
 Many of the macros defined in these \fC.tmac\fP files write
 auxiliary files that are absorbed into the document during a
 second run.  Let’s first investigate how groff deals with them,
-and then see how troff2page does the same in its own way. Note
+and then see how troff2page does the same in its own way.  Note
 that in order to write these aux files, groff must be run with
 the \fC-U\fP option for “unsafe” mode.
 .PP
@@ -145,12 +148,12 @@ with the \fC-U\fP, as all the required aux files are made.
 changes.)
 .PP
 troff2page also needs to process the document twice in order to absorb
-information from the aux files. However:
+information from the aux files.  However:
 .PP
-i. troff2page will automatically do the second processing
+i.  troff2page will automatically do the second processing
 without needing the user to explicitly call it a second time; and
 .PP
-ii. troff2page doesn’t need any special option to run in “unsafe”
+ii.  troff2page doesn’t need any special option to run in “unsafe”
 mode or to process tables.
 .EX
     % troff2page index.ms
@@ -179,7 +182,7 @@ global \fCSingle_pass_p\fP to true, i.e.,
     troff2page 'index.ms'
 .EE
 Call it the same way a second time to run the second pass, which
-resolve the aux files. This is exactly analogous to calling
+resolve the aux files.  This is exactly analogous to calling
 \fCgroff\fP twice on the same document to resolve aux files.
 .PP
 .TAG auxf

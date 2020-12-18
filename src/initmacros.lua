@@ -1,4 +1,4 @@
--- last modified 2020-12-17
+-- last modified 2020-12-18
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -519,7 +519,7 @@ function initialize_macros()
 
   defrequest('sp', function()
     --print('doing sp')
-    local num = read_length_in_pixels('v')
+    local num = read_length_in_pixels 'v'
     read_troff_line()
     if num == 0 then num = Gunit.v/Gunit.p end
     --print('sp arg is', num)
@@ -536,7 +536,7 @@ function initialize_macros()
 
   defrequest('ti', function()
     toss_back_string(expand_args(read_word()))
-    local arg = read_length_in_pixels('m')
+    local arg = read_length_in_pixels 'm'
     read_troff_line()
     if arg>0 then
       emit_verbatim '<br>'
@@ -547,7 +547,7 @@ function initialize_macros()
   defrequest('in', function()
     --print('doing in')
     local sign = read_opt_sign()
-    local num = read_length_in_pixels('m')
+    local num = read_length_in_pixels 'm'
     read_troff_line()
     if num then
       if sign=='+' then Margin_left=Margin_left+num
@@ -580,7 +580,7 @@ function initialize_macros()
   end)
 
   defrequest('@AU', function()
-    author_info('italic')
+    author_info()
   end)
 
   defrequest('AU', function()
@@ -651,7 +651,7 @@ function initialize_macros()
     if succeeded_p then
       call_redefined_TH(args)
     else
-      twarning('TH called outside table')
+      twarning 'TH called outside table'
     end
   end)
 

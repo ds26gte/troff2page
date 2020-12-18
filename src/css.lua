@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2020-12-18
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -40,16 +40,15 @@ function initialize_css_file(css_file)
   CSS = io.open(css_file, 'w')
   CSS:write([[
   body {
-    /* color: black;
-    background-color: #ffffff; */
     margin-top: 2em;
     margin-bottom: 2em;
+    margin-left: 8%;
+    margin-right: 8%;
   }
 
-  .title {
-    font-size: 200%;
-    /* font-weight: normal; */
+  h1.title {
     margin-top: 2.8em;
+    margin-bottom: 1.5em;
     text-align: center;
   }
 
@@ -62,11 +61,22 @@ function initialize_css_file(css_file)
     margin-top: 2em;
   }
 
-  .manpage .sh {
+  h1,h2,h3,h4,h5 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-family: sans-serif;
+    font-weight: normal;
+  }
+
+  h1.title {
+    font-size: 172.8%;
+  }
+
+  h1 {
     font-size: 144%;
   }
 
-  .manpage .ss {
+  h2,h3,h4,h5,h6 {
     font-size: 120%;
   }
 
@@ -182,11 +192,6 @@ function initialize_css_file(css_file)
 
   @media screen {
 
-    body {
-      margin-left: 8%;
-      margin-right: 8%;
-    }
-
     /*
     this ruins paragraph spacing on Firefox -- don't know why
     a {
@@ -253,7 +258,7 @@ function collect_css_info_from_preamble()
     CSS:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
   if ll ~= 0 then
-    CSS:write(string.format('\nbody { max-width: %spx; }\n', ll))
+    CSS:write(string.format('\n@media screen { body { max-width: %spx; } }\n', ll))
   end
   if Macro_package ~= 'man' then
     if p_i ~= 0 then

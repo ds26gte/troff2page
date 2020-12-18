@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201217 -- last modified
+troff2page_version = 20201219 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -1050,16 +1050,15 @@ function initialize_css_file(css_file)
   CSS = io.open(css_file, 'w')
   CSS:write([[
   body {
-    /* color: black;
-    background-color: #ffffff; */
     margin-top: 2em;
     margin-bottom: 2em;
+    margin-left: 8%;
+    margin-right: 8%;
   }
 
-  .title {
-    font-size: 200%;
-    /* font-weight: normal; */
+  h1.title {
     margin-top: 2.8em;
+    margin-bottom: 1.5em;
     text-align: center;
   }
 
@@ -1072,11 +1071,22 @@ function initialize_css_file(css_file)
     margin-top: 2em;
   }
 
-  .manpage .sh {
+  h1,h2,h3,h4,h5 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-family: sans-serif;
+    font-weight: normal;
+  }
+
+  h1.title {
+    font-size: 172.8%;
+  }
+
+  h1 {
     font-size: 144%;
   }
 
-  .manpage .ss {
+  h2,h3,h4,h5,h6 {
     font-size: 120%;
   }
 
@@ -1192,11 +1202,6 @@ function initialize_css_file(css_file)
 
   @media screen {
 
-    body {
-      margin-left: 8%;
-      margin-right: 8%;
-    }
-
     /*
     this ruins paragraph spacing on Firefox -- don't know why
     a {
@@ -1263,7 +1268,7 @@ function collect_css_info_from_preamble()
     CSS:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
   if ll ~= 0 then
-    CSS:write(string.format('\nbody { max-width: %spx; }\n', ll))
+    CSS:write(string.format('\n@media screen { body { max-width: %spx; } }\n', ll))
   end
   if Macro_package ~= 'man' then
     if p_i ~= 0 then
@@ -1639,7 +1644,7 @@ function emit_verbatim_escape(e, bkt, unclosed_p)
 end
 
 function emit(s)
-  --print('emit of', s, 'to', Out)
+  --print('emit of', s)
   --print('outputtingto=', Outputting_to)
   --emitCalled = emitCalled+1
   --if emitCalled > 50 then
@@ -1660,6 +1665,8 @@ function emit(s)
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
       if c == Escape_char then
+        --XXX: probably also need a superescape that works even
+        --when .eo
         --print('emit found \\')
         e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
@@ -1670,14 +1677,20 @@ function emit(s)
             elseif e == 'htmlgt' then inside_html_angle_brackets_p = false
             end
           end
-          Out:write(h)
-        elseif Turn_off_escape_char_p then
-          emit_verbatim_escape(e, bkt, unclosed_p)
+          Out:write(h) --CHECK
         else
-          local g = Glyph_table[e]
-          if g then Out:write(g)
-          else
+          local starts_with_u_p = (string.find(e, 'u') == 1)
+          local hnum = starts_with_u_p and string.sub(e, 2)
+          if hnum and tonumber('0x'..hnum) then
+            Out:write('&#x' .. hnum .. ';')
+          elseif Turn_off_escape_char_p then
             emit_verbatim_escape(e, bkt, unclosed_p)
+          else
+            local g = Glyph_table[e]
+            if g then Out:write(g)
+            else
+              emit_verbatim_escape(e, bkt, unclosed_p)
+            end
           end
         end
       elseif Outputting_to == 'title' and inside_html_angle_brackets_p then no_op()
@@ -3593,7 +3606,7 @@ function initialize_macros()
 
   defrequest('sp', function()
     --print('doing sp')
-    local num = read_length_in_pixels('v')
+    local num = read_length_in_pixels 'v'
     read_troff_line()
     if num == 0 then num = Gunit.v/Gunit.p end
     --print('sp arg is', num)
@@ -3610,7 +3623,7 @@ function initialize_macros()
 
   defrequest('ti', function()
     toss_back_string(expand_args(read_word()))
-    local arg = read_length_in_pixels('m')
+    local arg = read_length_in_pixels 'm'
     read_troff_line()
     if arg>0 then
       emit_verbatim '<br>'
@@ -3621,7 +3634,7 @@ function initialize_macros()
   defrequest('in', function()
     --print('doing in')
     local sign = read_opt_sign()
-    local num = read_length_in_pixels('m')
+    local num = read_length_in_pixels 'm'
     read_troff_line()
     if num then
       if sign=='+' then Margin_left=Margin_left+num
@@ -3654,7 +3667,7 @@ function initialize_macros()
   end)
 
   defrequest('@AU', function()
-    author_info('italic')
+    author_info()
   end)
 
   defrequest('AU', function()
@@ -3725,7 +3738,7 @@ function initialize_macros()
     if succeeded_p then
       call_redefined_TH(args)
     else
-      twarning('TH called outside table')
+      twarning 'TH called outside table'
     end
   end)
 
@@ -5252,9 +5265,9 @@ function if_test_passed_p()
   elseif c == 'c' then res= Color_table[read_word()]
   elseif c == 'd' then local w = expand_args(read_word())
     res= (Request_table[w] or Macro_table[w] or String_table[w])
-  elseif c == 'o' then twarning("if: oddness of pageno shouldn't be relevant for HTML")
+  elseif c == 'o' then twarning 'if: oddness of pageno shouldn\'t be relevant for HTML'
     res= ((Current_pageno%2) ~= 0)
-  elseif c == 'e' then twarning("if: oddness of pageno shouldn't be relevant for HTML")
+  elseif c == 'e' then twarning 'if: oddness of pageno shouldn\'t be relevant for HTML'
     res= ((Current_pageno%2) == 0)
   elseif c == '(' then toss_back_char(c)
     res= ((read_arith_expr{stop = true}) > 0)

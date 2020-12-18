@@ -1,12 +1,12 @@
-.\" last modified 2020-12-14
+.\" last modified 2020-12-19
 .SH 1
-9. Recovery from errors
+9.  Recovery from errors
 .LP
 .IX errors
 .IX text editor
 If troff2page fails on your document, it will display a message giving its
 best guess on what the problem is and where it occurred in the source
-document. It also offers to take you there in your text editor so you can fix it immediately.
+document.  It also offers to take you there in your text editor so you can fix it immediately.
 .EX
 .ec
     \&\f(CIfilename:lineno: error description\fP

@@ -1,6 +1,6 @@
-.\" last modified 2020-12-14
+.\" last modified 2020-12-19
 .SH 1
-7. Extending groff using Lua
+7.  Extending groff using Lua
 .LP
 .IX extending groff with Lua
 .IX extending groff and troff2page with Lua
@@ -8,7 +8,7 @@
 .IX endeval@.endeval, -mpca macro
 .IX pca-eval.tmac, macro file
 To invoke Lua from groff, we use the macro \fC.eval\fP with its closer
-\fC.endeval\fP. These are
+\fC.endeval\fP.  These are
 defined in the
 supplied
 groff macro file \fCpca-eval.tmac\fP, which you should put
