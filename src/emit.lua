@@ -1,4 +1,4 @@
--- last modified 2020-12-19
+-- last modified 2020-12-25
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -230,7 +230,7 @@ function emit_expanded_line()
         --print('eel 3')
         if count_leading_spaces_p then
           count_leading_spaces_p = false
-          --print('calling ELS I')
+          --print('calling ELS I', num_leading_spaces)
           if num_leading_spaces>0 then
             emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
             insert_leading_line_break_p=true
@@ -244,10 +244,12 @@ function emit_expanded_line()
       if blank_line_p then blank_line_p = false end
       if count_leading_spaces_p then
         count_leading_spaces_p = false
-        --print('calling ELS II')
+        --print('calling ELS II', num_leading_spaces, '->', c, '<-')
         if num_leading_spaces>0 then
           emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
           insert_leading_line_break_p=true
+          --print 'unsetting no space mode'
+          if No_space_mode_p then No_space_mode_p = false end
         end
       end
       if c == '"' then check_verbatim_apostrophe_status() end
@@ -338,6 +340,7 @@ end
 
 function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
   --print('doing emit_leading_spaces', num_leading_spaces, insert_leading_line_break_p)
+  --print('no space mode =', No_space_mode_p)
   Leading_spaces_number = num_leading_spaces
   assert(num_leading_spaces > 0)
   if Leading_spaces_macro then
@@ -348,6 +351,8 @@ function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
       it = Request_table[Leading_spaces_macro]
       if it then it() end
     end
+  elseif No_space_mode_p then
+    no_op()
   else
     -- true or insert_leading_line_break_p
     -- Just_after_par_start_p
@@ -392,6 +397,7 @@ function emit_interleaved_para()
 end
 
 function emit_para(opts)
+  if No_space_mode_p then return end
   opts = opts or {}
   --print('doing emit_para', opts.style, opts.no_margins_p, opts.continue_top_ev_p)
   local para_style = opts.style

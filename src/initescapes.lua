@@ -1,4 +1,4 @@
--- last modified 2020-12-15
+-- last modified 2020-12-26
 
 Escape_table = {}
 
@@ -185,7 +185,9 @@ defescape('h', function()
   if delim ~= delim2 then
     terror('\\h bad delims %s %s', delim, delim2)
   end
-  return verbatim_nbsp(x / 5)
+  return verbatim '<span style="padding-left: ' ..
+  verbatim(x) ..
+  verbatim 'px"> </span>'
 end)
 
 defescape('l', function()
@@ -214,6 +216,8 @@ end)
 defescape('&', function()
   return '\\[htmlempty]'
 end)
+
+defescape(')', Escape_table['&'])
 
 defescape('%', Escape_table['&'])
 

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201219 -- last modified
+troff2page_version = 20201226 -- last modified
 troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 troff2page_copyright_notice =
@@ -338,6 +338,7 @@ Main_troff_file = nil
 Margin_left = nil
 Missing_pieces = nil
 No_break_control_char = nil
+No_space_mode_p = nil
 Node_table = nil
 Num_of_times_th_called = nil
 Numreg_table = nil
@@ -700,6 +701,7 @@ function troff2page_1pass(argc, argv)
     Margin_left = 0,
     Missing_pieces = {},
     No_break_control_char = "'",
+    No_space_mode_p = false,
     Node_table = {},
     Num_of_times_th_called = 0,
     Numreg_table = {},
@@ -1071,7 +1073,7 @@ function initialize_css_file(css_file)
     margin-top: 2em;
   }
 
-  h1,h2,h3,h4,h5 {
+  h1,h2,h3,h4,h5,h6 {
     margin-top: 1em;
     margin-bottom: 0.5em;
     font-family: sans-serif;
@@ -1829,7 +1831,7 @@ function emit_expanded_line()
         --print('eel 3')
         if count_leading_spaces_p then
           count_leading_spaces_p = false
-          --print('calling ELS I')
+          --print('calling ELS I', num_leading_spaces)
           if num_leading_spaces>0 then
             emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
             insert_leading_line_break_p=true
@@ -1843,10 +1845,12 @@ function emit_expanded_line()
       if blank_line_p then blank_line_p = false end
       if count_leading_spaces_p then
         count_leading_spaces_p = false
-        --print('calling ELS II')
+        --print('calling ELS II', num_leading_spaces, '->', c, '<-')
         if num_leading_spaces>0 then
           emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
           insert_leading_line_break_p=true
+          --print 'unsetting no space mode'
+          if No_space_mode_p then No_space_mode_p = false end
         end
       end
       if c == '"' then check_verbatim_apostrophe_status() end
@@ -1937,6 +1941,7 @@ end
 
 function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
   --print('doing emit_leading_spaces', num_leading_spaces, insert_leading_line_break_p)
+  --print('no space mode =', No_space_mode_p)
   Leading_spaces_number = num_leading_spaces
   assert(num_leading_spaces > 0)
   if Leading_spaces_macro then
@@ -1947,6 +1952,8 @@ function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
       it = Request_table[Leading_spaces_macro]
       if it then it() end
     end
+  elseif No_space_mode_p then
+    no_op()
   else
     -- true or insert_leading_line_break_p
     -- Just_after_par_start_p
@@ -1991,6 +1998,7 @@ function emit_interleaved_para()
 end
 
 function emit_para(opts)
+  if No_space_mode_p then return end
   opts = opts or {}
   --print('doing emit_para', opts.style, opts.no_margins_p, opts.continue_top_ev_p)
   local para_style = opts.style
@@ -2669,7 +2677,9 @@ defescape('h', function()
   if delim ~= delim2 then
     terror('\\h bad delims %s %s', delim, delim2)
   end
-  return verbatim_nbsp(x / 5)
+  return verbatim '<span style="padding-left: ' ..
+  verbatim(x) ..
+  verbatim 'px"> </span>'
 end)
 
 defescape('l', function()
@@ -2698,6 +2708,8 @@ end)
 defescape('&', function()
   return '\\[htmlempty]'
 end)
+
+defescape(')', Escape_table['&'])
 
 defescape('%', Escape_table['&'])
 
@@ -3604,6 +3616,18 @@ function initialize_macros()
     emit_para{incremental_p = true}
   end)
 
+  defrequest('ns', function()
+    read_troff_line()
+    --print 'setting no space mode'
+    No_space_mode_p = true
+  end)
+
+  defrequest('rs', function()
+    read_troff_line()
+    --print 'unsetting no space mode'
+    No_space_mode_p = false
+  end)
+
   defrequest('sp', function()
     --print('doing sp')
     local num = read_length_in_pixels 'v'
@@ -3612,7 +3636,7 @@ function initialize_macros()
     --print('sp arg is', num)
     emit_para{interleaved_p = true,
       continue_top_ev_p = true,
-      style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
+      style = string.format('margin-top: %spx', num)}
     emit_verbatim '\n'
   end)
 

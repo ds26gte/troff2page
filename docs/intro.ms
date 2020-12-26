@@ -1,4 +1,4 @@
-.\" last modified 2020-12-19
+.\" last modified 2020-12-23
 .SH 1
 1.  Introduction
 .LP
@@ -26,9 +26,9 @@ all Unixish machines.  These are significant benefits: so even
 though
 troff is a toolchain of some vintage, there continues to be a
 devoted band of troffglodytes preserving the tradition.
-troff2page lets you put your troff documents on the Web without
+Troff2page lets you put your troff documents on the Web without
 your having to learn a new system or to maintain separate documents.
-With a flag, troff2page can also produce an Info version of your
+Troff2page can be instructed to also produce an Info version of your
 document that’s suitable for browing on a text terminal (chapter
 \*[TAG:gnuinfo]).
 .PP
@@ -38,7 +38,7 @@ ensure that the script \fCtroff2page\fP is in a directory in your
 \fCPATH\fP.
 .PP
 .TAG html-output
-.IX calling troff2page from!the command-line
+.IX calling Troff2page from!the command-line
 To convert an input troff document named \fCjobname.ms\fP, type
 the following on the operating-system command line.
 .EX
@@ -116,7 +116,7 @@ In the unlikely event that you have a document file named
 \fCtroff2page\fP ignores all other \fCgroff\fP options, most with a warning.
 The options
 \fC-z\fP, \fC-t\fP, and \fC-U\fP are silently ignored, as they’re always valid
-for troff2page.
+for Troff2page.
 .PP
 Macro file options must be given without the suffix \fC.tmac\fP or prefix
 \fCtmac.\fP.  Thus, \fC-mxyz\fP or \fC-m xyz\fP looks for the macro file
@@ -169,7 +169,7 @@ to console.
 Autoloaded init files
 .LP
 .TAG troff2pagerc
-.IX init files for troff2page
+.IX init files for Troff2page
 .IX troff2pagerc@.troff2pagerc, user macro file
 \fCtroff2page\fP can read directives in some autoloaded files
 without the need to explicitly use a command-line option.  These
@@ -178,7 +178,7 @@ output, and they’re loaded before the input document is
 processed.
 .PP
 i.  The first such file is named
-\fC.troff2pagerc\fP: troff2page looks for it in your macro
+\fC.troff2pagerc\fP: Troff2page looks for it in your macro
 directories: \fCGROFF_TMAC_PATH\fP, working directory, home — in
 that order.\**
 .FS
@@ -193,7 +193,7 @@ documents that are in that directory.
 If your changes will be used in all your documents, place it in
 your home or a private (not a system!) \fCGROFF_TMAC_PATH\fP directory.
 .PP
-That your home directory is the last place troff2page looks in
+That your home directory is the last place Troff2page looks in
 for \fC.troff2pagerc\fP has a nice benefit: Use
 \fC~/.troff2pagerc\fP for standard boilerplate customization that
 you want unthinkingly autoloaded for \fImost\fP of your
@@ -223,7 +223,7 @@ for HTML only.)
 .PP
 .IX man.local, man init file
 iii.  Finally, If the input file is recognizably a man page (i.e., it has the
-command \fC.TH\fP), both troff2page and groff will load, if it
+command \fC.TH\fP), both Troff2page and groff will load, if it
 exists, the init file \fCman.local\fP.  This init file, like
 \fC.troff2pagerc\fP, is searched for in the
 \fCGROFF_TMAC_PATH\fP, working directory, and home, in that
@@ -235,10 +235,10 @@ loaded, settings in \fCman.local\fP can override or shadow
 \fCjobname.t2p\fP, which in its turn shadows \fC.troff2pagerc\fP.
 .PP
 .SH 2
-Calling troff2page from within Lua
+Calling Troff2page from within Lua
 .LP
 .TAG calling_troff2page_within_lua
-.IX calling troff2page from!Lua
+.IX calling Troff2page from!Lua
 The script \fCtroff2page\fP runs on the command-line on Unix-esque
 machines that have Lua installed.
 For more installation information,

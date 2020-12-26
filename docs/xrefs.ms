@@ -1,11 +1,11 @@
-.\" last modified 2020-12-19
+.\" last modified 2020-12-26
 .SH 1
 4.  Cross-references
 .LP
 .IX cross-references
 .IX TAG@.TAG, -mpca macro
 .IX pca-tag.tmac, macro file
-troff2page provides a \fC.TAG\fP macro for managing
+Troff2page provides a \fC.TAG\fP macro for managing
 cross-references.  A compatible groff definition is provided in
 the supplied macro file \fCpca-tag.tmac\fP. (This overrides the
 similarly named macro in groff’s \fCwww.tmac\fP, in order to allow
@@ -41,12 +41,11 @@ ToC
 The
 macro file \fCpca-toc.tmac\fP supplies a \fC.ToC\fP macro
 for automatic generation of a table of contents.  This can be used
-by both groff and troff2page.
+by both groff and Troff2page.
 .PP
 .IX GROWPS, -ms number register
-The troff2page aspect of \fCpca-toc.tmac\fP
-uses \fC.TAG\fP.  For both outputs, ToC entries are created for
-headers of level \fC\\n[GROWPS]\fP or lower.  By default,
+For both outputs, ToC entries are created for
+headers of level \fC\\n[GROWPS]\fP or lower. By default,
 \fCGROWPS\fP is set to 0, so you should set it to at least 1 to see
 a ToC.
 .PP
@@ -54,8 +53,8 @@ a ToC.
 The original purpose of \fCGROWPS\fP was to govern the font-size
 of headers at levels below it, provided it is set to at least 2
 and the register \fC\en[PSINCR]\fP is set (which it is, by
-default, to 10p).
-troff2page respects this too.  If you’d rather use CSS to affect
+default, to 1p).
+Troff2page respects this too. If you’d rather use CSS to affect
 section-header style, including font-size, but you
 must have \fCGROWPS\fP \(>= 2
 because your ToC requires it, then conditionally set \fCPSINCR\fP
@@ -73,25 +72,25 @@ is perhaps initially more difficult, but would save a great deal of time
 in the long run if you use ‘ms’ regularly.
 .QE
 .IX pca-t2p-man.tmac, macro file
-troff2page autoloads the macro file \fCpca-t2p-man.tmac\fP (if it can
+Troff2page autoloads the macro file \fCpca-t2p-man.tmac\fP (if it can
 find it in \fCGROFF_TMAC_PATH\fP)
 to automatically generate a ToC for man pages,
 with a ToC entry for each \fC.SH\fP in the input.
 .PP
 .SH 2
 Bibliography
-.PP
+.LP
 The \fC.BIB\fP macro from
 the macro file \fCpca-bib.tmac\fP introduces a paragraph that is
 a simple bibliographic reference, e.g.,
 .EX
     .BIB landes_clock
-    David S.\ Landes, \fIRevolutions in Time: Clocks and the
+    David S. Landes, \fIRevolutions in Time: Clocks and the
     Making of the Modern World\fP, Belknap Press, 1983.
 .EE
 If it is the \fIn\fPth such reference in the document, it is prefixed
 with “[\fIn\fP]” in the output.  Furthermore, the label
-\fCTAG:utp\fP is
+\fCTAG:landes_clock\fP is
 associated with \fIn\fP, using the cross-reference mechanism
 described earlier, and can be used to cite the reference.  E.g.,
 .EX

@@ -1,19 +1,19 @@
-.\" last modified 2020-12-19
+.\" last modified 2020-12-22
 .SH 1
 6.  Slideshows
 .LP
 .IX slideshow
 .IX Slidy
-.IX SLIDES@.SLIDES, troff2page macro
+.IX SLIDES@.SLIDES, Troff2page macro
 To have your groff source to be converted into slideshow-ready HTML, insert
 into it (somewhere) the macro call
 .EX
     .SLIDES
 .EE
-This causes troff2page to use the style sheet \fCslide.css\fP and JavaScript file
+This causes Troff2page to use the style sheet \fCslide.css\fP and JavaScript file
 \fCslidy.js\fP from \*[url https://www.w3.org/Talks/Tools/#slidy]Slidy\& to convert
 your document into a single
-HTML page that can be browsed as a slideshow.  troff2page looks for these files in
+HTML page that can be browsed as a slideshow. Troff2page looks for these files in
 the working directory, and if they’re not found there, it links
 them from the W3C website.  It may be prudent to get these files
 beforehand and place them in your working directory, so the
@@ -29,7 +29,7 @@ An HTML page meant for presentation uses larger, bolder fonts by
 default (but you can add your own CSS). There are no navigation
 bars between slides.
 .PP
-.IX pause@.pause, troff2page macro
+.IX pause@.pause, Troff2page macro
 Use the \fC.pause\fP macro to
 interrupt display of the rest of the current slide.
 .PP

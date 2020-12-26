@@ -1,15 +1,15 @@
-.\" last modified 2020-12-19
+.\" last modified 2020-12-22
 .SH 1
 8.  Styling
 .LP
 .IX stylesheet, modifying
 .IX ig@.ig, groff request
 \fC.ig ##\fP can be used to specify settings that are relevant only
-when troff2page is used on a document, e.g., stylesheet changes.
-troff2page uses the output-stream \fCCSS\fP to
+when Troff2page is used on a document, e.g., stylesheet changes.
+Troff2page uses the output-stream \fCCSS\fP to
 write out its default style information.  The user can also
 append to this stream.  E.g.,
-.IX CSS, troff2page Lua output stream
+.IX CSS, Troff2page Lua output stream
 .EX
     .ig ##
     CSS:write([[
@@ -30,7 +30,7 @@ https://www.resene.co.nz/swatches]Resene Paints\&.
 .FE
 .PP
 .IX title@.title, CSS class
-troff2page makes available many CSS classes that you can modify
+Troff2page makes available many CSS classes that you can modify
 in this manner to change the look of your web pages.  For
 instance, the HTML element for the document title has class
 \fCtitle\fP.  Here’s a way to get a more happening,
@@ -57,19 +57,19 @@ Colophon
 .LP
 .IX colophon
 .IX last-modification time
-By default, troff2page places a colophon at the bottom right of the first
+By default, Troff2page places a colophon at the bottom right of the first
 page.  The colophon mentions
 .PP
 i.  the last-modification
 time of
 the document, and
 .PP
-ii.  the troff2page version used for the conversion.
+ii. the Troff2page version used for the conversion.
 Either or both can be suppressed via CSS.
 .PP
 .IX colophon@.colophon, CSS class
 .IX advertisement@.advertisement, CSS class
-To suppress the mention of troff2page,
+To suppress the mention of Troff2page,
 .PP
 .EX
     .colophon .advertisement {
@@ -85,7 +85,7 @@ To suppress the entire colophon,
     }
 .EE
 .PP
-troff2page calculates the last-mod time by choosing the timestamp
+Troff2page calculates the last-mod time by choosing the timestamp
 of the newest of the source documents that make up the document.
 Only user content is considered; macro and auxiliary files are
 not.
@@ -94,7 +94,7 @@ not.
 .IX DA@.DA, -ms macro
 To specify a document timestamp without regard to the actual mod times
 of the files in it, use the -ms macros \fC.ND\fP or \fC.DA\fP.
-troff2page doesn’t distinguish between them, but groff does.
+Troff2page doesn’t distinguish between them, but groff does.
 \fC.ND\fP is probably what you want for both typesetters. (groff
 doesn’t really have any notion of the last-mod date anyway: It
 simply uses the date that it was called on.
@@ -102,7 +102,7 @@ I.e., last-creation-of-printed-output date.)
 .PP
 For web pages, note that if
 either macro is called with an argument, that argument is used as the
-last-mod date, overriding the value that troff2page would
+last-mod date, overriding the value that Troff2page would
 have determined.
 .PP
 .IX lastmod@.lastmod, CSS class
@@ -116,7 +116,7 @@ accomplished via the CSS fragment:
 .EE
 .PP
 .IX TH@.TH, -man macro
-As a special case, for man pages, troff2page (like groff -man)
+As a special case, for man pages, Troff2page (like groff -man)
 takes the third argument of the titling macro \fC.TH\fP as the
 last-mod date.  If there isn’t a third argument, the colophon
 won’t mention any date.
@@ -125,7 +125,7 @@ won’t mention any date.
 Glyph substition
 .LP
 CSS isn’t the only recourse to style your document: Interesting
-glyphs offer another approach.  troff2page, like groff, allows
+glyphs offer another approach. Troff2page, like groff, allows
 you to use UTF-8 characters, either directly or via escape
 sequences of the form \fC\e[u\fIxxxx\fP]\fP, where \fIxxxx\fP is
 the corresponding hex number (in uppercase).
@@ -175,7 +175,7 @@ We could use the
 escape sequence \fC\ee\fP in our input to stand for a backslash,
 but especially in an extended display containing verbatim code,
 we would like to input the backslash as-is and have groff and
-troff2page temporarily suspend its escape effect.
+Troff2page temporarily suspend its escape effect.
 We could do this by having our display
 macros
 implicitly turn the escape character off when entering the display and back on when
@@ -255,7 +255,7 @@ Glyph substitution to the rescue:
 .EE
 .PP
 This lets you type the exotic backslash in your source but have
-groff and troff2page convert it into the regular backslash when
+groff and Troff2page convert it into the regular backslash when
 it lands on the page.
 Note there is no requirement that the font used by groff or the
 browser actually

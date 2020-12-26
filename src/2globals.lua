@@ -1,4 +1,4 @@
--- last modified 2020-12-15
+-- last modified 2020-12-25
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -95,6 +95,7 @@ Main_troff_file = nil
 Margin_left = nil
 Missing_pieces = nil
 No_break_control_char = nil
+No_space_mode_p = nil
 Node_table = nil
 Num_of_times_th_called = nil
 Numreg_table = nil

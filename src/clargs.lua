@@ -1,4 +1,4 @@
--- last modified 2020-12-15
+-- last modified 2020-12-25
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -111,6 +111,7 @@ function troff2page_1pass(argc, argv)
     Margin_left = 0,
     Missing_pieces = {},
     No_break_control_char = "'",
+    No_space_mode_p = false,
     Node_table = {},
     Num_of_times_th_called = 0,
     Numreg_table = {},

@@ -1,9 +1,9 @@
-.\" last modified 2020-12-19
+.\" last modified 2020-12-22
 .SH 1
 7.  Extending groff using Lua
 .LP
 .IX extending groff with Lua
-.IX extending groff and troff2page with Lua
+.IX extending groff and Troff2page with Lua
 .IX eval@.eval, -mpca macro
 .IX endeval@.endeval, -mpca macro
 .IX pca-eval.tmac, macro file
@@ -75,33 +75,33 @@ for each \fC.eval\fP, and each \fC.eval\fP sources its assigned
 aux file
 into the document.
 .PP
-.IX extending troff2page with Lua
+.IX extending Troff2page with Lua
 Lua code via \fC.eval\fP can
 serve as a very powerful \fIsecond extension language\fP
 for groff.  This benefit is available even when the document
-is processed by troff2page:
-We could run troff2page on the same document, \fCtau.ms\fP, and the
+is processed by Troff2page:
+We could run Troff2page on the same document, \fCtau.ms\fP, and the
 resulting \fCtau.html\fP will show the same content.
 .PP
-.IX extending troff2page with Lua!differently from groff
+.IX extending Troff2page with Lua!differently from groff
 .IX if@.if, groff request
 .IX ie@.ie, groff request
 .IX el@.el, groff request
 Furthermore, we can embed  \fC.eval\fP-enclosed Lua code inside an
 \fC.if\fP (or \fC.ie\fP or \fC.el\fP) statement so that it gets executed
-only for groff or only for troff2page.  (Recall we used the number register
+only for groff or only for Troff2page. (Recall we used the number register
 \fC\en[.troff2page]\fP for this purpose on page \*[TAG:cond-bp].)  In
-particular, by calling Lua code only for troff2page, the
+particular, by calling Lua code only for Troff2page, the
 user has the
-means to extend troff2page to deal with things that the core
+means to extend Troff2page to deal with things that the core
 program as supplied does
 not.
 .PP
-Note that when troff2page sees
+Note that when Troff2page sees
 \fC.eval\fP-enclosed Lua
 code, it runs it in a Lua environment that has not only the basic
 Lua language but also includes the procedures and data structures
-defined in troff2page.  These extras are not available (and are arguably
+defined in Troff2page. These extras are not available (and are arguably
 not useful) to the \fC.eval\fP code seen by groff.
 .PP
 .SH 2
@@ -173,7 +173,7 @@ much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
     .endeval
 .EE
 Here, the Lua procedure \fCdef_hsl_color\fP takes an HSL spec and
-writes out the equivalent RGB groff definition. (The troff2page
+writes out the equivalent RGB groff definition. (The Troff2page
 distribution provides \fCdef_hsl_color\fP in the macro file
 \fCdefhsl.tmac\fP.)
 .PP
@@ -207,27 +207,27 @@ emulate the sanguine chalk drawings of the Old Masters.
 .B2
 .PP
 .SH 2
-Extending troff2page only
+Extending Troff2page only
 .LP
-.IX extending troff2page with Lua!without producing output
-.IX ig@.ig ##, as troff2page extender
-troff2page treats groff’s \fC.ig\fP
+.IX extending Troff2page with Lua!without producing output
+.IX ig@.ig ##, as Troff2page extender
+Troff2page treats groff’s \fC.ig\fP
 environment, whenever it uses \fC##\fP as ender, as
 containing Lua code that can be used to extend
-troff2page.  This syntactic overloading of \fC.ig ##\fP is an innovation introduced by
+Troff2page. This syntactic overloading of \fC.ig ##\fP is an innovation introduced by
 Oliver Laumann’s \*[url \
 http://www-rn.informatik.uni-bremen.de/software/unroff]unroff\&.
 .PP
 Any Lua code enclosed within
 \&\fC.ig ##\fP ... \fC.##\fP will be processed by
-troff2page but not by
+Troff2page but not by
 groff, which treats it as a multiline comment of course.
 Note that \fC.ig ##\fP does not pipe its stdout back into
 the document, as \fC.eval\fP does.  This is to maintain the invariant
 that as far as output is
 concerned, \fC.ig ##\fP, like other \fC.ig\fPs, is \fIalways\fP a
 comment.  However, you can add Lua code within \fC.ig ##\fP
-to influence how troff2page — but not groff! — processes the rest of the
+to influence how Troff2page — but not groff! — processes the rest of the
 document.
 .PP
 For example, let’s define a
@@ -238,14 +238,14 @@ argument within angle brackets.
     .ds url \(la\fC\\$1\fP\(ra
 .EE
 This is adequate for the print output.
-For troff2page though, we’d like to
+For Troff2page though, we’d like to
 re-define this macro, in Lua, to create a hyperlink.
 We enclose this re-definition in a \fC.ig ##\fP, which not
 only allows it to be in Lua, but also makes it apply only
-when troff2page reads it:
-.IX defstring, troff2page Lua function
-.IX link_start, troff2page Lua function
-.IX link_stop, troff2page Lua function
+when Troff2page reads it:
+.IX defstring, Troff2page Lua function
+.IX link_start, Troff2page Lua function
+.IX link_stop, Troff2page Lua function
 .EX
     .ig ##
     defstring('url', function(url)
@@ -254,5 +254,4 @@ when troff2page reads it:
     .##
 .EE
 The procedures \fCdefstring\fP, \fClink_start\fP, and
-\fClink_stop\fP are defined in the troff2page code.
-.PP
+\fClink_stop\fP are defined in the Troff2page code.

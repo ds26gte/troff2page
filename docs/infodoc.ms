@@ -1,10 +1,10 @@
-.\" last modified 2020-12-19
+.\" last modified 2020-12-22
 .SH 1
 10.  GNU Info docs
 .LP
 .TAG gnuinfo
 .IX Info files, generating
-.IX troff2page2info@.troff2page2info, troff2page macro
+.IX troff2page2info@.troff2page2info, Troff2page macro
 You can call the macro
 .EX
     .troff2page2info

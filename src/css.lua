@@ -1,4 +1,4 @@
--- last modified 2020-12-18
+-- last modified 2020-12-21
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -61,7 +61,7 @@ function initialize_css_file(css_file)
     margin-top: 2em;
   }
 
-  h1,h2,h3,h4,h5 {
+  h1,h2,h3,h4,h5,h6 {
     margin-top: 1em;
     margin-bottom: 0.5em;
     font-family: sans-serif;

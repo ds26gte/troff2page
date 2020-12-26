@@ -1,4 +1,4 @@
-# last modified 2020-12-14
+# last modified 2020-12-19
 
 src_files = [!i]*.css *.ms *.tmac
 
@@ -18,6 +18,7 @@ index.ms: $(src_dir)/index.ms
 	cp -p $$(dirname $<)/*.jpg .; \
 	cp -p $$(dirname $<)/*.png .; \
 	cp -p $$(dirname $<)/*.ms .; \
+	cp -p $$(dirname $<)/*.t2p .; \
 	cp -p $$(dirname $<)/*.tmac .
 
 index.ps: index.ms $(src_files) .trofftemp.ind

@@ -1,22 +1,22 @@
-.\" last modified 2020-12-19
+.\" last modified 2020-12-22
 .SH 1
 5.  Making an index
 .LP
 .IX index
 .IX pca-ix.tmac, macro file
-.IX makeindex
+.IX MakeIndex
 The supplied macro file \fCpca-ix.tmac\fP
 creates a sorted
-index, with the aid of the external program makeindex.
-makeindex is included with TeX distributions, but you can
+index, with the aid of the external program MakeIndex.
+MakeIndex is included with TeX distributions, but you can
 also obtain \*[url \
 http://stuff.mit.edu/afs/sipb/project/tex-dev/src/tar/makeindex.tar.gz]just
-the makeindex distribution\&.
+the MakeIndex distribution\&.
 .PP
-Note that the indexes created by groff and troff2page are
+Note that the indexes created by groff and Troff2page are
 necessarily different, because the respective paginations
 are different.  In addition, the index generated for
-troff2page has the additional feature of hyperlinking to the
+Troff2page has the additional feature of hyperlinking to the
 appropriate locations in the body text.
 .PP
 .IX IX@.IX, -mpca macro
@@ -64,14 +64,14 @@ creates an index entry for “set!car” rather than creating a
 subentry “car” under “set"”.
 .PP
 Please see the
-makeindex
+MakeIndex
 documentation for all the details.  Essentially, the syntax for entering
 index entries is the same \*[url \
 http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in groff we use
 “\fC.IX item\fP” where in LaTeX one would use
 \%“\fC\eindex{item}\fP”.
 .PP
-\fCpca-ix.tmac\fP will call makeindex to create a
+\fCpca-ix.tmac\fP will call MakeIndex to create a
 sorted index in the auxiliary file \fC\e*[AUXF].ind\fP, which can be
 slurped back into the input document:
 .EX

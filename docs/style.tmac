@@ -1,4 +1,4 @@
-.\" last change 2020-12-17
+.\" last change 2020-12-20
 .\" Dorai Sitaram
 .
 .if \n[.X] \{\
@@ -10,12 +10,19 @@
 .
 .so defhsl.tmac
 .
+.if d @init \{\
+.  am @init
+.    nr FL \\n[LL]
+.  .
+.\}
+.
 .nr HM .75i
 .nr FM 1.25i
 .ds CH "
 .ds CF \\n[%]
 .
-.\" doesn't seem to have any effect
+.ss 12 0
+.
 .nr PSINCR 3p
 .
 .\"nr FPS \n[PS]

@@ -1,4 +1,4 @@
--- last modified 2020-12-18
+-- last modified 2020-12-26
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -517,6 +517,18 @@ function initialize_macros()
     emit_para{incremental_p = true}
   end)
 
+  defrequest('ns', function()
+    read_troff_line()
+    --print 'setting no space mode'
+    No_space_mode_p = true
+  end)
+
+  defrequest('rs', function()
+    read_troff_line()
+    --print 'unsetting no space mode'
+    No_space_mode_p = false
+  end)
+
   defrequest('sp', function()
     --print('doing sp')
     local num = read_length_in_pixels 'v'
@@ -525,7 +537,7 @@ function initialize_macros()
     --print('sp arg is', num)
     emit_para{interleaved_p = true,
       continue_top_ev_p = true,
-      style = string.format('margin-top: %spx; margin-bottom: %spx', num, num)}
+      style = string.format('margin-top: %spx', num)}
     emit_verbatim '\n'
   end)
 
