@@ -95,6 +95,6 @@ associated with \fIn\fP, using the cross-reference mechanism
 described earlier, and can be used to cite the reference.  E.g.,
 .EX
     For a history of the first portable device that, for better
-    or worse, completely changed how we live, see Landes
-    [\*[TAG:landes_clock]].
+    or worse, completely changed how we live, see
+    Landes\~[\*[TAG:landes_clock]].
 .EE

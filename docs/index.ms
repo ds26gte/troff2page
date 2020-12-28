@@ -1,7 +1,7 @@
 .so style.tmac
 .
 .TL
-troff2page
+Troff2page
 .AU
 .ie \n[.troff2page] \{\
 \*[url http://ds26gte.github.io]Dorai Sitaram\&

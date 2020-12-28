@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2020-12-26
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -25,9 +25,9 @@ function initialize_numregs()
   defnumreg('.T', {value = 1})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
-  defnumreg('.troff2page', {value = troff2page_version})
-  local version_yr = math.floor(troff2page_version/10000)
-  local version_wo_yr = troff2page_version - version_yr*10000
+  defnumreg('.troff2page', {value = Troff2page_version})
+  local version_yr = math.floor(Troff2page_version/10000)
+  local version_wo_yr = Troff2page_version - version_yr*10000
   defnumreg('.x', {value = version_yr})
   defnumreg('.y', {value = math.floor(version_wo_yr/100)})
   defnumreg('.Y', {value = version_wo_yr%100})

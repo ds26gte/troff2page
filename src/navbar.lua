@@ -1,4 +1,4 @@
--- last modified 2020-12-04
+-- last modified 2020-12-26
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
@@ -119,9 +119,9 @@ function emit_colophon()
     emit_verbatim '<div align=right class=advertisement>\n'
     emit_verbatim(Html_conversion_by)
     emit_verbatim ' '
-    emit(link_start(troff2page_website))
-    emit_verbatim 'troff2page '
-    emit_verbatim(troff2page_version)
+    emit(link_start(Troff2page_website))
+    emit_verbatim 'Troff2page '
+    emit_verbatim(Troff2page_version)
     emit(link_stop())
     emit_verbatim '\n</div>\n'
   end

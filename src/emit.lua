@@ -1,4 +1,4 @@
--- last modified 2020-12-25
+-- last modified 2020-12-26
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -276,13 +276,13 @@ function emit_html_preamble()
   emit_verbatim '<!--\n'
   emit_verbatim 'Generated from '
   emit_verbatim(Main_troff_file)
-  emit_verbatim ' by troff2page, '
+  emit_verbatim ' by Troff2page, '
   emit_verbatim 'v. '
-  emit_verbatim(troff2page_version); emit_newline()
-  emit_verbatim(troff2page_copyright_notice); emit_newline()
+  emit_verbatim(Troff2page_version); emit_newline()
+  emit_verbatim(Troff2page_copyright_notice); emit_newline()
   emit_verbatim '(running on '
   emit_verbatim(_VERSION); emit_verbatim ')\n'
-  emit_verbatim(troff2page_website); emit_newline()
+  emit_verbatim(Troff2page_website); emit_newline()
   emit_verbatim '-->\n'
   emit_verbatim '<head>\n'
   emit_verbatim '<meta charset="utf-8">\n'

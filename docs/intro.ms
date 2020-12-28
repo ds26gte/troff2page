@@ -1,4 +1,4 @@
-.\" last modified 2020-12-23
+.\" last modified 2020-12-26
 .SH 1
 1.  Introduction
 .LP
@@ -98,7 +98,7 @@ _
 .EX
     % troff2page --help
 .ft CI
-    troff2page version 20190929
+    Troff2page version 20201226
     Copyright (C) ...
     Usage: troff2page OPTION ... FILE
     Available options: ...

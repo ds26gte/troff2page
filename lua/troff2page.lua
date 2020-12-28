@@ -1,11 +1,11 @@
 #! /usr/bin/env lua
 
-troff2page_version = 20201226 -- last modified
-troff2page_website = 'http://ds26gte.github.io/troff2page'
+Troff2page_version = 20201228 -- last modified
+Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
-troff2page_copyright_notice =
+Troff2page_copyright_notice =
   string.format('Copyright (C) 2003-%s Dorai Sitaram',
-                 string.sub(troff2page_version, 1, 4))
+                 string.sub(Troff2page_version, 1, 4))
 
 
 if not table.unpack then
@@ -648,7 +648,7 @@ function troff2page_help()
   tlog(' -z              suppress formatted output to stdout [not needed]\n')
   tlog(' -t              preprocess with tbl [not needed]\n')
   tlog(' --              stop processing options\n')
-  tlog('For full details, please see %s\n', troff2page_website)
+  tlog('For full details, please see %s\n', Troff2page_website)
 end
 
 function troff2page_1pass(argc, argv)
@@ -746,8 +746,8 @@ function troff2page_1pass(argc, argv)
       if not document_found_p then
         if arg=='--help' or arg=='-h' or arg=='--version' or arg=='-v' then
           call_for_help_p = true
-          tlog('troff2page version %s\n', troff2page_version)
-          tlog ('%s\n', troff2page_copyright_notice)
+          tlog('Troff2page version %s\n', Troff2page_version)
+          tlog ('%s\n', Troff2page_copyright_notice)
           if arg=='--help' or arg=='-h' then
             troff2page_help()
           end
@@ -1877,13 +1877,13 @@ function emit_html_preamble()
   emit_verbatim '<!--\n'
   emit_verbatim 'Generated from '
   emit_verbatim(Main_troff_file)
-  emit_verbatim ' by troff2page, '
+  emit_verbatim ' by Troff2page, '
   emit_verbatim 'v. '
-  emit_verbatim(troff2page_version); emit_newline()
-  emit_verbatim(troff2page_copyright_notice); emit_newline()
+  emit_verbatim(Troff2page_version); emit_newline()
+  emit_verbatim(Troff2page_copyright_notice); emit_newline()
   emit_verbatim '(running on '
   emit_verbatim(_VERSION); emit_verbatim ')\n'
-  emit_verbatim(troff2page_website); emit_newline()
+  emit_verbatim(Troff2page_website); emit_newline()
   emit_verbatim '-->\n'
   emit_verbatim '<head>\n'
   emit_verbatim '<meta charset="utf-8">\n'
@@ -4455,9 +4455,9 @@ function initialize_numregs()
   defnumreg('.T', {value = 1})
   defnumreg('.U', {value = 1})
   defnumreg('.color', {value = 1})
-  defnumreg('.troff2page', {value = troff2page_version})
-  local version_yr = math.floor(troff2page_version/10000)
-  local version_wo_yr = troff2page_version - version_yr*10000
+  defnumreg('.troff2page', {value = Troff2page_version})
+  local version_yr = math.floor(Troff2page_version/10000)
+  local version_wo_yr = Troff2page_version - version_yr*10000
   defnumreg('.x', {value = version_yr})
   defnumreg('.y', {value = math.floor(version_wo_yr/100)})
   defnumreg('.Y', {value = version_wo_yr%100})
@@ -4933,9 +4933,9 @@ function emit_colophon()
     emit_verbatim '<div align=right class=advertisement>\n'
     emit_verbatim(Html_conversion_by)
     emit_verbatim ' '
-    emit(link_start(troff2page_website))
-    emit_verbatim 'troff2page '
-    emit_verbatim(troff2page_version)
+    emit(link_start(Troff2page_website))
+    emit_verbatim 'Troff2page '
+    emit_verbatim(Troff2page_version)
     emit(link_stop())
     emit_verbatim '\n</div>\n'
   end
