@@ -1,4 +1,4 @@
--- last modified 2020-12-16
+-- last modified 2021-01-04
 
 Gunit = {}
 
@@ -18,7 +18,7 @@ defunit('M', Gunit.m * .01)
 defunit('P', Gunit.p * 12)
 defunit('c', Gunit.i / 2.54)
 defunit('n', Gunit.m / 2)
-defunit('v', Gunit.p * 12)
+defunit('v', Gunit.p * 16)
 
 Unit_pattern = '[cfiMmnPpuv]'
 

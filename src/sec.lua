@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2021-01-04
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -138,8 +138,9 @@ function emit_section_header(level, opts)
     local psincr_per_level = counter_value_in_pixels 'PSINCR'
     if psincr_per_level >0 and growps >=2 and level < growps then
       local ps = counter_value_in_pixels 'PS'
+      local SHmag = raw_counter_value '.SHmag'
       emit_verbatim ' style="font-size: '
-      emit_verbatim(math.floor(100*(ps + (growps - level)*psincr_per_level)/ps))
+      emit_verbatim(math.floor(100*SHmag*(ps + (growps - level)*psincr_per_level)/ps))
       emit_verbatim '%"'
     end
     emit_verbatim '>'

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20201228 -- last modified
+Troff2page_version = 20210104 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -552,6 +552,10 @@ function do_bye()
     --print('nb_titling ->', escaped_Title)
     write_aux('nb_title(\'', escaped_Title, '\')')
   end
+  local SHmag = raw_counter_value '.SHmag'
+  if SHmag > 0 then
+    CSS:write(string.format('h1,h2,h3,h4,h5,h6 { font-size: %sem; }\n', SHmag))
+  end
   if Last_page_number == 0 then
     CSS:write('.navigation { display: none; }\n')
   end
@@ -1076,20 +1080,10 @@ function initialize_css_file(css_file)
   h1,h2,h3,h4,h5,h6 {
     margin-top: 1em;
     margin-bottom: 0.5em;
-    font-family: sans-serif;
-    font-weight: normal;
   }
 
   h1.title {
     font-size: 172.8%;
-  }
-
-  h1 {
-    font-size: 144%;
-  }
-
-  h2,h3,h4,h5,h6 {
-    font-size: 120%;
   }
 
   .dropcap {
@@ -1473,7 +1467,7 @@ defunit('M', Gunit.m * .01)
 defunit('P', Gunit.p * 12)
 defunit('c', Gunit.i / 2.54)
 defunit('n', Gunit.m / 2)
-defunit('v', Gunit.p * 12)
+defunit('v', Gunit.p * 16)
 
 Unit_pattern = '[cfiMmnPpuv]'
 
@@ -1849,10 +1843,9 @@ function emit_expanded_line()
         if num_leading_spaces>0 then
           emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
           insert_leading_line_break_p=true
-          --print 'unsetting no space mode'
-          if No_space_mode_p then No_space_mode_p = false end
         end
       end
+      if No_space_mode_p then No_space_mode_p = false end
       if c == '"' then check_verbatim_apostrophe_status() end
       r = r .. c
     end
@@ -3732,7 +3725,7 @@ function initialize_macros()
     --print('doing @NH')
     local args = {read_args()}
     --print('args=', table_to_string(args))
-    local lvl = args[1] or 1
+    local lvl = args[1] or math.max(raw_counter_value 'GROWPS', 1)
     --print('lvl=', lvl)
     if lvl=='S' then
       --print('doing @NH S')
@@ -3749,7 +3742,7 @@ function initialize_macros()
   defrequest('@SH', function()
     --print('doing @SH')
     local lvl = read_args()
-    local num = tonumber(lvl) or 1
+    local num = tonumber(lvl) or math.max(raw_counter_value 'GROWPS', 1)
     emit_section_header(num)
     --print('@SH done')
   end)
@@ -4462,7 +4455,7 @@ function initialize_numregs()
   defnumreg('.y', {value = math.floor(version_wo_yr/100)})
   defnumreg('.Y', {value = version_wo_yr%100})
   defnumreg('www:HX', {value = -1})
-  defnumreg('GROWPS', {value = 1})
+  defnumreg('GROWPS', {value = 0})
   defnumreg('PS', {value = 10*Gunit.p})
   defnumreg('PSINCR', {value = Gunit.p})
   defnumreg('PI', {value = 5*Gunit.n})
@@ -4470,6 +4463,8 @@ function initialize_numregs()
   defnumreg('DD', {value = .5*Gunit.v})
 
   defnumreg('DI', {value = raw_counter_value 'PI'})
+
+  defnumreg('.SHmag', {value = 1.2})
 
   do
     local t = os.date '*t'
@@ -5746,8 +5741,9 @@ function emit_section_header(level, opts)
     local psincr_per_level = counter_value_in_pixels 'PSINCR'
     if psincr_per_level >0 and growps >=2 and level < growps then
       local ps = counter_value_in_pixels 'PS'
+      local SHmag = raw_counter_value '.SHmag'
       emit_verbatim ' style="font-size: '
-      emit_verbatim(math.floor(100*(ps + (growps - level)*psincr_per_level)/ps))
+      emit_verbatim(math.floor(100*SHmag*(ps + (growps - level)*psincr_per_level)/ps))
       emit_verbatim '%"'
     end
     emit_verbatim '>'

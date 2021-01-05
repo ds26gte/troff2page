@@ -1,4 +1,4 @@
--- last modified 2020-12-26
+-- last modified 2021-01-04
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -32,7 +32,7 @@ function initialize_numregs()
   defnumreg('.y', {value = math.floor(version_wo_yr/100)})
   defnumreg('.Y', {value = version_wo_yr%100})
   defnumreg('www:HX', {value = -1})
-  defnumreg('GROWPS', {value = 1})
+  defnumreg('GROWPS', {value = 0})
   defnumreg('PS', {value = 10*Gunit.p})
   defnumreg('PSINCR', {value = Gunit.p})
   defnumreg('PI', {value = 5*Gunit.n})
@@ -40,6 +40,8 @@ function initialize_numregs()
   defnumreg('DD', {value = .5*Gunit.v})
 
   defnumreg('DI', {value = raw_counter_value 'PI'})
+
+  defnumreg('.SHmag', {value = 1.2})
 
   do
     local t = os.date '*t'

@@ -1,4 +1,4 @@
--- last modified 2020-12-21
+-- last modified 2021-01-04
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -64,20 +64,10 @@ function initialize_css_file(css_file)
   h1,h2,h3,h4,h5,h6 {
     margin-top: 1em;
     margin-bottom: 0.5em;
-    font-family: sans-serif;
-    font-weight: normal;
   }
 
   h1.title {
     font-size: 172.8%;
-  }
-
-  h1 {
-    font-size: 144%;
-  }
-
-  h2,h3,h4,h5,h6 {
-    font-size: 120%;
   }
 
   .dropcap {

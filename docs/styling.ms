@@ -1,4 +1,4 @@
-.\" last modified 2020-12-22
+.\" last modified 2021-01-04
 .SH 1
 8.  Styling
 .LP
@@ -122,12 +122,12 @@ last-mod date.  If there isn’t a third argument, the colophon
 won’t mention any date.
 .PP
 .SH 2
-Glyph substition
+Glyph substitution
 .LP
 CSS isn’t the only recourse to style your document: Interesting
 glyphs offer another approach. Troff2page, like groff, allows
 you to use UTF-8 characters, either directly or via escape
-sequences of the form \fC\e[u\fIxxxx\fP]\fP, where \fIxxxx\fP is
+sequences of the form \fC\e[u\fIxxxx\fC]\fR, where \fIxxxx\fP is
 the corresponding hex number (in uppercase).
 .PP
 .IX char@.char, groff request

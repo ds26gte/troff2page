@@ -1,4 +1,4 @@
--- last modified 2020-12-26
+-- last modified 2021-01-03
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -248,10 +248,9 @@ function emit_expanded_line()
         if num_leading_spaces>0 then
           emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
           insert_leading_line_break_p=true
-          --print 'unsetting no space mode'
-          if No_space_mode_p then No_space_mode_p = false end
         end
       end
+      if No_space_mode_p then No_space_mode_p = false end
       if c == '"' then check_verbatim_apostrophe_status() end
       r = r .. c
     end

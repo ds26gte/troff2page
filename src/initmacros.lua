@@ -1,4 +1,4 @@
--- last modified 2020-12-26
+-- last modified 2021-01-04
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -633,7 +633,7 @@ function initialize_macros()
     --print('doing @NH')
     local args = {read_args()}
     --print('args=', table_to_string(args))
-    local lvl = args[1] or 1
+    local lvl = args[1] or math.max(raw_counter_value 'GROWPS', 1)
     --print('lvl=', lvl)
     if lvl=='S' then
       --print('doing @NH S')
@@ -650,7 +650,7 @@ function initialize_macros()
   defrequest('@SH', function()
     --print('doing @SH')
     local lvl = read_args()
-    local num = tonumber(lvl) or 1
+    local num = tonumber(lvl) or math.max(raw_counter_value 'GROWPS', 1)
     emit_section_header(num)
     --print('@SH done')
   end)

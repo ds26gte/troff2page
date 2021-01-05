@@ -1,4 +1,4 @@
-.\" last modified 2020-12-25
+.\" last modified 2021-01-04
 .SH 1
 2. troff, groff, and Troff2page commands
 .LP
@@ -15,7 +15,7 @@ capital
 colored terracotta pink.
 The syntax recognized is the improved kind
 supported by \*[url https://www.gnu.org/software/groff]groff\&, \*[url \
-http://heirloom.sf.net/doctools.html]Heirloom troff\&, and \*[url
+http://heirloom.sf.net/doctools.html]Heirloom troff\&, and \*[url \
 http://github.com/aligrudi/neatroff]Neatroff\&, i.e., macro, string,
 and glyph names can be arbitrarily long, and strings can
 have arguments.  Most of the commands are converted to their

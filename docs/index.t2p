@@ -1,4 +1,4 @@
-.\" last modified 2020-12-18
+.\" last modified 2021-01-04
 .
 .\"nr HTML1 1
 .
@@ -47,8 +47,10 @@ CSS:write([[
         border-bottom: 1px solid #dddddf;
     }
 
-    h1,h2,h3,h4,h5 {
+    h1,h2,h3,h4,h5,h6 {
         color: #9b3d3d; /* terracotta pink */
+        font-family: sans-serif;
+        font-weight: normal;
     }
 
     a {

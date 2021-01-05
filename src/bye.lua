@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2021-01-04
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -76,6 +76,10 @@ function do_bye()
     --escaped_Title = string.gsub(escaped_Title, '"', '\\"')
     --print('nb_titling ->', escaped_Title)
     write_aux('nb_title(\'', escaped_Title, '\')')
+  end
+  local SHmag = raw_counter_value '.SHmag'
+  if SHmag > 0 then
+    CSS:write(string.format('h1,h2,h3,h4,h5,h6 { font-size: %sem; }\n', SHmag))
   end
   if Last_page_number == 0 then
     CSS:write('.navigation { display: none; }\n')
