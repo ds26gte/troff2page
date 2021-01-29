@@ -1,4 +1,4 @@
--- last modified 2021-01-04
+-- last modified 2021-01-29
 
 function defnumreg(w, ss)
   Numreg_table[w] = ss
@@ -14,7 +14,8 @@ function initialize_numregs()
   defnumreg('c.', {thunk = function() return Input_line_no; end})
   defnumreg('.i', {thunk = function() return Margin_left; end})
   defnumreg('.u', {thunk = function() return bool_to_num(not Ev_stack[1].hardlines); end})
-  defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
+  defnumreg('.ce', {thunk = function() return Lines_to_be_justified; end})
+  defnumreg('.rj', {thunk = function() return Lines_to_be_justified; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
   defnumreg('lss', {thunk = function() return Leading_spaces_number * Gunit.p*2.5; end})
   defnumreg('$$', {thunk = function()

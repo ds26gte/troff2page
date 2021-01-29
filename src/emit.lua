@@ -1,4 +1,4 @@
--- last modified 2021-01-03
+-- last modified 2021-01-29
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -372,6 +372,7 @@ function emit_end_para()
   In_para_p=false
   --print('doing emit_end_para')
   emit(switch_style())
+  if Lines_to_be_justified>0 then Lines_to_be_justified=0; emit_verbatim '</div>\n' end
   emit_verbatim '</p>\n'
   Margin_left = 0
   if Current_troff_input then

@@ -1,4 +1,4 @@
--- last modified 2020-12-15
+-- last modified 2021-01-29
 
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
@@ -52,7 +52,7 @@ function process_line()
       Previous_line_exec_p = false
     end
     --
-    if (not fillp() or Lines_to_be_centered > 0) and
+    if (not fillp() or Lines_to_be_justified > 0) and
       not Macro_copy_mode_p and
       Outputting_to == 'html' and
       Keep_newline_p and
@@ -60,10 +60,10 @@ function process_line()
       --print('ctr lines 1')
       emit_verbatim '<br>'
     end
-    if Keep_newline_p and Lines_to_be_centered > 0 then
+    if Keep_newline_p and Lines_to_be_justified > 0 then
       --print('ctr lines 2')
-      Lines_to_be_centered = Lines_to_be_centered - 1
-      if Lines_to_be_centered == 0 then
+      Lines_to_be_justified = Lines_to_be_justified - 1
+      if Lines_to_be_justified == 0 then
         emit_verbatim '</div>'
       end
     end

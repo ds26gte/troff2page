@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20210104 -- last modified
+Troff2page_version = 20210129 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -328,7 +328,7 @@ Last_modification_time = nil
 Last_page_number = nil
 Leading_spaces_macro = nil
 Leading_spaces_number = nil
-Lines_to_be_centered = nil
+Lines_to_be_justified = nil
 Macro_args = nil
 Macro_copy_mode_p = nil
 Macro_package = nil
@@ -696,7 +696,7 @@ function troff2page_1pass(argc, argv)
     Last_modification_time = false,
     Leading_spaces_macro = false,
     Leading_spaces_number = 0,
-    Lines_to_be_centered = 0,
+    Lines_to_be_justified = 0,
     Macro_args = { true },
     Macro_copy_mode_p = false,
     Macro_package = 'ms',
@@ -1967,6 +1967,7 @@ function emit_end_para()
   In_para_p=false
   --print('doing emit_end_para')
   emit(switch_style())
+  if Lines_to_be_justified>0 then Lines_to_be_justified=0; emit_verbatim '</div>\n' end
   emit_verbatim '</p>\n'
   Margin_left = 0
   if Current_troff_input then
@@ -2289,7 +2290,7 @@ function process_line()
       Previous_line_exec_p = false
     end
     --
-    if (not fillp() or Lines_to_be_centered > 0) and
+    if (not fillp() or Lines_to_be_justified > 0) and
       not Macro_copy_mode_p and
       Outputting_to == 'html' and
       Keep_newline_p and
@@ -2297,10 +2298,10 @@ function process_line()
       --print('ctr lines 1')
       emit_verbatim '<br>'
     end
-    if Keep_newline_p and Lines_to_be_centered > 0 then
+    if Keep_newline_p and Lines_to_be_justified > 0 then
       --print('ctr lines 2')
-      Lines_to_be_centered = Lines_to_be_centered - 1
-      if Lines_to_be_centered == 0 then
+      Lines_to_be_justified = Lines_to_be_justified - 1
+      if Lines_to_be_justified == 0 then
         emit_verbatim '</div>'
       end
     end
@@ -3164,6 +3165,21 @@ function all_args()
   end
   return r
 end
+
+function justify_lines(n, dir)
+  if n<=0 then
+    if Lines_to_be_justified>0 then Lines_to_be_justified=0; emit_verbatim '</div>' end
+  else
+    Lines_to_be_justified=n
+    emit_verbatim '<div align='
+    if dir=='ce' then emit_verbatim 'center'
+    elseif dir=='rj' then emit_verbatim 'right'
+    end
+    emit_verbatim '>'
+  end
+  emit '\n'
+end
+
 
 function initialize_macros()
   defrequest('bp', function()
@@ -4315,11 +4331,13 @@ function initialize_macros()
   defrequest('ce', function()
     local arg1 = read_args() or 1
     local n = tonumber(arg1)
-    if n<=0 then
-      if Lines_to_be_centered>0 then Lines_to_be_centered=0; emit_verbatim '</div>' end
-    else Lines_to_be_centered=n; emit_verbatim '<div align=center>'
-    end
-    emit '\n'
+    justify_lines(n, 'ce')
+  end)
+
+  defrequest('rj', function()
+    local arg1 = read_args() or 1
+    local n = tonumber(arg1)
+    justify_lines(n, 'rj')
   end)
 
   defrequest('nr', function()
@@ -4437,7 +4455,7 @@ function initialize_numregs()
   defnumreg('c.', {thunk = function() return Input_line_no; end})
   defnumreg('.i', {thunk = function() return Margin_left; end})
   defnumreg('.u', {thunk = function() return bool_to_num(not Ev_stack[1].hardlines); end})
-  defnumreg('.ce', {thunk = function() return Lines_to_be_centered; end})
+  defnumreg('.ce', {thunk = function() return Lines_to_be_justified; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
   defnumreg('lss', {thunk = function() return Leading_spaces_number * Gunit.p*2.5; end})
   defnumreg('$$', {thunk = function()

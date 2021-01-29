@@ -1,4 +1,4 @@
--- last modified 2020-12-25
+-- last modified 2021-01-29
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
@@ -85,7 +85,7 @@ Last_modification_time = nil
 Last_page_number = nil
 Leading_spaces_macro = nil
 Leading_spaces_number = nil
-Lines_to_be_centered = nil
+Lines_to_be_justified = nil
 Macro_args = nil
 Macro_copy_mode_p = nil
 Macro_package = nil

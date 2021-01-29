@@ -1,4 +1,4 @@
--- last modified 2021-01-04
+-- last modified 2021-01-29
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -71,6 +71,20 @@ function all_args()
     r = r .. Macro_args[i]
   end
   return r
+end
+
+function justify_lines(n, dir)
+  if n<=0 then
+    if Lines_to_be_justified>0 then Lines_to_be_justified=0; emit_verbatim '</div>' end
+  else
+    Lines_to_be_justified=n
+    emit_verbatim '<div align='
+    if dir=='ce' then emit_verbatim 'center'
+    elseif dir=='rj' then emit_verbatim 'right'
+    end
+    emit_verbatim '>'
+  end
+  emit '\n'
 end
 
 function initialize_macros()
@@ -1223,11 +1237,13 @@ function initialize_macros()
   defrequest('ce', function()
     local arg1 = read_args() or 1
     local n = tonumber(arg1)
-    if n<=0 then
-      if Lines_to_be_centered>0 then Lines_to_be_centered=0; emit_verbatim '</div>' end
-    else Lines_to_be_centered=n; emit_verbatim '<div align=center>'
-    end
-    emit '\n'
+    justify_lines(n, 'ce')
+  end)
+
+  defrequest('rj', function()
+    local arg1 = read_args() or 1
+    local n = tonumber(arg1)
+    justify_lines(n, 'rj')
   end)
 
   defrequest('nr', function()
