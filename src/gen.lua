@@ -1,4 +1,4 @@
--- last modified 2021-01-29
+-- last modified 2021-02-08
 
 function generate_html(percolatable_status_values)
   --print('doing generate_html to', Out)
@@ -82,9 +82,9 @@ function expand_escape(c)
   else c=get_char()
   end
   --
-  if Turn_off_escape_char_p then
-    return Escape_char .. c
-  end
+  --if Turn_off_escape_char_p then
+   -- return Superescape_char .. c
+  --end
   --
   local it = Escape_table[c]
   --print('it=', it)
@@ -98,7 +98,7 @@ function expand_escape(c)
   end
   --
   if Macro_copy_mode_p then
-    return Escape_char..c
+    return Superescape_char..c
   end
   --
   if it then

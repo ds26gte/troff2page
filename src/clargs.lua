@@ -1,4 +1,4 @@
--- last modified 2021-01-29
+-- last modified 2021-02-08
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -64,16 +64,17 @@ end
 function troff2page_1pass(argc, argv)
   --print('doing troff2page_1pass', argc, table_to_string(argv))
   flet({
+
     Afterpar = false,
     Aux_stream = false,
     Blank_line_macro = false,
+    CSS = false,
     Cascaded_if_p = false,
     Cascaded_if_stack = {},
     Check_file_write_date = false,
     Colophon_done_p = false,
     Color_table = {},
     Control_char = '.',
-    CSS = false,
     Current_diversion = false,
     Current_pageno = -1,
     Current_source_file = Main_troff_file,
@@ -127,13 +128,14 @@ function troff2page_1pass(argc, argv)
     Redirected_p = false,
     Request_table = {},
     Saved_escape_char = false,
+    Scripts = {},
     Single_output_page_p = false,
     Slides_p = false,
     Source_changed_since_last_time_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},
     Stylesheets = {},
-    Scripts = {},
+    Superescape_char = string.char(0x14),
     Table_align = false,
     Table_cell_number = 0,
     Table_colsep_char = '\t',
@@ -148,6 +150,7 @@ function troff2page_1pass(argc, argv)
     Turn_off_escape_char_p = false,
     Unescaped_glyph_table = {},
     Verbatim_apostrophe_p = false
+
   }, function()
     begin_html_document()
     local i=1; local document_found_p = false; local call_for_help_p = false;

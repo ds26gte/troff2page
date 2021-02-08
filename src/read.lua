@@ -1,4 +1,4 @@
--- last modified 2020-12-17
+-- last modified 2021-02-08
 
 function make_bstream(opts)
   return {
@@ -90,7 +90,7 @@ end
 
 function escape_char_p(c)
   --if (c==Escape_char) then print('Turn_off_escape_char_p=', Turn_off_escape_char_p) end
-  return not Turn_off_escape_char_p and c == Escape_char
+  return (not Turn_off_escape_char_p and c == Escape_char) or c==Superescape_char
 end
 
 function read_word()
@@ -103,7 +103,8 @@ function read_word()
   elseif escape_char_p(c) then
     get_char()
     local c2 = snoop_char()
-    if not c2 then return Escape_char
+    if not c2 then
+      return (not Turn_off_escape_char_p and Escape_char) or Superescape_char
     elseif c2 == '\n' then get_char(); return read_word()
     else toss_back_char(c); return read_bare_word()
     end
@@ -140,7 +141,7 @@ function read_quoted_phrase()
         read_escape_p = false
         c = get_char()
         if c == '\n' then no_op()
-        else r = r .. Escape_char .. c
+        else r = r .. Superescape_char .. c
         end
       elseif escape_char_p(c) then
         read_escape_p = true
@@ -171,7 +172,7 @@ function read_bare_word()
       elseif c == '\n' then get_char()
       else
         c = get_char()
-        r = r .. Escape_char .. c
+        r = r .. Superescape_char .. c
       end
     elseif not c or c == ' ' or c == '\t' or c == '\n' or
       (Reading_table_p and (c == '(' or c == ',' or c == ';' or c == '.')) or
@@ -211,7 +212,7 @@ function read_troff_line(stop_before_newline_p)
       if c == '\n' then get_char()
       else
         c = get_char()
-        r = r .. Escape_char .. c
+        r = r .. Superescape_char .. c
       end
     elseif escape_char_p(c) then
       read_escape_p = true
@@ -282,7 +283,7 @@ function if_test_passed_p()
     res= ((Current_pageno%2) == 0)
   elseif c == '(' then toss_back_char(c)
     res= ((read_arith_expr{stop = true}) > 0)
-  elseif c == Escape_char or string.find(c, '%d') or c == '+' or c == '-' then
+  elseif c == Escape_char or c==Superescape_char or string.find(c, '%d') or c == '+' or c == '-' then
     --print('itpp found', c)
     toss_back_char(c)
     res= ((read_arith_expr()) > 0)
@@ -402,7 +403,7 @@ function read_arith_expr(opts)
       if opts.inside_paren_p then --print('rae continuing with acc=', acc);
         ignore_spaces() end
       if opts.stop then break end
-    elseif c == Escape_char then get_char()
+    elseif c == Escape_char or c==Superescape_char then get_char()
       --print('rae doing esc')
       toss_back_string(expand_escape(snoop_char()))
     elseif string.match(c, Unit_pattern) and not unit_already_read_p then
@@ -459,7 +460,7 @@ function ignore_branch()
     elseif c=='\n' then --get_char();
       --if not fillp() then get_char() end
       break
-    elseif c == Escape_char then get_char()
+    elseif c == Escape_char or c==Superescape_char then get_char()
       c = snoop_char()
       if not c or c == '\n' then break
       elseif c == '{' then brace_p = true; get_char(); break
@@ -475,7 +476,7 @@ function ignore_branch()
       c = get_char()
       --print('igb read', c)
       if not c then terror 'ignore_branch: eof'
-      elseif c == Escape_char then c = get_char()
+      elseif c == Escape_char or c==Superescape_char then c = get_char()
         --print('igb read escaped', c)
         if not c then terror 'ignore_branch: escape eof'
         elseif c == '}' then nesting=nesting-1;

@@ -1,4 +1,4 @@
--- last modified 2021-01-29
+-- last modified 2021-02-09
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -35,12 +35,12 @@ end
 
 function emit_verbatim_escape(e, bkt, unclosed_p)
   if bkt == '[' then
-    Out:write('\\', '[', e)
+    Out:write(Superescape_char, '[', e)
     if not unclosed_p then Out:write(']') end
   elseif bkt == '(' then
-    Out:write('\\', '(', e)
+    Out:write(Superescape_char, '(', e)
   else
-    Out:write('\\', e)
+    Out:write(Superescape_char, e)
   end
 end
 
@@ -65,10 +65,8 @@ function emit(s)
     if c == '' then break end
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
-      if c == Escape_char then
-        --XXX: probably also need a superescape that works even
-        --when .eo
-        --print('emit found \\')
+      if (not Turn_off_escape_char_p and c == Escape_char) or c==Superescape_char then
+        --print('emit found Esc')
         e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
         local h = Html_glyphs[e]
@@ -84,8 +82,6 @@ function emit(s)
           local hnum = starts_with_u_p and string.sub(e, 2)
           if hnum and tonumber('0x'..hnum) then
             Out:write('&#x' .. hnum .. ';')
-          elseif Turn_off_escape_char_p then
-            emit_verbatim_escape(e, bkt, unclosed_p)
           else
             local g = Glyph_table[e]
             if g then Out:write(g)
@@ -125,7 +121,7 @@ end
 
 function emit_nbsp(n)
   for i = 1,n do
-    emit '\\[htmlnbsp]'
+    emit(Superescape_char .. '[htmlnbsp]')
   end
 end
 
@@ -133,7 +129,7 @@ function verbatim_nbsp(n)
   --print('doing verbatim_nbsp', n)
   local r = ''
   for i = 1,math.ceil(n) do
-    r = r .. '\\[htmlnbsp]'
+    r = r .. Superescape_char .. '[htmlnbsp]'
   end
   return r
 end
@@ -148,17 +144,17 @@ function verbatim(s)
     for i = 1,#s do
       c = string.sub(s, i, i)
       if c == '<' then
-        r = r .. '\\[htmllt]'
+        r = r .. Superescape_char .. '[htmllt]'
       elseif c == '>' then
-        r = r .. '\\[htmlgt]'
+        r = r .. Superescape_char .. '[htmlgt]'
       elseif c == '"' then
-        r = r .. '\\[htmlquot]'
+        r = r .. Superescape_char .. '[htmlquot]'
       elseif c == '&' then
-        r = r .. '\\[htmlamp]'
-      elseif c == '\\' then
-        r = r .. '\\[htmlbackslash]'
+        r = r .. Superescape_char .. '[htmlamp]'
+      elseif c == '\\' then --XXX
+        r = r .. Superescape_char .. '[htmlbackslash]'
       elseif c == ' ' then
-        r = r .. '\\[htmlspace]'
+        r = r .. Superescape_char .. '[htmlspace]'
       else
         r = r .. c
       end
@@ -225,7 +221,7 @@ function emit_expanded_line()
         break
       elseif Macro_copy_mode_p and (c == '\n' or c == '{' or c == '}' or c == 'h') then
         --print('eel 2, Macro_copy_mode_p and c=', c)
-        r = r .. Escape_char
+        r = r .. Superescape_char
       else
         --print('eel 3')
         if count_leading_spaces_p then
@@ -359,7 +355,7 @@ function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
       emit_verbatim '<!---***---><br>'
     end
     for j=1,Leading_spaces_number do
-      emit '\\[htmlnbsp]'
+      emit(Superescape_char .. '[htmlnbsp]')
     end
   end
 end

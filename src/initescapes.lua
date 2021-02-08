@@ -1,4 +1,4 @@
--- last modified 2020-12-26
+-- last modified 2021-02-08
 
 Escape_table = {}
 
@@ -148,7 +148,7 @@ end)
 defescape('(', function()
   local c1 = get_char(); local c2 = get_char()
   local s = c1..c2
-  return Glyph_table[s] or ('\\(' .. s)
+  return Glyph_table[s] or (Superescape_char .. '(' .. s)
 end)
 
 function glyphname_to_htmlchar(name)
@@ -157,13 +157,13 @@ function glyphname_to_htmlchar(name)
   if string.find(name, 'u') == 1 then
     local hnum = string.sub(name, 2)
     if tonumber('0x' .. hnum) then
-      return '\\[htmlamp]#x' .. hnum .. ';'
+      return Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
     end
   end
   if string.find(name, 'html') ~= 1 then
     twarning("warning: can't find special character '%s'", name)
   end
-  return '\\[' .. name .. ']'
+  return Superescape_char .. '[' .. name .. ']'
 end
 
 defescape('[', function()

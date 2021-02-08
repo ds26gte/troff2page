@@ -1,4 +1,4 @@
-.\" last modified 2021-01-04
+.\" last modified 2021-02-08
 .SH 1
 8.  Styling
 .LP
@@ -131,12 +131,43 @@ sequences of the form \fC\e[u\fIxxxx\fC]\fR, where \fIxxxx\fP is
 the corresponding hex number (in uppercase).
 .PP
 .IX char@.char, groff request
-.IX U+2621 \s-2CAUTION SIGN\s0 (\[u2621])
-.IX U+26A0 \s-2WARNING SIGN\s0 (\[u26A0])
-E.g., U+2621 \s-2CAUTION SIGN\s0
+.IX U+00B6 \s-2PILCROW SIGN\s0
+.IX U+2761 \s-2CURVED STEM PARAGRAPH SIGN ORNAMENT\s0
+The \fC.char\fP request is a convenient way to transliterate
+a character available in your text editor to something available
+in either your groff and/or browser font. E.g., the plain pilcrow
+or paraph
+character U+00B6 \s-2PILCROW SIGN\s0 (\[u00B6]) is commonly available while
+text editing,
+because it’s 8-bit ascii.  In contrast, the fancier
+U+2761 \s-2CURVED STEM PARAGRAPH SIGN ORNAMENT\s0 (\[u2761]) may not be
+present. To automatically transliterate the
+former to the latter:
+.PP
+.EX
+    .char \[u00B6] \[u2761]
+.EE
+.PP
+Usually, this works on the browser (because UTF-8 encoding is widespread),
+but fails for print, as the typical text font in
+groff does not have a glyph at code point U+2761. groff does have
+the glyph
+in its Zapf Dingbats (\fCZD\fP) font but at a different code point, which
+you can snag using a further \fC.char\fP
+call:
+.PP
+.EX
+    .if !\n[.troff2page] \{\
+      .char \[u2761] \f(ZD\N'161'\fP
+    .\}
+.EE
+.PP
+.IX U+2621 \s-2CAUTION SIGN\s0
+.IX U+26A0 \s-2WARNING SIGN\s0
+Here’s a more elaborate use case. You may want to use U+2621 \s-2CAUTION SIGN\s0
 and
 U+26A0 \s-2WARNING SIGN\s0
-— in a suitable color and size — may be used rather than
+— in a suitable color and size — rather than
 the pedestrian “\fBCAUTION\fP” and “\fBWARNING\fP” for admonition titles.
 .if \n[.troff2page] \{\
 .DS C
@@ -148,8 +179,8 @@ while these usually work well on browsers, the fonts
 used by groff for printing almost always won’t recognize them.
 (You could use fallback fonts, but often they test groff’s
 capacity, and it’s not worth loading them only for a couple of
-exotic glyphs.) A more reasonable workaround is to use
-the \fC.char\fP request to conditionally translate special characters into their
+exotic glyphs.) A more reasonable workaround is to
+conditionally translate special characters into their
 boring equivalents for print:
 .PP
 .EX
@@ -224,9 +255,9 @@ macros.  The problem then becomes what to do with large
 page-crossing displays.  This is almost unavoidable in computer
 technical prose.
 .PP
-.IX U+29F9 \s-2BIG REVERSE SOLIDUS\s0 (\[u29F9])
-.IX U+FE68 \s-2SMALL REVERSE SOLIDUS\s0 (\[uFE68])
-.IX U+005C \s-2REVERSE SOLIDUS\s0 (\[u005C])
+.IX U+29F9 \s-2BIG REVERSE SOLIDUS\s0
+.IX U+FE68 \s-2SMALL REVERSE SOLIDUS\s0
+.IX U+005C \s-2REVERSE SOLIDUS\s0
 .IX text editor
 Unicode glyph substitution offers another way out.  The Unicode
 characters U+29F9 \s-2BIG REVERSE SOLIDUS\s0 and U+FE68 \s-2SMALL REVERSE
@@ -250,8 +281,8 @@ there even on the HTML page, but you don’t want to disable
 groff’s escape character.
 Glyph substitution to the rescue:
 .PP
-.EX e
-    .char \e[u29F9] \e[u005C]
+.EX
+    .char \[u29F9] \[u005C]
 .EE
 .PP
 This lets you type the exotic backslash in your source but have

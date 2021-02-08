@@ -1,4 +1,4 @@
--- last modified 2020-12-13
+-- last modified 2021-02-08
 
 B_1000_0000 = 0x80
 B_1100_0000 = 0xc0
@@ -93,6 +93,6 @@ function get_char(dont_translate_p)
   end
   --
   --print(string.format('get_char returned unicode %X\n', ucode))
-  toss_back_string(string.format('[u%X]', ucode))
-  return Escape_char
+  toss_back_string(string.format('[u%04X]', ucode))
+  return Superescape_char
 end

@@ -1,4 +1,4 @@
--- last modified 2020-12-12
+-- last modified 2021-02-08
 
 --refer groff_char(7)
 Standard_glyphs = {
@@ -364,12 +364,12 @@ function defglyph(w, s)
 end
 
 function initialize_glyphs()
-  defglyph('htmllt', '\\[htmllt]')
-  defglyph('htmlgt', '\\[htmlgt]')
-  defglyph('htmlquot', '\\[htmlquot]')
-  defglyph('htmlamp', '\\[htmlamp]')
-  defglyph('htmlbackslash', '\\[htmlbackslash]')
-  defglyph('htmlspace', '\\[htmlspace]')
+  defglyph('htmllt', Superescape_char .. '[htmllt]')
+  defglyph('htmlgt', Superescape_char .. '[htmlgt]')
+  defglyph('htmlquot', Superescape_char .. '[htmlquot]')
+  defglyph('htmlamp', Superescape_char .. '[htmlamp]')
+  defglyph('htmlbackslash', Superescape_char .. '[htmlbackslash]')
+  defglyph('htmlspace', Superescape_char .. '[htmlspace]')
 
   for k,v in pairs(Standard_glyphs) do
     defglyph(k, verbatim(string.format('&#x%x;', v)))

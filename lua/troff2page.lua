@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20210129 -- last modified
+Troff2page_version = 20210209 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -288,6 +288,7 @@ Pso_file_suffix = '-Z-T.1'
 Afterpar = nil
 Aux_stream = nil
 Blank_line_macro = nil
+CSS = nil
 Cascaded_if_p = nil
 Cascaded_if_stack = nil
 Check_file_write_date = nil
@@ -295,19 +296,17 @@ Colophon_done_p = nil
 Color_table = nil
 Control_char = nil
 Convert_to_info_p = nil
-CSS = nil
 Current_diversion = nil
 Current_pageno = nil
 Current_source_file = nil
 Current_troff_input = nil
 Diversion_table = nil
-Expanding_args_p = nil
-Log_stream = nil
 End_macro = nil
 Escape_char = nil
 Ev_stack = nil
 Ev_table = nil
 Exit_status = nil
+Expanding_args_p = nil
 File_postlude = nil
 Footnote_buffer = nil
 Footnote_count = nil
@@ -329,6 +328,7 @@ Last_page_number = nil
 Leading_spaces_macro = nil
 Leading_spaces_number = nil
 Lines_to_be_justified = nil
+Log_stream = nil
 Macro_args = nil
 Macro_copy_mode_p = nil
 Macro_package = nil
@@ -356,13 +356,14 @@ Redirected_p = nil
 Request_table = nil
 Rerun_needed_p = nil
 Saved_escape_char = nil
+Scripts = nil
 Single_output_page_p = nil
 Slides_p = nil
 Source_changed_since_last_time_p = nil
 Sourcing_ascii_file_p = nil
 String_table = nil
 Stylesheets = nil
-Scripts = nil
+Superescape_char = nil
 Table_align = nil
 Table_cell_number = nil
 Table_colsep_char = nil
@@ -658,16 +659,17 @@ end
 function troff2page_1pass(argc, argv)
   --print('doing troff2page_1pass', argc, table_to_string(argv))
   flet({
+
     Afterpar = false,
     Aux_stream = false,
     Blank_line_macro = false,
+    CSS = false,
     Cascaded_if_p = false,
     Cascaded_if_stack = {},
     Check_file_write_date = false,
     Colophon_done_p = false,
     Color_table = {},
     Control_char = '.',
-    CSS = false,
     Current_diversion = false,
     Current_pageno = -1,
     Current_source_file = Main_troff_file,
@@ -721,13 +723,14 @@ function troff2page_1pass(argc, argv)
     Redirected_p = false,
     Request_table = {},
     Saved_escape_char = false,
+    Scripts = {},
     Single_output_page_p = false,
     Slides_p = false,
     Source_changed_since_last_time_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},
     Stylesheets = {},
-    Scripts = {},
+    Superescape_char = string.char(0x14),
     Table_align = false,
     Table_cell_number = 0,
     Table_colsep_char = '\t',
@@ -742,6 +745,7 @@ function troff2page_1pass(argc, argv)
     Turn_off_escape_char_p = false,
     Unescaped_glyph_table = {},
     Verbatim_apostrophe_p = false
+
   }, function()
     begin_html_document()
     local i=1; local document_found_p = false; local call_for_help_p = false;
@@ -1630,12 +1634,12 @@ end
 
 function emit_verbatim_escape(e, bkt, unclosed_p)
   if bkt == '[' then
-    Out:write('\\', '[', e)
+    Out:write(Superescape_char, '[', e)
     if not unclosed_p then Out:write(']') end
   elseif bkt == '(' then
-    Out:write('\\', '(', e)
+    Out:write(Superescape_char, '(', e)
   else
-    Out:write('\\', e)
+    Out:write(Superescape_char, e)
   end
 end
 
@@ -1660,10 +1664,8 @@ function emit(s)
     if c == '' then break end
     i = i + 1
     if Outputting_to == 'html' or Outputting_to == 'title' then
-      if c == Escape_char then
-        --XXX: probably also need a superescape that works even
-        --when .eo
-        --print('emit found \\')
+      if (not Turn_off_escape_char_p and c == Escape_char) or c==Superescape_char then
+        --print('emit found Esc')
         e, i, bkt, unclosed_p = read_possible_troff2page_specific_escape(s, i)
         --print('rptse found escaped ', e)
         local h = Html_glyphs[e]
@@ -1679,8 +1681,6 @@ function emit(s)
           local hnum = starts_with_u_p and string.sub(e, 2)
           if hnum and tonumber('0x'..hnum) then
             Out:write('&#x' .. hnum .. ';')
-          elseif Turn_off_escape_char_p then
-            emit_verbatim_escape(e, bkt, unclosed_p)
           else
             local g = Glyph_table[e]
             if g then Out:write(g)
@@ -1720,7 +1720,7 @@ end
 
 function emit_nbsp(n)
   for i = 1,n do
-    emit '\\[htmlnbsp]'
+    emit(Superescape_char .. '[htmlnbsp]')
   end
 end
 
@@ -1728,7 +1728,7 @@ function verbatim_nbsp(n)
   --print('doing verbatim_nbsp', n)
   local r = ''
   for i = 1,math.ceil(n) do
-    r = r .. '\\[htmlnbsp]'
+    r = r .. Superescape_char .. '[htmlnbsp]'
   end
   return r
 end
@@ -1743,17 +1743,17 @@ function verbatim(s)
     for i = 1,#s do
       c = string.sub(s, i, i)
       if c == '<' then
-        r = r .. '\\[htmllt]'
+        r = r .. Superescape_char .. '[htmllt]'
       elseif c == '>' then
-        r = r .. '\\[htmlgt]'
+        r = r .. Superescape_char .. '[htmlgt]'
       elseif c == '"' then
-        r = r .. '\\[htmlquot]'
+        r = r .. Superescape_char .. '[htmlquot]'
       elseif c == '&' then
-        r = r .. '\\[htmlamp]'
-      elseif c == '\\' then
-        r = r .. '\\[htmlbackslash]'
+        r = r .. Superescape_char .. '[htmlamp]'
+      elseif c == '\\' then --XXX
+        r = r .. Superescape_char .. '[htmlbackslash]'
       elseif c == ' ' then
-        r = r .. '\\[htmlspace]'
+        r = r .. Superescape_char .. '[htmlspace]'
       else
         r = r .. c
       end
@@ -1820,7 +1820,7 @@ function emit_expanded_line()
         break
       elseif Macro_copy_mode_p and (c == '\n' or c == '{' or c == '}' or c == 'h') then
         --print('eel 2, Macro_copy_mode_p and c=', c)
-        r = r .. Escape_char
+        r = r .. Superescape_char
       else
         --print('eel 3')
         if count_leading_spaces_p then
@@ -1954,7 +1954,7 @@ function emit_leading_spaces(num_leading_spaces, insert_leading_line_break_p)
       emit_verbatim '<!---***---><br>'
     end
     for j=1,Leading_spaces_number do
-      emit '\\[htmlnbsp]'
+      emit(Superescape_char .. '[htmlnbsp]')
     end
   end
 end
@@ -2320,9 +2320,9 @@ function expand_escape(c)
   else c=get_char()
   end
   --
-  if Turn_off_escape_char_p then
-    return Escape_char .. c
-  end
+  --if Turn_off_escape_char_p then
+   -- return Superescape_char .. c
+  --end
   --
   local it = Escape_table[c]
   --print('it=', it)
@@ -2336,7 +2336,7 @@ function expand_escape(c)
   end
   --
   if Macro_copy_mode_p then
-    return Escape_char..c
+    return Superescape_char..c
   end
   --
   if it then
@@ -2634,7 +2634,7 @@ end)
 defescape('(', function()
   local c1 = get_char(); local c2 = get_char()
   local s = c1..c2
-  return Glyph_table[s] or ('\\(' .. s)
+  return Glyph_table[s] or (Superescape_char .. '(' .. s)
 end)
 
 function glyphname_to_htmlchar(name)
@@ -2643,13 +2643,13 @@ function glyphname_to_htmlchar(name)
   if string.find(name, 'u') == 1 then
     local hnum = string.sub(name, 2)
     if tonumber('0x' .. hnum) then
-      return '\\[htmlamp]#x' .. hnum .. ';'
+      return Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
     end
   end
   if string.find(name, 'html') ~= 1 then
     twarning("warning: can't find special character '%s'", name)
   end
-  return '\\[' .. name .. ']'
+  return Superescape_char .. '[' .. name .. ']'
 end
 
 defescape('[', function()
@@ -3080,12 +3080,12 @@ function defglyph(w, s)
 end
 
 function initialize_glyphs()
-  defglyph('htmllt', '\\[htmllt]')
-  defglyph('htmlgt', '\\[htmlgt]')
-  defglyph('htmlquot', '\\[htmlquot]')
-  defglyph('htmlamp', '\\[htmlamp]')
-  defglyph('htmlbackslash', '\\[htmlbackslash]')
-  defglyph('htmlspace', '\\[htmlspace]')
+  defglyph('htmllt', Superescape_char .. '[htmllt]')
+  defglyph('htmlgt', Superescape_char .. '[htmlgt]')
+  defglyph('htmlquot', Superescape_char .. '[htmlquot]')
+  defglyph('htmlamp', Superescape_char .. '[htmlamp]')
+  defglyph('htmlbackslash', Superescape_char .. '[htmlbackslash]')
+  defglyph('htmlspace', Superescape_char .. '[htmlspace]')
 
   for k,v in pairs(Standard_glyphs) do
     defglyph(k, verbatim(string.format('&#x%x;', v)))
@@ -3179,7 +3179,6 @@ function justify_lines(n, dir)
   end
   emit '\n'
 end
-
 
 function initialize_macros()
   defrequest('bp', function()
@@ -3419,9 +3418,10 @@ function initialize_macros()
     --print('doing char')
     ignore_spaces()
     local c = get_char()
-    if c == Escape_char then
+    if c == Escape_char or c==Superescape_char then
       local glyph_name = read_escaped_word()
       local rhs = expand_args(read_troff_string_line(), 'not_copy_mode')
+      --print('setting glyph', glyph_name, 'to', rhs)
       defglyph(glyph_name, rhs)
     else
       local rhs = expand_args(read_troff_string_line())
@@ -3436,7 +3436,7 @@ function initialize_macros()
       ignore_spaces()
       --problem is it translates anyway
       local c = get_char('dont_translate')
-      if c == Escape_char then
+      if c == Escape_char or c==Superescape_char then
         --this part works OK
         local glyph_name = read_escaped_word()
         Glyph_table[glyph_name] = nil
@@ -4456,6 +4456,7 @@ function initialize_numregs()
   defnumreg('.i', {thunk = function() return Margin_left; end})
   defnumreg('.u', {thunk = function() return bool_to_num(not Ev_stack[1].hardlines); end})
   defnumreg('.ce', {thunk = function() return Lines_to_be_justified; end})
+  defnumreg('.rj', {thunk = function() return Lines_to_be_justified; end})
   defnumreg('lsn', {thunk = function() return Leading_spaces_number; end})
   defnumreg('lss', {thunk = function() return Leading_spaces_number * Gunit.p*2.5; end})
   defnumreg('$$', {thunk = function()
@@ -4729,8 +4730,8 @@ function get_char(dont_translate_p)
   end
   --
   --print(string.format('get_char returned unicode %X\n', ucode))
-  toss_back_string(string.format('[u%X]', ucode))
-  return Escape_char
+  toss_back_string(string.format('[u%04X]', ucode))
+  return Superescape_char
 end
 
 
@@ -5116,7 +5117,7 @@ end
 
 function escape_char_p(c)
   --if (c==Escape_char) then print('Turn_off_escape_char_p=', Turn_off_escape_char_p) end
-  return not Turn_off_escape_char_p and c == Escape_char
+  return (not Turn_off_escape_char_p and c == Escape_char) or c==Superescape_char
 end
 
 function read_word()
@@ -5129,7 +5130,8 @@ function read_word()
   elseif escape_char_p(c) then
     get_char()
     local c2 = snoop_char()
-    if not c2 then return Escape_char
+    if not c2 then
+      return (not Turn_off_escape_char_p and Escape_char) or Superescape_char
     elseif c2 == '\n' then get_char(); return read_word()
     else toss_back_char(c); return read_bare_word()
     end
@@ -5166,7 +5168,7 @@ function read_quoted_phrase()
         read_escape_p = false
         c = get_char()
         if c == '\n' then no_op()
-        else r = r .. Escape_char .. c
+        else r = r .. Superescape_char .. c
         end
       elseif escape_char_p(c) then
         read_escape_p = true
@@ -5197,7 +5199,7 @@ function read_bare_word()
       elseif c == '\n' then get_char()
       else
         c = get_char()
-        r = r .. Escape_char .. c
+        r = r .. Superescape_char .. c
       end
     elseif not c or c == ' ' or c == '\t' or c == '\n' or
       (Reading_table_p and (c == '(' or c == ',' or c == ';' or c == '.')) or
@@ -5237,7 +5239,7 @@ function read_troff_line(stop_before_newline_p)
       if c == '\n' then get_char()
       else
         c = get_char()
-        r = r .. Escape_char .. c
+        r = r .. Superescape_char .. c
       end
     elseif escape_char_p(c) then
       read_escape_p = true
@@ -5308,7 +5310,7 @@ function if_test_passed_p()
     res= ((Current_pageno%2) == 0)
   elseif c == '(' then toss_back_char(c)
     res= ((read_arith_expr{stop = true}) > 0)
-  elseif c == Escape_char or string.find(c, '%d') or c == '+' or c == '-' then
+  elseif c == Escape_char or c==Superescape_char or string.find(c, '%d') or c == '+' or c == '-' then
     --print('itpp found', c)
     toss_back_char(c)
     res= ((read_arith_expr()) > 0)
@@ -5428,7 +5430,7 @@ function read_arith_expr(opts)
       if opts.inside_paren_p then --print('rae continuing with acc=', acc);
         ignore_spaces() end
       if opts.stop then break end
-    elseif c == Escape_char then get_char()
+    elseif c == Escape_char or c==Superescape_char then get_char()
       --print('rae doing esc')
       toss_back_string(expand_escape(snoop_char()))
     elseif string.match(c, Unit_pattern) and not unit_already_read_p then
@@ -5485,7 +5487,7 @@ function ignore_branch()
     elseif c=='\n' then --get_char();
       --if not fillp() then get_char() end
       break
-    elseif c == Escape_char then get_char()
+    elseif c == Escape_char or c==Superescape_char then get_char()
       c = snoop_char()
       if not c or c == '\n' then break
       elseif c == '{' then brace_p = true; get_char(); break
@@ -5501,7 +5503,7 @@ function ignore_branch()
       c = get_char()
       --print('igb read', c)
       if not c then terror 'ignore_branch: eof'
-      elseif c == Escape_char then c = get_char()
+      elseif c == Escape_char or c==Superescape_char then c = get_char()
         --print('igb read escaped', c)
         if not c then terror 'ignore_branch: escape eof'
         elseif c == '}' then nesting=nesting-1;
@@ -5689,7 +5691,7 @@ function get_header(k, opts)
       --print('gh/apar ipp=', In_para_p)
       local res = o:get_output_stream_string()
       --io.write('orig res= ->', res, '<-\n')
-      res = string.gsub(res, '\\%[htmllt%]/?p\\%[htmlgt%]', '')
+      res = string.gsub(res, Superescape_char .. '%[htmllt%]/?p' .. Superescape_char .. '%[htmlgt%]', '')
       res = string_trim_blanks(res)
       --io.write('res= ->', res, '<-\n')
       k(res)

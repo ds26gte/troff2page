@@ -1,4 +1,4 @@
--- last modified 2021-01-29
+-- last modified 2021-02-09
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -325,9 +325,10 @@ function initialize_macros()
     --print('doing char')
     ignore_spaces()
     local c = get_char()
-    if c == Escape_char then
+    if c == Escape_char or c==Superescape_char then
       local glyph_name = read_escaped_word()
       local rhs = expand_args(read_troff_string_line(), 'not_copy_mode')
+      --print('setting glyph', glyph_name, 'to', rhs)
       defglyph(glyph_name, rhs)
     else
       local rhs = expand_args(read_troff_string_line())
@@ -342,7 +343,7 @@ function initialize_macros()
       ignore_spaces()
       --problem is it translates anyway
       local c = get_char('dont_translate')
-      if c == Escape_char then
+      if c == Escape_char or c==Superescape_char then
         --this part works OK
         local glyph_name = read_escaped_word()
         Glyph_table[glyph_name] = nil
