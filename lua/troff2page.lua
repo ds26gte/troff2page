@@ -1011,8 +1011,12 @@ function raw_counter_value(str)
   return get_counter_named(str).value
 end
 
-function counter_value_in_pixels(str)
+function counter_value_in_points(str)
   return raw_counter_value(str)/Gunit.p
+end
+
+function counter_value_in_pixels(str)
+  return raw_counter_value(str)/Gunit.px
 end
 
 function formatted_counter_value(str)
@@ -1122,6 +1126,7 @@ function initialize_css_file(css_file)
 
   blockquote {
     margin-left: 2em;
+    margin-right: 0em;
   }
 
   blockquote.quotebar {
@@ -1259,7 +1264,7 @@ function initialize_css_file(css_file)
 end
 
 function collect_css_info_from_preamble()
-  local ps = counter_value_in_pixels 'PS'
+  local ps = counter_value_in_points 'PS'
   local p_i = counter_value_in_pixels 'PI'
   local pd = counter_value_in_pixels 'PD'
   local ll = counter_value_in_pixels 'LL'
@@ -1268,6 +1273,7 @@ function collect_css_info_from_preamble()
     CSS:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
   if ll ~= 0 then
+    --print('LL in px =', ll)
     CSS:write(string.format('\n@media screen { body { max-width: %spx; } }\n', ll))
   end
   if Macro_package ~= 'man' then
@@ -1473,6 +1479,8 @@ defunit('c', Gunit.i / 2.54)
 defunit('n', Gunit.m / 2)
 defunit('v', Gunit.p * 16)
 
+defunit('px', Gunit.i / 96)
+
 Unit_pattern = '[cfiMmnPpuv]'
 
 function point_equivalent_of(u)
@@ -1484,12 +1492,12 @@ function read_length_in_pixels(unit)
   local n, unit_already_read_p = read_arith_expr()
   --print('\tread_arith_expr retd', n, unit_already_read_p)
   if unit_already_read_p then
-    return n / Gunit.p
+    return n / Gunit.px
   end
   --
   if unit then
     if string.match(unit, Unit_pattern) then
-      return n*Gunit[unit] / Gunit.p
+      return n*Gunit[unit] / Gunit.px
     end
     terror('Unknown length indicator %s', unit)
   end
@@ -1497,7 +1505,7 @@ function read_length_in_pixels(unit)
   --XXX: deadc0de?
   local u = snoop_char()
   if u and string.match(u, Unit_pattern) then get_char()
-    return n*Gunit[u] / Gunit.p
+    return n*Gunit[u] / Gunit.px
   end
   --
   return  math_round(4.5*n) -- XXX

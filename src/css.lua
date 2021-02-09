@@ -1,4 +1,4 @@
--- last modified 2021-01-04
+-- last modified 2021-02-09
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
@@ -102,6 +102,7 @@ function initialize_css_file(css_file)
 
   blockquote {
     margin-left: 2em;
+    margin-right: 0em;
   }
 
   blockquote.quotebar {
@@ -239,7 +240,7 @@ function initialize_css_file(css_file)
 end
 
 function collect_css_info_from_preamble()
-  local ps = counter_value_in_pixels 'PS'
+  local ps = counter_value_in_points 'PS'
   local p_i = counter_value_in_pixels 'PI'
   local pd = counter_value_in_pixels 'PD'
   local ll = counter_value_in_pixels 'LL'
@@ -248,6 +249,7 @@ function collect_css_info_from_preamble()
     CSS:write(string.format('\nbody { font-size: %s%%; }\n', ps*10))
   end
   if ll ~= 0 then
+    --print('LL in px =', ll)
     CSS:write(string.format('\n@media screen { body { max-width: %spx; } }\n', ll))
   end
   if Macro_package ~= 'man' then

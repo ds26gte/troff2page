@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2021-02-09
 
 function left_zero_pad(n, reqd_length)
   local n = tostring(n)
@@ -80,8 +80,12 @@ function raw_counter_value(str)
   return get_counter_named(str).value
 end
 
-function counter_value_in_pixels(str)
+function counter_value_in_points(str)
   return raw_counter_value(str)/Gunit.p
+end
+
+function counter_value_in_pixels(str)
+  return raw_counter_value(str)/Gunit.px
 end
 
 function formatted_counter_value(str)
