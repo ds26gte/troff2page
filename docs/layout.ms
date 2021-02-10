@@ -133,7 +133,7 @@ HTML-style paragraphs
 .IX v, groff scaling factor
 .IX PD, -ms number register
 .IX PI, -ms number register
-.IX LP, groff macro
+.IX LP@.LP, groff macro
 By default, Troff2page sets paragraphs exactly as groff does: the first
 lines of paragraphs are indented (unless explicitly disabled via an
 \fC.LP\fP), and

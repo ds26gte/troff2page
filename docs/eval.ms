@@ -1,4 +1,4 @@
-.\" last modified 2021-02-09
+.\" last modified 2021-02-10
 .SH 1
 7.  Extending groff using Lua
 .LP
@@ -24,8 +24,8 @@ example.
 Consider the following groff document, \fCtau.ms\fP:
 .IX mso@.mso, groff request
 .IX troff, groff Lua output stream
-.IX t@\e(*t, groff glyph name (\(*t, U+03C4 \s-2GREEK SMALL LETTER TAU\s0)
-.IX =@\e(~=, groff glyph name (\(~=, U+2248 \s-2ALMOST EQUAL TO\s0)
+.IX t@\e(*t, groff glyph name (\(*t)
+.IX =@\e(~=, groff glyph name (\(~=)
 .EX
     .mso pca-eval.tmac
     .

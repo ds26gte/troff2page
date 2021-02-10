@@ -548,8 +548,14 @@ function initialize_macros()
     --print('doing sp')
     local num = read_length_in_pixels 'v'
     read_troff_line()
-    if num == 0 then num = Gunit.v/Gunit.p end
     --print('sp arg is', num)
+    if num == 0 then num = Gunit.v/Gunit.px end
+    --print('sp arg1 is', num)
+    local pd = raw_counter_value 'PD'
+    --print('pd is', pd)
+    if pd < 0 or pd > 5000*Gunit.u then
+      num = num + Gunit.v/Gunit.px
+    end
     emit_para{interleaved_p = true,
       continue_top_ev_p = true,
       style = string.format('margin-top: %spx', num)}

@@ -1,4 +1,4 @@
-.\" last modified 2021-02-09
+.\" last modified 2021-02-10
 .SH 1
 8.  Styling
 .LP
@@ -57,16 +57,10 @@ Colophon
 .LP
 .IX colophon
 .IX last-modification time
-By default, Troff2page places a colophon at the bottom right of the first
-page.  The colophon mentions
-.PP
-i.  the last-modification
-time of
-the document, and
-.PP
-ii. the Troff2page version used for the conversion.
-.PP
-Either or both can be suppressed via CSS.
+By default, Troff2page places a colophon at the bottom right of
+the first page.  The colophon mentions: (1) the last-modification
+time of the document; and (2) the Troff2page version used for the
+conversion. Either or both can be suppressed via CSS.
 .PP
 .IX colophon@.colophon, CSS class
 .IX advertisement@.advertisement, CSS class
@@ -120,11 +114,22 @@ won’t mention any date.
 .SH 2
 Glyph substitution
 .LP
-CSS isn’t the only recourse to style your document: Interesting
-glyphs offer another approach. Troff2page, like groff, allows
-you to use UTF-8 characters, either directly or via escape
-sequences of the form \fC\e[u\fIxxxx\fC]\fR, where \fIxxxx\fP is
-the corresponding hex number (in uppercase).
+CSS isn’t the only way to style your document: Interesting glyphs
+offer another approach. Troff2page, like groff, allows you to use
+UTF-8 characters, either directly or via escape sequences of the
+form \fC\e[u\fIxxxx\fC_\fIyyyy\fC...]\fR, where the \fIxxxx\fP
+and \fIyyyy\fP are hex numbers in uppercase. \fIxxxx\fP is the
+code point of the base glyph, and each optional \fC_\fIyyyy\fR is
+a code point for a combining diacritic.
+.PP
+.IX U+00E9 \s-2LATIN SMALL LETTER E WITH ACUTE\s0
+.IX U+0065 \s-2LATIN SMALL LETTER E\s0
+.IX U+0301 \s-2COMBINING ACUTE ACCENT\s0
+Thus U+00E9 \s-2LATIN SMALL LETTER E WITH ACUTE\s0 (é) can be
+entered (1) directly as \fCé\fP; (2) as the Unicode escape
+\fC\e[u00E9]\fP; or (3) as the Unicode \fIcombining\fP escape
+\fC\e[u0065_0301]\fP, because U+0065 is \s-2LATIN SMALL LETTER
+E\s0 and U+0301 is \s-2COMBINING ACUTE ACCENT\s0.
 .PP
 .IX char@.char, groff request
 .IX U+00B6 \s-2PILCROW SIGN\s0
@@ -229,7 +234,7 @@ A display environment could be fenced by a pair of macros
     .  DE
     ..
 .EE
-.IX e@\ee, groff escape (\e, U+005C REVERSE SOLIDUS\s0)
+.IX e@\ee, groff escape (\e)
 We could use the
 escape sequence \fC\ee\fP in our input to stand for a backslash,
 but especially in an extended display containing verbatim code,

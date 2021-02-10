@@ -1,4 +1,4 @@
--- last modified 2021-02-08
+-- last modified 2021-02-10
 
 Escape_table = {}
 
@@ -156,8 +156,33 @@ function glyphname_to_htmlchar(name)
   if it then return it end
   if string.find(name, 'u') == 1 then
     local hnum = string.sub(name, 2)
-    if tonumber('0x' .. hnum) then
-      return Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
+    local uscore_i = string.find(hnum, '_')
+    if not uscore_i then
+      if tonumber('0x' .. hnum) then
+        return Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
+      end
+    else
+      local res = ''
+      while true do
+        local component = string.sub(hnum, 1, uscore_i - 1)
+        --print('component = ', component)
+        if tonumber('0x' .. component) then
+          res = res .. Superescape_char .. '[htmlamp]#x' .. component .. ';'
+          --print('res = ', res)
+          hnum = string.sub(hnum, uscore_i + 1)
+          uscore_i = string.find(hnum, '_')
+          if not uscore_i then
+            if tonumber('0x' .. hnum) then
+              --print('last component = ', hnum)
+              res = res .. Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
+              --print('final res = ', res)
+              return res
+            else break
+            end
+          end
+        else break
+        end
+      end
     end
   end
   if string.find(name, 'html') ~= 1 then

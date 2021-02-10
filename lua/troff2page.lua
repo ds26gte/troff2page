@@ -2650,8 +2650,33 @@ function glyphname_to_htmlchar(name)
   if it then return it end
   if string.find(name, 'u') == 1 then
     local hnum = string.sub(name, 2)
-    if tonumber('0x' .. hnum) then
-      return Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
+    local uscore_i = string.find(hnum, '_')
+    if not uscore_i then
+      if tonumber('0x' .. hnum) then
+        return Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
+      end
+    else
+      local res = ''
+      while true do
+        local component = string.sub(hnum, 1, uscore_i - 1)
+        --print('component = ', component)
+        if tonumber('0x' .. component) then
+          res = res .. Superescape_char .. '[htmlamp]#x' .. component .. ';'
+          --print('res = ', res)
+          hnum = string.sub(hnum, uscore_i + 1)
+          uscore_i = string.find(hnum, '_')
+          if not uscore_i then
+            if tonumber('0x' .. hnum) then
+              --print('last component = ', hnum)
+              res = res .. Superescape_char .. '[htmlamp]#x' .. hnum .. ';'
+              --print('final res = ', res)
+              return res
+            else break
+            end
+          end
+        else break
+        end
+      end
     end
   end
   if string.find(name, 'html') ~= 1 then
@@ -3649,8 +3674,14 @@ function initialize_macros()
     --print('doing sp')
     local num = read_length_in_pixels 'v'
     read_troff_line()
-    if num == 0 then num = Gunit.v/Gunit.p end
     --print('sp arg is', num)
+    if num == 0 then num = Gunit.v/Gunit.px end
+    --print('sp arg1 is', num)
+    local pd = raw_counter_value 'PD'
+    --print('pd is', pd)
+    if pd < 0 or pd > 5000*Gunit.u then
+      num = num + Gunit.v/Gunit.px
+    end
     emit_para{interleaved_p = true,
       continue_top_ev_p = true,
       style = string.format('margin-top: %spx', num)}
