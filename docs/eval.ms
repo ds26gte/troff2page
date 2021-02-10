@@ -1,4 +1,4 @@
-.\" last modified 2020-12-22
+.\" last modified 2021-02-09
 .SH 1
 7.  Extending groff using Lua
 .LP
@@ -121,7 +121,7 @@ https://en.wikipedia.org/wiki/HSL_and_HSV]algorithm\& to convert HSL to RGB,
 implementing it using groff’s limited arithmetic is tedious.  Instead,
 we’ll define a
 much easier Lua procedure to do the same, and put it inside an \fC.eval\fP:
-.EX 1
+.EX
     .mso pca-eval.tmac
     .
     .eval
@@ -234,7 +234,7 @@ For example, let’s define a
 \fC\e*[url ...]\fP string register that simply typesets its URL
 argument within angle brackets.
 .IX ds@.ds, groff request
-.EX
+.EX 1
     .ds url \(la\fC\\$1\fP\(ra
 .EE
 This is adequate for the print output.

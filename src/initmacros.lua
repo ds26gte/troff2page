@@ -1,4 +1,4 @@
--- last modified 2021-02-09
+-- last modified 2021-02-10
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -107,8 +107,8 @@ function initialize_macros()
 
   defrequest('blm', function()
     local w = read_args() or false
-    print('doing blm', w)
-    print('its a mac=', Macro_table[w])
+    --print('doing blm', w)
+    --print('its a mac=', Macro_table[w])
     Blank_line_macro = w
   end)
 

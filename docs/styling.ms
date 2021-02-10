@@ -1,4 +1,4 @@
-.\" last modified 2021-02-08
+.\" last modified 2021-02-09
 .SH 1
 8.  Styling
 .LP
@@ -65,26 +65,23 @@ time of
 the document, and
 .PP
 ii. the Troff2page version used for the conversion.
+.PP
 Either or both can be suppressed via CSS.
 .PP
 .IX colophon@.colophon, CSS class
 .IX advertisement@.advertisement, CSS class
 To suppress the mention of Troff2page,
-.PP
 .EX
     .colophon .advertisement {
       display: none;
     }
 .EE
-.PP
 To suppress the entire colophon,
-.PP
 .EX
     .colophon {
       display: none;
     }
 .EE
-.PP
 Troff2page calculates the last-mod time by choosing the timestamp
 of the newest of the source documents that make up the document.
 Only user content is considered; macro and auxiliary files are
@@ -114,7 +111,6 @@ accomplished via the CSS fragment:
       display: none;
     }
 .EE
-.PP
 .IX TH@.TH, -man macro
 As a special case, for man pages, Troff2page (like groff -man)
 takes the third argument of the titling macro \fC.TH\fP as the
@@ -143,11 +139,9 @@ because it’s 8-bit ascii.  In contrast, the fancier
 U+2761 \s-2CURVED STEM PARAGRAPH SIGN ORNAMENT\s0 (\[u2761]) may not be
 present. To automatically transliterate the
 former to the latter:
-.PP
-.EX
+.EX 1
     .char \[u00B6] \[u2761]
 .EE
-.PP
 Usually, this works on the browser (because UTF-8 encoding is widespread),
 but fails for print, as the typical text font in
 groff does not have a glyph at code point U+2761. groff does have
@@ -155,20 +149,19 @@ the glyph
 in its Zapf Dingbats (\fCZD\fP) font but at a different code point, which
 you can snag using a further \fC.char\fP
 call:
-.PP
-.EX
+.EX 1
     .if !\n[.troff2page] \{\
       .char \[u2761] \f(ZD\N'161'\fP
     .\}
 .EE
-.PP
 .IX U+2621 \s-2CAUTION SIGN\s0
 .IX U+26A0 \s-2WARNING SIGN\s0
-Here’s a more elaborate use case. You may want to use U+2621 \s-2CAUTION SIGN\s0
+Here’s a more elaborate use case: You may want to use U+2621 \s-2CAUTION SIGN\s0
 and
 U+26A0 \s-2WARNING SIGN\s0
-— in a suitable color and size — rather than
-the pedestrian “\fBCAUTION\fP” and “\fBWARNING\fP” for admonition titles.
+rather than
+the pedestrian “\fBCAUTION\fP” and “\fBWARNING\fP” for admonition
+titles.
 .if \n[.troff2page] \{\
 .DS C
 \M[yellow]\s+4\fB☡\fP\s0\M[]                 \M[red]\m[white]\s+4\fB⚠\fP\s0\m[]\M[]
@@ -183,41 +176,73 @@ exotic glyphs.) A more reasonable workaround is to
 conditionally translate special characters into their
 boring equivalents for print:
 .PP
-.EX
+.EX 1
     .if !\n[.troff2page] \{\
     .  char \[u2621] \fBCAUTION\fP
     .  char \[u26A0] \fBWARNING\fP
     .\}
 .EE
-.PP
+If you used color and sizing to jazz up the icons, and you don’t
+want these apply to the non-icon versions (or if you want to
+modify the latter in a different way), trivial admonition macros
+may be written that expand differently for HTML and print, e.g.,
+.EX 1
+    .de CAUTION
+    .  if \n[.troff2page] \{\
+    .    \M[yellow]\s+4\fB\[u2621]\fP\s0\M[]
+    .  \}
+    .  el \fBCAUTION\fP
+    ..
+.EE
+.EX 1
+    .de WARNING
+    .  if \n[.troff2page] \{\
+    .    \M[red]\m[white]\s+4\fB\[u26A0]\fP\s0\m[]\M[]
+    .  \}
+    .  el \fBWARNING\fP
+    ..
+.EE
 .PP
 .SH 2
 Typing verbatim \\e in displays
 .LP
 .IX \\@\e, groff escape character
-.IX eo@.eo, groff request
-.IX ec@.ec, groff request
 The display used above brings up another use-case for glyph
 translation, even when (and especially if) no exotic characters
 are desired.  The display shows the backslash (\fC\e\fP) character, which
 is also the default escape character for groff.
 .PP
+A display environment could be fenced by a pair of macros
+\fC.EX\fP/\fC.EE\fP defined as follows:
+.IX EX@.EX, -ms macro
+.IX EE@.EE, -ms macro
+.IX LD@.LD, -ms macro
+.IX DE@.DE, -ms macro
+.IX ft@.ft, groff request
+.EX
+    .de EX
+    .  LD
+    .  ft C
+    ..
+    .
+    .de EE
+    .  DE
+    ..
+.EE
+.IX e@\ee, groff escape (\e, U+005C REVERSE SOLIDUS\s0)
 We could use the
 escape sequence \fC\ee\fP in our input to stand for a backslash,
 but especially in an extended display containing verbatim code,
 we would like to input the backslash as-is and have groff and
 Troff2page temporarily suspend its escape effect.
-We could do this by having our display
+.IX eo@.eo, groff request
+.IX ec@.ec, groff request
+We could do this by having our \fC.EX\fP/\fC.EE\fP
 macros
 implicitly turn the escape character off when entering the display and back on when
-exiting it.  The requests for these actions are \fC.eo\fP and
+exiting it.
+The requests for these actions are \fC.eo\fP and
 \fC.ec\fP respectively:
-.IX LD@.LD, -ms macro
-.IX DE@.DE, -ms macro
-.IX ft@.ft, groff request
-.IX EX@.EX, -ms macro
-.IX EE@.EE, -ms macro
-.PP
 .EX
     .de EX
     .  LD
@@ -230,7 +255,6 @@ exiting it.  The requests for these actions are \fC.eo\fP and
     .  DE
     ..
 .EE
-.PP
 We then use the macros \fC.EX\fP and \fC.EE\fP around the code text to
 display it, in monospace font and with the escape character
 temporarily disabled. (An improved version of these macros are provided
@@ -280,11 +304,9 @@ for a nasty surprise.  You really do want the \fIreal\fP backslash in
 there even on the HTML page, but you don’t want to disable
 groff’s escape character.
 Glyph substitution to the rescue:
-.PP
-.EX
+.EX 1
     .char \[u29F9] \[u005C]
 .EE
-.PP
 This lets you type the exotic backslash in your source but have
 groff and Troff2page convert it into the regular backslash when
 it lands on the page.

@@ -1,4 +1,4 @@
-.\" last modified 2020-12-22
+.\" last modified 2021-02-09
 .SH 1
 5.  Making an index
 .LP
@@ -36,13 +36,11 @@ E.g.,
 identifies an index entry for “-m, groff option” but alphabetizes
 it as though it were “m” rather than something that starts with a
 hyphen.
-.PP
 .EX
     .IX groff!macro packages
 .EE
 makes “macro packages” an indented index subentry under “groff”.
 Up to two \fC!\fPs may be used.
-.PP
 .EX
     .IX groff!macro packages!ms
 .EE
@@ -74,7 +72,7 @@ http://tex.loria.fr/bibdex/makeindex.pdf]as for LaTeX\&, except that in groff we
 \fCpca-ix.tmac\fP will call MakeIndex to create a
 sorted index in the auxiliary file \fC\e*[AUXF].ind\fP, which can be
 slurped back into the input document:
-.EX
+.EX 1
     .so \*[AUXF].ind
 .EE
 Adding a section header on top is up to you.

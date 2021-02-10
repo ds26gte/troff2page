@@ -1,4 +1,4 @@
-.\" last modified 2020-12-22
+.\" last modified 2021-02-09
 .SH 1
 9.  Recovery from errors
 .LP
@@ -8,7 +8,6 @@ If Troff2page fails on your document, it will display a message giving its
 best guess on what the problem is and where it occurred in the source
 document.  It also offers to take you there in your text editor so you can fix it immediately.
 .EX
-.ec
     \&\f(CIfilename:lineno: error description\fP
     Type e to edit file filename at line lineno; x to quit
     ?

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20210209 -- last modified
+Troff2page_version = 20210210 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -3208,8 +3208,8 @@ function initialize_macros()
 
   defrequest('blm', function()
     local w = read_args() or false
-    print('doing blm', w)
-    print('its a mac=', Macro_table[w])
+    --print('doing blm', w)
+    --print('its a mac=', Macro_table[w])
     Blank_line_macro = w
   end)
 

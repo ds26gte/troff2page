@@ -1,4 +1,4 @@
-.\" last modified 2020-12-22
+.\" last modified 2021-02-10
 .SH 1
 3.  Page layout
 .LP
@@ -27,11 +27,11 @@ one.  Thus \fC.bp\fP causes a page-break in both the HTML and the print outputs.
 .IX if@.if, groff request
 Generally, page-breaks require a different \(aesthetic in HTML than in
 print.  You can use groff conditionals to express this difference:
-.EX
+.EX 1
     .if \n[.troff2page] .bp
 .EE
 causes a page-break only in the HTML, whereas
-.EX
+.EX 1
     .if !\n[.troff2page] .bp
 .EE
 causes a page-break only in print.
@@ -43,7 +43,7 @@ document.
 .IX page breaks!for HTML only
 If may be convenient to define a \fC.HBP\fP macro that causes a page-break
 only for HTML:
-.EX
+.EX 1
     .de HBP
     .if \n[.troff2page] .bp
     ..
@@ -64,7 +64,7 @@ to embed a page break.
 .IX als@.als, groff request
 Here’s a way to create pagebreaks in HTML before every top-level \fC.SH\fP, by
 redefining the underlying \fC.@SH\fP macro:
-.EX
+.EX 1
     .if \n[.troff2page] \{\
     .
     .  rn @SH __@SH_orig
@@ -107,7 +107,7 @@ Troff2page. But don’t do this.
 .IX p@.p, groff number register
 If you’d rather stick to known groff registers, the read-only
 paper-length register \fC\en(.p\fP is a candidate.  groff sets
-it to 11\(sd, i.e., the length of a US Letter size paper.
+it to 11 inches, i.e., the length of a US Letter size paper.
 Presumably it could vary depending on country of use, but it is
 never going to be non-positive. Troff2page, since it doesn’t deal in paper, sets
 \fC\en(.p\fP to 0.
@@ -151,7 +151,7 @@ separation that HTML uses.  Note that setting \fCPD\fP to a negative value
 should be done only for HTML, as groff will happily overstrike
 text in order to respect a negative \fCPD\fP:
 .IX p, groff scaling factor
-.EX
+.EX 1
     .if \n[.troff2page] \{\
     .  nr PI 0n
     .  nr PD 0-1p
@@ -182,9 +182,9 @@ you might think of as length units.
 .IX m, groff scaling factor
 .IX p, groff scaling factor (point)
 Other groff scaling factors that Troff2page recognizes
-are: \fCi\fP (inch = 1\(sd = 1/12 foot), \fCc\fP (cm =
-50/127\(sd), \fCp\fP (point = 1/72\(sd), \fCP\fP (pica = 12
-points), \fCm\fP (em = 2 ens), and \fCM\fP (1/100 em).
+are: \fCi\fP (inch = 1/12 ft), \fCc\fP (cm =
+50/127 in., \fCp\fP (point = 1/72 in., \fCP\fP (pica = 12
+pt), \fCm\fP (em = 2 ens), and \fCM\fP (1/100 em).
 .PP
 .IMG inch.jpg 3.5i
 .PP
@@ -237,9 +237,9 @@ phones): the text will correspondingly shrink to
 fit the window, avoiding the need for horizontal scrolling.
 .PP
 A good \fCLL\fP value for Troff2page should be a bit larger than
--ms’s 6\(sd, which is too narrow for a browser. The following sets it
+-ms’s 6 inches, which is too narrow for a browser. The following sets it
 to 1/8000 of a mile, but it takes effect only for HTML:
-.EX
+.EX 1
     .if \n[.troff2page] .nr LL 7.92i
 .EE
 .PP
@@ -264,12 +264,12 @@ it.
 .PP
 .IX images!width
 An optional final argument specifies the width of the image.  The
-default is 1\(sd.
+default is 1 inch.
 E.g.,
 .EX
     .IMG -L t2p.png 2.718281828i
 .EE
-produces a left-justified, \fIe\fP\(sd-wide image:
+produces a left-justified image that’s \fIe\fP inches wide:
 .IMG -L t2p.png 2.718281828i
 .LP
 .IX convert, image program

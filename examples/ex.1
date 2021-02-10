@@ -1,24 +1,28 @@
-The .EX renders as a monospace display only if troff2page is called
-with the -man or -mpca options.
+.LP
+Let’s use .char to convert the currency sign to a section sign.
+.char ¤ §
 .PP
-Eos recusandae cupiditate voluptatem asperiores quisquam aut ut
-ut. Id deleniti autem veniam. Dolore temporibus facere
-praesentium. Et qui esse praesentium. Itaque architecto dolorem
-quod vel rerum quibusdam repudiandae.
-.PP
+Text fenced by .EX/.EE renders as a monospace display only if
+troff2page is called with the -man or -mpca options.
+Backslash-qua-escape can be used, so backslash can’t be verbatim:
+use \ee or a .char kludge. Backslash-qua-escape is useful
+especially if UTF-8 characters are used either directly or via
+transliteration. It also allows the display to cross page
+boundaries.
 .EX
   Velit fuga maxime qui sunt
-      9 o’clock (<- non-ascii char shd render as-is)
+      \[u00B6] (<- backslash isn't verbatim)
+      ¶ ❡ 9 o’clock (<- UTF-8 chars render as-is)
+      ¤ (<- .char is respected)
   necessitatibus. Distinctio vitae
   perferendis aut et magni
           voluptatem. Quo reiciendis nam
           reiciendis sed ut atque
   laboriosam.
 .EE
-.PP
-Veniam sint blanditiis quam ut doloremque voluptatem consequatur
-et. Doloribus perspiciatis impedit facere harum. Voluptatem
-cumque dolor voluptatem aut debitis. Quis blanditiis labore atque
-est voluptatum sint soluta. Sed autem itaque impedit fuga alias
-eos et praesentium. Voluptas consectetur nisi totam ad assumenda
-nihil totam.
+If you want backslash verbatim, and are willing to forgo UTF-8,
+call .EX with some (any) argument. Page boundaries can’t be
+crossed, as groff needs backslash-qua-escape at page breaks.
+Troff2page, unlike groff, will allow direct UTF-8 (not \e[uxxxx])
+regardless, and page boundary considerations are anyway
+irrelevant in HTML.

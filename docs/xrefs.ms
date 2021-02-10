@@ -1,4 +1,4 @@
-.\" last modified 2020-12-26
+.\" last modified 2021-02-09
 .SH 1
 4.  Cross-references
 .LP
@@ -18,7 +18,7 @@ the current page.  The \fIstring\fP \fC\e*[TAG:sec_trofflua]\fP
 is defined to typeset as that page number.
 Thus, in a hand-crafted table of contents, you could
 use
-.EX
+.EX 1
     Extending groff using Lua, \*[TAG:sec_trofflua]
 .EE
 In the HTML output, the string \fC\e*[TAG:sec_trofflua]\fP
@@ -59,10 +59,9 @@ section-header style, including font-size, but you
 must have \fCGROWPS\fP \(>= 2
 because your ToC requires it, then conditionally set \fCPSINCR\fP
 to 0.
-.EX
+.EX 1
     .if \n[.troff2page] .nr PSINCR 0
 .EE
-.PP
 \fCpca-toc.tmac\fP doesn’t require you to modify how you use your header
 macros (\fC.SH\fP or \fC.NH\fP). It is a solution to the
 following statement from the groff manual:
@@ -83,7 +82,7 @@ Bibliography
 The \fC.BIB\fP macro from
 the macro file \fCpca-bib.tmac\fP introduces a paragraph that is
 a simple bibliographic reference, e.g.,
-.EX
+.EX 1
     .BIB landes_clock
     David S. Landes, \fIRevolutions in Time: Clocks and the
     Making of the Modern World\fP, Belknap Press, 1983.
@@ -93,7 +92,7 @@ with “[\fIn\fP]” in the output.  Furthermore, the label
 \fCTAG:landes_clock\fP is
 associated with \fIn\fP, using the cross-reference mechanism
 described earlier, and can be used to cite the reference.  E.g.,
-.EX
+.EX 1
     For a history of the first portable device that, for better
     or worse, completely changed how we live, see
     Landes\~[\*[TAG:landes_clock]].

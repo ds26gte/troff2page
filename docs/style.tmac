@@ -23,21 +23,20 @@
 .
 .ss 12 0
 .
-.\"nr PSINCR 3p
+.if !\n[.troff2page] \{\
+.nr GROWPS 2
 .nr PSINCR 2p
+.nr PI 1.5m
+.\}
 .
 .\"nr FPS \n[PS]
 .\"nr FVS \n[VS]
-.
-.if !\n[.troff2page] .nr PI 1.5m
 .
 .defcolor terracottapink rgb #9b3d3d
 .
 .am @AU
 .  ft R
 ..
-.
-.nr GROWPS 2
 .
 .if \n[.X] \{\
 .de DC
