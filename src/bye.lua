@@ -1,4 +1,4 @@
--- last modified 2021-01-04
+-- last modified 2021-06-17
 
 function clear_per_doc_tables()
   Color_table = {}
@@ -59,7 +59,7 @@ function do_bye()
   --print('pageno=', pageno)
   write_aux('nb_last_page_number(', pageno, ')')
   emit_end_page()
-  if raw_counter_value 'HTML1' ~= 0 then
+  if raw_counter_value 'HTML1' ~=0 then
     write_aux 'nb_single_output_page()'
   end
   if Verbatim_apostrophe_p then
@@ -90,7 +90,7 @@ function do_bye()
   if Last_modification_time then
     write_aux('nb_last_modification_time(', Last_modification_time, ')')
   end
-  if Slides_p then
+  if raw_counter_value 't2pslides' ~=0 then
     --print('doing slide setup')
     local slidy_css_file = probe_file('slidy.css') or
       'http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css'

@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20210210 -- last modified
+Troff2page_version = 20210617 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -248,7 +248,7 @@ if os.getenv 'COMSPEC' then Operating_system = 'windows' end
 
 Ghostscript = 'gs'
 if Operating_system == 'windows' then
-  for _,f in pairs {'g:\\cygwin\\bin\\gs.exe', 
+  for _,f in pairs {'g:\\cygwin\\bin\\gs.exe',
     'g:\\cygwin\\bin\\gs.exe',
     'c:\\aladdin\\gs6.01\\bin\\gswin32c.exe',
     'd:\\aladdin\\gs6.01\\bin\\gswin32c.exe',
@@ -272,6 +272,7 @@ Css_file_suffix = '-Z-S.css'
 Html_conversion_by = 'HTML conversion by'
 Html_page_suffix = '-Z-H-'
 Image_file_suffix = '-Z-G-'
+Image_format = 'png'
 Last_modified = 'Last modified: '
 Log_file_suffix = '-Z-L.log'
 Navigation_contents_name = 'contents'
@@ -285,102 +286,6 @@ Navigation_sentence_end = ''
 Output_extension = '.html'
 Pso_file_suffix = '-Z-T.1'
 
-Afterpar = nil
-Aux_stream = nil
-Blank_line_macro = nil
-CSS = nil
-Cascaded_if_p = nil
-Cascaded_if_stack = nil
-Check_file_write_date = nil
-Colophon_done_p = nil
-Color_table = nil
-Control_char = nil
-Convert_to_info_p = nil
-Current_diversion = nil
-Current_pageno = nil
-Current_source_file = nil
-Current_troff_input = nil
-Diversion_table = nil
-End_macro = nil
-Escape_char = nil
-Ev_stack = nil
-Ev_table = nil
-Exit_status = nil
-Expanding_args_p = nil
-File_postlude = nil
-Footnote_buffer = nil
-Footnote_count = nil
-Glyph_table = nil
-Groff_tmac_path = nil
-Html_head = nil
-Html_page = nil
-Image_file_count = nil
-In_para_p = nil
-Input_line_no = nil
-Inside_table_text_block_p = nil
-It = nil
-Jobname = nil
-Just_after_par_start_p = nil
-Keep_newline_p = nil
-Last_line_had_leading_spaces_p = nil
-Last_modification_time = nil
-Last_page_number = nil
-Leading_spaces_macro = nil
-Leading_spaces_number = nil
-Lines_to_be_justified = nil
-Log_stream = nil
-Macro_args = nil
-Macro_copy_mode_p = nil
-Macro_package = nil
-Macro_spill_over = nil
-Macro_table = nil
-Main_troff_file = nil
-Margin_left = nil
-Missing_pieces = nil
-No_break_control_char = nil
-No_space_mode_p = nil
-Node_table = nil
-Num_of_times_th_called = nil
-Numreg_table = nil
-Out = nil
-Output_streams = nil
-Outputting_to = nil
-Preferred_last_modification_time = nil
-Previous_line_exec_p = nil
-Pso_temp_file = nil
-Reading_quoted_phrase_p = nil
-Reading_string_call_p = nil
-Reading_table_header_p = nil
-Reading_table_p = nil
-Redirected_p = nil
-Request_table = nil
-Rerun_needed_p = nil
-Saved_escape_char = nil
-Scripts = nil
-Single_output_page_p = nil
-Slides_p = nil
-Source_changed_since_last_time_p = nil
-Sourcing_ascii_file_p = nil
-String_table = nil
-Stylesheets = nil
-Superescape_char = nil
-Table_align = nil
-Table_cell_number = nil
-Table_colsep_char = nil
-Table_default_format_line = nil
-Table_format_table = nil
-Table_number_of_columns = nil
-Table_options = nil
-Table_row_number = nil
-Temp_string_count = nil
-This_footnote_is_numbered_p = nil
-Title = nil
-Turn_off_escape_char_p = nil
-Unescaped_glyph_table = nil
-Verbatim_apostrophe_p = nil
-
-Single_pass_p = nil
-Image_format = 'png'
 
 
 function accent_marks()
@@ -535,7 +440,7 @@ function do_bye()
   --print('pageno=', pageno)
   write_aux('nb_last_page_number(', pageno, ')')
   emit_end_page()
-  if raw_counter_value 'HTML1' ~= 0 then
+  if raw_counter_value 'HTML1' ~=0 then
     write_aux 'nb_single_output_page()'
   end
   if Verbatim_apostrophe_p then
@@ -566,7 +471,7 @@ function do_bye()
   if Last_modification_time then
     write_aux('nb_last_modification_time(', Last_modification_time, ')')
   end
-  if Slides_p then
+  if raw_counter_value 't2pslides' ~=0 then
     --print('doing slide setup')
     local slidy_css_file = probe_file('slidy.css') or
       'http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css'
@@ -633,6 +538,7 @@ function set_register(regset, type)
   elseif type=='number' then
     --print('calling defnumreg', lhs, rhs)
     defnumreg(lhs, {value = tonumber(rhs)})
+    --print('reg val is', raw_counter_value(lhs))
   end
 end
 
@@ -645,7 +551,7 @@ function troff2page_help()
   tlog(' --version       print version number\n')
   tlog(' -m name         read macros name.tmac or tmac.name\n')
   tlog(' -mname          read macros name.tmac or tmac.name\n')
-  tlog(' -rcn            define a number register r as n\n')
+  tlog(' -rcn            define a number register c as n\n')
   tlog(' -r reg=num      define a number register reg as num\n')
   tlog(' -dcs            define a string c as s\n')
   tlog(' -d xxx=str      define a string xxx as str\n')
@@ -725,7 +631,6 @@ function troff2page_1pass(argc, argv)
     Saved_escape_char = false,
     Scripts = {},
     Single_output_page_p = false,
-    Slides_p = false,
     Source_changed_since_last_time_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},
@@ -747,7 +652,7 @@ function troff2page_1pass(argc, argv)
     Verbatim_apostrophe_p = false
 
   }, function()
-    begin_html_document()
+    initialize_all_registers()
     local i=1; local document_found_p = false; local call_for_help_p = false;
     while i<=argc do
       local arg = argv[i]
@@ -801,6 +706,7 @@ function troff2page_1pass(argc, argv)
           document_found_p=true; i=i-1
         end
       else
+        begin_html_document()
         for j=i,argc do
           local f = argv[j]
           if not probe_file(f) then
@@ -1027,8 +933,9 @@ end
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
   --print('doing link_stylesheets', css_file)
-  if Single_output_page_p then
+  if Single_output_page_p or raw_counter_value 't2pebook' ~=0 then
     if probe_file(css_file) then
+      --print('copying', css_file, 'into style tag')
       Out:write('<style>\n')
       copy_file_to_stream(css_file, Out)
       Out:write('</style>\n')
@@ -1057,19 +964,15 @@ function link_scripts()
   end
 end
 
-function initialize_css_file(css_file)
-  --print('doing initialize_css_file', css_file)
+function initialize_css_file()
+  --print('doing initialize_css_file', CSS)
+  --print('t2pebook reg is', raw_counter_value 't2pebook')
   local css_file = Jobname..Css_file_suffix
   ensure_file_deleted(css_file)
-  CSS = io.open(css_file, 'w')
-  CSS:write([[
-  body {
-    margin-top: 2em;
-    margin-bottom: 2em;
-    margin-left: 8%;
-    margin-right: 8%;
-  }
 
+  CSS = io.open(css_file, 'w')
+
+  CSS:write([[
   h1.title {
     margin-top: 2.8em;
     margin-bottom: 1.5em;
@@ -1107,8 +1010,8 @@ function initialize_css_file(css_file)
   }
 
   p.breakinpar {
-      margin-top: 0;
-      margin-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   span.blankline {
@@ -1117,7 +1020,7 @@ function initialize_css_file(css_file)
   }
 
   span.blankline::before {
-      content: '\a0';
+    content: '\a0';
   }
 
   pre {
@@ -1204,8 +1107,18 @@ function initialize_css_file(css_file)
   .colophon a {
     color: gray;
   }
+  ]])
 
-  @media screen {
+  if raw_counter_value 't2pebook' ==0 then
+    CSS:write([[
+    body {
+      margin-top: 2em;
+      margin-bottom: 2em;
+      margin-left: 8%;
+      margin-right: 8%;
+    }
+
+    @media screen {
 
     /*
     this ruins paragraph spacing on Firefox -- don't know why
@@ -1261,9 +1174,13 @@ function initialize_css_file(css_file)
 
   }
   ]])
+  end
+
 end
 
 function collect_css_info_from_preamble()
+  --print('doing collect_css_info_from_preamble')
+  if raw_counter_value 't2pebook' ~=0 then return end
   local ps = counter_value_in_points 'PS'
   local p_i = counter_value_in_pixels 'PI'
   local pd = counter_value_in_pixels 'PD'
@@ -1534,12 +1451,16 @@ function start_display(w)
     emit_verbatim ' '
     emit_verbatim 'verbatim'
   end
-  emit_verbatim '" align='
-  if w == 'block' then
-    emit_verbatim 'center'
-  elseif w == 'indent' then
-    emit_verbatim 'left'
-  else emit_verbatim(w)
+  emit_verbatim '"'
+  if raw_counter_value 't2pebook' ==0 then
+    -- TODO: avoid align= as it's not HTML5
+    emit_verbatim ' align='
+    if w == 'block' then
+      emit_verbatim 'center'
+    elseif w == 'indent' then
+      emit_verbatim 'left'
+    else emit_verbatim(w)
+    end
   end
   if w == 'indent' then
     emit_verbatim ' style="margin-left: '
@@ -1575,7 +1496,7 @@ function do_afterpar()
 end
 
 function do_eject()
-  if Slides_p then
+  if raw_counter_value 't2pslides' ~=0 then
     --print('eject for slides')
     --print('eject/slides calling eep')
     emit_end_para()
@@ -1583,6 +1504,9 @@ function do_eject()
     emit_verbatim '<div class=slide>\n'
     emit_para()
     --print('done ejecting for slides')
+  elseif raw_counter_value 't2pebook' ~=0 then
+    emit_end_para()
+    emit_para()
   elseif Single_output_page_p then
     emit_end_para()
     emit_verbatim '<div class=pagebreak></div>'
@@ -1894,11 +1818,12 @@ function emit_html_preamble()
   link_scripts()
   emit_verbatim '<meta name=robots content="index,follow">\n'
   for _,h in pairs(Html_head) do emit_verbatim(h) end
+  --initialize_css_file()
   emit_verbatim '</head>\n'
   emit_verbatim '<body>\n'
   emit_verbatim '<div'
   if Macro_package=='man' then emit_verbatim ' class=manpage' end
-  if Slides_p then emit_verbatim ' class=slide' end
+  if raw_counter_value 't2pslides' ~=0 then emit_verbatim ' class=slide' end
   emit_verbatim '>\n'
 end
 
@@ -2070,6 +1995,7 @@ function emit_end_page()
   emit_footnotes()
   emit_navigation_bar()
   if Current_pageno == 0 then
+    --print('calling collect_css_info_from_preamble')
     emit_colophon(); collect_css_info_from_preamble()
   end
   emit_html_postamble()
@@ -2078,11 +2004,14 @@ end
 
 function emit_img(img_file, align, width, height)
   --print('doing emit_img', img_file, align, width, height)
-  emit_verbatim '<div align='
-  emit_verbatim(align)
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim 'align='
+    emit_verbatim(align)
+  end
   emit_verbatim '>\n'
   emit_verbatim '<img src="'
-  emit_verbatim(img_file)
+  do_img_src(img_file)
   emit_verbatim '"'
   if width and width ~= 0 then
     emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '" '
@@ -2221,7 +2150,11 @@ function emit_footnotes()
   if #Footnote_buffer == 0 then return end
   --print('emitfootnotes FS calling eep')
   emit_end_para()
-  emit_verbatim '<div class=footnote><hr align=left width="40%">'
+  emit_verbatim '<div class=footnote><hr'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=left'
+  end
+  emit_verbatim ' width="40%">'
   for i = 1, #Footnote_buffer do
     emit_para()
     local fn = Footnote_buffer[i]
@@ -2394,9 +2327,36 @@ function ps_to_image(f, fmt)
   return ps_to_image_png(f)
 end
 
+function do_img_src(f)
+  --print('doing do_img_src', f)
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim(f)
+  else
+    --local tmpf = Jobname..'-Z-Z.temp'
+    local tmpf= 'imagefile.temp'
+    os.execute('echo -n data: > ' .. tmpf)
+    os.execute('file -bN --mime-type ' .. f .. ' >> ' .. tmpf)
+    os.execute('echo -n \\;base64, >> ' .. tmpf)
+    os.execute('base64 -w0 < ' .. f .. ' >> ' .. tmpf)
+    local fh = io.open(tmpf)
+    local x
+    while true do
+      x = fh:read(256)
+      if x then
+        Out:write(x)
+      else
+        break
+      end
+    end
+    io.close(fh)
+    --ensure_file_deleted(tmpf)
+  end
+end
+
+
 function source_image_file(img_file)
   emit_verbatim '<img src="'
-  emit_verbatim(img_file)
+  do_img_src(img_file)
   emit_verbatim '" border="0" alt="['
   emit_verbatim(img_file)
   emit_verbatim ']">'
@@ -2454,13 +2414,20 @@ function write_aux(...)
   Aux_stream:write('\n')
 end
 
-function begin_html_document()
-
+function initialize_all_registers()
   initialize_glyphs()
   initialize_numregs()
   initialize_strings()
   initialize_macros()
-  initialize_css_file()
+end
+
+
+function begin_html_document()
+
+  --print('doing begin_html_document')
+
+
+  --print('done initns')
 
   Convert_to_info_p = false
 
@@ -2482,6 +2449,7 @@ function begin_html_document()
   end
 
   emit_start()
+  initialize_css_file()
 
   do
     local it = find_macro_file('.troff2pagerc')
@@ -3204,9 +3172,12 @@ function justify_lines(n, dir)
     if Lines_to_be_justified>0 then Lines_to_be_justified=0; emit_verbatim '</div>' end
   else
     Lines_to_be_justified=n
-    emit_verbatim '<div align='
-    if dir=='ce' then emit_verbatim 'center'
-    elseif dir=='rj' then emit_verbatim 'right'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align='
+      if dir=='ce' then emit_verbatim 'center'
+      elseif dir=='rj' then emit_verbatim 'right'
+      end
     end
     emit_verbatim '>'
   end
@@ -3515,7 +3486,11 @@ function initialize_macros()
     elseif align == '-C' then align='center'
     elseif align == '-R' then align='right'
     end
-    emit_verbatim '<div align='; emit_verbatim(align); emit_verbatim '>'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' then
+      emit_verbatim ' align='; emit_verbatim(align) 
+    end
+    emit_verbatim '>'
     flet({Groff_image_options=''},
     function()
       call_with_image_stream(function(o)
@@ -3753,7 +3728,11 @@ function initialize_macros()
     --print('AB calling eep')
     emit_end_para()
     if w ~= 'no' then
-      emit_verbatim '<div align=center class=abstract>'
+      emit_verbatim '<div'
+      if raw_counter_value 't2pebook' ==0 then
+        emit_verbatim ' align=center'
+      end
+      emit_verbatim ' class=abstract>'
       emit_verbatim(String_table.ABSTRACT())
       emit_verbatim '</div>'
       emit_para()
@@ -3850,7 +3829,9 @@ function initialize_macros()
   defrequest('DA', Request_table.ND)
 
   defrequest('CSS', function()
+    --print('doing CSS')
     local f = read_args()
+    if raw_counter_value 't2pebook' ~= 0 then return end
     if not table_member(f, Stylesheets) then
       flag_missing_piece 'stylesheet'
     end
@@ -3871,7 +3852,9 @@ function initialize_macros()
         end
       end
       w = read_one_line()
-      CSS:write(w, '\n')
+      if raw_counter_value 't2pebook' ==0 then
+        CSS:write(w, '\n')
+      end
     end
   end)
 
@@ -3879,11 +3862,6 @@ function initialize_macros()
     if not Redirected_p then flag_missing_piece 'redirect' end
     local f = read_args()
     write_aux('nb_redirect("', f, '")')
-  end)
-
-  defrequest('SLIDES', function()
-    if not Slides_p then flag_missing_piece 'slides' end
-    write_aux 'nb_slides()'
   end)
 
   defrequest('gcolor', function()
@@ -4130,18 +4108,28 @@ function initialize_macros()
   defrequest('EQ', function()
     local w, eqno = read_args()
     w = w or 'C'
-    emit_verbatim '<div class=display align='
-    emit_verbatim(w=='C' and 'center' or 'left')
+    emit_verbatim '<div class=display'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align='
+      emit_verbatim(w=='C' and 'center' or 'left')
+    end
     emit_verbatim '>'
     if eqno then
-      emit_verbatim '<table><tr><td width="80%" align='
-      emit_verbatim(w=='C' and 'center' or 'left')
+      emit_verbatim '<table><tr><td width="80%"'
+      if raw_counter_value 't2pebook' ==0 then
+        emit_verbatim ' align='
+        emit_verbatim(w=='C' and 'center' or 'left')
+      end
       emit_verbatim '>\n'
     end
     make_image('.EQ', '.EN')
     if eqno then
       emit_newline()
-      emit_verbatim '</td><td width="20%" align=right>'
+      emit_verbatim '</td><td width="20%"'
+      if raw_counter_value 't2pebook' ==0 then
+        emit_verbatim 'align=right'
+      end
+      emit_verbatim '>'
       emit_nbsp(16)
       troff2page_string(eqno)
       emit_verbatim '</td></tr></table>'
@@ -4170,7 +4158,9 @@ function initialize_macros()
       table_do_global_options()
       table_do_format_section()
       emit_verbatim '<div'
-      if Table_align then emit_verbatim ' align='; emit_verbatim(Table_align) end
+      if raw_counter_value 't2pebook' ==0 and Table_align then 
+        emit_verbatim ' align='; emit_verbatim(Table_align) 
+      end
       emit_verbatim '>\n'
       emit_verbatim '<table'
       Out:write(Table_options)
@@ -4882,7 +4872,11 @@ function emit_navigation_bar(headerp)
   local index_page = Node_table['TAG:__troff2page_index']
   local index_page_p = (pageno == index_page)
   --
-  emit_verbatim '<div align=right class=navigation>['
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=right'
+  end
+  emit_verbatim ' class=navigation>['
   emit(Navigation_sentence_begin)
   --
   emit_verbatim '<span'
@@ -4963,7 +4957,11 @@ end
 function emit_colophon()
   --print('colophon calling eep')
   emit_end_para()
-  emit_verbatim '<div align=right class=colophon>\n'
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=right'
+  end
+  emit_verbatim ' class=colophon>\n'
   --
   local it
   local timestamp
@@ -4977,13 +4975,21 @@ function emit_colophon()
     if it ~= '' then timestamp = it end
   end
   if timestamp and timestamp ~= '' then
-    emit_verbatim '<div align=right class=lastmod>\n'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align=right'
+    end
+    emit_verbatim ' class=lastmod>\n'
     emit(Last_modified); emit(timestamp)
     emit_verbatim '<br>\n</div>\n'
   end
   --
   if true then
-    emit_verbatim '<div align=right class=advertisement>\n'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align=right'
+    end
+    emit_verbatim ' class=advertisement>\n'
     emit_verbatim(Html_conversion_by)
     emit_verbatim ' '
     emit(link_start(Troff2page_website))
@@ -5047,10 +5053,6 @@ end
 
 function nb_script(jsf)
   table.insert(Scripts, jsf)
-end
-
-function nb_slides()
-  Slides_p = true
 end
 
 function nb_last_modification_time(t)
@@ -5488,7 +5490,11 @@ function author_info()
   read_troff_line()
   --print('authorinfo calling eep')
   emit_end_para()
-  emit_verbatim '<div align=center class=author>'
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=center'
+  end
+  emit_verbatim ' class=author>'
   --print('authorinfo calling par')
   emit_para()
   --dprint('calling unfill')
@@ -5679,7 +5685,11 @@ function store_title(title, opts)
   if opts.emit_p then
     --print('storetitle calling eep')
     emit_end_para()
-    emit_verbatim '<h1 align=center class=title>'
+    emit_verbatim '<h1'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align=center'
+    end
+    emit_verbatim ' class=title>'
     --title = string.gsub(title, '\n', '\\n')
     --title = string.gsub(title, '"', '\\"')
     local unescaped_title = string.gsub(title, '\\\\', '\\')
@@ -5764,7 +5774,7 @@ function emit_section_header(level, opts)
   level = math.max(1,level)
   opts = opts or {}
   --
-  if Slides_p and level==1 then do_eject() end
+  if raw_counter_value 't2pslides' ~=0 and level==1 then do_eject() end
   --
   local this_section_num = opts.secnum
   local growps = raw_counter_value 'GROWPS'
@@ -6349,7 +6359,9 @@ function table_do_cell()
   local c; local it
   local cell_style = ''
   emit_verbatim '\n<td valign=top'
-  if align then emit_verbatim ' align='; emit_verbatim(align) end
+  if raw_counter_value 't2pebook' ==0 and align then 
+    emit_verbatim ' align='; emit_verbatim(align) 
+  end
   if width then
     --print('width=', width)
     local width_num = string.gsub(width, '^([%d.]*).*$', '%1')

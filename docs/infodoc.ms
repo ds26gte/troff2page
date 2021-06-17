@@ -1,6 +1,6 @@
-.\" last modified 2020-12-22
+.\" last modified 2021-06-17
 .SH 1
-10.  GNU Info docs
+11.  GNU Info docs
 .LP
 .TAG gnuinfo
 .IX Info files, generating

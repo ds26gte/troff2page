@@ -1,6 +1,6 @@
-.\" last modified 2021-02-09
+.\" last modified 2021-06-17
 .SH 1
-9.  Recovery from errors
+10.  Recovery from errors
 .LP
 .IX errors
 .IX text editor

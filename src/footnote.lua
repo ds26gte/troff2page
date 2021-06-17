@@ -1,10 +1,14 @@
--- last modified 2017-08-20
+-- last modified 2021-06-17
 
 function emit_footnotes()
   if #Footnote_buffer == 0 then return end
   --print('emitfootnotes FS calling eep')
   emit_end_para()
-  emit_verbatim '<div class=footnote><hr align=left width="40%">'
+  emit_verbatim '<div class=footnote><hr'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=left'
+  end
+  emit_verbatim ' width="40%">'
   for i = 1, #Footnote_buffer do
     emit_para()
     local fn = Footnote_buffer[i]

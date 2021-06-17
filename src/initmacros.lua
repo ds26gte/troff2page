@@ -1,4 +1,4 @@
--- last modified 2021-02-10
+-- last modified 2021-06-17
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -78,9 +78,12 @@ function justify_lines(n, dir)
     if Lines_to_be_justified>0 then Lines_to_be_justified=0; emit_verbatim '</div>' end
   else
     Lines_to_be_justified=n
-    emit_verbatim '<div align='
-    if dir=='ce' then emit_verbatim 'center'
-    elseif dir=='rj' then emit_verbatim 'right'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align='
+      if dir=='ce' then emit_verbatim 'center'
+      elseif dir=='rj' then emit_verbatim 'right'
+      end
     end
     emit_verbatim '>'
   end
@@ -389,7 +392,11 @@ function initialize_macros()
     elseif align == '-C' then align='center'
     elseif align == '-R' then align='right'
     end
-    emit_verbatim '<div align='; emit_verbatim(align); emit_verbatim '>'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' then
+      emit_verbatim ' align='; emit_verbatim(align) 
+    end
+    emit_verbatim '>'
     flet({Groff_image_options=''},
     function()
       call_with_image_stream(function(o)
@@ -627,7 +634,11 @@ function initialize_macros()
     --print('AB calling eep')
     emit_end_para()
     if w ~= 'no' then
-      emit_verbatim '<div align=center class=abstract>'
+      emit_verbatim '<div'
+      if raw_counter_value 't2pebook' ==0 then
+        emit_verbatim ' align=center'
+      end
+      emit_verbatim ' class=abstract>'
       emit_verbatim(String_table.ABSTRACT())
       emit_verbatim '</div>'
       emit_para()
@@ -724,7 +735,9 @@ function initialize_macros()
   defrequest('DA', Request_table.ND)
 
   defrequest('CSS', function()
+    --print('doing CSS')
     local f = read_args()
+    if raw_counter_value 't2pebook' ~= 0 then return end
     if not table_member(f, Stylesheets) then
       flag_missing_piece 'stylesheet'
     end
@@ -745,7 +758,9 @@ function initialize_macros()
         end
       end
       w = read_one_line()
-      CSS:write(w, '\n')
+      if raw_counter_value 't2pebook' ==0 then
+        CSS:write(w, '\n')
+      end
     end
   end)
 
@@ -753,11 +768,6 @@ function initialize_macros()
     if not Redirected_p then flag_missing_piece 'redirect' end
     local f = read_args()
     write_aux('nb_redirect("', f, '")')
-  end)
-
-  defrequest('SLIDES', function()
-    if not Slides_p then flag_missing_piece 'slides' end
-    write_aux 'nb_slides()'
   end)
 
   defrequest('gcolor', function()
@@ -1004,18 +1014,28 @@ function initialize_macros()
   defrequest('EQ', function()
     local w, eqno = read_args()
     w = w or 'C'
-    emit_verbatim '<div class=display align='
-    emit_verbatim(w=='C' and 'center' or 'left')
+    emit_verbatim '<div class=display'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align='
+      emit_verbatim(w=='C' and 'center' or 'left')
+    end
     emit_verbatim '>'
     if eqno then
-      emit_verbatim '<table><tr><td width="80%" align='
-      emit_verbatim(w=='C' and 'center' or 'left')
+      emit_verbatim '<table><tr><td width="80%"'
+      if raw_counter_value 't2pebook' ==0 then
+        emit_verbatim ' align='
+        emit_verbatim(w=='C' and 'center' or 'left')
+      end
       emit_verbatim '>\n'
     end
     make_image('.EQ', '.EN')
     if eqno then
       emit_newline()
-      emit_verbatim '</td><td width="20%" align=right>'
+      emit_verbatim '</td><td width="20%"'
+      if raw_counter_value 't2pebook' ==0 then
+        emit_verbatim 'align=right'
+      end
+      emit_verbatim '>'
       emit_nbsp(16)
       troff2page_string(eqno)
       emit_verbatim '</td></tr></table>'
@@ -1044,7 +1064,9 @@ function initialize_macros()
       table_do_global_options()
       table_do_format_section()
       emit_verbatim '<div'
-      if Table_align then emit_verbatim ' align='; emit_verbatim(Table_align) end
+      if raw_counter_value 't2pebook' ==0 and Table_align then 
+        emit_verbatim ' align='; emit_verbatim(Table_align) 
+      end
       emit_verbatim '>\n'
       emit_verbatim '<table'
       Out:write(Table_options)

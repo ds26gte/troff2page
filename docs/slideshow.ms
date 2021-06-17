@@ -1,14 +1,15 @@
-.\" last modified 2020-12-22
+.\" last modified 2021-06-17
 .SH 1
 6.  Slideshows
 .LP
 .IX slideshow
 .IX Slidy
-.IX SLIDES@.SLIDES, Troff2page macro
-To have your groff source to be converted into slideshow-ready HTML, insert
-into it (somewhere) the macro call
+.IX r t2pslides@-r t2pslides=1, Troff2page command-line option
+To have your groff source be converted into slideshow-ready
+HTML, set the number register \fCt2pslides\fP to non-0 using the
+command-line option
 .EX
-    .SLIDES
+    -r t2pslides=1
 .EE
 This causes Troff2page to use the style sheet \fCslide.css\fP and JavaScript file
 \fCslidy.js\fP from \*[url https://www.w3.org/Talks/Tools/#slidy]Slidy\& to convert

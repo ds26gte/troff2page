@@ -1,17 +1,24 @@
--- last modified 2020-12-04
+-- last modified 2021-06-17
 
 function write_aux(...)
   Aux_stream:write(...)
   Aux_stream:write('\n')
 end
 
-function begin_html_document()
-
+function initialize_all_registers()
   initialize_glyphs()
   initialize_numregs()
   initialize_strings()
   initialize_macros()
-  initialize_css_file()
+end
+
+
+function begin_html_document()
+
+  --print('doing begin_html_document')
+
+
+  --print('done initns')
 
   Convert_to_info_p = false
 
@@ -33,6 +40,7 @@ function begin_html_document()
   end
 
   emit_start()
+  initialize_css_file()
 
   do
     local it = find_macro_file('.troff2pagerc')

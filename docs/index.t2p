@@ -1,4 +1,4 @@
-.\" last modified 2021-02-09
+.\" last modified 2021-06-17
 .
 .\"nr HTML1 1
 .
@@ -42,6 +42,7 @@
 .troff2page2info
 .
 .ig ##
+if raw_counter_value 't2pebook' == 0 then
 CSS:write([[
 @media screen {
     h1.title {
@@ -77,4 +78,5 @@ body {
     font-size: 500%;
 }
 ]])
+end
 .##

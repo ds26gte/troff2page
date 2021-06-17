@@ -1,4 +1,4 @@
--- last modified 2021-02-08
+-- last modified 2021-06-17
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -38,6 +38,7 @@ function set_register(regset, type)
   elseif type=='number' then
     --print('calling defnumreg', lhs, rhs)
     defnumreg(lhs, {value = tonumber(rhs)})
+    --print('reg val is', raw_counter_value(lhs))
   end
 end
 
@@ -50,7 +51,7 @@ function troff2page_help()
   tlog(' --version       print version number\n')
   tlog(' -m name         read macros name.tmac or tmac.name\n')
   tlog(' -mname          read macros name.tmac or tmac.name\n')
-  tlog(' -rcn            define a number register r as n\n')
+  tlog(' -rcn            define a number register c as n\n')
   tlog(' -r reg=num      define a number register reg as num\n')
   tlog(' -dcs            define a string c as s\n')
   tlog(' -d xxx=str      define a string xxx as str\n')
@@ -130,7 +131,6 @@ function troff2page_1pass(argc, argv)
     Saved_escape_char = false,
     Scripts = {},
     Single_output_page_p = false,
-    Slides_p = false,
     Source_changed_since_last_time_p = false,
     Sourcing_ascii_file_p = false,
     String_table = {},
@@ -152,7 +152,7 @@ function troff2page_1pass(argc, argv)
     Verbatim_apostrophe_p = false
 
   }, function()
-    begin_html_document()
+    initialize_all_registers()
     local i=1; local document_found_p = false; local call_for_help_p = false;
     while i<=argc do
       local arg = argv[i]
@@ -206,6 +206,7 @@ function troff2page_1pass(argc, argv)
           document_found_p=true; i=i-1
         end
       else
+        begin_html_document()
         for j=i,argc do
           local f = argv[j]
           if not probe_file(f) then

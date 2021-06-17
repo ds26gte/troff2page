@@ -1,4 +1,4 @@
--- last modified 2020-12-26
+-- last modified 2021-06-17
 
 function emit_navigation_bar(headerp)
   if headerp and Last_page_number == -1 then
@@ -15,7 +15,11 @@ function emit_navigation_bar(headerp)
   local index_page = Node_table['TAG:__troff2page_index']
   local index_page_p = (pageno == index_page)
   --
-  emit_verbatim '<div align=right class=navigation>['
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=right'
+  end
+  emit_verbatim ' class=navigation>['
   emit(Navigation_sentence_begin)
   --
   emit_verbatim '<span'
@@ -96,7 +100,11 @@ end
 function emit_colophon()
   --print('colophon calling eep')
   emit_end_para()
-  emit_verbatim '<div align=right class=colophon>\n'
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=right'
+  end
+  emit_verbatim ' class=colophon>\n'
   --
   local it
   local timestamp
@@ -110,13 +118,21 @@ function emit_colophon()
     if it ~= '' then timestamp = it end
   end
   if timestamp and timestamp ~= '' then
-    emit_verbatim '<div align=right class=lastmod>\n'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align=right'
+    end
+    emit_verbatim ' class=lastmod>\n'
     emit(Last_modified); emit(timestamp)
     emit_verbatim '<br>\n</div>\n'
   end
   --
   if true then
-    emit_verbatim '<div align=right class=advertisement>\n'
+    emit_verbatim '<div'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align=right'
+    end
+    emit_verbatim ' class=advertisement>\n'
     emit_verbatim(Html_conversion_by)
     emit_verbatim ' '
     emit(link_start(Troff2page_website))

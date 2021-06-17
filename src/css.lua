@@ -1,10 +1,11 @@
--- last modified 2021-02-09
+-- last modified 2021-06-17
 
 function link_stylesheets()
   local css_file = Jobname..Css_file_suffix
   --print('doing link_stylesheets', css_file)
-  if Single_output_page_p then
+  if Single_output_page_p or raw_counter_value 't2pebook' ~=0 then
     if probe_file(css_file) then
+      --print('copying', css_file, 'into style tag')
       Out:write('<style>\n')
       copy_file_to_stream(css_file, Out)
       Out:write('</style>\n')
@@ -33,19 +34,15 @@ function link_scripts()
   end
 end
 
-function initialize_css_file(css_file)
-  --print('doing initialize_css_file', css_file)
+function initialize_css_file()
+  --print('doing initialize_css_file', CSS)
+  --print('t2pebook reg is', raw_counter_value 't2pebook')
   local css_file = Jobname..Css_file_suffix
   ensure_file_deleted(css_file)
-  CSS = io.open(css_file, 'w')
-  CSS:write([[
-  body {
-    margin-top: 2em;
-    margin-bottom: 2em;
-    margin-left: 8%;
-    margin-right: 8%;
-  }
 
+  CSS = io.open(css_file, 'w')
+
+  CSS:write([[
   h1.title {
     margin-top: 2.8em;
     margin-bottom: 1.5em;
@@ -83,8 +80,8 @@ function initialize_css_file(css_file)
   }
 
   p.breakinpar {
-      margin-top: 0;
-      margin-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   span.blankline {
@@ -93,7 +90,7 @@ function initialize_css_file(css_file)
   }
 
   span.blankline::before {
-      content: '\a0';
+    content: '\a0';
   }
 
   pre {
@@ -180,8 +177,18 @@ function initialize_css_file(css_file)
   .colophon a {
     color: gray;
   }
+  ]])
 
-  @media screen {
+  if raw_counter_value 't2pebook' ==0 then
+    CSS:write([[
+    body {
+      margin-top: 2em;
+      margin-bottom: 2em;
+      margin-left: 8%;
+      margin-right: 8%;
+    }
+
+    @media screen {
 
     /*
     this ruins paragraph spacing on Firefox -- don't know why
@@ -237,9 +244,13 @@ function initialize_css_file(css_file)
 
   }
   ]])
+  end
+
 end
 
 function collect_css_info_from_preamble()
+  --print('doing collect_css_info_from_preamble')
+  if raw_counter_value 't2pebook' ~=0 then return end
   local ps = counter_value_in_points 'PS'
   local p_i = counter_value_in_pixels 'PI'
   local pd = counter_value_in_pixels 'PD'

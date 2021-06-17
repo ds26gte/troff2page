@@ -1,4 +1,4 @@
--- last modified 2020-12-04
+-- last modified 2021-06-17
 
 function next_html_image_file_stem()
   Image_file_count = Image_file_count + 1
@@ -35,9 +35,36 @@ function ps_to_image(f, fmt)
   return ps_to_image_png(f)
 end
 
+function do_img_src(f)
+  --print('doing do_img_src', f)
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim(f)
+  else
+    --local tmpf = Jobname..'-Z-Z.temp'
+    local tmpf= 'imagefile.temp'
+    os.execute('echo -n data: > ' .. tmpf)
+    os.execute('file -bN --mime-type ' .. f .. ' >> ' .. tmpf)
+    os.execute('echo -n \\;base64, >> ' .. tmpf)
+    os.execute('base64 -w0 < ' .. f .. ' >> ' .. tmpf)
+    local fh = io.open(tmpf)
+    local x
+    while true do
+      x = fh:read(256)
+      if x then
+        Out:write(x)
+      else
+        break
+      end
+    end
+    io.close(fh)
+    --ensure_file_deleted(tmpf)
+  end
+end
+
+
 function source_image_file(img_file)
   emit_verbatim '<img src="'
-  emit_verbatim(img_file)
+  do_img_src(img_file)
   emit_verbatim '" border="0" alt="['
   emit_verbatim(img_file)
   emit_verbatim ']">'

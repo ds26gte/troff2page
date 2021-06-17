@@ -1,6 +1,6 @@
-.\" last modified 2021-02-10
+.\" last modified 2021-06-17
 .SH 1
-7.  Extending groff using Lua
+8.  Extending groff using Lua
 .LP
 .IX extending groff with Lua
 .IX extending groff and Troff2page with Lua

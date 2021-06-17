@@ -1,6 +1,6 @@
-.\" last modified 2021-02-10
+.\" last modified 2021-06-17
 .SH 1
-8.  Styling
+9.  Styling
 .LP
 .IX stylesheet, modifying
 .IX ig@.ig, groff request

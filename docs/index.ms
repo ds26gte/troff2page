@@ -21,12 +21,13 @@ Troff2page
 .so xrefs.ms
 .so genindex.ms
 .so slideshow.ms
+.so ebook.ms
 .so eval.ms
 .so styling.ms
 .so error.ms
 .so infodoc.ms
 .\"so nvimtex.ms
-.PP
+.LP
 .if t \{\
 .SH 1
 Index

@@ -1,4 +1,4 @@
--- last modified 2020-12-06
+-- last modified 2021-06-17
 
 function troff_align_to_html(i)
   if not i then
@@ -22,12 +22,16 @@ function start_display(w)
     emit_verbatim ' '
     emit_verbatim 'verbatim'
   end
-  emit_verbatim '" align='
-  if w == 'block' then
-    emit_verbatim 'center'
-  elseif w == 'indent' then
-    emit_verbatim 'left'
-  else emit_verbatim(w)
+  emit_verbatim '"'
+  if raw_counter_value 't2pebook' ==0 then
+    -- TODO: avoid align= as it's not HTML5
+    emit_verbatim ' align='
+    if w == 'block' then
+      emit_verbatim 'center'
+    elseif w == 'indent' then
+      emit_verbatim 'left'
+    else emit_verbatim(w)
+    end
   end
   if w == 'indent' then
     emit_verbatim ' style="margin-left: '

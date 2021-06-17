@@ -1,4 +1,4 @@
--- last modified 2021-02-09
+-- last modified 2021-06-17
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -287,11 +287,12 @@ function emit_html_preamble()
   link_scripts()
   emit_verbatim '<meta name=robots content="index,follow">\n'
   for _,h in pairs(Html_head) do emit_verbatim(h) end
+  --initialize_css_file()
   emit_verbatim '</head>\n'
   emit_verbatim '<body>\n'
   emit_verbatim '<div'
   if Macro_package=='man' then emit_verbatim ' class=manpage' end
-  if Slides_p then emit_verbatim ' class=slide' end
+  if raw_counter_value 't2pslides' ~=0 then emit_verbatim ' class=slide' end
   emit_verbatim '>\n'
 end
 
@@ -463,6 +464,7 @@ function emit_end_page()
   emit_footnotes()
   emit_navigation_bar()
   if Current_pageno == 0 then
+    --print('calling collect_css_info_from_preamble')
     emit_colophon(); collect_css_info_from_preamble()
   end
   emit_html_postamble()
@@ -471,11 +473,14 @@ end
 
 function emit_img(img_file, align, width, height)
   --print('doing emit_img', img_file, align, width, height)
-  emit_verbatim '<div align='
-  emit_verbatim(align)
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim 'align='
+    emit_verbatim(align)
+  end
   emit_verbatim '>\n'
   emit_verbatim '<img src="'
-  emit_verbatim(img_file)
+  do_img_src(img_file)
   emit_verbatim '"'
   if width and width ~= 0 then
     emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '" '

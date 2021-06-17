@@ -1,4 +1,4 @@
--- last modified 2020-12-05
+-- last modified 2021-06-17
 
 function nb_macro_package(m)
   Macro_package = m
@@ -50,10 +50,6 @@ end
 
 function nb_script(jsf)
   table.insert(Scripts, jsf)
-end
-
-function nb_slides()
-  Slides_p = true
 end
 
 function nb_last_modification_time(t)

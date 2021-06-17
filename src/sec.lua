@@ -1,4 +1,4 @@
--- last modified 2021-02-08
+-- last modified 2021-06-17
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -17,7 +17,11 @@ function store_title(title, opts)
   if opts.emit_p then
     --print('storetitle calling eep')
     emit_end_para()
-    emit_verbatim '<h1 align=center class=title>'
+    emit_verbatim '<h1'
+    if raw_counter_value 't2pebook' ==0 then
+      emit_verbatim ' align=center'
+    end
+    emit_verbatim ' class=title>'
     --title = string.gsub(title, '\n', '\\n')
     --title = string.gsub(title, '"', '\\"')
     local unescaped_title = string.gsub(title, '\\\\', '\\')
@@ -102,7 +106,7 @@ function emit_section_header(level, opts)
   level = math.max(1,level)
   opts = opts or {}
   --
-  if Slides_p and level==1 then do_eject() end
+  if raw_counter_value 't2pslides' ~=0 and level==1 then do_eject() end
   --
   local this_section_num = opts.secnum
   local growps = raw_counter_value 'GROWPS'

@@ -1,4 +1,4 @@
--- last modified 2021-02-08
+-- last modified 2021-06-17
 
 function make_bstream(opts)
   return {
@@ -422,7 +422,11 @@ function author_info()
   read_troff_line()
   --print('authorinfo calling eep')
   emit_end_para()
-  emit_verbatim '<div align=center class=author>'
+  emit_verbatim '<div'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim ' align=center'
+  end
+  emit_verbatim ' class=author>'
   --print('authorinfo calling par')
   emit_para()
   --dprint('calling unfill')

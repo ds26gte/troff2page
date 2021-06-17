@@ -1,4 +1,4 @@
--- last modified 2020-12-07
+-- last modified 2021-06-17
 
 function table_do_global_options()
   --print('doing table_do_global_options')
@@ -142,7 +142,9 @@ function table_do_cell()
   local c; local it
   local cell_style = ''
   emit_verbatim '\n<td valign=top'
-  if align then emit_verbatim ' align='; emit_verbatim(align) end
+  if raw_counter_value 't2pebook' ==0 and align then 
+    emit_verbatim ' align='; emit_verbatim(align) 
+  end
   if width then
     --print('width=', width)
     local width_num = string.gsub(width, '^([%d.]*).*$', '%1')

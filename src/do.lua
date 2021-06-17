@@ -1,4 +1,4 @@
--- last modified 2020-11-23
+-- last modified 2021-06-17
 
 function do_afterpar()
   local it = Afterpar
@@ -9,7 +9,7 @@ function do_afterpar()
 end
 
 function do_eject()
-  if Slides_p then
+  if raw_counter_value 't2pslides' ~=0 then
     --print('eject for slides')
     --print('eject/slides calling eep')
     emit_end_para()
@@ -17,6 +17,9 @@ function do_eject()
     emit_verbatim '<div class=slide>\n'
     emit_para()
     --print('done ejecting for slides')
+  elseif raw_counter_value 't2pebook' ~=0 then
+    emit_end_para()
+    emit_para()
   elseif Single_output_page_p then
     emit_end_para()
     emit_verbatim '<div class=pagebreak></div>'

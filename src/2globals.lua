@@ -1,11 +1,11 @@
--- last modified 2021-02-08
+-- last modified 2021-02-27
 
 Operating_system = 'unix'
 if os.getenv 'COMSPEC' then Operating_system = 'windows' end
 
 Ghostscript = 'gs'
 if Operating_system == 'windows' then
-  for _,f in pairs {'g:\\cygwin\\bin\\gs.exe', 
+  for _,f in pairs {'g:\\cygwin\\bin\\gs.exe',
     'g:\\cygwin\\bin\\gs.exe',
     'c:\\aladdin\\gs6.01\\bin\\gswin32c.exe',
     'd:\\aladdin\\gs6.01\\bin\\gswin32c.exe',
@@ -29,6 +29,7 @@ Css_file_suffix = '-Z-S.css'
 Html_conversion_by = 'HTML conversion by'
 Html_page_suffix = '-Z-H-'
 Image_file_suffix = '-Z-G-'
+Image_format = 'png'
 Last_modified = 'Last modified: '
 Log_file_suffix = '-Z-L.log'
 Navigation_contents_name = 'contents'
@@ -42,99 +43,3 @@ Navigation_sentence_end = ''
 Output_extension = '.html'
 Pso_file_suffix = '-Z-T.1'
 
-Afterpar = nil
-Aux_stream = nil
-Blank_line_macro = nil
-CSS = nil
-Cascaded_if_p = nil
-Cascaded_if_stack = nil
-Check_file_write_date = nil
-Colophon_done_p = nil
-Color_table = nil
-Control_char = nil
-Convert_to_info_p = nil
-Current_diversion = nil
-Current_pageno = nil
-Current_source_file = nil
-Current_troff_input = nil
-Diversion_table = nil
-End_macro = nil
-Escape_char = nil
-Ev_stack = nil
-Ev_table = nil
-Exit_status = nil
-Expanding_args_p = nil
-File_postlude = nil
-Footnote_buffer = nil
-Footnote_count = nil
-Glyph_table = nil
-Groff_tmac_path = nil
-Html_head = nil
-Html_page = nil
-Image_file_count = nil
-In_para_p = nil
-Input_line_no = nil
-Inside_table_text_block_p = nil
-It = nil
-Jobname = nil
-Just_after_par_start_p = nil
-Keep_newline_p = nil
-Last_line_had_leading_spaces_p = nil
-Last_modification_time = nil
-Last_page_number = nil
-Leading_spaces_macro = nil
-Leading_spaces_number = nil
-Lines_to_be_justified = nil
-Log_stream = nil
-Macro_args = nil
-Macro_copy_mode_p = nil
-Macro_package = nil
-Macro_spill_over = nil
-Macro_table = nil
-Main_troff_file = nil
-Margin_left = nil
-Missing_pieces = nil
-No_break_control_char = nil
-No_space_mode_p = nil
-Node_table = nil
-Num_of_times_th_called = nil
-Numreg_table = nil
-Out = nil
-Output_streams = nil
-Outputting_to = nil
-Preferred_last_modification_time = nil
-Previous_line_exec_p = nil
-Pso_temp_file = nil
-Reading_quoted_phrase_p = nil
-Reading_string_call_p = nil
-Reading_table_header_p = nil
-Reading_table_p = nil
-Redirected_p = nil
-Request_table = nil
-Rerun_needed_p = nil
-Saved_escape_char = nil
-Scripts = nil
-Single_output_page_p = nil
-Slides_p = nil
-Source_changed_since_last_time_p = nil
-Sourcing_ascii_file_p = nil
-String_table = nil
-Stylesheets = nil
-Superescape_char = nil
-Table_align = nil
-Table_cell_number = nil
-Table_colsep_char = nil
-Table_default_format_line = nil
-Table_format_table = nil
-Table_number_of_columns = nil
-Table_options = nil
-Table_row_number = nil
-Temp_string_count = nil
-This_footnote_is_numbered_p = nil
-Title = nil
-Turn_off_escape_char_p = nil
-Unescaped_glyph_table = nil
-Verbatim_apostrophe_p = nil
-
-Single_pass_p = nil
-Image_format = 'png'
