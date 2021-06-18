@@ -1,4 +1,4 @@
--- last modified 2021-06-17
+-- last modified 2021-06-18
 
 function next_html_image_file_stem()
   Image_file_count = Image_file_count + 1
@@ -43,24 +43,13 @@ function do_img_src(f)
     --local tmpf = Jobname..'-Z-Z.temp'
     local tmpf= 'imagefile.temp'
     os.execute('echo -n data: > ' .. tmpf)
-    os.execute('file -bN --mime-type ' .. f .. ' >> ' .. tmpf)
+    os.execute('echo -n $(file -bN --mime-type ' .. f .. ') >> ' .. tmpf)
     os.execute('echo -n \\;base64, >> ' .. tmpf)
     os.execute('base64 -w0 < ' .. f .. ' >> ' .. tmpf)
-    local fh = io.open(tmpf)
-    local x
-    while true do
-      x = fh:read(256)
-      if x then
-        Out:write(x)
-      else
-        break
-      end
-    end
-    io.close(fh)
+    copy_file_bytes_to_stream(tmpf, Out)
     --ensure_file_deleted(tmpf)
   end
 end
-
 
 function source_image_file(img_file)
   emit_verbatim '<img src="'

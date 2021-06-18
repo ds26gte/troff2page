@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20210617 -- last modified
+Troff2page_version = 20210618 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -234,6 +234,22 @@ function copy_file_to_stream(fi, o)
     end
   end)
 end
+
+function copy_file_bytes_to_stream(fi, o)
+  local blk_size = 256
+  local blk
+  with_open_input_file(fi, function(i)
+    while true do
+      blk = i:read(blk_size)
+      if blk then
+        o:write(blk)
+      else
+        break
+      end
+    end
+  end)
+end
+
 
 function copy_file_to_file(fi, fo)
   --print('doing copy_file_to_file', fi, fo)
@@ -2015,12 +2031,12 @@ end
 
 function emit_img(img_file, align, width, height)
   --print('doing emit_img', img_file, align, width, height)
-  emit_verbatim '<div'
   if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim '<div'
     emit_verbatim 'align='
     emit_verbatim(align)
+    emit_verbatim '>\n'
   end
-  emit_verbatim '>\n'
   emit_verbatim '<img src="'
   do_img_src(img_file)
   emit_verbatim '"\n'
@@ -2030,8 +2046,13 @@ function emit_img(img_file, align, width, height)
   if height and height ~= 0 then
     emit_verbatim ' height="'; emit_verbatim(height); emit_verbatim '"'
   end
+  emit_verbatim ' alt="['
+  emit_verbatim(img_file)
+  emit_verbatim ']"'
   emit_verbatim '>\n'
-  emit_verbatim '</div>\n'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim '</div>\n'
+  end
 end
 
 
@@ -2346,24 +2367,13 @@ function do_img_src(f)
     --local tmpf = Jobname..'-Z-Z.temp'
     local tmpf= 'imagefile.temp'
     os.execute('echo -n data: > ' .. tmpf)
-    os.execute('file -bN --mime-type ' .. f .. ' >> ' .. tmpf)
+    os.execute('echo -n $(file -bN --mime-type ' .. f .. ') >> ' .. tmpf)
     os.execute('echo -n \\;base64, >> ' .. tmpf)
     os.execute('base64 -w0 < ' .. f .. ' >> ' .. tmpf)
-    local fh = io.open(tmpf)
-    local x
-    while true do
-      x = fh:read(256)
-      if x then
-        Out:write(x)
-      else
-        break
-      end
-    end
-    io.close(fh)
+    copy_file_bytes_to_stream(tmpf, Out)
     --ensure_file_deleted(tmpf)
   end
 end
-
 
 function source_image_file(img_file)
   emit_verbatim '<img src="'

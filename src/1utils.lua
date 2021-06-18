@@ -1,4 +1,4 @@
--- last modified 2020-12-04
+-- last modified 2021-06-18
 
 if not table.unpack then
   table.unpack = unpack
@@ -226,6 +226,22 @@ function copy_file_to_stream(fi, o)
     end
   end)
 end
+
+function copy_file_bytes_to_stream(fi, o)
+  local blk_size = 256
+  local blk
+  with_open_input_file(fi, function(i)
+    while true do
+      blk = i:read(blk_size)
+      if blk then
+        o:write(blk)
+      else
+        break
+      end
+    end
+  end)
+end
+
 
 function copy_file_to_file(fi, fo)
   --print('doing copy_file_to_file', fi, fo)

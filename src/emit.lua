@@ -1,4 +1,4 @@
--- last modified 2021-06-17
+-- last modified 2021-06-18
 
 function read_possible_troff2page_specific_escape(s, i)
   --print('rptse of ', i)
@@ -473,12 +473,12 @@ end
 
 function emit_img(img_file, align, width, height)
   --print('doing emit_img', img_file, align, width, height)
-  emit_verbatim '<div'
   if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim '<div'
     emit_verbatim 'align='
     emit_verbatim(align)
+    emit_verbatim '>\n'
   end
-  emit_verbatim '>\n'
   emit_verbatim '<img src="'
   do_img_src(img_file)
   emit_verbatim '"\n'
@@ -488,6 +488,11 @@ function emit_img(img_file, align, width, height)
   if height and height ~= 0 then
     emit_verbatim ' height="'; emit_verbatim(height); emit_verbatim '"'
   end
+  emit_verbatim ' alt="['
+  emit_verbatim(img_file)
+  emit_verbatim ']"'
   emit_verbatim '>\n'
-  emit_verbatim '</div>\n'
+  if raw_counter_value 't2pebook' ==0 then
+    emit_verbatim '</div>\n'
+  end
 end
