@@ -481,9 +481,9 @@ function emit_img(img_file, align, width, height)
   emit_verbatim '>\n'
   emit_verbatim '<img src="'
   do_img_src(img_file)
-  emit_verbatim '"'
+  emit_verbatim '"\n'
   if width and width ~= 0 then
-    emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '" '
+    emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '"'
   end
   if height and height ~= 0 then
     emit_verbatim ' height="'; emit_verbatim(height); emit_verbatim '"'

@@ -1077,13 +1077,6 @@ function initialize_css_file()
     border-width: 1px;
   }
 
-  .navigation {
-    color: #72010f; /* venetian red */
-    text-align: right;
-    font-size: medium;
-    font-style: italic;
-  }
-
   .disable {
     color: gray;
   }
@@ -1109,6 +1102,17 @@ function initialize_css_file()
   }
   ]])
 
+  if raw_counter_value 't2pebook' ~=0 then
+    CSS:write([[
+    body {
+      text-align: left;
+    }
+
+    p.indent {
+    }
+    ]])
+  end
+
   if raw_counter_value 't2pebook' ==0 then
     CSS:write([[
     body {
@@ -1116,6 +1120,13 @@ function initialize_css_file()
       margin-bottom: 2em;
       margin-left: 8%;
       margin-right: 8%;
+    }
+
+    .navigation {
+      color: #72010f; /* venetian red */
+      text-align: right;
+      font-size: medium;
+      font-style: italic;
     }
 
     @media screen {
@@ -2012,9 +2023,9 @@ function emit_img(img_file, align, width, height)
   emit_verbatim '>\n'
   emit_verbatim '<img src="'
   do_img_src(img_file)
-  emit_verbatim '"'
+  emit_verbatim '"\n'
   if width and width ~= 0 then
-    emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '" '
+    emit_verbatim ' width="'; emit_verbatim(width); emit_verbatim '"'
   end
   if height and height ~= 0 then
     emit_verbatim ' height="'; emit_verbatim(height); emit_verbatim '"'
@@ -2357,7 +2368,7 @@ end
 function source_image_file(img_file)
   emit_verbatim '<img src="'
   do_img_src(img_file)
-  emit_verbatim '" border="0" alt="['
+  emit_verbatim '"\nborder="0" alt="['
   emit_verbatim(img_file)
   emit_verbatim ']">'
 end
@@ -3505,6 +3516,7 @@ function initialize_macros()
   end)
 
   defrequest('IMG', function()
+    --print('doing IMG')
     local align = read_word()
     local img_file, width, height
     if align=='-L' or align=='-C' or align=='-R' then
@@ -3522,7 +3534,7 @@ function initialize_macros()
     if width==0 then
       width = point_equivalent_of 'i'
     end
-    emit_img(img_file, align, width)
+    emit_img(img_file, align, math_round(width))
   end)
 
   defrequest('PIMG', Request_table.IMG)

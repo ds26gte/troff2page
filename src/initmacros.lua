@@ -411,6 +411,7 @@ function initialize_macros()
   end)
 
   defrequest('IMG', function()
+    --print('doing IMG')
     local align = read_word()
     local img_file, width, height
     if align=='-L' or align=='-C' or align=='-R' then
@@ -428,7 +429,7 @@ function initialize_macros()
     if width==0 then
       width = point_equivalent_of 'i'
     end
-    emit_img(img_file, align, width)
+    emit_img(img_file, align, math_round(width))
   end)
 
   defrequest('PIMG', Request_table.IMG)

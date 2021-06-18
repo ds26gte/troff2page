@@ -65,7 +65,7 @@ end
 function source_image_file(img_file)
   emit_verbatim '<img src="'
   do_img_src(img_file)
-  emit_verbatim '" border="0" alt="['
+  emit_verbatim '"\nborder="0" alt="['
   emit_verbatim(img_file)
   emit_verbatim ']">'
 end

@@ -147,13 +147,6 @@ function initialize_css_file()
     border-width: 1px;
   }
 
-  .navigation {
-    color: #72010f; /* venetian red */
-    text-align: right;
-    font-size: medium;
-    font-style: italic;
-  }
-
   .disable {
     color: gray;
   }
@@ -179,6 +172,17 @@ function initialize_css_file()
   }
   ]])
 
+  if raw_counter_value 't2pebook' ~=0 then
+    CSS:write([[
+    body {
+      text-align: left;
+    }
+
+    p.indent {
+    }
+    ]])
+  end
+
   if raw_counter_value 't2pebook' ==0 then
     CSS:write([[
     body {
@@ -186,6 +190,13 @@ function initialize_css_file()
       margin-bottom: 2em;
       margin-left: 8%;
       margin-right: 8%;
+    }
+
+    .navigation {
+      color: #72010f; /* venetian red */
+      text-align: right;
+      font-size: medium;
+      font-style: italic;
     }
 
     @media screen {

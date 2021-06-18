@@ -1,4 +1,4 @@
-.\" last modified 2020-12-26
+.\" last modified 2021-06-17
 .SH 1
 1.  Introduction
 .LP
@@ -29,7 +29,7 @@ devoted band of troffglodytes preserving the tradition.
 Troff2page lets you put your troff documents on the Web without
 your having to learn a new system or to maintain separate documents.
 Troff2page can be instructed to also produce an Info version of your
-document that’s suitable for browing on a text terminal (chapter
+document that’s suitable for browsing on a text terminal (chapter
 \*[TAG:gnuinfo]).
 .PP
 .IX PATH, environment variable
