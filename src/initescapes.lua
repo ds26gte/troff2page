@@ -1,4 +1,4 @@
--- last modified 2021-02-10
+-- last modified 2021-11-07
 
 Escape_table = {}
 
@@ -39,17 +39,17 @@ defescape('M', function()
 end)
 
 defescape('*', function()
-  --print('doing star')
+  -- print('doing star')
   local s, args = read_troff_string_and_args()
-  --print('s=', s, 'args=', table_to_string(args))
+  -- print('s=', s, 'args=', table_to_string(args))
   local it
   it = String_table[s]
   if it then --print('s it', it);
-    --print('calling string', s)
+    -- print('calling string', s)
     local x = it(table.unpack(args))
-    --print('x=', x)
+    -- print('x=', x)
     local y= expand_args(x, 'not_copy_mode')
-    --print('y=', y)
+    -- print('y=', y)
     return y
   end
   it = Macro_table[s]
@@ -247,6 +247,10 @@ defescape(')', Escape_table['&'])
 defescape('%', Escape_table['&'])
 
 defescape('p', Escape_table['&'])
+
+defescape('!', Escape_table['&'])
+
+defescape('?', Escape_table['&'])
 
 defescape('e', function()
   return verbatim(Escape_char)

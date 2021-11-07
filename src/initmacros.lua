@@ -1,4 +1,4 @@
--- last modified 2021-06-17
+-- last modified 2021-11-07
 
 function defrequest(w, th)
   if Macro_table[w] then
@@ -261,14 +261,16 @@ function initialize_macros()
   end)
 
   defrequest('di', function()
-    --print('doing di')
+    -- print('doing di')
     local w = read_args()
     if w then
+      -- print('staring diversion', w)
       local o = make_string_output_stream()
       Diversion_table[w] = {stream = o, oldstream = Out, olddiversion = Current_diversion}
       Out = o
       Current_diversion = w
     else
+      -- print('ending divn')
       local curr_div = Diversion_table[Current_diversion]
       if curr_div then
         Out = curr_div.oldstream
@@ -663,19 +665,20 @@ function initialize_macros()
   end)
 
   defrequest('@NH', function()
-    --print('doing @NH')
+    -- print('doing @NH')
     local args = {read_args()}
-    --print('args=', table_to_string(args))
-    local lvl = args[1] or math.max(raw_counter_value 'GROWPS', 1)
-    --print('lvl=', lvl)
+    -- print('args=', table_to_string(args))
+    -- local lvl = args[1] or math.max(raw_counter_value 'GROWPS', 1)
+    local lvl = args[1] or 1
+    -- print('lvl=', lvl)
     if lvl=='S' then
-      --print('doing @NH S')
+      -- print('doing @NH S')
       table.remove(args,1)
       lvl=#args
       local secnum = table.concat(args, '.')
       emit_section_header(lvl, {numbered_p=true, secnum=secnum})
     else
-      --print('doing regular NH')
+      -- print('doing regular NH')
       emit_section_header(tonumber(lvl), {numbered_p=true})
     end
   end)

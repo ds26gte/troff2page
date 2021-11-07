@@ -1,13 +1,13 @@
-# last modified 2021-02-09
+# last modified 2021-11-06
 
-src_files = [!i]*.css *.ms *.tmac
+src_files = *.ms *.tmac
 
 src_dir = /home/ds26gte/src/troff2page/docs
 
 all: index.html
 
 index.html: index.ms $(src_files)
-	troff2page index.ms
+	troff2page.lua index.ms
 
 index.info: index.html
 

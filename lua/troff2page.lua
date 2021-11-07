@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20210618 -- last modified
+Troff2page_version = 20211107 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -2522,17 +2522,17 @@ defescape('M', function()
 end)
 
 defescape('*', function()
-  --print('doing star')
+  -- print('doing star')
   local s, args = read_troff_string_and_args()
-  --print('s=', s, 'args=', table_to_string(args))
+  -- print('s=', s, 'args=', table_to_string(args))
   local it
   it = String_table[s]
   if it then --print('s it', it);
-    --print('calling string', s)
+    -- print('calling string', s)
     local x = it(table.unpack(args))
-    --print('x=', x)
+    -- print('x=', x)
     local y= expand_args(x, 'not_copy_mode')
-    --print('y=', y)
+    -- print('y=', y)
     return y
   end
   it = Macro_table[s]
@@ -2730,6 +2730,10 @@ defescape(')', Escape_table['&'])
 defescape('%', Escape_table['&'])
 
 defescape('p', Escape_table['&'])
+
+defescape('!', Escape_table['&'])
+
+defescape('?', Escape_table['&'])
 
 defescape('e', function()
   return verbatim(Escape_char)
@@ -3376,14 +3380,16 @@ function initialize_macros()
   end)
 
   defrequest('di', function()
-    --print('doing di')
+    -- print('doing di')
     local w = read_args()
     if w then
+      -- print('staring diversion', w)
       local o = make_string_output_stream()
       Diversion_table[w] = {stream = o, oldstream = Out, olddiversion = Current_diversion}
       Out = o
       Current_diversion = w
     else
+      -- print('ending divn')
       local curr_div = Diversion_table[Current_diversion]
       if curr_div then
         Out = curr_div.oldstream
@@ -3778,19 +3784,20 @@ function initialize_macros()
   end)
 
   defrequest('@NH', function()
-    --print('doing @NH')
+    -- print('doing @NH')
     local args = {read_args()}
-    --print('args=', table_to_string(args))
-    local lvl = args[1] or math.max(raw_counter_value 'GROWPS', 1)
-    --print('lvl=', lvl)
+    -- print('args=', table_to_string(args))
+    -- local lvl = args[1] or math.max(raw_counter_value 'GROWPS', 1)
+    local lvl = args[1] or 1
+    -- print('lvl=', lvl)
     if lvl=='S' then
-      --print('doing @NH S')
+      -- print('doing @NH S')
       table.remove(args,1)
       lvl=#args
       local secnum = table.concat(args, '.')
       emit_section_header(lvl, {numbered_p=true, secnum=secnum})
     else
-      --print('doing regular NH')
+      -- print('doing regular NH')
       emit_section_header(tonumber(lvl), {numbered_p=true})
     end
   end)
@@ -5792,7 +5799,7 @@ function get_header(k, opts)
 end
 
 function emit_section_header(level, opts)
-  --print('doing emit_section_header', level)
+  -- print('doing emit_section_header', level)
   level = math.max(1,level)
   opts = opts or {}
   --
@@ -5802,8 +5809,8 @@ function emit_section_header(level, opts)
   local growps = raw_counter_value 'GROWPS'
   --print('emitsectionheader calling eep')
   emit_end_para()
+  get_counter_named 'nh*hl'.value = level
   if opts.numbered_p then
-    get_counter_named 'nh*hl'.value = level
     if not this_section_num then
       increment_section_counter(level)
       this_section_num = section_counter_value()
@@ -5818,9 +5825,9 @@ function emit_section_header(level, opts)
     defstring('SN-STYLE', this_section_num_dot_thunk)
   end
   ignore_spaces()
-  --print('emit_section_header calling get_header')
+  -- print('emit_section_header calling get_header')
   get_header(function(header)
-    --print('get_header arg header=', header)
+    -- print('get_header arg header=', header)
     local hnum = math.max(1, math.min(6, level))
     emit_verbatim '<h'
     emit(hnum)

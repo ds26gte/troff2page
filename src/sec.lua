@@ -1,4 +1,4 @@
--- last modified 2021-06-17
+-- last modified 2021-11-07
 
 function store_title(title, opts)
   --print('doing store_title', title, table_to_string(opts))
@@ -102,7 +102,7 @@ function get_header(k, opts)
 end
 
 function emit_section_header(level, opts)
-  --print('doing emit_section_header', level)
+  -- print('doing emit_section_header', level)
   level = math.max(1,level)
   opts = opts or {}
   --
@@ -112,8 +112,8 @@ function emit_section_header(level, opts)
   local growps = raw_counter_value 'GROWPS'
   --print('emitsectionheader calling eep')
   emit_end_para()
+  get_counter_named 'nh*hl'.value = level
   if opts.numbered_p then
-    get_counter_named 'nh*hl'.value = level
     if not this_section_num then
       increment_section_counter(level)
       this_section_num = section_counter_value()
@@ -128,9 +128,9 @@ function emit_section_header(level, opts)
     defstring('SN-STYLE', this_section_num_dot_thunk)
   end
   ignore_spaces()
-  --print('emit_section_header calling get_header')
+  -- print('emit_section_header calling get_header')
   get_header(function(header)
-    --print('get_header arg header=', header)
+    -- print('get_header arg header=', header)
     local hnum = math.max(1, math.min(6, level))
     emit_verbatim '<h'
     emit(hnum)

@@ -1,4 +1,4 @@
-.\" last modified 2021-06-17
+.\" last modified 2021-11-07
 .SH 1
 9.  Styling
 .LP
@@ -324,10 +324,26 @@ editor with a Unicode font.
 .SH 2
 \\e in a section heading
 .LP
-This and the previous section’s headers both have a verbatim backslash in the
-header.  You could use glyph substitution here too.  However, if
-you aren’t, \fIand\fP you’re using the \fC.ToC\fP macro, the fact that
-the ToC macros use groff diversions creates a hitch.  You can use
-the \fC\\e\fP escape to get a literal backslash, but the
-diversion eats an escape, so you have to double it.  Ergo:
-\fC\\\\e\fP.
+This and the previous section’s headings both have a verbatim
+backslash in the heading. Glyph substitution works fine here.
+.PP
+However, if you use \fC\\e\fP, there is a situation to watch
+out for. If you're using the \fC.ToC\fP macro, \fIand\fP this
+particular heading happens to be eligible to go into the ToC,
+then the escape fails as it goes through a groff diversion.
+.PP
+To remedy this, enclose the problem areas of the heading with a
+pair of \fC\?\fPs. (In fact, you can be conservative and enclose the
+entire heading.) Unfortunately, you should take care to do this
+only for
+headings meant for the ToC. Wrapping \fC\?\fP around a non-ToC heading
+will cause the heading to
+disappear!
+.PP
+While glyph substitution doesn't have this problem, note that
+this is a pervasive problem for all escapes, including
+font-changing escapes, so this trick is good to keep handy.
+.PP
+These problems are groff-specific. Troff2page will cleanly
+process the heading, ToC or no ToC, and whether or not you use
+\fC\?\fP.
