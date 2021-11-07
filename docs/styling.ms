@@ -209,7 +209,7 @@ may be written that expand differently for HTML and print, e.g.,
 .EE
 .PP
 .SH 2
-Typing verbatim \\e in displays
+\?Typing verbatim \e in displays\?
 .LP
 .IX \\@\e, groff escape character
 The display used above brings up another use-case for glyph
@@ -322,21 +322,22 @@ You still have to \fItype\fP the exotic backslash, so you do require a competent
 editor with a Unicode font.
 .PP
 .SH 2
-\\e in a section heading
+\?\e in a section heading\?
 .LP
 This and the previous section’s headings both have a verbatim
 backslash in the heading. Glyph substitution works fine here.
 .PP
-However, if you use \fC\\e\fP, there is a situation to watch
+However, if you use \fC\ee\fP, there is a situation to watch
 out for. If you're using the \fC.ToC\fP macro, \fIand\fP this
 particular heading happens to be eligible to go into the ToC,
 then the escape fails as it goes through a groff diversion.
 .PP
+.IX ?@\e?, groff escape
 To remedy this, enclose the problem areas of the heading with a
-pair of \fC\?\fPs. (In fact, you can be conservative and enclose the
+pair of \fC\e?\fPs. (In fact, you can be conservative and enclose the
 entire heading.) Unfortunately, you should take care to do this
 only for
-headings meant for the ToC. Wrapping \fC\?\fP around a non-ToC heading
+headings meant for the ToC. Wrapping \fC\e?\fP around a non-ToC heading
 will cause the heading to
 disappear!
 .PP
@@ -346,4 +347,4 @@ font-changing escapes, so this trick is good to keep handy.
 .PP
 These problems are groff-specific. Troff2page will cleanly
 process the heading, ToC or no ToC, and whether or not you use
-\fC\?\fP.
+\fC\e?\fP.
