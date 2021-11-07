@@ -1,4 +1,4 @@
-.\" last modified 2021-01-04
+.\" last modified 2021-11-07
 .SH 1
 2. troff, groff, and Troff2page commands
 .LP
@@ -60,11 +60,9 @@ mpca macro files
 .IX pca-toc.tmac, macro file
 .IX pca-verb.tmac, macro file
 .IX pca.tmac, macro file
-Troff2page can process documents that use the \fCms\fP extension macros
-provided in \*[url http://github.com/ds26gte/mpca]mpca\&. For
-convenience, this repo is included as a submodule \fCmpca\fP.
-It includes general-purpose extensions to the \fCms\fP package,
-viz.,
+Troff2page can process documents that use the general-purpose \fCms\fP extension macros
+provided in \*[url http://github.com/ds26gte/mpca]mpca\&. `mpca`
+macro files include:
 \fCpca-bib.tmac\fP for bibliographic citations;
 \fCpca-dc.tmac\fP for drop caps;
 \fCpca-eval.tmac\fP for extending groff using Lua;
@@ -73,12 +71,11 @@ viz.,
 \fCpca-tag.tmac\fP for cross-references;
 \fCpca-toc.tmac\fP for table of contents;
 \fCpca-verb.tmac\fP for verbatim displays.
-These extensions may loaded severally or as the
+These extensions may be loaded severally or as the
 single comprehensive macro file \fCpca.tmac\fP.
 To load them all, use the command-line option \fC-mpca\fP or
 include \fC.mso pca.tmac\fP in your document source.
-Please consult
-this submodule’s documentation for more information.
+Please consult the `mpca` documentation for more information.
 .PP
 .IX GROFF_TMAC_PATH, environment variable
 In order to take advantage of the \fCmpca\fP tmac files, you

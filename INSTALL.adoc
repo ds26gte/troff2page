@@ -11,28 +11,22 @@ Copy the script `troff2page` to a directory in your PATH.
 Copy the file `man/man1/troff2page.1` to the `man1` subdirectory of a
 directory in your `MANPATH`.
 
-troff2page can also use the `*.tmac` files from the `mpca` repo.
-To include `mpca` as a submodule, do
+troff2page can, if it finds them on your system, can make
+effective use of the `*.tmac` files from the `mpca` repo. `mpca`
+is available from https://github.com/ds26gte/mpca. Getting `mpca` is
+optional: You can still use troff2page fruitfully even
+if you have no need for the `mpca` features.
 
-  git submodule init
-  git submodule update
+The troff2page documentation (in the `docs` subdirectory) does
+rely on `mpca`. However, the `Makefile` in the `docs` directory
+will get the needed macro files for one-off use if it doesn't
+find them on your system.
 
-This will create an `mpca` subdirectory. Either include this
-directory or a copy of it in your `GROFF_TMAC_PATH`; or add the
-`pca*.tmac` files in it to some directory already in your
-`GROFF_TMAC_PATH`. In a pinch, if you don’t want to mess with
-`GROFF_TMAC_PATH` just yet, you may simply copy these `*.tmac`
-files to your home directory.
-
-NOTE: `mpca` is available on its own from
-      https://github.com/ds26gte/mpca.
-
-These `*.tmac` files from `mpca`, while generally useful, are
-specifically needed to typeset the troff2page documentation,
-which is provided in `docs/index.ms`. If you don’t need these
-macros for anything other than processing `index.ms`, you may
-make do by copying these files to the directory containing
-`index.ms`.
+NOTE: If you do decide to download `mpca`, include its `tmac` subdirectory in
+your `GROFF_TMAC_PATH`; or add the `pca*.tmac` files in it to
+some directory already in your `GROFF_TMAC_PATH`. In a pinch, if
+you don't want to mess with `GROFF_TMAC_PATH`, you may simply
+copy these `*.tmac` files to your home directory.
 
 == Man page
 
