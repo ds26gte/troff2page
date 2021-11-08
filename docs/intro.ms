@@ -1,4 +1,4 @@
-.\" last modified 2021-06-17
+.\" last modified 2021-11-08
 .SH 1
 1.  Introduction
 .LP
@@ -170,15 +170,17 @@ Autoloaded init files
 .LP
 .TAG troff2pagerc
 .IX init files for Troff2page
-.IX troff2pagerc@.troff2pagerc, user macro file
+.IX troff2pagerc.tmac@.troff2pagerc.tmac, user macro file
+.IX TROFF2PAGERC, environment variable
 \fCtroff2page\fP can read directives in some autoloaded files
 without the need to explicitly use a command-line option.  These
 are useful to specify information that is relevant only for the HTML
 output, and they’re loaded before the input document is
 processed.
 .PP
-i.  The first such file is named
-\fC.troff2pagerc\fP: Troff2page looks for it in your macro
+i.  The first such file is the one named by the environment
+variable \fCTROFF2PAGERC\fP, or if that isn't set,
+\fC.troff2pagerc.tmac\fP: Troff2page looks for it in your macro
 directories: \fCGROFF_TMAC_PATH\fP, working directory, home — in
 that order.\**
 .FS
@@ -194,29 +196,30 @@ If your changes will be used in all your documents, place it in
 your home or a private (not a system!) \fCGROFF_TMAC_PATH\fP directory.
 .PP
 That your home directory is the last place Troff2page looks in
-for \fC.troff2pagerc\fP has a nice benefit: Use
-\fC~/.troff2pagerc\fP for standard boilerplate customization that
+for \fC.troff2pagerc.tmac\fP has a nice benefit: Use
+\fC~/.troff2pagerc.tmac\fP for standard boilerplate customization that
 you want unthinkingly autoloaded for \fImost\fP of your
 documents, but easily disable it for the documents that need
 special TLC by simply placing an empty or different
-\fC.troff2pagerc\fP in the working directory.
+\fC.troff2pagerc.tmac\fP in the working directory.
 .PP
 A
 more system-level \fCGROFF_TMAC_PATH\fP placement is typically
 unadvised for such an ad hoc file.
 .PP
-\fCtroff2page\fP loads only the first \fC.troff2pagerc\fP it
+\fCtroff2page\fP loads only the first \fC.troff2pagerc.tmac\fP it
 finds.
 .PP
 .IX t2p@.t2p, user macro file
 ii.  Next, \fCtroff2page\fP will also pick up a file
 \fCjobname.t2p\fP, where \fCjobname\fP is the basename of the input document.
 This is useful for directives that are specific to this document.
-\fCjobname.t2p\fP, unlike \fC.troff2pagerc\fP, is looked for only in the
+\fCjobname.t2p\fP, unlike \fC.troff2pagerc.tmac\fP, is looked for only in the
 working directory, and not more generally in
 \fCGROFF_TMAC_PATH\fP.
 .PP
-(Note that groff itself will \fInot\fP load either \fC.troff2pagerc\fP or
+(Note that groff itself will \fInot\fP load either
+\fC.troff2pagerc.tmac\fP or
 \fCjobname.t2p\fP automatically.  But that is presumably OK, since
 these two files typically contain information that’s relevant
 for HTML only.)
@@ -225,14 +228,15 @@ for HTML only.)
 iii.  Finally, If the input file is recognizably a man page (i.e., it has the
 command \fC.TH\fP), both Troff2page and groff will load, if it
 exists, the init file \fCman.local\fP.  This init file, like
-\fC.troff2pagerc\fP, is searched for in the
+\fC.troff2pagerc.tmac\fP, is searched for in the
 \fCGROFF_TMAC_PATH\fP, working directory, and home, in that
 order.
 .PP
 None of the autoloaded file disables the loading of
 the others.  However, because of the order in which they’re
 loaded, settings in \fCman.local\fP can override or shadow
-\fCjobname.t2p\fP, which in its turn shadows \fC.troff2pagerc\fP.
+\fCjobname.t2p\fP, which in its turn shadows
+\fC.troff2pagerc.tmac\fP.
 .PP
 .SH 2
 Calling Troff2page from within Lua

@@ -1,4 +1,4 @@
-.\" last modified 2021-06-17
+.\" last modified 2021-11-08
 .SH 1
 11.  GNU Info docs
 .LP
@@ -16,10 +16,10 @@ If the basename of the input groff document is \fCjobname\fP, the
 Info file is created in \fCjobname.info\fP, which may be
 displayed on any Info viewer.
 .PP
-.IX troff2pagerc@.troff2pagerc, user macro file
+.IX troff2pagerc.tmac@.troff2pagerc.tmac, user macro file
 .IX t2p@.t2p, user macro file
 A good place to set \fC.troff2page2info\fP without modifying the input groff
-document is in \fC.troff2pagerc\fP or \fCjobname.t2p\fP,
+document is in \fC.troff2pagerc.tmac\fP or \fCjobname.t2p\fP,
 described on page \*[TAG:troff2pagerc].
 .PP
 .IX TROFF2PAGE2INFO, environment variable

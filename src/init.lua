@@ -1,4 +1,4 @@
--- last modified 2021-06-17
+-- last modified 2021-11-08
 
 function write_aux(...)
   Aux_stream:write(...)
@@ -43,7 +43,7 @@ function begin_html_document()
   initialize_css_file()
 
   do
-    local it = find_macro_file('.troff2pagerc')
+    local it = find_macro_file(os.getenv 'TROFF2PAGERC' or '.troff2pagerc.tmac')
     if it then troff2page_file(it) end
     it = Jobname .. '.t2p'
     if probe_file(it) then troff2page_file(it) end

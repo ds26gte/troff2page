@@ -1,7 +1,0 @@
-.ig
-Last modified 2020-11-19.
-
-This file is here only to prevent $HOME/.troff2pagerc, if it
-exists, from being autoloaded. We have all the macros and css we
-need right here.
-..
