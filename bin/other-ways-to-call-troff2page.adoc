@@ -1,0 +1,43 @@
+= Other ways to call Troff2page
+
+You can use the built-in Lua of either Neovim or LuaTeX to run
+Troff2page.
+
+== Neovim
+
+Place `troff2page.vim` in a `plugin/` subdirectory on your
+`'runtimepath'`.
+
+Place `troff2page.lua` in a `lua/` subdirectory on your
+`'runtimepath'`.
+
+Script `neovim-troff2page` (rename to `troff2page` if desired) then
+calls Troff2page using Neovim's Lua. The argument syntax is
+exactly the same as for `troff2page.lua` as described in the
+manual.
+
+You can also use the Neovim command `:Troff2page` at the Neovim
+command line. It takes the same arguments as the shell script,
+and `%` stands for the file in the current editor window. In
+addition, calling it with no args converts the file in the
+current editor window.
+
+== LuaTeX
+
+Place `troff2page.lua` in a directory in your `TEXINPUTS`.
+
+Script `luatex-troff2page` (rename to `troff2page` if desired) then
+calls troff2page using LuaTeX's Lua. The argument syntax is
+exactly the same as for `troff2page.lua` as described in the
+manual.
+
+It can also be loaded into LuaTeX by
+
+  \directlua{troff2page = require 'troff2page.lua'}
+
+This defines a Lua function `troff2page.troff2page` than can be
+called on troff documents with options as needed, e.g.,
+
+  \directlua{
+    troff2page.troff2page('-mpca -t doc.ms')
+  }

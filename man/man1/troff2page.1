@@ -1,4 +1,4 @@
-.TH TROFF2PAGE 1 "2021-11-07" \" last modified
+.TH TROFF2PAGE 1 "2021-11-09" \" last modified
 .SH NAME
 .LP
 troff2page \- makes Web pages from troff documents
@@ -108,35 +108,6 @@ The \fImpca\fP package (https://github.com/ds26gte/mpca) contains
 many useful macro files that can be used by both troff2page and
 groff, giving compatible results.
 Please see the troff2page manual for further details.
-.PP
-.SH NEOVIM
-.LP
-If the files \fIlua/troff2page.lua\fP and \fIplugin/troff2page.vim\fP are
-installed in your Neovim path, you can use the command \fI:Troff2page\fP to
-convert files directly from Neovim.
-.PP
-The \fI:Troff2page\fP accepts the same style of arguments as the \fItroff2page\fP
-script. In addition, if called with no arguments, \fI:Troff2page\fP will convert the
-file in the current window.
-.PP
-.SH LuaTeX
-.LP
-If the file \fIlua/troff2page\fP is in installed in your
-\fITEXINPUTS\fP path, it can be loaded into LuaTeX by
-.PP
-.EX
-    \edirectlua{troff2page = require 'troff2page'}
-.EE
-.PP
-This defines the Lua function \fItroff2page.troff2page\fP which
-can be called on troff documents with options as needed, e.g.,
-.PP
-.EX
-    \edirectlua{
-      troff2page.troff2page('-mpca -t doc.ms')
-    }
-.EE
-.PP
 .PP
 .SH INFO DOCS
 .LP

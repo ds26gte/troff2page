@@ -1,10 +1,11 @@
-# last modified 2019-09-30
+# last modified 2021-11-09
 # Dorai Sitaram
 
 # Use this if you have Neovim but not standalone Lua.
 
-# Assumes lua/troff2page.lua and plugin/troff2page.vim
-# have been installed in the appropriate Neovim directories.
+# Assumes troff2page.lua and troff2page.vim
+# are in the lua/ and plugin/ subdirectories respectively
+# of a directory in 'runtimepath'.
 
 if test $# -eq 0; then
   echo troff2page needs at least one argument; exit

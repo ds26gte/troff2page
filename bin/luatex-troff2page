@@ -1,9 +1,9 @@
-# last modified 2020-11-16
+# last modified 2021-11-09
 # Dorai Sitaram
 
 # Use this if you have LuaTeX but not standalone Lua.
 
-# Assumes lua/troff2page.lua has been copied to a
+# Assumes troff2page.lua has been copied to a
 # directory in your TEXINPUTS.
 
 if test $# -eq 0; then

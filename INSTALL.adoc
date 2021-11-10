@@ -6,7 +6,8 @@ Get the troff2page distribution from GitHub:
 
 This creates a directory `troff2page`.  `cd` to it.
 
-Copy the script `troff2page` to a directory in your PATH.
+Copy the script `bin/troff2page.lua` (`bin/troff2page` is a soft
+link) to a directory in your PATH.
 
 Copy the file `man/man1/troff2page.1` to the `man1` subdirectory of a
 directory in your `MANPATH`.
@@ -42,7 +43,7 @@ to get started with using troff2page.
 LuaTeX 1.12.0.
 
 NOTE: The branch `lisp` in the troff2page git repository contains
-      an implementation in Common Lisp.
+      an older implementation in Common Lisp.
 
 == Documentation
 
