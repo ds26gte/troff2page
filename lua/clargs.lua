@@ -1,4 +1,4 @@
--- last modified 2021-06-17
+-- last modified 2021-11-12
 
 function load_man_defs()
   local f = find_macro_file('pca-t2p-man.tmac')
@@ -31,8 +31,9 @@ function set_register(regset, type)
     lhs, rhs = string.match(regset, '^([^=])(.+)')
   end
   --print('lhs=', lhs, 'rhs=', rhs)
-  if not lhs then tlog('expression expected\n') end
-  if type=='string' then
+  if not lhs then
+    tlog('expression expected\n')
+  elseif type=='string' then
     --print('calling defstring', lhs, rhs)
     defstring(lhs, function() return verbatim(rhs) end)
   elseif type=='number' then
@@ -221,6 +222,7 @@ function troff2page_1pass(argc, argv)
     end -- while
     if not document_found_p and not call_for_help_p then
       --tlog('troff2page called with no document files.\n')
+      begin_html_document()
       troff2page_stream(io.stdin)
     end
     do_bye()
