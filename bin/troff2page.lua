@@ -1,6 +1,6 @@
 #! /usr/bin/env lua
 
-Troff2page_version = 20230104 -- last modified
+Troff2page_version = 20230105 -- last modified
 Troff2page_website = 'http://ds26gte.github.io/troff2page'
 
 Troff2page_copyright_notice =
@@ -1841,14 +1841,13 @@ function emit_html_preamble()
   emit_verbatim '-->\n'
   emit_verbatim '<head>\n'
   emit_verbatim '<meta charset="utf-8">\n'
+  emit_verbatim '<meta name="generator" content="troff2page '
+  emit_verbatim(Troff2page_version)
+  emit_verbatim '">\n'
   emit_verbatim '<meta name="viewport" content="width=device-width">\n'
   emit_external_title()
   link_stylesheets()
   link_scripts()
-  emit_verbatim '<meta name="generator" content="troff2page '
-  emit_verbatim(Troff2page_version)
-  emit_verbatim '">\n'
-  emit_verbatim '<meta name="robots" content="index,follow">\n'
   for _,h in pairs(Html_head) do emit_verbatim(h) end
   --initialize_css_file()
   emit_verbatim '</head>\n'
